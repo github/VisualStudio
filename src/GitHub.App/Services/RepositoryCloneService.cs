@@ -121,7 +121,20 @@ namespace GitHub.Services
             try
             {
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
+
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
+
+                var repositoryUrl = new UriString(cloneUrl).ToRepositoryUrl();
+                var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    // If it isn't a GitHub URL, assume it's an Enterprise URL
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
             }
             catch (Exception ex)
             {
