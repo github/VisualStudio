@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="112" approved="yes">
         <source>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</source>
-        <target xml:lang="zh-CN" state="translated">这是一个将GitHub工作流引入Visual Studio的扩展。</target>
+        <target xml:lang="zh-CN">这是一个将GitHub工作流引入Visual Studio的扩展。</target>
         <note/>
       </trans-unit>
     </body>
