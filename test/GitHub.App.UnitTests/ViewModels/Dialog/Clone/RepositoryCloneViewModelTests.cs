@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
@@ -9,6 +10,7 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.Dialog.Clone;
+using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
 using Rothko;
@@ -187,6 +189,63 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
+        public async Task PathWarning_Is_Set_For_Existing_Clone_At_Destination()
+        {
+            var owner = "owner";
+            var repo = "repo";
+            var remoteUrl = CreateGitHubUrl("owner", "repo");
+            var gitService = CreateGitService(true, remoteUrl);
+            var target = CreateTarget(gitService: gitService);
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
+            target.Path = directoryExists;
+
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.YouHaveAlreadyClonedToThisLocation));
+        }
+
+        [Test]
+        public async Task PathWarning_Is_Set_For_Repository_With_No_Origin()
+        {
+            var owner = "owner";
+            var repo = "repo";
+            var gitService = CreateGitService(true, null);
+            var target = CreateTarget(gitService: gitService);
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
+            target.Path = directoryExists;
+
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.LocalRepositoryDoesntHaveARemoteOrigin));
+        }
+
+        [Test]
+        public async Task PathWarning_Is_Set_For_Directory_With_No_Repository()
+        {
+            var owner = "owner";
+            var repo = "repo";
+            var gitService = CreateGitService(false, null);
+            var target = CreateTarget(gitService: gitService);
+            SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
+            target.Path = directoryExists;
+
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.CantFindARepositoryAtLocalPath));
+        }
+
+        [Test]
+        public async Task PathWarning_Is_Set_For_Existing_Repository_At_Destination_With_Different_Remote()
+        {
+            var originalOwner = "original_Owner";
+            var forkedOwner = "forked_owner";
+            var repo = "repo";
+            var forkedUrl = CreateGitHubUrl(forkedOwner, repo);
+            var expectMessage = string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, forkedUrl);
+            var gitService = CreateGitService(true, CreateGitHubUrl(forkedOwner, repo));
+            var target = CreateTarget(gitService: gitService);
+            SetRepository(target.GitHubTab, CreateRepositoryModel(originalOwner, repo));
+
+            target.Path = directoryExists;
+
+            Assert.That(target.PathWarning, Is.EqualTo(expectMessage));
+        }
+
+        [Test]
         public async Task Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
         {
             var target = CreateTarget();
@@ -352,7 +411,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
-            gitService = gitService ?? Substitute.For<IGitService>();
+            gitService = gitService ?? CreateGitService(true, "https://github.com/owner/repo");
             urlTab = urlTab ?? CreateRepositoryUrlViewModel();
 
             return new RepositoryCloneViewModel(
@@ -365,6 +424,21 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 gitHubTab,
                 enterpriseTab,
                 urlTab);
+        }
+
+        private static IGitService CreateGitService(bool repositoryExists, UriString remoteUrl)
+        {
+            var gitService = Substitute.For<IGitService>();
+
+            IRepository repository = null;
+            if (repositoryExists)
+            {
+                repository = Substitute.For<IRepository>();
+                gitService.GetRemoteUri(repository).Returns(remoteUrl);
+            }
+
+            gitService.GetRepository(directoryExists).Returns(repository);
+            return gitService;
         }
 
         static IUsageService CreateUsageService(bool isGroupA = false)
@@ -389,7 +463,13 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             var repository = Substitute.For<IRepositoryModel>();
             repository.Owner.Returns(owner);
             repository.Name.Returns(name);
+            repository.CloneUrl.Returns(CreateGitHubUrl(owner, name));
             return repository;
+        }
+
+        static UriString CreateGitHubUrl(string owner, string repo)
+        {
+            return new UriString($"https://github.com/{owner}/{repo}");
         }
 
         static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
