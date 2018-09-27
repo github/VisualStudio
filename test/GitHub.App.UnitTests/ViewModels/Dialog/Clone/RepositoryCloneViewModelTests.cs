@@ -1,9 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Numerics;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -18,7 +17,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 {
     public class RepositoryCloneViewModelTests
     {
-        const string directoryExists = "d:\\exists";
+        const string directoryExists = "d:\\exists\\directory";
+        const string fileExists = "d:\\exists\\file";
         const string defaultPath = "d:\\default\\path";
 
         [Test]
@@ -167,7 +167,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathError_Is_Not_Set_When_No_Repository_Selected()
+        public async Task PathWarning_Is_Not_Set_When_No_Repository_Selected()
         {
             var target = CreateTarget();
 
@@ -177,11 +177,11 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathError_Is_Set_For_Existing_File_At_Destination()
+        public async Task PathWarning_Is_Set_For_Existing_File_At_Destination()
         {
             var target = CreateTarget();
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
-            target.Path = directoryExists;
+            target.Path = fileExists;
 
             Assert.That(target.PathWarning, Is.EqualTo(Resources.DestinationAlreadyExists));
         }
@@ -256,7 +256,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Clone_Is_Disabled_When_Has_PathError()
+        public async Task Clone_Is_Disabled_When_Path_DirectoryExists()
         {
             var target = CreateTarget();
 
@@ -268,6 +268,20 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             target.Path = directoryExists;
 
             Assert.That(target.Clone.CanExecute(null), Is.False);
+        }
+
+        [Test]
+        public async Task Open_Is_Enabled_When_Path_DirectoryExists()
+        {
+            var target = CreateTarget();
+
+            await target.InitializeAsync(null);
+            Assert.That(target.Open.CanExecute(null), Is.False);
+            SetRepository(target.GitHubTab, CreateRepositoryModel());
+
+            target.Path = directoryExists;
+
+            Assert.That(target.Open.CanExecute(null), Is.True);
         }
 
         static void SetRepository(IRepositoryCloneTabViewModel vm, IRepositoryModel repository)
@@ -312,8 +326,10 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         {
             var result = Substitute.For<IRepositoryCloneService>();
             result.DefaultClonePath.Returns(defaultClonePath);
-            result.DestinationDirectoryExists(directoryExists).Returns(false);
-            result.DestinationFileExists(directoryExists).Returns(true);
+            result.DestinationDirectoryExists(directoryExists).Returns(true);
+            result.DestinationFileExists(directoryExists).Returns(false);
+            result.DestinationDirectoryExists(fileExists).Returns(false);
+            result.DestinationFileExists(fileExists).Returns(true);
             return result;
         }
 
