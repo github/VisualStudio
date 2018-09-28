@@ -123,6 +123,9 @@
   <data name="CloneTitle" xml:space="preserve">
     <value>Clone a Repository</value>
   </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Open from GitHub</value>
+  </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>Could not connect to github.com</value>
   </data>
@@ -328,7 +331,7 @@ https://git-scm.com/download/win</value>
     <value>Cancel Review</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>The destination already exists.</value>
+    <value>A file exists at the destination path.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
     <value>Logout Required</value>
@@ -820,5 +823,17 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
+  </data>
+  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>A repository already exists at this location, but it has a remote of {0}.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
 </root>

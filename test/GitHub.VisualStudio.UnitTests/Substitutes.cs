@@ -31,7 +31,7 @@ namespace UnitTests
         }
 
 
-       // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
+        // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
         public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
 
         public static IVSGitServices IVSGitServices
@@ -72,7 +72,7 @@ namespace UnitTests
         /// RepositoryCloneService and RepositoryCreationService, which are real
         /// instances.
         /// </summary>
-        public static IGitHubServiceProvider ServiceProvider { get { return GetServiceProvider();  } }
+        public static IGitHubServiceProvider ServiceProvider { get { return GetServiceProvider(); } }
 
         /// <summary>
         /// This returns a service provider with mocked IRepositoryCreationService and
@@ -111,7 +111,8 @@ namespace UnitTests
 
             var os = OperatingSystem;
             var vsgit = IVSGitServices;
-            var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<IGraphQLClientFactory>(), Substitute.For<IUsageTracker>());
+            var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<ITeamExplorerServices>(),
+                Substitute.For<IGraphQLClientFactory>(), Substitute.For<IUsageTracker>());
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);

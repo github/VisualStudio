@@ -250,6 +250,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is already a directory at this location, but it doesn&apos;t contain a repository..
+        /// </summary>
+        public static string CantFindARepositoryAtLocalPath {
+            get {
+                return ResourceManager.GetString("CantFindARepositoryAtLocalPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changes ({0}).
         /// </summary>
         public static string ChangesCountFormat {
@@ -505,7 +514,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The destination already exists..
+        ///   Looks up a localized string similar to A file exists at the destination path..
         /// </summary>
         public static string DestinationAlreadyExists {
             get {
@@ -874,6 +883,24 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A repository already exists at this location, but it doesn&apos;t have a remote named &quot;origin&quot;..
+        /// </summary>
+        public static string LocalRepositoryDoesntHaveARemoteOrigin {
+            get {
+                return ResourceManager.GetString("LocalRepositoryDoesntHaveARemoteOrigin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A repository already exists at this location, but it has a remote of {0}..
+        /// </summary>
+        public static string LocalRepositoryHasARemoteOf {
+            get {
+                return ResourceManager.GetString("LocalRepositoryHasARemoteOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make sure to use your password and not a Personal Access token to sign in..
         /// </summary>
         public static string LoginFailedForbiddenMessage {
@@ -1185,6 +1212,15 @@ namespace GitHub {
         public static string OpenFileInSolution {
             get {
                 return ResourceManager.GetString("OpenFileInSolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open from GitHub.
+        /// </summary>
+        public static string OpenFromGitHubTitle {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubTitle", resourceCulture);
             }
         }
         
@@ -2141,6 +2177,15 @@ namespace GitHub {
         public static string years {
             get {
                 return ResourceManager.GetString("years", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have already cloned to this location. Click &apos;Open&apos; to open the local repository..
+        /// </summary>
+        public static string YouHaveAlreadyClonedToThisLocation {
+            get {
+                return ResourceManager.GetString("YouHaveAlreadyClonedToThisLocation", resourceCulture);
             }
         }
         

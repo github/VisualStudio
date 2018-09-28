@@ -70,11 +70,12 @@ namespace GitHub.StartPage
             if (request == null)
                 return null;
 
-            var uri = request.Repository.CloneUrl.ToRepositoryUrl();
+            var uri = request.Url.ToRepositoryUrl();
+            var repositoryName = request.Url.RepositoryName;
             return new CodeContainer(
                 localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
-                                new CodeContainerSourceControlProperties(request.Repository.Name, request.Path, new Guid(Guids.GitSccProviderId))),
-                remote: new RemoteCodeContainer(request.Repository.Name,
+                                new CodeContainerSourceControlProperties(repositoryName, request.Path, new Guid(Guids.GitSccProviderId))),
+                remote: new RemoteCodeContainer(repositoryName,
                                                 new Guid(Guids.CodeContainerProviderId),
                                                 uri,
                                                 new Uri(uri.ToString().TrimSuffix(".git")),
@@ -133,7 +134,7 @@ namespace GitHub.StartPage
                 if (basePath != null)
                 {
                     var path = Path.Combine(basePath, repository.Name);
-                    result = new CloneDialogResult(path, repository);
+                    result = new CloneDialogResult(path, repository.CloneUrl);
                 }
             }
 
@@ -141,17 +142,13 @@ namespace GitHub.StartPage
             {
                 try
                 {
-                    await cloneService.CloneRepository(
-                        result.Repository.CloneUrl,
-                        result.Path,
-                        progress);
-
+                    await cloneService.CloneOrOpenRepository(result, progress);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
                 }
                 catch
                 {
                     var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError($"Failed to clone the repository '{result.Repository.Name}'");
+                    teServices.ShowError($"Failed to clone the repository '{result.Url.RepositoryName}'");
                     result = null;
                 }
             }

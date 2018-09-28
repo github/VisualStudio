@@ -362,11 +362,9 @@
     </CommandPlacement>
 
     <!-- Open from GitHub command -->
-    <!-- Removing from `File > Open` menu until we have a proper UI
     <CommandPlacement guid="guidGitHubCmdSet" id="openFromUrlCommand" priority="0x0100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_FILE_OPENSCC_CASCADE"/>
     </CommandPlacement>
-    -->
 
     <!-- Add Connection (Team Explorer) command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">
