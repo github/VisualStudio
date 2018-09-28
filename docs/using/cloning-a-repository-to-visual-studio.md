@@ -17,10 +17,10 @@ Next to the account you want to clone from, click **Clone**.
 
 ### From the **Start Page**
 
-Using Visual Studio 2017, click the GitHub button on the Start Page to open the clone dialog. 
+Using Visual Studio 2017, click the `GitHub` button on the `Start Page` to open the clone dialog. 
 
 
-### From the menu
+### From the **File** menu
 
 Go to `File > Open > Open From GitHub...`
 
