@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -23,12 +23,13 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IOperatingSystem os;
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
+        readonly IGitService gitService;
         readonly IUsageService usageService;
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         IRepositoryModel previousRepository;
-        ObservableAsPropertyHelper<string> pathError;
+        ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
 
         [ImportingConstructor]
@@ -36,6 +37,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IOperatingSystem os,
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
+            IGitService gitService,
             IUsageService usageService,
             IUsageTracker usageTracker,
             IRepositorySelectViewModel gitHubTab,
@@ -45,6 +47,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.os = os;
             this.connectionManager = connectionManager;
             this.service = service;
+            this.gitService = gitService;
             this.usageService = usageService;
             this.usageTracker = usageTracker;
 
@@ -59,22 +62,27 @@ namespace GitHub.ViewModels.Dialog.Clone
             Path = service.DefaultClonePath;
             repository.Subscribe(x => UpdatePath(x));
 
-            pathError = Observable.CombineLatest(
+            pathWarning = Observable.CombineLatest(
                 repository,
                 this.WhenAnyValue(x => x.Path),
-                ValidatePath)
-                .ToProperty(this, x => x.PathError);
+                ValidatePathWarning)
+                .ToProperty(this, x => x.PathWarning);
 
             var canClone = Observable.CombineLatest(
-                repository,
-                this.WhenAnyValue(x => x.PathError),
-                (repo, error) => (repo, error))
-                .Select(x => x.repo != null && x.error == null);
+                repository, this.WhenAnyValue(x => x.Path),
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && !service.DestinationDirectoryExists(path));
+
+            var canOpen = Observable.CombineLatest(
+                repository, this.WhenAnyValue(x => x.Path),
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
 
             Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
             Clone = ReactiveCommand.CreateAsyncObservable(
                 canClone,
-                _ => repository.Select(x => new CloneDialogResult(Path, x)));
+                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
+            Open = ReactiveCommand.CreateAsyncObservable(
+                canOpen,
+                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
@@ -87,7 +95,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref path, value);
         }
 
-        public string PathError => pathError.Value;
+        public string PathWarning => pathWarning.Value;
 
         public int SelectedTabIndex
         {
@@ -95,13 +103,15 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedTabIndex, value);
         }
 
-        public string Title => Resources.CloneTitle;
+        public string Title => Resources.OpenFromGitHubTitle;
 
-        public IObservable<object> Done => Clone;
+        public IObservable<object> Done => Observable.Merge(Clone, Open);
 
         public ReactiveCommand<object> Browse { get; }
 
         public ReactiveCommand<CloneDialogResult> Clone { get; }
+
+        public ReactiveCommand<CloneDialogResult> Open { get; }
 
         public async Task InitializeAsync(IConnection connection)
         {
@@ -228,13 +238,39 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        string ValidatePath(IRepositoryModel repository, string path)
+        string ValidatePathWarning(IRepositoryModel repositoryModel, string path)
         {
-            if (repository != null)
+            if (repositoryModel != null)
             {
-                return service.DestinationExists(path) ?
-                    Resources.DestinationAlreadyExists :
-                    null;
+                if (service.DestinationFileExists(path))
+                {
+                    return Resources.DestinationAlreadyExists;
+                }
+
+                if (service.DestinationDirectoryExists(path))
+                {
+                    using (var repository = gitService.GetRepository(path))
+                    {
+                        if (repository == null)
+                        {
+                            return Resources.CantFindARepositoryAtLocalPath;
+                        }
+
+                        var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
+                        if (localUrl == null)
+                        {
+                            return Resources.LocalRepositoryDoesntHaveARemoteOrigin;
+                        }
+
+                        var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
+                        if (localUrl != targetUrl)
+                        {
+                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
+                        }
+
+                        return Resources.YouHaveAlreadyClonedToThisLocation;
+                    }
+                }
             }
 
             return null;

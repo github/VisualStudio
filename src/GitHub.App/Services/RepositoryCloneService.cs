@@ -34,6 +34,7 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
@@ -42,11 +43,13 @@ namespace GitHub.Services
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
             IVSGitServices vsGitServices,
+            ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
             IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
 
@@ -104,6 +107,54 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
+        public async Task CloneOrOpenRepository(
+            CloneDialogResult cloneDialogResult,
+            object progress = null)
+        {
+            Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
+
+            var repositoryPath = cloneDialogResult.Path;
+            var url = cloneDialogResult.Url;
+
+            if (DestinationFileExists(repositoryPath))
+            {
+                throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
+            }
+
+            var repositoryUrl = url.ToRepositoryUrl();
+            var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
+            if (DestinationDirectoryExists(repositoryPath))
+            {
+                teamExplorerServices.OpenRepository(repositoryPath);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens);
+                }
+            }
+            else
+            {
+                var cloneUrl = repositoryUrl.ToString();
+                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
+            }
+
+            teamExplorerServices.ShowHomePage();
+        }
+
+        /// <inheritdoc/>
         public async Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
@@ -121,19 +172,12 @@ namespace GitHub.Services
             try
             {
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
-
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
-                var repositoryUrl = new UriString(cloneUrl).ToRepositoryUrl();
-                var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-                if (isDotCom)
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
-                }
-                else
-                {
-                    // If it isn't a GitHub URL, assume it's an Enterprise URL
-                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                    // Count the number of times users clone into the Default Repository Location
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
                 }
             }
             catch (Exception ex)
@@ -144,7 +188,10 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public bool DestinationExists(string path) => Directory.Exists(path) || File.Exists(path);
+        public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
