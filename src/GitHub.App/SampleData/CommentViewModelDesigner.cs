@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Reactive;
 using System.Diagnostics.CodeAnalysis;
-using GitHub.InlineReviews.ViewModels;
-using ReactiveUI;
+using System.Reactive;
 using GitHub.ViewModels;
+using ReactiveUI;
 
-namespace GitHub.InlineReviews.SampleData
+namespace GitHub.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    class CommentViewModelDesigner : ReactiveObject, ICommentViewModel
+    public class CommentViewModelDesigner : ReactiveObject, ICommentViewModel
     {
         public CommentViewModelDesigner()
         {

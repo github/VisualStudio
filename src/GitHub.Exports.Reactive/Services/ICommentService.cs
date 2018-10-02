@@ -1,4 +1,4 @@
-﻿namespace GitHub.InlineReviews.Services
+﻿namespace GitHub.Services
 {
     /// <summary>
     /// This service allows for functionality to be injected into the chain of different peek Comment ViewModel types.

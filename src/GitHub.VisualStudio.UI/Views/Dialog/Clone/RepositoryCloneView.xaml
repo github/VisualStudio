@@ -5,6 +5,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
+             xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
@@ -53,9 +54,9 @@
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
 
-        <ghfvs:InfoPanel Message="{Binding PathWarning}"
-                         DockPanel.Dock="Bottom"
-                         Margin="0"/>
+        <uic:InfoPanel Message="{Binding PathWarning}"
+                       DockPanel.Dock="Bottom"
+                       Margin="0"/>
 
         <TabControl SelectedIndex="{Binding SelectedTabIndex}"
                     Style="{StaticResource LightModalViewTabControl}">

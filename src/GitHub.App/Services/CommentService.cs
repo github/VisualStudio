@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace GitHub.InlineReviews.Services
+namespace GitHub.Services
 {
     [Export(typeof(ICommentService))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

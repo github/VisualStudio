@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using GitHub.VisualStudio.UI.Helpers;
 
-namespace GitHub.InlineReviews.Views
+namespace GitHub.VisualStudio.Views
 {
     public partial class CommentThreadView : UserControl
     {

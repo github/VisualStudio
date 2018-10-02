@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Reactive;
-using GitHub.Models;
-using GitHub.ViewModels;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews.ViewModels
+namespace GitHub.ViewModels
 {
     /// <summary>
     /// A comment thread.
