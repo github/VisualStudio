@@ -29,11 +29,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         const string FullPath = "c:\\repo\\test.cs";
         const string RelativePath = "test.cs";
 
-        public InlineCommentPeekViewModelTests()
-        {
-            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-        }
-
         [Test]
         public async Task ThreadIsCreatedForExistingComments()
         {
@@ -141,7 +136,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                     RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
                 });
 
-            await target.Thread.Comments[0].CommitEdit.ExecuteAsyncTask(null);
+            await target.Thread.Comments[0].CommitEdit.Execute();
 
             Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
         }
@@ -191,7 +186,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
             var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginEdit.Execute(null);
+            placeholder.BeginEdit.Execute();
             placeholder.Body = "Comment being edited";
 
             var file = await sessionManager.GetLiveFile(
@@ -234,9 +229,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
 
             var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginEdit.Execute(null);
+            await placeholder.BeginEdit.Execute();
             placeholder.Body = "Comment being edited";
-            placeholder.CommitEdit.Execute(null);
+            await placeholder.CommitEdit.Execute();
 
             placeholder = target.Thread.Comments.Last();
             Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));
@@ -271,9 +266,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 });
 
             var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
-            placeholder.BeginEdit.Execute(null);
+            await placeholder.BeginEdit.Execute();
             placeholder.Body = "Comment being edited";
-            placeholder.StartReview.Execute(null);
+            await placeholder.StartReview.Execute();
 
             placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
             Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));

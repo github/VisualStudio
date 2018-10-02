@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -31,8 +32,8 @@ namespace GitHub.ViewModels
             this.WhenAnyValue(x => x.Filter).Subscribe(FilterChanged);
             this.WhenAnyValue(x => x.Selected).Subscribe(_ => Filter = null);
             ClearSelection = ReactiveCommand.Create(
-                this.WhenAnyValue(x => x.Selected).Select(x => x != null))
-                .OnExecuteCompleted(_ => Selected = null);
+                () => { Selected = null; },
+                this.WhenAnyValue(x => x.Selected).Select(x => x != null));
         }
 
         public IReadOnlyList<IActorViewModel> Users
@@ -76,7 +77,7 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref selected, value); }
         }
 
-        public ReactiveCommand<object> ClearSelection { get; }
+        public ReactiveCommand<Unit, Unit> ClearSelection { get; }
 
         void FilterChanged(string filter)
         {

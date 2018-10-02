@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj" />
     <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
     <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj" />
@@ -32,7 +31,5 @@
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
-    <PackageReference Include="Rx-Testing" Version="2.2.5-custom" targetFramework="net45" />
   </ItemGroup>
 </Project>

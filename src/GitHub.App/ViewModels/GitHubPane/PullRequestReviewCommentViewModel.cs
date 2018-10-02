@@ -34,7 +34,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.model = model;
             RelativePath = relativePath;
 
-            Open = ReactiveCommand.CreateAsyncTask(DoOpen);
+            Open = ReactiveCommand.CreateFromTask(DoOpen);
         }
 
         /// <inheritdoc/>
@@ -44,9 +44,9 @@ namespace GitHub.ViewModels.GitHubPane
         public string RelativePath { get; set; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> Open { get; }
+        public ReactiveCommand<Unit, Unit> Open { get; }
 
-        async Task DoOpen(object o)
+        async Task DoOpen()
         {
             try
             {

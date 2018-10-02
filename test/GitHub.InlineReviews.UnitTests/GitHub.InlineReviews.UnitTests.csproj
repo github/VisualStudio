@@ -17,11 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Helpers\ReactiveTestHelper.cs" Link="ReactiveTestHelper.cs" />
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
+    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj" />
     <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj" />
   </ItemGroup>
 
@@ -29,7 +30,5 @@
     <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" version="14.3.25407" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
-    <PackageReference Include="Rx-Testing" Version="2.2.5-custom" targetFramework="net45" />
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ public class LoginCredentialsViewModelTests
             var connection = Substitute.For<IConnection>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
-            var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+            var gitHubLoginCommand = ReactiveCommand.CreateFromObservable(() =>
                 Observable.Return(connection));
             gitHubLogin.Login.Returns(gitHubLoginCommand);
             var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
@@ -30,7 +30,7 @@ public class LoginCredentialsViewModelTests
             var signalled = false;
 
             loginViewModel.Done.Subscribe(_ => signalled = true);
-            await gitHubLoginCommand.ExecuteAsync();
+            await gitHubLoginCommand.Execute();
 
             Assert.True(signalled);
         }
@@ -41,7 +41,7 @@ public class LoginCredentialsViewModelTests
             var connectionManager = Substitute.For<IConnectionManager>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
-            var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+            var gitHubLoginCommand = ReactiveCommand.CreateFromObservable(() =>
                 Observable.Return<IConnection>(null));
             gitHubLogin.Login.Returns(gitHubLoginCommand);
             var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
@@ -50,7 +50,7 @@ public class LoginCredentialsViewModelTests
             var signalled = false;
 
             loginViewModel.Done.Subscribe(_ => signalled = true);
-            await gitHubLoginCommand.ExecuteAsync();
+            await gitHubLoginCommand.Execute();
 
             Assert.False(signalled);
         }
@@ -62,12 +62,12 @@ public class LoginCredentialsViewModelTests
             var connection = Substitute.For<IConnection>();
 
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
-            var gitHubLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+            var gitHubLoginCommand = ReactiveCommand.CreateFromObservable(() =>
                 Observable.Return<IConnection>(null));
             gitHubLogin.Login.Returns(gitHubLoginCommand);
 
             var enterpriseLogin = Substitute.For<ILoginToGitHubForEnterpriseViewModel>();
-            var enterpriseLoginCommand = ReactiveCommand.CreateAsyncObservable(_ =>
+            var enterpriseLoginCommand = ReactiveCommand.CreateFromObservable(() =>
                 Observable.Return(connection));
             enterpriseLogin.Login.Returns(enterpriseLoginCommand);
 
@@ -79,8 +79,8 @@ public class LoginCredentialsViewModelTests
                 .Where(x => x != null)
                 .Subscribe(_ => success = true);
 
-            await gitHubLoginCommand.ExecuteAsync();
-            await enterpriseLoginCommand.ExecuteAsync();
+            await gitHubLoginCommand.Execute();
+            await enterpriseLoginCommand.Execute();
 
             Assert.True(success);
         }

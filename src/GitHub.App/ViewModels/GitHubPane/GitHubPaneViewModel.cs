@@ -49,10 +49,10 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
         readonly ObservableAsPropertyHelper<bool> isSearchEnabled;
         readonly ObservableAsPropertyHelper<string> title;
-        readonly ReactiveCommand<Unit> refresh;
-        readonly ReactiveCommand<Unit> showPullRequests;
-        readonly ReactiveCommand<object> openInBrowser;
-        readonly ReactiveCommand<object> help;
+        readonly ReactiveCommand<Unit, Unit> refresh;
+        readonly ReactiveCommand<Unit, Unit> showPullRequests;
+        readonly ReactiveCommand<Unit, Unit> openInBrowser;
+        readonly ReactiveCommand<Unit, Unit> help;
         IDisposable connectionSubscription;
         Task initializeTask;
         IViewModel content;
@@ -133,27 +133,28 @@ namespace GitHub.ViewModels.GitHubPane
                 .Select(x => x is ISearchablePageViewModel)
                 .ToProperty(this, x => x.IsSearchEnabled);
 
-            refresh = ReactiveCommand.CreateAsyncTask(
+            refresh = ReactiveCommand.CreateFromTask(
+                () => navigator.Content.Refresh(),
                 currentPage.SelectMany(x => x?.WhenAnyValue(
                         y => y.IsLoading,
                         y => y.IsBusy,
                         (loading, busy) => !loading && !busy)
-                            ?? Observable.Return(false)),
-                _ => navigator.Content.Refresh());
+                            ?? Observable.Return(false)));
             refresh.ThrownExceptions.Subscribe();
 
-            showPullRequests = ReactiveCommand.CreateAsyncTask(
-                this.WhenAny(x => x.Content, x => x.Value == navigator),
-                _ => ShowPullRequests());
+            showPullRequests = ReactiveCommand.CreateFromTask(
+                ShowPullRequests,
+                this.WhenAny(x => x.Content, x => x.Value == navigator));
 
-            openInBrowser = ReactiveCommand.Create(currentPage.Select(x => x is IOpenInBrowser));
-            openInBrowser.Subscribe(_ =>
-            {
-                var url = ((IOpenInBrowser)navigator.Content).WebUrl;
-                if (url != null) browser.OpenUrl(url);
-            });
+            openInBrowser = ReactiveCommand.Create(
+                () =>
+                {
+                    var url = ((IOpenInBrowser)navigator.Content).WebUrl;
+                    if (url != null) browser.OpenUrl(url);
+                },
+                currentPage.Select(x => x is IOpenInBrowser));
 
-            help = ReactiveCommand.Create();
+            help = ReactiveCommand.Create(() => { });
             help.Subscribe(_ =>
             {
                 browser.OpenUrl(new Uri(GitHubUrls.Documentation));
@@ -350,7 +351,7 @@ namespace GitHub.ViewModels.GitHubPane
             BindNavigatorCommand(menuService, PkgCmdIDList.helpCommand, help);
         }
 
-        OleMenuCommand BindNavigatorCommand<T>(IMenuCommandService menu, int commandId, ReactiveCommand<T> command)
+        OleMenuCommand BindNavigatorCommand<P, R>(IMenuCommandService menu, int commandId, ReactiveCommand<P, R> command)
         {
             Guard.ArgumentNotNull(menu, nameof(menu));
             Guard.ArgumentNotNull(command, nameof(command));

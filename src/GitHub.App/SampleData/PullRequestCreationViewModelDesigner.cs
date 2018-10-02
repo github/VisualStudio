@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Validation;
@@ -40,8 +41,8 @@ namespace GitHub.SampleData
         public string SelectedAssignee { get; set; }
         public List<string> Users { get; set; }
 
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
-        public IReactiveCommand<object> Cancel { get; }
+        public ReactiveCommand<Unit, IPullRequestModel> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public string PRTitle { get; set; }
 

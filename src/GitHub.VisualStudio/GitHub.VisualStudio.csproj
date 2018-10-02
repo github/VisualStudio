@@ -12,7 +12,7 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
-	<XlfLanguages>zh-CN</XlfLanguages>
+    <XlfLanguages>zh-CN</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -288,29 +288,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Reactive, Version=4.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Reactive.4.0.0\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-XAML.2.2.5-custom\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Expression.Blend.Sdk.WPF.1.0.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -477,20 +467,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\akavache\Akavache.Sqlite3\Akavache.Sqlite3.csproj">
-      <Project>{241c47df-ca8e-4296-aa03-2c48bb646abd}</Project>
-      <Name>Akavache.Sqlite3</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
-      <Project>{b4e665e5-6caf-4414-a6e2-8de1c3bcf203}</Project>
-      <Name>Akavache_Net45</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>
@@ -505,26 +481,13 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj">
-      <Project>{600998c4-54dd-4755-bfa8-6f44544d8e2e}</Project>
-      <Name>ReactiveUI.Events_Net45</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI\ReactiveUI.csproj">
+      <Project>{a4f579f3-77d3-450a-aacc-f2653ef11e69}</Project>
+      <Name>ReactiveUI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
-      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
-      <Name>ReactiveUI_Net45</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
-      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
-      <Name>Splat-Net45</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj">
+      <Project>{ad0306b7-f88e-44a4-ab36-1d04822e9234}</Project>
+      <Name>Splat</Name>
     </ProjectReference>
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
       <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>

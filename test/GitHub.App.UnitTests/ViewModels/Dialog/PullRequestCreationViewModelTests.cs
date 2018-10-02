@@ -185,7 +185,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
                 return Observable.Return(pr);
             });
 
-        await vm.CreatePullRequest.ExecuteAsync();
+        await vm.CreatePullRequest.Execute();
 
         var unused2 = gitClient.Received().Push(l2repo, sourceBranchName, remote);
         if (!sourceBranchIsTracking)

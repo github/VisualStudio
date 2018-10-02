@@ -8,14 +8,6 @@ using NUnit.Framework;
 [TestFixture]
 public class ListenerCollectionTests : TestBase
 {
-#if !DISABLE_REACTIVE_UI
-    [OneTimeSetUp]
-    public void Setup()
-    {
-        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-    }
-#endif
-
     [Test]
     public void StickyItemShouldNotBePresentInitiallyWhereNoSelectionHasHappened()
     {

@@ -6,6 +6,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Extensions;
+using GitHub.Extensions.Reactive;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -27,18 +28,18 @@ namespace GitHub.ViewModels.Dialog
         {
             this.repositoryForkService = repositoryForkService;
 
-            SwitchFork = ReactiveCommand.CreateAsyncObservable(OnSwitchFork);
+            SwitchFork = ReactiveCommand.CreateFromObservable(OnSwitchFork);
         }
 
         public IRepositoryModel SourceRepository { get; private set; }
 
         public IRepositoryModel DestinationRepository { get; private set; }
 
-        public IReactiveCommand<object> SwitchFork { get; }
+        public ReactiveCommand<Unit, Unit> SwitchFork { get; }
 
         public string Title => Resources.SwitchOriginTitle;
 
-        public IObservable<object> Done => SwitchFork.Where(value => value != null);
+        public IObservable<object> Done => SwitchFork.Where(value => value != null).SelectNull();
 
         public void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
         {
@@ -46,7 +47,7 @@ namespace GitHub.ViewModels.Dialog
             DestinationRepository = remoteRepository;
         }
 
-        IObservable<object> OnSwitchFork(object o)
+        IObservable<Unit> OnSwitchFork()
         {
             return repositoryForkService.SwitchRemotes(DestinationRepository, UpdateOrigin, AddUpstream, ResetMasterTracking);
         }

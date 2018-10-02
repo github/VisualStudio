@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -68,7 +69,7 @@ namespace GitHub.SampleData
         public IActorViewModel User { get; set; }
         public IReadOnlyList<IPullRequestReviewViewModel> Reviews { get; set; }
         public string PullRequestTitle { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
         {

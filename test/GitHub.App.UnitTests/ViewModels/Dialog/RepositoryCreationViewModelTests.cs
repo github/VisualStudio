@@ -17,6 +17,7 @@ using Rothko;
 using UnitTests;
 using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
+using System.Windows.Input;
 
 public class RepositoryCreationViewModelTests
 {
@@ -99,7 +100,7 @@ public class RepositoryCreationViewModelTests
 
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
-            await vm.BrowseForDirectory.ExecuteAsync();
+            await vm.BrowseForDirectory.Execute();
 
             Assert.That(@"c:\fake\foo", Is.EqualTo(vm.BaseRepositoryPath));
         }
@@ -114,7 +115,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
-            await vm.BrowseForDirectory.ExecuteAsync();
+            await vm.BrowseForDirectory.Execute();
 
             Assert.That(@"c:\fake\dev", Is.EqualTo(vm.BaseRepositoryPath));
         }
@@ -270,7 +271,7 @@ public class RepositoryCreationViewModelTests
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "repo";
 
-            Assert.True(vm.CreateRepository.CanExecute(null));
+            Assert.True(((ICommand)vm.CreateRepository).CanExecute(null));
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
             Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
@@ -496,7 +497,7 @@ public class RepositoryCreationViewModelTests
 
             using (var handlers = ReactiveTestHelper.OverrideHandlersForTesting())
             {
-                await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+                await vm.CreateRepository.Execute().Catch(Observable.Return(Unit.Default));
 
                 Assert.That("Could not create a repository on GitHub", Is.EqualTo(handlers.LastError.ErrorMessage));
             }
@@ -517,7 +518,7 @@ public class RepositoryCreationViewModelTests
             vm.SelectedAccount = account;
             vm.KeepPrivate = true;
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -547,7 +548,7 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedLicense = new LicenseItem("mit", "MIT");
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -577,7 +578,7 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedGitIgnoreTemplate = GitIgnoreItem.Create("VisualStudio");
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -604,9 +605,8 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.RepositoryName = repositoryName;
             vm.BaseRepositoryPath = baseRepositoryPath;
-            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<Unit>;
 
-            bool result = reactiveCommand.CanExecute(null);
+            bool result = ((ICommand)vm.CreateRepository).CanExecute(null);
 
             Assert.That(expected, Is.EqualTo(result));
         }

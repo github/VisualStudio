@@ -20,7 +20,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var target = CreateTarget();
                 var exception = new TwoFactorChallengeFailedException();
 
-                target.OkCommand.ExecuteAsync();
+                target.OkCommand.Execute();
                 target.Show(new TwoFactorRequiredUserError(exception));
 
                 Assert.False(target.IsBusy);
@@ -45,7 +45,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var userError = new TwoFactorRequiredUserError(exception);
                 var task = target.Show(userError).ToTask();
 
-                target.OkCommand.Execute(null);
+                target.OkCommand.Execute();
                 var result = await task;
 
                 Assert.That(result, Is.Null);
@@ -60,7 +60,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var task = target.Show(userError).ToTask();
 
                 target.AuthenticationCode = "123456";
-                target.OkCommand.Execute(null);
+                target.OkCommand.Execute();
 
                 var result = await task;
                 Assert.That("123456", Is.EqualTo(result.AuthenticationCode));
@@ -75,7 +75,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var task = target.Show(userError).ToTask();
 
                 target.AuthenticationCode = "123456";
-                target.ResendCodeCommand.Execute(null);
+                target.ResendCodeCommand.Execute();
                 var result = await task;
 
                 Assert.False(target.IsBusy);
@@ -91,7 +91,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
                 var task = target.Show(userError).ToTask();
 
                 Assert.True(target.ShowErrorMessage);
-                target.ResendCodeCommand.Execute(null);
+                target.ResendCodeCommand.Execute();
 
                 var result = await task;
                 Assert.False(target.ShowErrorMessage);

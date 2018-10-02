@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 public static class ReactiveTestHelper
 {
@@ -19,6 +21,11 @@ public static class ReactiveTestHelper
             return Observable.Return(recoveryOptionResult);
         });
         return new UserErrorResult(subject, handlerOverride);
+    }
+
+    public static bool CanExecute<TParam, TResult>(this ReactiveCommand<TParam, TResult> command, object parameter = null)
+    {
+        return ((ICommand)command).CanExecute(parameter);
     }
 }
 
