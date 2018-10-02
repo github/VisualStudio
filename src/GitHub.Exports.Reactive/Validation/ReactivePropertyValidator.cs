@@ -177,7 +177,7 @@ namespace GitHub.Validation
             propertyChangeSignal
                 .Select(x => new ValidationParameter { PropertyValue = x, RequiresReset = false })
                 .Do(validationParameter => currentValidationParameter = validationParameter)
-                .Subscribe(validationParameter => validateCommand.Execute(validationParameter));
+                .Subscribe(validationParameter => validateCommand.Execute(validationParameter).Subscribe());
         }
 
         public ReactivePropertyValidator<TProp> IfTrue(Func<TProp, bool> predicate, string errorMessage)

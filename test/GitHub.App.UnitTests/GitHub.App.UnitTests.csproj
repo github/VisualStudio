@@ -24,10 +24,11 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Testing\ReactiveUI.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Reactive.Testing" Version="4.0.0"/>
+    <PackageReference Include="Microsoft.Reactive.Testing" Version="4.0.0" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
   </ItemGroup>

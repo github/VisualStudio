@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews.ViewModels
             DeleteComment = ReactiveCommand.Create<Tuple<int, int>>(_ => { });
 
             var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser);
-            placeholder.BeginEdit.Execute();
+            placeholder.BeginEdit.Execute().Subscribe();
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 

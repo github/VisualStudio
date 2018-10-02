@@ -555,7 +555,6 @@ namespace GitHub.ViewModels.GitHubPane
         void SubscribeOperationError(ReactiveCommand<Unit, Unit> command)
         {
             command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
-            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
         static string GetBranchDisplayName(bool isFromFork, string owner, string label)
@@ -572,6 +571,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         IObservable<Unit> DoCheckout()
         {
+            OperationError = null;
+
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, Model).ToList();
@@ -597,6 +598,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         IObservable<Unit> DoPull()
         {
+            OperationError = null;
+
             return pullRequestsService.Pull(LocalRepository)
                 .Do(_ =>
                 {
@@ -609,6 +612,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         IObservable<Unit> DoPush()
         {
+            OperationError = null;
+
             return pullRequestsService.Push(LocalRepository)
                 .Do(_ =>
                 {
@@ -624,6 +629,7 @@ namespace GitHub.ViewModels.GitHubPane
             try
             {
                 IsBusy = true;
+                OperationError = null;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
                 var result = await syncSubmodulesCommand.SyncSubmodules();

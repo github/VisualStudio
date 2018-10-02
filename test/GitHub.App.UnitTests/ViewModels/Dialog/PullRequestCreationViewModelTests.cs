@@ -13,6 +13,8 @@ using Octokit;
 using UnitTests;
 using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
+using ReactiveUI.Testing;
+using System.Reactive.Concurrency;
 
 /// <summary>
 /// All the tests in this class are split in subclasses so that when they run
@@ -149,50 +151,53 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         string targetRepoOwner, string targetBranchName,
         string title, string body)
     {
-        var remote = "origin";
-        var data = PrepareTestData(repoName, sourceRepoOwner, sourceBranchName, targetRepoOwner, targetBranchName, "origin",
-            repoIsFork, sourceBranchIsTracking);
+        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+        {
+            var remote = "origin";
+            var data = PrepareTestData(repoName, sourceRepoOwner, sourceBranchName, targetRepoOwner, targetBranchName, "origin",
+                repoIsFork, sourceBranchIsTracking);
 
-        var targetRepo = data.TargetRepo;
-        var gitClient = data.GitClient;
-        var l2repo = data.L2Repo;
-        var activeRepo = data.ActiveRepo;
-        var sourceBranch = data.SourceBranch;
-        var targetBranch = data.TargetBranch;
-        var ms = data.ModelService;
+            var targetRepo = data.TargetRepo;
+            var gitClient = data.GitClient;
+            var l2repo = data.L2Repo;
+            var activeRepo = data.ActiveRepo;
+            var sourceBranch = data.SourceBranch;
+            var targetBranch = data.TargetBranch;
+            var ms = data.ModelService;
 
-        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
-        var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
-        await vm.InitializeAsync(data.ActiveRepo, data.Connection);
+            var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+            var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService);
+            await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
-        // the TargetBranch property gets set to whatever the repo default is (we assume master here),
-        // so we only set it manually to emulate the user selecting a different target branch
-        if (targetBranchName != "master")
-            vm.TargetBranch = new BranchModel(targetBranchName, targetRepo);
+            // the TargetBranch property gets set to whatever the repo default is (we assume master here),
+            // so we only set it manually to emulate the user selecting a different target branch
+            if (targetBranchName != "master")
+                vm.TargetBranch = new BranchModel(targetBranchName, targetRepo);
 
-        if (title != null)
-            vm.PRTitle = title;
+            if (title != null)
+                vm.PRTitle = title;
 
-        // this is optional
-        if (body != null)
-            vm.Description = body;
+            // this is optional
+            if (body != null)
+                vm.Description = body;
 
-        ms.CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, Arg.Any<string>(), Arg.Any<string>())
-            .Returns(x =>
-            {
-                var pr = Substitute.For<IPullRequestModel>();
-                pr.Base.Returns(new GitReferenceModel("ref", "label", "sha", "https://clone.url"));
-                return Observable.Return(pr);
-            });
+            ms.CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, Arg.Any<string>(), Arg.Any<string>())
+                .Returns(x =>
+                {
+                    var pr = Substitute.For<IPullRequestModel>();
+                    pr.Base.Returns(new GitReferenceModel("ref", "label", "sha", "https://clone.url"));
+                    return Observable.Return(pr);
+                });
 
-        await vm.CreatePullRequest.Execute();
+            await vm.CreatePullRequest.Execute();
 
-        var unused2 = gitClient.Received().Push(l2repo, sourceBranchName, remote);
-        if (!sourceBranchIsTracking)
-            unused2 = gitClient.Received().SetTrackingBranch(l2repo, sourceBranchName, remote);
-        else
-            unused2 = gitClient.DidNotReceiveWithAnyArgs().SetTrackingBranch(Args.LibGit2Repo, Args.String, Args.String);
-        var unused = ms.Received().CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, title ?? "Source branch", body ?? String.Empty);
+            var unused2 = gitClient.Received().Push(l2repo, sourceBranchName, remote);
+            if (!sourceBranchIsTracking)
+                unused2 = gitClient.Received().SetTrackingBranch(l2repo, sourceBranchName, remote);
+            else
+                unused2 = gitClient.DidNotReceiveWithAnyArgs().SetTrackingBranch(Args.LibGit2Repo, Args.String, Args.String);
+            var unused = ms.Received().CreatePullRequest(activeRepo, targetRepo, sourceBranch, targetBranch, title ?? "Source branch", body ?? String.Empty);
+        }
     }
 
     [Test]

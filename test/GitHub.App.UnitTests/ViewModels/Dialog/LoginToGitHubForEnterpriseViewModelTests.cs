@@ -9,6 +9,7 @@ using NSubstitute;
 using Octokit;
 using NUnit.Framework;
 using System.Windows.Input;
+using ReactiveUI.Testing;
 
 public class LoginToGitHubForEnterpriseViewModelTests
 {
@@ -28,68 +29,80 @@ public class LoginToGitHubForEnterpriseViewModelTests
         [Test]
         public async Task ReturnsCheckingWhenProbeNotFinished()
         {
-            var scheduler = new TestScheduler();
-            var caps = Substitute.For<IEnterpriseCapabilitiesService>();
-            var task = new TaskCompletionSource<EnterpriseProbeResult>();
-            caps.Probe(null).ReturnsForAnyArgs(task.Task);
-            var target = CreateTarget(scheduler, caps);
-
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-
-            Assert.That(EnterpriseProbeStatus.Checking, Is.EqualTo(target.ProbeStatus));
-
-            try
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
             {
-                task.SetCanceled();
-                await task.Task;
+                var scheduler = new TestScheduler();
+                var caps = Substitute.For<IEnterpriseCapabilitiesService>();
+                var task = new TaskCompletionSource<EnterpriseProbeResult>();
+                caps.Probe(null).ReturnsForAnyArgs(task.Task);
+                var target = CreateTarget(scheduler, caps);
+
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+
+                Assert.That(EnterpriseProbeStatus.Checking, Is.EqualTo(target.ProbeStatus));
+
+                try
+                {
+                    task.SetCanceled();
+                    await task.Task;
+                }
+                catch (TaskCanceledException) { }
             }
-            catch (TaskCanceledException) { }
         }
 
         [Test]
         public async Task ReturnsValidWhenProbeReturnsOk()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseProbeResult.Ok);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseProbeResult.Ok);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            scheduler.Stop();
-            await target.UpdatingProbeStatus;
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                scheduler.Stop();
+                await target.UpdatingProbeStatus;
 
-            Assert.That(EnterpriseProbeStatus.Valid, Is.EqualTo(target.ProbeStatus));
+                Assert.That(EnterpriseProbeStatus.Valid, Is.EqualTo(target.ProbeStatus));
+            }
         }
 
         [Test]
         public async Task ReturnsInvalidWhenProbeReturnsFailed()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseProbeResult.Failed);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseProbeResult.Failed);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            scheduler.Stop();
-            await target.UpdatingProbeStatus;
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                scheduler.Stop();
+                await target.UpdatingProbeStatus;
 
-            Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
+                Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
+            }
         }
 
         [Test]
         public async Task ReturnsInvalidWhenProbeReturnsNotFound()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseProbeResult.NotFound);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseProbeResult.NotFound);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            scheduler.Stop();
-            await target.UpdatingProbeStatus;
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                scheduler.Stop();
+                await target.UpdatingProbeStatus;
 
-            Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
+                Assert.That(EnterpriseProbeStatus.Invalid, Is.EqualTo(target.ProbeStatus));
+            }
         }
     }
 
@@ -109,44 +122,53 @@ public class LoginToGitHubForEnterpriseViewModelTests
         [Test]
         public void ReturnsToken()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.Token);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.Token);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.That(EnterpriseLoginMethods.Token, Is.EqualTo(target.SupportedLoginMethods));
+                Assert.That(EnterpriseLoginMethods.Token, Is.EqualTo(target.SupportedLoginMethods));
+            }
         }
 
         [Test]
         public void ReturnsUsernameAndPassword()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.That(EnterpriseLoginMethods.UsernameAndPassword, Is.EqualTo(target.SupportedLoginMethods));
+                Assert.That(EnterpriseLoginMethods.UsernameAndPassword, Is.EqualTo(target.SupportedLoginMethods));
+            }
         }
 
         [Test]
         public void GivesPrecedenceToUsernameAndPasswordOverToken()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.Token |
-                EnterpriseLoginMethods.UsernameAndPassword |
-                EnterpriseLoginMethods.OAuth);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.Token |
+                    EnterpriseLoginMethods.UsernameAndPassword |
+                    EnterpriseLoginMethods.OAuth);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
 
-            Assert.That(
-                EnterpriseLoginMethods.UsernameAndPassword | EnterpriseLoginMethods.OAuth,
-                Is.EqualTo(target.SupportedLoginMethods));
+                Assert.That(
+                    EnterpriseLoginMethods.UsernameAndPassword | EnterpriseLoginMethods.OAuth,
+                    Is.EqualTo(target.SupportedLoginMethods));
+            }
         }
     }
 
@@ -155,58 +177,70 @@ public class LoginToGitHubForEnterpriseViewModelTests
         [Test]
         public void DisabledWhenUserNameEmpty()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            target.Password = "pass";
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.Password = "pass";
 
-            Assert.False(((ICommand)target.Login).CanExecute(null));
+                Assert.False(((ICommand)target.Login).CanExecute(null));
+            }
         }
 
         [Test]
         public void DisabledWhenPasswordEmpty()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            target.UsernameOrEmail = "user";
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.UsernameOrEmail = "user";
 
-            Assert.False(((ICommand)target.Login).CanExecute(null));
+                Assert.False(((ICommand)target.Login).CanExecute(null));
+            }
         }
 
         [Test]
         public void EnabledWhenUsernameAndPasswordSet()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.UsernameAndPassword);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            target.UsernameOrEmail = "user";
-            target.Password = "pass";
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.UsernameOrEmail = "user";
+                target.Password = "pass";
 
-            Assert.True(((ICommand)target.Login).CanExecute(null));
+                Assert.True(((ICommand)target.Login).CanExecute(null));
+            }
         }
 
         [Test]
         public void EnabledWhenOnlyPasswordSetWhenUsingTokenLogin()
         {
-            var scheduler = new TestScheduler();
-            var caps = CreateCapabilties(EnterpriseLoginMethods.Token);
-            var target = CreateTarget(scheduler, caps);
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var scheduler = new TestScheduler();
+                var caps = CreateCapabilties(EnterpriseLoginMethods.Token);
+                var target = CreateTarget(scheduler, caps);
 
-            target.EnterpriseUrl = "https://foo.bar";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
-            target.Password = "pass";
+                target.EnterpriseUrl = "https://foo.bar";
+                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
+                target.Password = "pass";
 
-            Assert.True(((ICommand)target.Login).CanExecute(null));
+                Assert.True(((ICommand)target.Login).CanExecute(null));
+            }
         }
     }
 

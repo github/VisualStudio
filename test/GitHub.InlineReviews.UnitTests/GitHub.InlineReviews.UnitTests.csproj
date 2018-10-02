@@ -22,6 +22,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Testing\ReactiveUI.Testing.csproj" />
     <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj" />
     <ProjectReference Include="..\..\src\GitHub.InlineReviews\GitHub.InlineReviews.csproj" />
   </ItemGroup>

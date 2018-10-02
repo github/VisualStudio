@@ -186,7 +186,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
             var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginEdit.Execute();
+            placeholder.BeginEdit.Execute().Subscribe();
             placeholder.Body = "Comment being edited";
 
             var file = await sessionManager.GetLiveFile(
