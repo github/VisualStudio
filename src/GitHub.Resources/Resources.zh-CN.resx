@@ -123,6 +123,9 @@
   <data name="CloneTitle" xml:space="preserve">
     <value>克隆一个 版本库</value>
   </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Open from GitHub</value>
+  </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>无法连接到github.com</value>
   </data>
@@ -327,10 +330,10 @@
     <value>取消评审</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>The destination already exists.</value>
+    <value>A file exists at the destination path.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
-    <value>Logout Required</value>
+    <value>需要注销</value>
   </data>
   <data name="day" xml:space="preserve">
     <value>{0:N0} 天前</value>
@@ -345,7 +348,7 @@
     <value>{0:N0} 小时前</value>
   </data>
   <data name="JustNow" xml:space="preserve">
-    <value>just now</value>
+    <value>就现在</value>
   </data>
   <data name="minute" xml:space="preserve">
     <value>{0:N0} 分钟前</value>
@@ -819,5 +822,17 @@
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>无法在当前存储库中找到目标URL。在进行提取后再试一次。</value>
+  </data>
+  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>A repository already exists at this location, but it has a remote of {0}.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
 </root>

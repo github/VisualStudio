@@ -20,6 +20,7 @@ using NSubstitute;
 using Octokit;
 using NUnit.Framework;
 using GitHub.Commands;
+using GitHub.ViewModels;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {

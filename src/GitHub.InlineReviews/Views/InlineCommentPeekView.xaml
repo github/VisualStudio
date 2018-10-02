@@ -105,7 +105,7 @@
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
             <Grid>
-                <local:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
+                <ghfvs:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
             </Grid>
         </ScrollViewer>
     </DockPanel>
