@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Primitives;
 
 namespace GitHub.Models
 {
@@ -12,10 +13,10 @@ namespace GitHub.Models
         /// </summary>
         /// <param name="path">The path to clone the repository to.</param>
         /// <param name="repository">The selected repository.</param>
-        public CloneDialogResult(string path, IRepositoryModel repository)
+        public CloneDialogResult(string path, UriString cloneUrl)
         {
             Path = path;
-            Repository = repository;
+            Url = cloneUrl;
         }
 
         /// <summary>
@@ -24,8 +25,8 @@ namespace GitHub.Models
         public string Path { get; }
 
         /// <summary>
-        /// Gets the repository selected by the user.
+        /// Gets the url selected by the user.
         /// </summary>
-        public IRepositoryModel Repository { get; }
+        public UriString Url { get; }
     }
 }

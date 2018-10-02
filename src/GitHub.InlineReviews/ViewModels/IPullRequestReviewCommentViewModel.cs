@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels

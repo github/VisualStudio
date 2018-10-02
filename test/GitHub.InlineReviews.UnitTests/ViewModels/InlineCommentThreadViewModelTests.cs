@@ -5,6 +5,7 @@ using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
 using NUnit.Framework;
 

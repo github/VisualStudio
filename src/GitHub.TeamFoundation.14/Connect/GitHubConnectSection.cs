@@ -151,16 +151,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
-                    await cloneService.CloneRepository(
-                        result.Repository.CloneUrl,
-                        result.Path);
+                    await cloneService.CloneOrOpenRepository(result);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
                 catch (Exception e)
                 {
                     var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Repository.Name));
+                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.CloneOrOpenFailed, result.Url.RepositoryName));
                 }
             }
         }
