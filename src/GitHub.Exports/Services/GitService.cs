@@ -13,6 +13,14 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class GitService : IGitService
     {
+        readonly IRepositoryFacade repositoryFacade;
+
+        [ImportingConstructor]
+        public GitService(IRepositoryFacade repositoryFacade)
+        {
+            this.repositoryFacade = repositoryFacade;
+        }
+
         /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote named origin exists, this method returns null
@@ -56,8 +64,8 @@ namespace GitHub.Services
         /// <returns>An instance of <see cref="IRepositoryModel"/> or null</returns>
         public IRepository GetRepository(string path)
         {
-            var repoPath = Repository.Discover(path);
-            return repoPath == null ? null : new Repository(repoPath);
+            var repoPath = repositoryFacade.Discover(path);
+            return repoPath == null ? null : repositoryFacade.NewRepository(repoPath);
         }
 
         /// <summary>
@@ -80,7 +88,7 @@ namespace GitHub.Services
         /// <remarks>
         /// This is equivalent to creating it via MEF with <see cref="CreationPolicy.NonShared"/>
         /// </remarks>
-        public static IGitService GitServiceHelper => new GitService();
+        public static IGitService GitServiceHelper => new GitService(new RepositoryFacade());
 
         /// <summary>
         /// Finds the latest pushed commit of a file and returns the sha of that commit. Returns null when no commits have 

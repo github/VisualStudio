@@ -29,8 +29,11 @@ public class GitServiceTests : TestBaseClass
         origin.Url.Returns(url);
         var repository = Substitute.For<IRepository>();
         repository.Network.Remotes["origin"].Returns(origin);
+        var repositoryFacade = new RepositoryFacade();
+        var target = new GitService(repositoryFacade);
 
-        var gitservice = new GitService();
-        Assert.That(expected, Is.EqualTo(gitservice.GetUri(repository)?.ToString()));
+        var repositoryUrl = target.GetUri(repository)?.ToString();
+
+        Assert.That(expected, Is.EqualTo(repositoryUrl));
     }
 }
