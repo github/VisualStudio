@@ -104,13 +104,8 @@ namespace GitHub.Services
                         }
 
                         var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
-                        foreach (var c in repo.Commits)
-                        {
-                            if (repo.Refs.ReachableFrom(remoteHeads, new[] { c }).Any())
-                            {
-                                return c.Sha;
-                            }
-                        }
+                        var reachableRef = repo.Refs.ReachableFrom(remoteHeads, repo.Commits).FirstOrDefault()?.TargetIdentifier;
+                        return reachableRef;
                     }
 
                     return null;
