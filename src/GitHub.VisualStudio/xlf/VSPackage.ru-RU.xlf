@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ru" original="../VSPackage.resx">
+    <body>
+      <trans-unit id="110">
+        <source>GitHub.VisualStudio</source>
+        <target xml:lang="ru" state="needs-translation">GitHub.VisualStudio</target>
+        <note/>
+      </trans-unit>
+      <trans-unit id="112">
+        <source>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</source>
+        <target xml:lang="ru" state="needs-translation">A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</target>
+        <note/>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
