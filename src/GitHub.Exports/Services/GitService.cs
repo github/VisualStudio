@@ -93,7 +93,7 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(path, nameof(path));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 using (var repo = GetRepository(path))
                 {
