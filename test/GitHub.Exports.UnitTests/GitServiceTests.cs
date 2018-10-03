@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using GitHub.Services;
 using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
-public class GitServiceTests : TestBaseClass
+public class GitServiceTests
 {
     [TestCase("asdf", null)]
     [TestCase("", null)]
@@ -35,5 +34,65 @@ public class GitServiceTests : TestBaseClass
         var repositoryUrl = target.GetUri(repository)?.ToString();
 
         Assert.That(expected, Is.EqualTo(repositoryUrl));
+    }
+
+    public class TheGetLatestPushedShaMethod
+    {
+        [TestCase("777", "777", "777")]
+        [TestCase("666", "777", null)]
+        public async Task Return_Sha_When_Local_And_Remote_Shas_Match(string localSha, string remoteSha, string expectSha)
+        {
+            var path = "path";
+            var trackedBranch = CreateBranch(remoteSha);
+            var headBranch = CreateBranch(localSha, trackedBranch);
+            var repo = CreateRepository(headBranch);
+            var repositoryFacade = CreateRepositoryFacade(path, repo);
+            var target = new GitService(repositoryFacade);
+
+            var sha = await target.GetLatestPushedSha(path).ConfigureAwait(false);
+
+            Assert.That(sha, Is.EqualTo(expectSha));
+        }
+
+        static IRepositoryFacade CreateRepositoryFacade(string path, IRepository repo)
+        {
+            var repositoryFacade = Substitute.For<IRepositoryFacade>();
+            repositoryFacade.Discover(path).Returns(path);
+            repositoryFacade.NewRepository(path).Returns(repo);
+            return repositoryFacade;
+        }
+
+        static IRepository CreateRepository(Branch headBranch)
+        {
+            var repo = Substitute.For<IRepository>();
+            repo.Head.Returns(headBranch);
+            var branchCollection = Substitute.For<BranchCollection>();
+            var branches = new List<Branch> { headBranch };
+            branchCollection.GetEnumerator().Returns(_ => branches.GetEnumerator());
+            repo.Branches.Returns(branchCollection);
+            return repo;
+        }
+
+        static Branch CreateBranch(string tipSha, Branch trackedBranch = null)
+        {
+            var tipCommit = Substitute.For<Commit>();
+            tipCommit.Sha.Returns(tipSha);
+            var branch = Substitute.For<Branch>();
+            var commitLog = Substitute.For<ICommitLog>();
+            var commits = new List<Commit> { tipCommit };
+            commitLog.GetEnumerator().Returns(_ => commits.GetEnumerator());
+            branch.Commits.Returns(commitLog);
+            branch.Tip.Returns(tipCommit);
+            if (trackedBranch != null)
+            {
+                var trackingDetails = Substitute.For<BranchTrackingDetails>();
+                trackingDetails.CommonAncestor.Returns(tipCommit);
+                branch.IsTracking.Returns(true);
+                branch.TrackedBranch.Returns(trackedBranch);
+                branch.TrackingDetails.Returns(trackingDetails);
+            }
+
+            return branch;
+        }
     }
 }
