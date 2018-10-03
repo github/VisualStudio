@@ -87,8 +87,9 @@ namespace GitHub.Services
         /// been found in any remote branches or the current local branch. 
         /// </summary>
         /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns></returns>
-        public Task<string> GetLatestPushedSha(string path)
+        public Task<string> GetLatestPushedSha(string path, string remote = "origin")
         {
             Guard.ArgumentNotNull(path, nameof(path));
 
@@ -103,7 +104,8 @@ namespace GitHub.Services
                             return repo.Head.Tip.Sha;
                         }
 
-                        var remoteHeads = repo.Refs.Where(r => r.IsRemoteTrackingBranch).ToList();
+                        var branchPrefix = $"remotes/{remote}/";
+                        var remoteHeads = repo.Refs.Where(r => r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal)).ToList();
                         var reachableRef = repo.Refs.ReachableFrom(remoteHeads, repo.Commits).FirstOrDefault()?.TargetIdentifier;
                         return reachableRef;
                     }
