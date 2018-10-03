@@ -104,10 +104,32 @@ namespace GitHub.Services
                             return repo.Head.Tip.Sha;
                         }
 
-                        var branchPrefix = $"remotes/{remote}/";
+                        // Check for the common case where a branch was forked from a local branch.
+                        // Use CommonAncestor because we don't want to search for a commit that only exists
+                        // locally or that has been added to the remote tracking branch since the fork.
+                        // This won't work if new commits have been pulled to forked from branch.
+                        var commonAncestorShas = repo.Branches
+                            .Where(b => b.IsTracking)
+                            .Select(b => b.TrackingDetails.CommonAncestor?.Sha)
+                            .Where(s => s != null)
+                            .ToArray();
+                        foreach (var commit in repo.Commits)
+                        {
+                            if (commonAncestorShas.Contains(commit.Sha))
+                            {
+                                return commit.Sha;
+                            }
+                        }
+
+                        var branchPrefix = $"refs/remotes/{remote}/";
                         var remoteHeads = repo.Refs.Where(r => r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal)).ToList();
-                        var reachableRef = repo.Refs.ReachableFrom(remoteHeads, repo.Commits).FirstOrDefault()?.TargetIdentifier;
-                        return reachableRef;
+                        foreach (var commit in repo.Commits)
+                        {
+                            if (repo.Refs.ReachableFrom(remoteHeads, new[] { commit }).Any())
+                            {
+                                return commit.Sha;
+                            }
+                        }
                     }
 
                     return null;
