@@ -127,6 +127,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Events.WPF", "su
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Testing", "submodules\reactiveui\src\ReactiveUI.Testing\ReactiveUI.Testing.csproj", "{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Wpf", "submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj", "{E899B03C-6E8E-4375-AB65-FC925D721D8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -516,6 +518,16 @@ Global
 		{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -547,6 +559,7 @@ Global
 		{AD0306B7-F88E-44A4-AB36-1D04822E9234} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AF9}
 		{86C54B27-717F-478C-AC8C-01F1C68A56C5} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
 		{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
+		{E899B03C-6E8E-4375-AB65-FC925D721D8B} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}

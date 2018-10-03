@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI\ReactiveUI.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
   </ItemGroup>
