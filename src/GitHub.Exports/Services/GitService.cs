@@ -132,10 +132,22 @@ namespace GitHub.Services
                             }
                         }
 
-                        // This is the less common case where a branch was forked from a local branch
-                        // which has since had new commits pulled to it. It also covers cases where a
-                        // branch was forked from a reference rather than a branch that is tracking
-                        // a remote (e.g. from the head of a PR `refs/pull/#/head`).
+                        // This is a less common case where a branch was forked from a local branch
+                        // which has since had new commits pulled to it.
+                        var nearestCommonAncestor = repo.Branches
+                            .Where(b => b.IsRemote && b.RemoteName == remote)
+                            .Select(b => repo.ObjectDatabase.CalculateHistoryDivergence(b.Tip, repo.Head.Tip))
+                            .Where(hd => hd.AheadBy != null)
+                            .OrderBy(hd => hd.BehindBy)
+                            .Select(hd => hd.CommonAncestor)
+                            .FirstOrDefault();
+                        if (nearestCommonAncestor != null)
+                        {
+                            return nearestCommonAncestor.Sha;
+                        }
+
+                        // This is a less case where a branch was forked from a reference rather than a
+                        // branch that is tracking a remote (e.g. from the head of a PR `refs/pull/#/head`).
                         var branchPrefix = $"refs/remotes/{remote}/";
                         var pullPrefix = "refs/pull/";
                         var remoteHeads = repo.Refs.Where(r =>
