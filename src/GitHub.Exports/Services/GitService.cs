@@ -132,7 +132,11 @@ namespace GitHub.Services
                         }
 
                         var branchPrefix = $"refs/remotes/{remote}/";
-                        var remoteHeads = repo.Refs.Where(r => r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal)).ToList();
+                        var pullPrefix = "refs/pull/";
+                        var remoteHeads = repo.Refs.Where(r =>
+                            r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal) ||
+                            r.CanonicalName.StartsWith(pullPrefix, StringComparison.Ordinal))
+                            .ToList();
                         foreach (var commit in repo.Commits)
                         {
                             if (repo.Refs.ReachableFrom(remoteHeads, new[] { commit }).Any())
