@@ -173,6 +173,34 @@ public class GitServiceTests
             }
         }
 
+        [Test]
+        public async Task TowPossibleRemoteBranches_ReturnNearestCommitSha()
+        {
+            using (var temp = new TempDirectory())
+            {
+                string expectSha;
+                var dir = temp.Directory.FullName;
+                using (var repo = new Repository(Repository.Init(dir)))
+                {
+                    AddCommit(repo); // First commit
+                    var commit1 = AddCommit(repo);
+                    var commit2 = AddCommit(repo);
+                    var commit3 = AddCommit(repo);
+                    var branch1 = repo.Branches.Add("branch1", commit1);
+                    AddTrackedBranch(repo, branch1, commit1);
+                    var branch2 = repo.Branches.Add("branch2", commit2);
+                    AddTrackedBranch(repo, branch2, commit2);
+                    expectSha = commit2.Sha;
+                }
+
+                var target = new GitService(new RepositoryFacade());
+
+                var sha = await target.GetLatestPushedSha(dir).ConfigureAwait(false);
+
+                Assert.That(sha, Is.EqualTo(expectSha));
+            }
+        }
+
         [TestCase("origin", true)]
         [TestCase("jcansdale", false)]
         public async Task BehindRemoteBranch_ReturnRemoteCommitSha(string remoteName, bool expectFound)
