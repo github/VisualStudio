@@ -114,10 +114,9 @@ namespace GitHub.Services
                             return commonAncestor.Sha;
                         }
 
-                        // Check for the common case where a branch was forked from a local branch.
+                        // This is the common case where a branch was forked from a local branch.
                         // Use CommonAncestor because we don't want to search for a commit that only exists
                         // locally or that has been added to the remote tracking branch since the fork.
-                        // This won't work if new commits have been pulled to forked from branch.
                         var commonAncestorShas = repo.Branches
                             .Where(b => b.IsTracking)
                             .Select(b => b.TrackingDetails.CommonAncestor?.Sha)
@@ -131,6 +130,10 @@ namespace GitHub.Services
                             }
                         }
 
+                        // This is the less common case where a branch was forked from a local branch
+                        // which has since had new commits pulled to it. It also covers cases where a
+                        // branch was forked from a reference rather than a branch that is tracking
+                        // a remote (e.g. from the head of a PR `refs/pull/#/head`).
                         var branchPrefix = $"refs/remotes/{remote}/";
                         var pullPrefix = "refs/pull/";
                         var remoteHeads = repo.Refs.Where(r =>
