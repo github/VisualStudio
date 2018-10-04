@@ -122,7 +122,9 @@ namespace GitHub.Services
                             .Select(b => b.TrackingDetails.CommonAncestor?.Sha)
                             .Where(s => s != null)
                             .ToArray();
-                        foreach (var commit in repo.Commits)
+
+                        var sortByTopological = new CommitFilter { SortBy = CommitSortStrategies.Topological };
+                        foreach (var commit in repo.Commits.QueryBy(sortByTopological))
                         {
                             if (commonAncestorShas.Contains(commit.Sha))
                             {
@@ -140,7 +142,7 @@ namespace GitHub.Services
                             r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal) ||
                             r.CanonicalName.StartsWith(pullPrefix, StringComparison.Ordinal))
                             .ToList();
-                        foreach (var commit in repo.Commits)
+                        foreach (var commit in repo.Commits.QueryBy(sortByTopological))
                         {
                             if (repo.Refs.ReachableFrom(remoteHeads, new[] { commit }).Any())
                             {
