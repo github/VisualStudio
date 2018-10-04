@@ -173,8 +173,11 @@ public class GitServiceTests
             }
         }
 
-        [Test]
-        public async Task BehindRemoteBranches_ReturnRemoteCommitSha()
+        // refs / pull /{ pullRequestNumber}/ head
+
+        [TestCase("origin", true)]
+        [TestCase("jcansdale", false)]
+        public async Task BehindRemoteBranch_ReturnRemoteCommitSha(string remoteName, bool expectFound)
         {
             using (var temp = new TempDirectory())
             {
@@ -186,12 +189,9 @@ public class GitServiceTests
                     var commit1 = AddCommit(repo);
                     var commit2 = AddCommit(repo);
                     var branchA = repo.Branches.Add("branchA", commit2);
-                    var commit3 = AddCommit(repo);
-                    var branchB = repo.Branches.Add("branchB", commit3);
                     repo.Reset(ResetMode.Hard, commit1);
-                    expectSha = commit1.Sha;
-                    AddTrackedBranch(repo, branchA, commit2);
-                    AddTrackedBranch(repo, branchB, commit3);
+                    expectSha = expectFound ? commit1.Sha : null;
+                    AddTrackedBranch(repo, branchA, commit2, remoteName: remoteName);
                 }
 
                 var target = new GitService(new RepositoryFacade());
