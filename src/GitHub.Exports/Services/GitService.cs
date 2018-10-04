@@ -107,9 +107,11 @@ namespace GitHub.Services
                 {
                     if (repo != null)
                     {
-                        if (repo.Head.IsTracking && repo.Head.Tip.Sha == repo.Head.TrackedBranch.Tip.Sha)
+                        // This is the common case where HEAD is tracking a remote branch
+                        var commonAncestor = repo.Head.TrackingDetails.CommonAncestor;
+                        if (commonAncestor != null)
                         {
-                            return repo.Head.Tip.Sha;
+                            return commonAncestor.Sha;
                         }
 
                         // Check for the common case where a branch was forked from a local branch.
