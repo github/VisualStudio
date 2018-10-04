@@ -132,11 +132,13 @@ namespace GitHub.Services
                             }
                         }
 
-                        // This is a less common case where a branch was forked from a local branch
-                        // which has since had new commits pulled to it.
+                        // This is a less common case where a branch was forked from a branch
+                        // which has since had new commits added to it.
                         var nearestCommonAncestor = repo.Branches
-                            .Where(b => b.IsRemote && b.RemoteName == remote)
-                            .Select(b => repo.ObjectDatabase.CalculateHistoryDivergence(b.Tip, repo.Head.Tip))
+                            .Where(b => b.IsRemote)
+                            .Select(b => b.Tip)
+                            .Distinct()
+                            .Select(c => repo.ObjectDatabase.CalculateHistoryDivergence(c, repo.Head.Tip))
                             .Where(hd => hd.AheadBy != null)
                             .OrderBy(hd => hd.BehindBy)
                             .Select(hd => hd.CommonAncestor)
@@ -144,22 +146,6 @@ namespace GitHub.Services
                         if (nearestCommonAncestor != null)
                         {
                             return nearestCommonAncestor.Sha;
-                        }
-
-                        // This is a less case where a branch was forked from a reference rather than a
-                        // branch that is tracking a remote (e.g. from the head of a PR `refs/pull/#/head`).
-                        var branchPrefix = $"refs/remotes/{remote}/";
-                        var pullPrefix = "refs/pull/";
-                        var remoteHeads = repo.Refs.Where(r =>
-                            r.CanonicalName.StartsWith(branchPrefix, StringComparison.Ordinal) ||
-                            r.CanonicalName.StartsWith(pullPrefix, StringComparison.Ordinal))
-                            .ToList();
-                        foreach (var commit in repo.Commits.QueryBy(sortByTopological))
-                        {
-                            if (repo.Refs.ReachableFrom(remoteHeads, new[] { commit }).Any())
-                            {
-                                return commit.Sha;
-                            }
                         }
                     }
 

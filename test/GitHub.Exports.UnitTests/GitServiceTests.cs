@@ -202,7 +202,7 @@ public class GitServiceTests
         }
 
         [TestCase("origin", true)]
-        [TestCase("jcansdale", false)]
+        [TestCase("jcansdale", true, Description = "Search all remotes")]
         public async Task BehindRemoteBranch_ReturnRemoteCommitSha(string remoteName, bool expectFound)
         {
             using (var temp = new TempDirectory())
@@ -218,34 +218,6 @@ public class GitServiceTests
                     repo.Reset(ResetMode.Hard, commit1);
                     expectSha = expectFound ? commit1.Sha : null;
                     AddTrackedBranch(repo, branchA, commit2, remoteName: remoteName);
-                }
-
-                var target = new GitService(new RepositoryFacade());
-
-                var sha = await target.GetLatestPushedSha(dir).ConfigureAwait(false);
-
-                Assert.That(sha, Is.EqualTo(expectSha));
-            }
-        }
-
-        [TestCase("refs/remotes/origin/master", true)]
-        [TestCase("refs/pull/777/head", true)]
-        [TestCase("refs/heads/other", false)]
-        [TestCase("refs/remotes/other/master", false)]
-        public async Task BehindRefWithCanonicalName_ReturnRemoteCommitSha(string canonicalName, bool expectFound)
-        {
-            using (var temp = new TempDirectory())
-            {
-                string expectSha;
-                var dir = temp.Directory.FullName;
-                using (var repo = new Repository(Repository.Init(dir)))
-                {
-                    AddCommit(repo); // First commit
-                    var commit1 = AddCommit(repo);
-                    var commit2 = AddCommit(repo);
-                    repo.Reset(ResetMode.Hard, commit1);
-                    expectSha = expectFound ? commit1.Sha : null;
-                    repo.Refs.Add(canonicalName, commit2.Id);
                 }
 
                 var target = new GitService(new RepositoryFacade());
