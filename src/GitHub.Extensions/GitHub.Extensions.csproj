@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   
   <Import Project="$(SolutionDir)\src\common\signing.props" />
