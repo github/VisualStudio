@@ -44,25 +44,37 @@ $opencoverArgs = @(
     "-register:user -output:$rootDirectory\coverage.xml"
 ) -join " "
 
-$codecovDirectory = Join-Path $env:USERPROFILE .nuget\packages\Codecov\1.1.0\tools
+$codecovDirectory = Join-Path $env:USERPROFILE .nuget\packages\codecov\1.1.0\tools
 $codecov = Join-Path $codecovDirectory codecov.exe
 $codecovArgs = "-f $rootDirectory\coverage.xml"
 
 & {
     Trap {
-        Write-Output "Code coverage failed"
+        Write-Output "OpenCover trapped"
         exit 0
     }
 
     Run-Process 600 $opencover $opencoverArgs
 
-    if($AppVeyor) {
+    if (!$?) {
+        Write-Output "OpenCover failed"
+        exit 0
+    }
+}
+
+if($AppVeyor) {
+    & {
+        Trap {
+            Write-Output "Codecov trapped"
+            exit 0
+        }
+
         Push-AppveyorArtifact "$rootDirectory\coverage.xml"
         Run-Process 300 $codecov $codecovArgs
-    }
 
-    if (!$?) {
-        Write-Output "Code coverage failed"
-        exit 0
+        if (!$?) {
+            Write-Output "Codecov failed"
+            exit 0
+        }
     }
 }
