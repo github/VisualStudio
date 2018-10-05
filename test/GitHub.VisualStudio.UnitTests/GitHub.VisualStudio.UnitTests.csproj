@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="Codecov" Version="1.1.0" />
+    <PackageReference Include="BCC-MSBuildLog" Version="0.0.2-alpha" />
+    <PackageReference Include="BCC-Submission" Version="0.0.2-alpha" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
     <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
