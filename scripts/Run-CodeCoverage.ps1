@@ -44,7 +44,7 @@ $opencoverArgs = @(
     "-register:user -output:$rootDirectory\coverage.xml"
 ) -join " "
 
-$codecovDirectory = Join-Path $env:USERPROFILE .nuget\packages\Codecov.1.1.0\tools
+$codecovDirectory = Join-Path $env:USERPROFILE .nuget\packages\Codecov\1.1.0\tools
 $codecov = Join-Path $codecovDirectory codecov.exe
 $codecovArgs = "-f $rootDirectory\coverage.xml"
 
