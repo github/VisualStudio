@@ -8,7 +8,7 @@ namespace GitHub.Extensions
 {
     public static class IServiceProviderExtensions
     {
-        static readonly ILogger log = LogManager.ForContext<VSServices>();
+        static readonly ILogger log = LogManager.ForContext(typeof(IServiceProviderExtensions));
 
         /// <summary>
         /// Safe variant of GetService that doesn't throw exceptions if the service is

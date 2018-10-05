@@ -101,7 +101,7 @@ namespace GitHub.Commands
                 {
                     if (!info.Session.IsCheckedOut)
                     {
-                        ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
+                        ShowInfoMessage(Resources.NavigateToEditorNotCheckedOutInfoMessage);
                         return;
                     }
 
