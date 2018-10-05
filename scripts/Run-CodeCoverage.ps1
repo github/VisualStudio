@@ -40,7 +40,8 @@ $opencover = Join-Path $opencoverDirectory OpenCover.Console.exe
 $opencoverArgs = @(
     "-target:`"$nunitConsoleRunner`"",
     "-targetargs:`"$opencoverTargetArgs`"",
-    "-filter:`"+[GitHub*]* -[GitHub*UnitTests]*`"",
+    "-filter:`"+[GitHub*]* -[GitHub*Unit]GitHub.*.SampleData -[GitHub*UnitTests]*`"",
+    "-excludebyfile:*.xaml;*.xaml.cs",
     "-register:user -output:$rootDirectory\coverage.xml"
 ) -join " "
 
