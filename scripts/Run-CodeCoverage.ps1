@@ -35,7 +35,7 @@ $testAssemblies = @(
 
 $opencoverTargetArgs = ($testAssemblies -join " ") + " --where \`"cat!=Timings and cat!=CodeCoverageFlake\`" --inprocess --noresult"
 
-$opencoverDirectory = Join-Path $rootDirectory packages\OpenCover.4.6.519\tools
+$opencoverDirectory = Join-Path $env:USERPROFILE .nuget\packages\OpenCover.4.6.519\tools
 $opencover = Join-Path $opencoverDirectory OpenCover.Console.exe
 $opencoverArgs = @(
     "-target:`"$nunitConsoleRunner`"",
@@ -44,7 +44,7 @@ $opencoverArgs = @(
     "-register:user -output:$rootDirectory\coverage.xml"
 ) -join " "
 
-$codecovDirectory = Join-Path $rootDirectory packages\Codecov.1.1.0\tools
+$codecovDirectory = Join-Path $env:USERPROFILE .nuget\packages\Codecov.1.1.0\tools
 $codecov = Join-Path $codecovDirectory codecov.exe
 $codecovArgs = "-f $rootDirectory\coverage.xml"
 
@@ -54,7 +54,7 @@ $codecovArgs = "-f $rootDirectory\coverage.xml"
         exit 0
     }
 
-    Run-Process 1200 $opencover $opencoverArgs
+    Run-Process 600 $opencover $opencoverArgs
 
     if($AppVeyor) {
         Push-AppveyorArtifact "$rootDirectory\coverage.xml"
