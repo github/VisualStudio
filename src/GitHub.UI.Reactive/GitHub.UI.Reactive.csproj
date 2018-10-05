@@ -3,6 +3,8 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\src\common\signing.props" />
