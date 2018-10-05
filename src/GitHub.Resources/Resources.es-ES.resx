@@ -139,7 +139,7 @@
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>Please enter an Enterprise URL</value>
+    <value>Por favor ingrese un Enterprise URL</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
     <value>Please enter a valid Enterprise URL</value>
