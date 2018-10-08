@@ -12,7 +12,7 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
-	<XlfLanguages>zh-CN</XlfLanguages>
+    <XlfLanguages>zh-CN</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -243,9 +243,8 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.14.1.111\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Octokit.GraphQL, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
@@ -476,6 +475,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll">
+      <Link>Newtonsoft.Json.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\preview_200x200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
