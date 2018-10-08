@@ -10,7 +10,7 @@ coverage:
   status:
     project: yes
     patch: yes
-    changes: yes
+    changes: no
 
 parsers:
   gcov:
@@ -27,3 +27,8 @@ comment:
   
 fixes:
   - "/C/projects/visualstudio/::"
+
+ignore:
+  - "*.xaml"
+  - "*.xaml.cs"
+  - "**/SampleData/*"
