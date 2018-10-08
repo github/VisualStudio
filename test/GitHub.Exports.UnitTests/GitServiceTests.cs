@@ -71,7 +71,7 @@ public class GitServiceTests
 
                 var sha = await target.GetLatestPushedSha(dir).ConfigureAwait(false);
 
-                Assert.That(sha, Is.Null);
+                Assert.That(sha, Is.EqualTo(expectSha));
             }
         }
 
@@ -255,11 +255,11 @@ public class GitServiceTests
             repo.Branches.Update(branch, b => b.TrackedBranch = canonicalName);
         }
 
-        public async Task IntergrationTest()
+        public static async Task IntergrationTest()
         {
             var path = @"C:\Source\github.com\dotnet\roslyn";
             var gitService = new GitService(new RepositoryFacade());
-            var sha = await gitService.GetLatestPushedSha(path);
+            var sha = await gitService.GetLatestPushedSha(path).ConfigureAwait(false);
             Console.WriteLine(sha);
         }
     }
