@@ -5,10 +5,10 @@ using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressDa
 #endif
 
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -17,15 +17,12 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
-#if TEAMEXPLORER14
+using Microsoft.TeamFoundation.Controls;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using ReactiveUI;
-#else
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Threading;
-#endif
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using ReactiveUI;
 using Serilog;
+using Microsoft;
 
 namespace GitHub.Services
 {
@@ -81,8 +78,11 @@ namespace GitHub.Services
             bool recurseSubmodules,
             object progress = null)
         {
+            var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
+            Assumes.Present(teamExplorer);
+
 #if TEAMEXPLORER14
-            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
+            var gitExt = await GetGitRepositoriesExtAsync(teamExplorer);
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
             // The operation will have completed when CanClone goes false and then true again.
@@ -98,6 +98,25 @@ namespace GitHub.Services
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
 #endif
+        }
+
+        static async Task<IGitRepositoriesExt> GetGitRepositoriesExtAsync(ITeamExplorer teamExplorer)
+        {
+            var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect));
+            Assumes.Present(connectPage);
+            var gitExt = connectPage.GetService<IGitRepositoriesExt>();
+            Assumes.Present(gitExt);
+            return gitExt;
+        }
+
+        static async Task<ITeamExplorerPage> NavigateToPageAsync(ITeamExplorer teamExplorer, Guid pageId)
+        {
+            teamExplorer.NavigateToPage(pageId, null);
+            var page = await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(x => x?.GetId() == pageId)
+                .Take(1);
+            return page;
         }
 
         IGitRepositoryInfo GetRepoFromVS()
