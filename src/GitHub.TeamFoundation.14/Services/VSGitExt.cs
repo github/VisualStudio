@@ -94,7 +94,10 @@ namespace GitHub.VisualStudio.Base
                         gitService.GetHashCode(),
                         gitService.ActiveRepositories.Select(x => x.RepositoryPath));
 
-                    ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                    if (gitService != null)
+                    {
+                        ActiveRepositories = gitService.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                    }
                 }
             }
             catch (Exception e)
