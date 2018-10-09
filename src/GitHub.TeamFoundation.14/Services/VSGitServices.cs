@@ -86,11 +86,15 @@ namespace GitHub.Services
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
             // The operation will have completed when CanClone goes false and then true again.
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
+            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1); // Wait until started
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1); // Wait until completed
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
+
+            // Show progress on Team Explorer - Home
+            NavigateToHomePage(teamExplorer);
 
             await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -98,6 +102,11 @@ namespace GitHub.Services
                 await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
             });
 #endif
+        }
+
+        static void NavigateToHomePage(ITeamExplorer teamExplorer)
+        {
+            teamExplorer.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
         }
 
         static async Task<IGitRepositoriesExt> GetGitRepositoriesExtAsync(ITeamExplorer teamExplorer)
