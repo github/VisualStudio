@@ -36,6 +36,7 @@ namespace GitHub.Services
 
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
+        readonly Lazy<IVSServices> vsServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -46,10 +47,13 @@ namespace GitHub.Services
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSGitServices(IGitHubServiceProvider serviceProvider, Lazy<IStatusBarNotificationService> statusBar)
+        public VSGitServices(IGitHubServiceProvider serviceProvider,
+            Lazy<IStatusBarNotificationService> statusBar,
+            Lazy<IVSServices> vsServices)
         {
             this.serviceProvider = serviceProvider;
             this.statusBar = statusBar;
+            this.vsServices = vsServices;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -86,9 +90,15 @@ namespace GitHub.Services
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
             // The operation will have completed when CanClone goes false and then true again.
+            // It looks like the CanClone property is only live as long as the Connect page is visible.
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1); // Wait until started
-            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1); // Wait until completed
+
+            // Show progress on Team Explorer - Home
+            NavigateToHomePage(teamExplorer);
+
+            // Open cloned repository in Team Explorer
+            vsServices.Value.TryOpenRepository(clonePath);
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
