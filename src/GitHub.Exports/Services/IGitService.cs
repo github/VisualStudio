@@ -28,7 +28,7 @@ namespace GitHub.Services
         /// <param name="remote">The remote name to look for</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
         UriString GetUri(string path, string remote = "origin");
-        
+
         /// <summary>
         /// Probes for a git repository and if one is found, returns a <see cref="IRepositoryModel"/> instance for the
         /// repository.
@@ -54,7 +54,8 @@ namespace GitHub.Services
         /// been found in any remote branches or the current local branch. 
         /// </summary>
         /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns></returns>
-        Task<string> GetLatestPushedSha(string path);
+        Task<string> GetLatestPushedSha(string path, string remote = "origin");
     }
 }
