@@ -150,6 +150,9 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
                 }
             }
+
+            // Give user a chance to choose a solution
+            teamExplorerServices.ShowHomePage();
         }
 
         /// <inheritdoc/>
