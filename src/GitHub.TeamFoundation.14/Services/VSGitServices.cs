@@ -89,16 +89,15 @@ namespace GitHub.Services
             var gitExt = await GetGitRepositoriesExtAsync(teamExplorer);
             gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
 
+            // First open the target folder in case the user navigates away from the Connect page.
+            vsServices.Value.TryOpenRepository(clonePath);
+
             // The operation will have completed when CanClone goes false and then true again.
-            // It looks like the CanClone property is only live as long as the Connect page is visible.
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1); // Wait until started
             await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1); // Wait until completed
 
-            // Show progress on Team Explorer - Home
+            // Navigate when clone completes, otherwise we'll stop receiving updates to CanClone property.
             NavigateToHomePage(teamExplorer);
-
-            // Open cloned repository in Team Explorer
-            vsServices.Value.TryOpenRepository(clonePath);
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
