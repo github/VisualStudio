@@ -88,21 +88,15 @@ namespace GitHub.Services
 #if TEAMEXPLORER14
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             await WaitForCloneOnHomePageAsync(teamExplorer);
-
-            // Show the repository on Team Explorer - Home
-            vsServices.Value.TryOpenRepository(clonePath);
+            vsServices.Value.TryOpenRepository(clonePath); // Show the repository on Team Explorer - Home
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
+            typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
+            var cloneTask = gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
 
-            // Show progress on Team Explorer - Home
-            NavigateToHomePage(teamExplorer);
-
-            await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-            {
-                typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
-                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
-            });
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await cloneTask;
 #endif
         }
 
