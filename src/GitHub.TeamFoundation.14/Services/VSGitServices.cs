@@ -86,18 +86,11 @@ namespace GitHub.Services
             Assumes.Present(teamExplorer);
 
 #if TEAMEXPLORER14
-            var gitExt = await GetGitRepositoriesExtAsync(teamExplorer);
-            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+            await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
+            await WaitForCloneOnHomePageAsync(teamExplorer);
 
-            // First open the target folder in case the user navigates away from the Connect page.
+            // Show the repository on Team Explorer - Home
             vsServices.Value.TryOpenRepository(clonePath);
-
-            // The operation will have completed when CanClone goes false and then true again.
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1); // Wait until started
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1); // Wait until completed
-
-            // Navigate when clone completes, otherwise we'll stop receiving updates to CanClone property.
-            NavigateToHomePage(teamExplorer);
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
@@ -113,18 +106,34 @@ namespace GitHub.Services
 #endif
         }
 
-        static void NavigateToHomePage(ITeamExplorer teamExplorer)
-        {
-            teamExplorer.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-        }
-
-        static async Task<IGitRepositoriesExt> GetGitRepositoriesExtAsync(ITeamExplorer teamExplorer)
+        static async Task StartClonenOnConnectPageAsync(
+            ITeamExplorer teamExplorer, string cloneUrl, string clonePath, bool recurseSubmodules)
         {
             var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect));
             Assumes.Present(connectPage);
             var gitExt = connectPage.GetService<IGitRepositoriesExt>();
             Assumes.Present(gitExt);
-            return gitExt;
+
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+        }
+
+        static async Task WaitForCloneOnHomePageAsync(ITeamExplorer teamExplorer)
+        {
+            var homePage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Home));
+            Assumes.Present(homePage);
+            var gettingStartedSection = homePage.GetSection(new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"));
+            Assumes.Present(gettingStartedSection);
+
+            // The clone progress bar appears on the GettingStarted section, so we wait for
+            // this to be hidden before continuing.
+            await gettingStartedSection
+                .WhenAnyValue(x => x.IsVisible)
+                .Any(x => x == false);
+        }
+
+        static void NavigateToHomePage(ITeamExplorer teamExplorer)
+        {
+            teamExplorer.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
         }
 
         static async Task<ITeamExplorerPage> NavigateToPageAsync(ITeamExplorer teamExplorer, Guid pageId)
