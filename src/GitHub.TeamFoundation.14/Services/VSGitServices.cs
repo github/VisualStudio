@@ -36,6 +36,7 @@ namespace GitHub.Services
 
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
         readonly Lazy<IVSServices> vsServices;
 
         /// <summary>
