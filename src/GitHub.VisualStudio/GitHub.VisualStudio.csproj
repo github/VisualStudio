@@ -507,6 +507,10 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Events.WPF\ReactiveUI.Events.WPF.csproj">
+      <Project>{86c54b27-717f-478c-ac8c-01f1c68a56c5}</Project>
+      <Name>ReactiveUI.Events.WPF</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj">
       <Project>{e899b03c-6e8e-4375-ab65-fc925d721d8b}</Project>
       <Name>ReactiveUI.Wpf</Name>
