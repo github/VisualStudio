@@ -121,6 +121,9 @@ namespace GitHub.Services
                 throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
             }
 
+            // Make sure the Clone Repository UI is visible while cloning
+            teamExplorerServices.ShowHomePage();
+
             var repositoryUrl = url.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             if (DestinationDirectoryExists(repositoryPath))
@@ -150,8 +153,6 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
                 }
             }
-
-            teamExplorerServices.ShowHomePage();
         }
 
         /// <inheritdoc/>
