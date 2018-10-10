@@ -88,6 +88,7 @@ namespace GitHub.Services
 
 #if TEAMEXPLORER14
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
             vsServices.Value.TryOpenRepository(clonePath); // Show the repository on Team Explorer - Home
 #else
@@ -114,8 +115,6 @@ namespace GitHub.Services
 
         static async Task WaitForCloneOnHomePageAsync(ITeamExplorer teamExplorer)
         {
-            NavigateToHomePage(teamExplorer);
-
             // The clone progress bar appears on the GettingStartedSection of the Home page,
             // so we wait for this to be hidden before continuing.
             var sectionId = new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"); // GettingStartedSection
