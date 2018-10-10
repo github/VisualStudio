@@ -119,15 +119,16 @@ namespace GitHub.Services
 
         static async Task WaitForCloneOnHomePageAsync(ITeamExplorer teamExplorer)
         {
-            var homePage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Home));
-            Assumes.Present(homePage);
-            var gettingStartedSection = homePage.GetSection(new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"));
-            Assumes.Present(gettingStartedSection);
+            NavigateToHomePage(teamExplorer);
 
-            // The clone progress bar appears on the GettingStarted section, so we wait for
-            // this to be hidden before continuing.
-            await gettingStartedSection
-                .WhenAnyValue(x => x.IsVisible)
+            // The clone progress bar appears on the GettingStartedSection of the Home page,
+            // so we wait for this to be hidden before continuing.
+            var sectionId = new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"); // GettingStartedSection
+            await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(p => p.GetId() == new Guid(TeamExplorerPageIds.Home))
+                .Select(p => p.GetSection(sectionId))
+                .SelectMany(s => s.WhenAnyValue(x => x.IsVisible))
                 .Any(x => x == false);
         }
 
