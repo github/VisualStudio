@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.App;
+using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
@@ -28,8 +30,8 @@ namespace GitHub.ViewModels.Dialog
         public ForkRepositorySelectViewModel(IModelServiceFactory modelServiceFactory)
         {
             this.modelServiceFactory = modelServiceFactory;
-            SelectedAccount = ReactiveCommand.Create();
-            SwitchOrigin = ReactiveCommand.Create();
+            SelectedAccount = ReactiveCommand.Create<IAccount>(_ => { });
+            SwitchOrigin = ReactiveCommand.Create<IRemoteRepositoryModel>(_ => { });
         }
 
         public string Title => Resources.ForkRepositoryTitle;
@@ -52,11 +54,11 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        public ReactiveCommand<object> SelectedAccount { get; }
+        public ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
 
-        public ReactiveCommand<object> SwitchOrigin { get; }
+        public ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin { get; }
 
-        public IObservable<object> Done => SelectedAccount;
+        public IObservable<object> Done => SelectedAccount.SelectNull();
 
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {

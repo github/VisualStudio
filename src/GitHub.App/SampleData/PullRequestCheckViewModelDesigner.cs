@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Windows.Media.Imaging;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
@@ -16,6 +17,6 @@ namespace GitHub.SampleData
 
         public Uri DetailsUrl { get; set; } = new Uri("http://github.com");
 
-        public ReactiveCommand<object> OpenDetailsUrl { get; set; } = null;
+        public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; set; } = null;
     }
 }

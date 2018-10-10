@@ -4,7 +4,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
     <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj" />
   </ItemGroup>

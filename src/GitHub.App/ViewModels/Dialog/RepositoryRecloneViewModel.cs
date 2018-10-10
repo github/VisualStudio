@@ -25,7 +25,7 @@ namespace GitHub.ViewModels.Dialog
         static readonly ILogger log = LogManager.ForContext<RepositoryRecloneViewModel>();
 
         readonly IOperatingSystem operatingSystem;
-        readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<Unit, Unit> browseForDirectoryCommand = ReactiveCommand.Create(() => { });
         readonly ObservableAsPropertyHelper<bool> canClone;
         string baseRepositoryPath;
 
@@ -56,7 +56,7 @@ namespace GitHub.ViewModels.Dialog
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value != null && y.Value);
             canClone = canCloneObservable.ToProperty(this, x => x.CanClone);
-            CloneCommand = ReactiveCommand.Create(canCloneObservable);
+            CloneCommand = ReactiveCommand.Create(() => { }, canCloneObservable);
 
             browseForDirectoryCommand.Subscribe(_ => ShowBrowseForDirectoryDialog());
             this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
@@ -129,7 +129,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Signals that the user clicked the clone button.
         /// </summary>
-        public IReactiveCommand<object> CloneCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CloneCommand { get; private set; }
 
         IRepositoryModel selectedRepository;
         /// <summary>

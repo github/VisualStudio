@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -30,7 +31,7 @@ namespace GitHub.SampleData
 
         public IObservable<object> Done => null;
 
-        public IObservable<object> Back => null;
+        public IObservable<Unit> Back => null;
 
         public string Title => null;
 
@@ -40,9 +41,9 @@ namespace GitHub.SampleData
 
         public IAccount DestinationAccount { get; }
 
-        public IReactiveCommand<Repository> CreateFork => null;
+        public ReactiveCommand<Unit, Repository> CreateFork => null;
 
-        public IReactiveCommand<object> BackCommand => null;
+        public ReactiveCommand<Unit, Unit> BackCommand => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 

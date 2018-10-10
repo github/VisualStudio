@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GitHub.Extensions;
 using GitHub.Factories;
+using System.Windows.Input;
 
 public class RepositoryPublishViewModelTests
 {
@@ -214,7 +215,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo";
 
-            Assert.True(vm.PublishRepository.CanExecute(null));
+            Assert.True(((ICommand)vm.PublishRepository).CanExecute(null));
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
             Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
@@ -295,7 +296,7 @@ public class RepositoryPublishViewModelTests
             var vm = Helpers.SetupConnectionsAndViewModel(repositoryPublishService, notificationService, cm);
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
+            await vm.PublishRepository.Execute().Catch(Observable.Return(ProgressState.Fail));
 
             Assert.That(vm.SafeRepositoryNameWarningValidator.ValidationResult.Message, Is.Not.Null);
             notificationService.DidNotReceive().ShowMessage(Args.String);
@@ -324,7 +325,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
+            await vm.PublishRepository.Execute().Catch(Observable.Return(ProgressState.Fail));
 
             Assert.That("repo-name", Is.EqualTo(vm.RepositoryName));
             notificationService.Received().ShowError("There is already a repository named 'repo-name' for the current account.");
@@ -358,7 +359,7 @@ public class RepositoryPublishViewModelTests
 
             vm.RepositoryName = "repo-name";
 
-            await vm.PublishRepository.ExecuteAsync().Catch(Observable.Return(ProgressState.Fail));
+            await vm.PublishRepository.Execute().Catch(Observable.Return(ProgressState.Fail));
 
             Assert.That("repo-name", Is.EqualTo(vm.RepositoryName))
                 ;
