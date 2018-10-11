@@ -122,7 +122,11 @@ namespace GitHub.Services
                 .WhenAnyValue(x => x.CurrentPage)
                 .Where(p => p.GetId() == new Guid(TeamExplorerPageIds.Home))
                 .Select(p => p.GetSection(sectionId))
-                .SelectMany(s => s.WhenAnyValue(x => x.IsVisible))
+                .Where(s => s != null)
+                .Select(s => s.WhenAnyValue(x => x.IsVisible))
+                .Switch()                           // Watch the topmost section
+                .StartWith(false)                   // If no events arrive default to invisible
+                .Throttle(TimeSpan.FromSeconds(1))  // Ignore glitch where section starts invisible
                 .Any(x => x == false);
         }
 
