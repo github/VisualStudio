@@ -78,8 +78,9 @@ namespace GitHub.Services
                 return false;
             }
 
-            var repoDir = os.Directory.GetDirectory(repoPath);
-            if (!repoDir.Exists)
+            var gitPath = Path.Combine(repoPath, ".git");
+            var gitDir = os.Directory.GetDirectory(gitPath);
+            if (!gitDir.Exists)
             {
                 return false;
             }
