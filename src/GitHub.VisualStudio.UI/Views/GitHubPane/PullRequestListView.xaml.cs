@@ -41,7 +41,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                         vm.AuthorFilter.WhenAnyValue(x => x.Selected)
                             .Skip(1)
                             .Subscribe(_ => authorFilterDropDown.IsOpen = false),
-                        vm.OpenItemInBrowser.Subscribe(x => OpenInBrowser((IPullRequestListItemViewModel)x)));
+                        vm.OpenItemInBrowser.Subscribe(OpenInBrowser));
                 }
             };
 

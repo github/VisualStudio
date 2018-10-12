@@ -13,6 +13,7 @@ using Octokit;
 using ReactiveUI;
 using Serilog;
 using Repository = Octokit.Repository;
+using System.Reactive;
 
 namespace GitHub.Services
 {
@@ -63,7 +64,7 @@ namespace GitHub.Services
                 });
         }
 
-        public IObservable<object> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
+        public IObservable<Unit> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
         {
             return Observable.Defer(() => Observable.Return(new object())
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -93,7 +94,7 @@ namespace GitHub.Services
                             "CloneUrl is {UpdatedRepository} not {DestinationRepository}", updatedRepository?.CloneUrl ?? "[NULL]", destinationRepository.CloneUrl);
                     }
 
-                    return new object();
+                    return Unit.Default;
                 });
         }
 

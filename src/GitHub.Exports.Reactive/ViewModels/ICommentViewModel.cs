@@ -85,26 +85,26 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
-        ReactiveCommand<object> BeginEdit { get; }
+        ReactiveCommand<Unit, Unit> BeginEdit { get; }
 
         /// <summary>
         /// Gets a command which will cancel editing of the comment.
         /// </summary>
-        ReactiveCommand<object> CancelEdit { get; }
+        ReactiveCommand<Unit, Unit> CancelEdit { get; }
 
         /// <summary>
         /// Gets a command which will commit edits to the comment.
         /// </summary>
-        ReactiveCommand<Unit> CommitEdit { get; }
+        ReactiveCommand<Unit, Unit> CommitEdit { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.
         /// </summary>
-        ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Deletes a comment.
         /// </summary>
-        ReactiveCommand<Unit> Delete { get; }
+        ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }

@@ -28,10 +28,10 @@ namespace GitHub.SampleData
         public IActorViewModel Author { get; set; }
         public Uri WebUrl { get; }
 
-        public ReactiveCommand<object> BeginEdit { get; }
-        public ReactiveCommand<object> CancelEdit { get; }
-        public ReactiveCommand<Unit> CommitEdit { get; }
-        public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<Unit> Delete { get; }
+        public ReactiveCommand<Unit, Unit> BeginEdit { get; }
+        public ReactiveCommand<Unit, Unit> CancelEdit { get; }
+        public ReactiveCommand<Unit, Unit> CommitEdit { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }

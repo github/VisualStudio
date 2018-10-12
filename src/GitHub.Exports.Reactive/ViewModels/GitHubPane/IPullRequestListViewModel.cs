@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -11,11 +12,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which navigates to the "Create Pull Request" view.
         /// </summary>
-        ReactiveCommand<object> CreatePullRequest { get; }
+        ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
 
         /// <summary>
         /// Gets a command that opens pull request item on GitHub.
         /// </summary>
-        ReactiveCommand<object> OpenItemInBrowser { get; }
+        ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
     }
 }

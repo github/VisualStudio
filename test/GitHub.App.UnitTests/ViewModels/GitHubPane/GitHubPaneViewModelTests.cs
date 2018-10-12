@@ -275,8 +275,8 @@ public class GitHubPaneViewModelTests : TestBaseClass
     static INavigationViewModel CreateNavigator()
     {
         var result = Substitute.For<INavigationViewModel>();
-        result.NavigateBack.Returns(ReactiveCommand.Create());
-        result.NavigateForward.Returns(ReactiveCommand.Create());
+        result.NavigateBack.Returns(ReactiveCommand.Create(() => { }));
+        result.NavigateForward.Returns(ReactiveCommand.Create(() => { }));
         return result;
     }
 
