@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using GitHub.ViewModels;
 using ReactiveUI;
 
 namespace GitHub.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    public class CommentThreadViewModelDesigner : ICommentThreadViewModel
+    public class CommentThreadViewModelDesigner : ViewModelBase, ICommentThreadViewModel
     {
-        public ObservableCollection<ICommentViewModel> Comments { get; }
-            = new ObservableCollection<ICommentViewModel>();
+        public IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
+            = new ReactiveList<ICommentViewModel>();
 
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };
 
-        public ReactiveCommand<string, Unit> PostComment { get; }
-        public ReactiveCommand<Tuple<string, string>, Unit> EditComment { get; }
-        public ReactiveCommand<Tuple<int, int>, Unit> DeleteComment { get; }
+        public Task DeleteComment(int pullRequestId, int commentId) => Task.CompletedTask;
+        public Task EditComment(string id, string body) => Task.CompletedTask;
+        public Task PostComment(string body) => Task.CompletedTask;
     }
 }
