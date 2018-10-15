@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -29,12 +30,12 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="Accounts"/>.
         /// </summary>
-        ReactiveCommand<object> SelectedAccount { get; }
+        ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
 
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="ExistingForks"/>.
         /// </summary>
-        ReactiveCommand<object> SwitchOrigin { get; }
+        ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin { get; }
 
         /// <summary>
         /// Initializes the view model.

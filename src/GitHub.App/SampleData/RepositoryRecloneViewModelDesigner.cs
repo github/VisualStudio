@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Models;
@@ -15,7 +16,7 @@ namespace GitHub.SampleData
         public string BaseRepositoryPath { get; set; }
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         public ICommand BrowseForDirectory { get; }
-        public IReactiveCommand<object> CloneCommand { get; }
+        public ReactiveCommand<Unit, Unit> CloneCommand { get; }
         public IRepositoryModel SelectedRepository { get; set; }
         public IObservable<object> Done { get; }
 

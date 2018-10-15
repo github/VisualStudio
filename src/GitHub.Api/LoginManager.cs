@@ -115,7 +115,9 @@ namespace GitHub.Api
                     // be using a personal access token as the password.
                     if (EnterpriseWorkaround(hostAddress, e))
                     {
-                        auth = new ApplicationAuthorization(password);
+                        auth = new ApplicationAuthorization(0, 
+                            null, null, null, null, null, null, null,
+                            DateTimeOffset.MinValue, DateTimeOffset.MinValue, null, password);
                     }
                     else
                     {

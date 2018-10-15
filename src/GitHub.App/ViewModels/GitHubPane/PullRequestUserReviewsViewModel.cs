@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -44,7 +45,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.editorService = editorService;
             this.sessionManager = sessionManager;
 
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
+            NavigateToPullRequest = ReactiveCommand.Create(() =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
         }
 
@@ -78,7 +79,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "login")]

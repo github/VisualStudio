@@ -73,8 +73,8 @@ namespace GitHub.ViewModels.GitHubPane
                 .Where(x => !x.IsValid && x.DisplayValidationError)
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
-            CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
-                _ => service
+            CreatePullRequest = ReactiveCommand.CreateFromObservable(
+                () => service
                     .CreatePullRequest(modelService, activeLocalRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
@@ -85,16 +85,17 @@ namespace GitHub.ViewModels.GitHubPane
                         var error = apiException?.ApiError?.Errors?.FirstOrDefault();
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
-                    }))
-            .OnExecuteCompleted(pr =>
+                    }),
+                whenAnyValidationResultChanges);
+            CreatePullRequest.Subscribe(pr =>
             {
                 notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, SourceBranch.DisplayName, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name + "#" + pr.Number,
                     TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
                 NavigateTo("/pulls?refresh=true");
-                Cancel.Execute(null);
+                Cancel.Execute();
             });
 
-            Cancel = ReactiveCommand.Create();
+            Cancel = ReactiveCommand.Create(() => { });
             Cancel.Subscribe(_ => Close());
 
             isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
@@ -269,8 +270,8 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
-        public IReactiveCommand<object> Cancel { get; }
+        public ReactiveCommand<Unit, IPullRequestModel> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         string title;
         public string PRTitle

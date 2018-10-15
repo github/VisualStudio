@@ -20,10 +20,10 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG;TRACE;TEAMEXPLORER15</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -32,8 +32,6 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>CODE_ANALYSIS;DEBUG;TRACE;TEAMEXPLORER15</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -42,7 +40,6 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE;TEAMEXPLORER15</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -52,6 +49,10 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\EnvDTE.8.0.2\lib\net10\EnvDTE.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.23.1.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LibGit2Sharp.0.23.1\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
@@ -150,22 +151,19 @@
       <HintPath>..\..\packages\Stateless.2.5.56.0\lib\portable-net40+sl50+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Stateless.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\stdole.7.0.3302\lib\net10\stdole.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Reactive, Version=4.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Reactive.4.0.0\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -264,13 +262,17 @@
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
-      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
-      <Name>ReactiveUI_Net45</Name>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj">
+      <Project>{e899b03c-6e8e-4375-ab65-fc925d721d8b}</Project>
+      <Name>ReactiveUI.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
-      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
-      <Name>Splat-Net45</Name>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI\ReactiveUI.csproj">
+      <Project>{a4f579f3-77d3-450a-aacc-f2653ef11e69}</Project>
+      <Name>ReactiveUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj">
+      <Project>{ad0306b7-f88e-44a4-ab36-1d04822e9234}</Project>
+      <Name>Splat</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
@@ -295,6 +297,10 @@
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj">
+      <Project>{54e8d71a-aabb-4698-95fe-7f11612b8e59}</Project>
+      <Name>GitHub.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>

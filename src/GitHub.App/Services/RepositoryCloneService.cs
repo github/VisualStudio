@@ -34,6 +34,7 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IUsageTracker usageTracker;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
@@ -42,11 +43,13 @@ namespace GitHub.Services
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
             IVSGitServices vsGitServices,
+            ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
             IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
             this.usageTracker = usageTracker;
 
@@ -66,7 +69,7 @@ namespace GitHub.Services
 
                 var affiliation = new RepositoryAffiliation?[]
                 {
-                    RepositoryAffiliation.Owner
+                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -84,6 +87,7 @@ namespace GitHub.Services
                     .Viewer
                     .Select(viewer => new ViewerRepositoriesModel
                     {
+                        Owner = viewer.Login,
                         Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
@@ -103,38 +107,92 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
+        public async Task CloneOrOpenRepository(
+            CloneDialogResult cloneDialogResult,
+            object progress = null)
+        {
+            Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
+
+            var repositoryPath = cloneDialogResult.Path;
+            var url = cloneDialogResult.Url;
+
+            if (DestinationFileExists(repositoryPath))
+            {
+                throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
+            }
+
+            var repositoryUrl = url.ToRepositoryUrl();
+            var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
+            if (DestinationDirectoryExists(repositoryPath))
+            {
+                teamExplorerServices.OpenRepository(repositoryPath);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens);
+                }
+            }
+            else
+            {
+                var cloneUrl = repositoryUrl.ToString();
+                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
+            }
+
+            // Give user a chance to choose a solution
+            teamExplorerServices.ShowHomePage();
+        }
+
+        /// <inheritdoc/>
         public async Task CloneRepository(
             string cloneUrl,
-            string repositoryName,
             string repositoryPath,
             object progress = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
-            Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
-
-            string path = Path.Combine(repositoryPath, repositoryName);
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
             await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(path);
+            operatingSystem.Directory.CreateDirectory(repositoryPath);
             await ThreadingHelper.SwitchToMainThreadAsync();
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, path, true, progress);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
+
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Count the number of times users clone into the Default Repository Location
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
+                }
             }
             catch (Exception ex)
             {
-                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, path);
+                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, repositoryPath);
                 throw;
             }
         }
 
         /// <inheritdoc/>
-        public bool DestinationExists(string path) => Directory.Exists(path) || File.Exists(path);
+        public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {

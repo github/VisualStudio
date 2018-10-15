@@ -471,7 +471,7 @@ namespace GitHub.Services
             var exitCode = await Where("git");
             if (exitCode != 0)
             {
-                progress(App.Resources.CouldntFindGitOnPath);
+                progress(Resources.CouldntFindGitOnPath);
                 return false;
             }
 
@@ -819,8 +819,8 @@ namespace GitHub.Services
         public bool ConfirmCancelPendingReview()
         {
             return MessageBox.Show(
-                       GitHub.App.Resources.CancelPendingReviewConfirmation,
-                       GitHub.App.Resources.CancelPendingReviewConfirmationCaption,
+                       Resources.CancelPendingReviewConfirmation,
+                       Resources.CancelPendingReviewConfirmationCaption,
                        MessageBoxButtons.YesNo,
                        MessageBoxIcon.Question) == DialogResult.Yes;
         }
@@ -931,7 +931,7 @@ namespace GitHub.Services
                     await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
 
                 // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
-                if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
+                if (!Splat.ModeDetector.InUnitTestRunner())
                     await Task.Delay(TimeSpan.FromSeconds(5));
 
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
