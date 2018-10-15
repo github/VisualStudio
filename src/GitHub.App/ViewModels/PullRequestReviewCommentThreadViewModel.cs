@@ -1,12 +1,16 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GitHub.App.Models.Drafts;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels
 {
@@ -25,9 +29,13 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewCommentThreadViewModel"/> class.
         /// </summary>
+        /// <param name="draftStore">The message draft store.</param>
         /// <param name="factory">The view model factory.</param>
         [ImportingConstructor]
-        public PullRequestReviewCommentThreadViewModel(IViewViewModelFactory factory)
+        public PullRequestReviewCommentThreadViewModel(
+            IMessageDraftStore draftStore,
+            IViewViewModelFactory factory)
+            : base(draftStore)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
 
@@ -75,7 +83,7 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User).ConfigureAwait(false);
+            await base.InitializeAsync(session.User).ConfigureAwait(true);
 
             Session = session;
             File = file;
@@ -97,7 +105,7 @@ namespace GitHub.ViewModels
             if (addPlaceholder)
             {
                 var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
-                await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(false);
+                await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(true);
                 Comments.Add(vm);
             }
         }
@@ -123,6 +131,14 @@ namespace GitHub.ViewModels
             var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
             await vm.InitializeAsPlaceholderAsync(session, this, isEditing).ConfigureAwait(false);
             Comments.Add(vm);
+
+            var (key, secondaryKey) = GetDraftKeys(vm);
+            var draft = await DraftStore.GetDraft<CommentDraft>(key, secondaryKey).ConfigureAwait(true);
+
+            if (draft != null)
+            {
+                vm.Body = draft.Body;
+            }
         }
 
         public override async Task PostComment(string body)
@@ -169,6 +185,30 @@ namespace GitHub.ViewModels
         public override async Task DeleteComment(int pullRequestId, int commentId)
         {
             await Session.DeleteComment(pullRequestId, commentId).ConfigureAwait(false);
+        }
+
+        public static (string key, string secondaryKey) GetDraftKeys(
+            UriString cloneUri,
+            int pullRequestNumber,
+            string relativePath,
+            int lineNumber)
+        {
+            var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{relativePath}");
+            return (key, lineNumber.ToString(CultureInfo.InvariantCulture));
+        }
+
+        protected override CommentDraft BuildDraft(ICommentViewModel comment)
+        {
+            return base.BuildDraft(comment);
+        }
+
+        protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment)
+        {
+            return GetDraftKeys(
+                Session.LocalRepository.CloneUrl.WithOwner(Session.RepositoryOwner),
+                Session.PullRequest.Number,
+                File.RelativePath,
+                LineNumber);
         }
     }
 }

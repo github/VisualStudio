@@ -327,12 +327,13 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         IViewViewModelFactory CreateFactory()
         {
+            var draftStore = Substitute.For<IMessageDraftStore>();
             var commentService = Substitute.For<ICommentService>();
             var result = Substitute.For<IViewViewModelFactory>();
             result.CreateViewModel<IPullRequestReviewCommentViewModel>().Returns(_ =>
                 new PullRequestReviewCommentViewModel(commentService));
             result.CreateViewModel<IPullRequestReviewCommentThreadViewModel>().Returns(_ =>
-                new PullRequestReviewCommentThreadViewModel(result));
+                new PullRequestReviewCommentThreadViewModel(draftStore, result));
             return result;
         }
 
