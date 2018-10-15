@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Models.Drafts;
@@ -51,6 +52,21 @@ namespace GitHub.App.UnitTests.ViewModels
                 scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
 
                 await drafts.DidNotReceiveWithAnyArgs().UpdateDraft<CommentDraft>(null, null, null);
+            }
+        }
+
+        [Test]
+        public async Task CancelEditDeletesDraft()
+        {
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var drafts = Substitute.For<IMessageDraftStore>();
+                var target = CreateTarget(drafts: drafts);
+
+                await target.AddPlaceholder(false);
+                await target.Comments[0].CancelEdit.Execute();
+
+                await drafts.Received().DeleteDraft("file.cs", "10");
             }
         }
 

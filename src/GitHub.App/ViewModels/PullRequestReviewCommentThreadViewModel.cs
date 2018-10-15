@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -107,6 +108,15 @@ namespace GitHub.ViewModels
                 var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
                 await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(true);
                 Comments.Add(vm);
+
+                var (key, secondaryKey) = GetDraftKeys(vm);
+                var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
+
+                if (draft?.Side == Side)
+                {
+                    await vm.BeginEdit.Execute();
+                    vm.Body = draft.Body;
+                }
             }
         }
 
