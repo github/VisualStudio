@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using System.Threading.Tasks;
-using GitHub.App.Models.Drafts;
 using GitHub.Models;
+using GitHub.Models.Drafts;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;

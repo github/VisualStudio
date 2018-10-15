@@ -3,10 +3,10 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using GitHub.App.Models.Drafts;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Models.Drafts;
 using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
@@ -133,9 +133,9 @@ namespace GitHub.ViewModels
             Comments.Add(vm);
 
             var (key, secondaryKey) = GetDraftKeys(vm);
-            var draft = await DraftStore.GetDraft<CommentDraft>(key, secondaryKey).ConfigureAwait(true);
+            var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
 
-            if (draft != null)
+            if (draft?.Side == side)
             {
                 vm.Body = draft.Body;
             }
@@ -193,13 +193,19 @@ namespace GitHub.ViewModels
             string relativePath,
             int lineNumber)
         {
+            relativePath = relativePath.Replace("\\", "/");
             var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{relativePath}");
             return (key, lineNumber.ToString(CultureInfo.InvariantCulture));
         }
 
         protected override CommentDraft BuildDraft(ICommentViewModel comment)
         {
-            return base.BuildDraft(comment);
+            return new PullRequestReviewCommentDraft
+            {
+                Body = comment.Body,
+                Side = Side,
+                UpdatedAt = DateTimeOffset.UtcNow,
+            };
         }
 
         protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment)

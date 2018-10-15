@@ -5,9 +5,9 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using GitHub.App.Models.Drafts;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Models.Drafts;
 using GitHub.Services;
 using ReactiveUI;
 

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.App.Models.Drafts;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Models.Drafts;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
