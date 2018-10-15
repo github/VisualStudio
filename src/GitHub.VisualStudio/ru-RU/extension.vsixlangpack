@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<PackageLanguagePackManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
-  <Metadata>
-    <DisplayName>GitHub Extension for Visual Studio</DisplayName>
-    <Description>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</Description>
-  </Metadata>
-</PackageLanguagePackManifest>
