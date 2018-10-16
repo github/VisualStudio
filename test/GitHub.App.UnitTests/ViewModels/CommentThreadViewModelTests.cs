@@ -91,7 +91,7 @@ namespace GitHub.App.UnitTests.ViewModels
             {
                 var c = new TestComment();
                 await c.InitializeAsPlaceholderAsync(this, isEditing);
-                Comments.Add(c);
+                AddPlaceholder(c);
             }
 
             public override Task DeleteComment(int pullRequestId, int commentId) => throw new NotImplementedException();

@@ -107,7 +107,6 @@ namespace GitHub.ViewModels
             {
                 var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
                 await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(true);
-                Comments.Add(vm);
 
                 var (key, secondaryKey) = GetDraftKeys(vm);
                 var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
@@ -117,6 +116,8 @@ namespace GitHub.ViewModels
                     await vm.BeginEdit.Execute();
                     vm.Body = draft.Body;
                 }
+
+                AddPlaceholder(vm);
             }
         }
 
@@ -140,7 +141,6 @@ namespace GitHub.ViewModels
 
             var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
             await vm.InitializeAsPlaceholderAsync(session, this, isEditing).ConfigureAwait(false);
-            Comments.Add(vm);
 
             var (key, secondaryKey) = GetDraftKeys(vm);
             var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
@@ -149,6 +149,8 @@ namespace GitHub.ViewModels
             {
                 vm.Body = draft.Body;
             }
+
+            AddPlaceholder(vm);
         }
 
         public override async Task PostComment(string body)

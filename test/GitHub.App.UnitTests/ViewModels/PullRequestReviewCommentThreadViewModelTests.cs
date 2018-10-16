@@ -73,20 +73,45 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Test]
-        public async Task LoadsDraftForNewComment()
+        public async Task LoadsDraftForNewThread()
         {
-            var draftStore = Substitute.For<IMessageDraftStore>();
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var draftStore = Substitute.For<IMessageDraftStore>();
 
-            draftStore.GetDraft<CommentDraft>(
-                "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
-                .Returns(new CommentDraft
-                {
-                    Body = "Draft comment.",
-                });
+                draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                    "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                    .Returns(new PullRequestReviewCommentDraft
+                    {
+                        Body = "Draft comment.",
+                        Side = DiffSide.Right,
+                    });
 
-            var target = await CreateTarget(draftStore: draftStore, newThread: true);
+                var target = await CreateTarget(draftStore: draftStore, newThread: true);
 
-            Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
+                Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
+            }
+        }
+
+        [Test]
+        public async Task LoadsDraftForExistingThread()
+        {
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var draftStore = Substitute.For<IMessageDraftStore>();
+
+                draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                    "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                    .Returns(new PullRequestReviewCommentDraft
+                    {
+                        Body = "Draft comment.",
+                        Side = DiffSide.Right,
+                    });
+
+                var target = await CreateTarget(draftStore: draftStore);
+
+                Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
+            }
         }
 
         async Task<PullRequestReviewCommentThreadViewModel> CreateTarget(
@@ -105,17 +130,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             review = review ?? new PullRequestReviewModel();
             comments = comments ?? CreateComments();
 
-            var thread = Substitute.For<IInlineCommentThreadModel>();
-            thread.Comments.Returns(comments.ToList());
-
             var result = new PullRequestReviewCommentThreadViewModel(draftStore, factory);
 
             if (newThread)
             {
-                await result.InitializeNewAsync(session, file, 10, DiffSide.Left, true);
+                await result.InitializeNewAsync(session, file, 10, DiffSide.Right, true);
             }
             else
             {
+                var thread = Substitute.For<IInlineCommentThreadModel>();
+                thread.Comments.Returns(comments.ToList());
+                thread.LineNumber.Returns(10);
+
                 await result.InitializeAsync(session, file, review, thread, true);
             }
 

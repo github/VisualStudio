@@ -179,16 +179,15 @@ namespace GitHub.InlineReviews.ViewModels
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
-
-            Thread = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
+            var vm = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
 
             if (thread?.Comments.Count > 0)
             {
-                await Thread.InitializeAsync(session, file, thread.Comments[0].Review, thread, true);
+                await vm.InitializeAsync(session, file, thread.Comments[0].Review, thread, true);
             }
             else
             {
-                await Thread.InitializeNewAsync(session, file, lineNumber, side, true);
+                await vm.InitializeNewAsync(session, file, lineNumber, side, true);
             }
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))
@@ -201,6 +200,8 @@ namespace GitHub.InlineReviews.ViewModels
                     placeholder.Body = placeholderBody;
                 }
             }
+
+            Thread = vm;
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)
