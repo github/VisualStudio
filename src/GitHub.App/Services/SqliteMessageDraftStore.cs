@@ -21,15 +21,14 @@ namespace GitHub.Services
     public class SqliteMessageDraftStore : IMessageDraftStore
     {
         static readonly ILogger log = LogManager.ForContext<SqliteMessageDraftStore>();
-        readonly SQLiteAsyncConnection connection;
+        readonly IOperatingSystem os;
+        SQLiteAsyncConnection connection;
+        bool initialized;
 
         [ImportingConstructor]
         public SqliteMessageDraftStore(IOperatingSystem os)
         {
-            var path = Path.Combine(
-                os.Environment.GetApplicationDataPath(),
-                "drafts.db");
-            connection = new SQLiteAsyncConnection(path);
+            this.os = os;
         }
 
         public async Task<T> GetDraft<T>(string key, string secondaryKey) where T : class
@@ -37,21 +36,24 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotNull(secondaryKey, nameof(secondaryKey));
 
-            try
+            if (await Initialize().ConfigureAwait(false))
             {
-                var result = await connection.Table<Draft>().Where(
-                    x => x.Key == key && x.SecondaryKey == secondaryKey)
-                    .FirstOrDefaultAsync()
-                    .ConfigureAwait(false);
-
-                if (result != null)
+                try
                 {
-                    return JsonConvert.DeserializeObject<T>(result.Data);
+                    var result = await connection.Table<Draft>().Where(
+                        x => x.Key == key && x.SecondaryKey == secondaryKey)
+                        .FirstOrDefaultAsync()
+                        .ConfigureAwait(false);
+
+                    if (result != null)
+                    {
+                        return JsonConvert.DeserializeObject<T>(result.Data);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Failed to load message draft into {Type}", typeof(T));
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed to load message draft into {Type}", typeof(T));
+                }
             }
 
             return null;
@@ -61,17 +63,20 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            try
+            if (await Initialize().ConfigureAwait(false))
             {
-                var result = await connection.Table<Draft>().Where(x => x.Key == key)
-                    .ToListAsync()
-                    .ConfigureAwait(false);
+                try
+                {
+                    var result = await connection.Table<Draft>().Where(x => x.Key == key)
+                        .ToListAsync()
+                        .ConfigureAwait(false);
 
-                return result.Select(x => (x.SecondaryKey, JsonConvert.DeserializeObject<T>(x.Data)));
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Failed to load message drafts into {Type}", typeof(T));
+                    return result.Select(x => (x.SecondaryKey, JsonConvert.DeserializeObject<T>(x.Data)));
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Failed to load message drafts into {Type}", typeof(T));
+                }
             }
 
             return null;
@@ -81,6 +86,11 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotNull(secondaryKey, nameof(secondaryKey));
+
+            if (!await Initialize().ConfigureAwait(false))
+            {
+                return;
+            }
 
             try
             {
@@ -104,6 +114,11 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotNull(secondaryKey, nameof(secondaryKey));
 
+            if (!await Initialize().ConfigureAwait(false))
+            {
+                return;
+            }
+
             try
             {
                 await connection.ExecuteAsync(
@@ -115,6 +130,42 @@ namespace GitHub.Services
             {
                 log.Error(ex, "Failed to update message draft");
             }
+        }
+
+        async Task<bool> Initialize()
+        {
+            if (!initialized)
+            {
+                var path = Path.Combine(os.Environment.GetApplicationDataPath(), "drafts.db");
+
+                try
+                {
+                    connection = new SQLiteAsyncConnection(path);
+
+                    var draftsTable = await connection.GetTableInfoAsync("Drafts").ConfigureAwait(false);
+
+                    if (draftsTable.Count == 0)
+                    {
+                        await connection.ExecuteAsync(@"
+                            CREATE TABLE `Drafts` (
+	                            `Key`	TEXT,
+	                            `SecondaryKey`	TEXT,
+	                            `Data`	TEXT,
+	                            UNIQUE(`Key`,`SecondaryKey`)
+                            );").ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Error opening drafts from {Path}.", path);
+                }
+                finally
+                {
+                    initialized = true;
+                }
+            }
+
+            return connection != null;
         }
 
         [Table("Drafts")]
