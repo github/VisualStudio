@@ -70,6 +70,7 @@ namespace GitHub.InlineReviews.Services
                 var sessions = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession);
                 activeReposities
                     .CombineLatest(sessions, (r, s) => (r, s))
+                    .Throttle(TimeSpan.FromSeconds(1))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => RefreshCurrentSession(x.r, x.s).Forget());
             }
