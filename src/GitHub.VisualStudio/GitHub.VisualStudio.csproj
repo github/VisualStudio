@@ -330,6 +330,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolverPackage.cs" />
+    <Compile Include="BindingPathUtilities.cs" />
     <Compile Include="Commands\BlameLinkCommand.cs" />
     <Compile Include="Commands\CreateGistCommand.cs" />
     <Compile Include="Commands\OpenFromClipboardCommand.cs" />
