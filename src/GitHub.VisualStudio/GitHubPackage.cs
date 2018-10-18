@@ -13,6 +13,7 @@ using GitHub.Services;
 using GitHub.Settings;
 using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
+using GitHub.Services.Vssdk.Services;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.UI;
@@ -149,6 +150,9 @@ namespace GitHub.VisualStudio
         [ExportForVisualStudioProcess]
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
+        [ExportForVisualStudioProcess]
+        public IVsTippingService TippingService => GetService<IVsTippingService>();
+
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
 
@@ -160,6 +164,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
+    [ProvideService(typeof(IVsTippingService))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
@@ -175,6 +180,7 @@ namespace GitHub.VisualStudio
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
+            AddService(typeof(IVsTippingService), CreateService, true);
             return Task.CompletedTask;
         }
 
@@ -288,6 +294,10 @@ namespace GitHub.VisualStudio
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 return new PackageSettings(sp);
+            }
+            else if (serviceType == typeof(IVsTippingService))
+            {
+                return new VsTippingService(this);
             }
             // go the mef route
             else
