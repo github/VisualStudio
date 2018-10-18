@@ -192,7 +192,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (!string.IsNullOrWhiteSpace(placeholderBody))
             {
-                var placeholder = Thread.Comments.LastOrDefault();
+                var placeholder = vm.Comments.LastOrDefault();
 
                 if (placeholder?.EditState == CommentEditState.Placeholder)
                 {

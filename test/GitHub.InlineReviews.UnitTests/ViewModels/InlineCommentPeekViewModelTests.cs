@@ -370,6 +370,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
+            result.PullRequest.Returns(new PullRequestDetailModel());
             result.User.Returns(new ActorModel { Login = "CurrentUser" });
             result.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
             return result;
