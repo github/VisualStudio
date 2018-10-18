@@ -72,7 +72,7 @@ namespace GitHub.InlineReviews.Services
                     .CombineLatest(sessions, (r, s) => (r, s))
                     .Throttle(TimeSpan.FromSeconds(1))
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => RefreshCurrentSession(x.r, x.s).Forget());
+                    .Subscribe(x => RefreshCurrentSession(x.r, x.s).Forget(log));
             }
             catch (Exception e)
             {
@@ -82,22 +82,15 @@ namespace GitHub.InlineReviews.Services
 
         async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
         {
-            try
+            var showStatus = await IsDotComOrEnterpriseRepository(repository);
+            if (!showStatus)
             {
-                var showStatus = await IsDotComOrEnterpriseRepository(repository);
-                if (!showStatus)
-                {
-                    ShowStatus(null);
-                    return;
-                }
+                ShowStatus(null);
+                return;
+            }
 
-                var viewModel = CreatePullRequestStatusViewModel(session);
-                ShowStatus(viewModel);
-            }
-            catch (Exception e)
-            {
-                log.Error(e, nameof(RefreshCurrentSession));
-            }
+            var viewModel = CreatePullRequestStatusViewModel(session);
+            ShowStatus(viewModel);
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
