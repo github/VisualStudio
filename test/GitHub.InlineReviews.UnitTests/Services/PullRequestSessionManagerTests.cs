@@ -37,37 +37,31 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public void ReadsPullRequestFromCorrectFork()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var service = CreatePullRequestService();
-                    var sessionService = CreateSessionService();
+                var service = CreatePullRequestService();
+                var sessionService = CreateSessionService();
 
-                    service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
-                        Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
+                    Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
 
-                    var connectionManager = CreateConnectionManager();
-                    var target = CreateTarget(
-                        service: service,
-                        sessionService: sessionService,
-                        connectionManager: connectionManager);
+                var connectionManager = CreateConnectionManager();
+                var target = CreateTarget(
+                    service: service,
+                    sessionService: sessionService,
+                    connectionManager: connectionManager);
 
-                    var address = HostAddress.Create(OwnerCloneUrl);
-                    sessionService.Received(1).ReadPullRequestDetail(address, "fork", "repo", 15);
-                }
+                var address = HostAddress.Create(OwnerCloneUrl);
+                sessionService.Received(1).ReadPullRequestDetail(address, "fork", "repo", 15);
             }
 
             [Test]
             public void LocalRepositoryModelNull()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var repositoryModel = null as LocalRepositoryModel;
-                    var teamExplorerContext = CreateTeamExplorerContext(repositoryModel);
+                var repositoryModel = null as LocalRepositoryModel;
+                var teamExplorerContext = CreateTeamExplorerContext(repositoryModel);
 
-                    var target = CreateTarget(teamExplorerContext: teamExplorerContext);
+                var target = CreateTarget(teamExplorerContext: teamExplorerContext);
 
-                    Assert.Null(target.CurrentSession);
-                }
+                Assert.Null(target.CurrentSession);
             }
         }
 
@@ -76,154 +70,124 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public void CreatesSessionForCurrentBranch()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var target = CreateTarget();
+                var target = CreateTarget();
 
-                    Assert.That(target.CurrentSession, Is.Not.Null);
-                    Assert.That(target.CurrentSession.IsCheckedOut, Is.True);
-                }
+                Assert.That(target.CurrentSession, Is.Not.Null);
+                Assert.That(target.CurrentSession.IsCheckedOut, Is.True);
             }
 
             [Test]
             public void CurrentSessionIsNullIfNoPullRequestForCurrentBranch()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var service = CreatePullRequestService();
-                    service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
+                var service = CreatePullRequestService();
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
 
-                    var target = CreateTarget(service: service);
+                var target = CreateTarget(service: service);
 
-                    Assert.That(target.CurrentSession, Is.Null);
-                }
+                Assert.That(target.CurrentSession, Is.Null);
             }
 
             [Test]
             public void CurrentSessionChangesWhenBranchChanges()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var service = CreatePullRequestService();
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(
-                        service: service,
-                        teamExplorerContext: teamExplorerContext);
+                var service = CreatePullRequestService();
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(
+                    service: service,
+                    teamExplorerContext: teamExplorerContext);
 
-                    var session = target.CurrentSession;
+                var session = target.CurrentSession;
 
-                    service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
-                    teamExplorerContext.StatusChanged += Raise.Event();
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
+                teamExplorerContext.StatusChanged += Raise.Event();
 
-                    Assert.That(session, Is.Not.SameAs(target.CurrentSession));
-                }
+                Assert.That(session, Is.Not.SameAs(target.CurrentSession));
             }
 
             [Test]
             public void LocalRepositoryModelNull()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var repositoryModel = null as LocalRepositoryModel;
-                    var target = CreateTarget(
-                        teamExplorerContext: CreateTeamExplorerContext(null));
+                var repositoryModel = null as LocalRepositoryModel;
+                var target = CreateTarget(
+                    teamExplorerContext: CreateTeamExplorerContext(null));
 
-                    Assert.That(target.CurrentSession, Is.Null);
-                }
+                Assert.That(target.CurrentSession, Is.Null);
             }
 
             [Test]
             public void CurrentSessionChangesToNullIfNoPullRequestForCurrentBranch()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var service = CreatePullRequestService();
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(
-                        service: service,
-                        teamExplorerContext: teamExplorerContext);
-                    Assert.That(target.CurrentSession, Is.Not.Null);
+                var service = CreatePullRequestService();
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(
+                    service: service,
+                    teamExplorerContext: teamExplorerContext);
+                Assert.That(target.CurrentSession, Is.Not.Null);
 
-                    Tuple<string, int> newPullRequest = null;
-                    service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(newPullRequest));
-                    teamExplorerContext.StatusChanged += Raise.Event();
+                Tuple<string, int> newPullRequest = null;
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(newPullRequest));
+                teamExplorerContext.StatusChanged += Raise.Event();
 
-                    var session = target.CurrentSession;
+                var session = target.CurrentSession;
 
-                    Assert.That(session, Is.Null);
-                }
+                Assert.That(session, Is.Null);
             }
 
             [Test]
             public void CurrentSessionChangesToNullWhenRepoChangedToNull()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(teamExplorerContext: teamExplorerContext);
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(teamExplorerContext: teamExplorerContext);
 
-                    Assert.That(target.CurrentSession, Is.Not.Null);
+                Assert.That(target.CurrentSession, Is.Not.Null);
 
-                    SetActiveRepository(teamExplorerContext, null);
-                    var session = target.CurrentSession;
+                SetActiveRepository(teamExplorerContext, null);
+                var session = target.CurrentSession;
 
-                    Assert.That(session, Is.Null);
-                }
+                Assert.That(session, Is.Null);
             }
 
             [Test]
             public void CurrentSessionChangesWhenRepoChanged()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(teamExplorerContext: teamExplorerContext);
-                    var session = target.CurrentSession;
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(teamExplorerContext: teamExplorerContext);
+                var session = target.CurrentSession;
 
-                    SetActiveRepository(teamExplorerContext, CreateRepositoryModel("https://github.com/owner/other"));
+                SetActiveRepository(teamExplorerContext, CreateRepositoryModel("https://github.com/owner/other"));
 
-                    Assert.That(session, Is.Not.SameAs(target.CurrentSession));
-                }
+                Assert.That(session, Is.Not.SameAs(target.CurrentSession));
             }
 
             [Test]
             public void RepoChangedDoesntCreateNewSessionIfNotNecessary()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(teamExplorerContext: teamExplorerContext);
-                    var session = target.CurrentSession;
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(teamExplorerContext: teamExplorerContext);
+                var session = target.CurrentSession;
 
-                    teamExplorerContext.StatusChanged += Raise.Event();
+                teamExplorerContext.StatusChanged += Raise.Event();
 
-                    Assert.That(session, Is.SameAs(target.CurrentSession));
-                }
+                Assert.That(session, Is.SameAs(target.CurrentSession));
             }
 
             [Test]
             public void RepoChangedHandlesNullRepository()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
-                    var target = CreateTarget(teamExplorerContext: teamExplorerContext);
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var target = CreateTarget(teamExplorerContext: teamExplorerContext);
 
-                    SetActiveRepository(teamExplorerContext, null);
+                SetActiveRepository(teamExplorerContext, null);
 
-                    Assert.That(target.CurrentSession, Is.Null);
-                }
+                Assert.That(target.CurrentSession, Is.Null);
             }
 
             [Test]
             public void CreatesSessionWithCorrectRepositoryOwner()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var target = CreateTarget(service: CreatePullRequestService("this-owner"));
+                var target = CreateTarget(service: CreatePullRequestService("this-owner"));
 
-                    Assert.That("this-owner", Is.EqualTo(target.CurrentSession.RepositoryOwner));
-                }
+                Assert.That("this-owner", Is.EqualTo(target.CurrentSession.RepositoryOwner));
             }
         }
 
@@ -234,27 +198,21 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public async Task BaseShaIsSet()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var target = CreateTarget();
-                    var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var textView = CreateTextView();
+                var target = CreateTarget();
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That("BASESHA", Is.SameAs(file.BaseSha));
-                }
+                Assert.That("BASESHA", Is.SameAs(file.BaseSha));
             }
 
             [Test]
             public async Task CommitShaIsSet()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var target = CreateTarget();
-                    var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var textView = CreateTextView();
+                var target = CreateTarget();
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
-                }
+                Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
             }
 
             [Test]
@@ -271,187 +229,169 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public async Task DiffIsSet()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var contents = Encoding.UTF8.GetBytes("File contents");
-                    var diff = new List<DiffChunk>();
-                    var sessionService = CreateSessionService();
+                var textView = CreateTextView();
+                var contents = Encoding.UTF8.GetBytes("File contents");
+                var diff = new List<DiffChunk>();
+                var sessionService = CreateSessionService();
 
-                    sessionService.GetContents(textView.TextBuffer).Returns(contents);
-                    sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
-                    sessionService.Diff(
-                        Arg.Any<ILocalRepositoryModel>(),
-                        "MERGE_BASE",
-                        "HEADSHA",
-                        FilePath,
-                        contents).Returns(diff);
+                sessionService.GetContents(textView.TextBuffer).Returns(contents);
+                sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
+                sessionService.Diff(
+                    Arg.Any<ILocalRepositoryModel>(),
+                    "MERGE_BASE",
+                    "HEADSHA",
+                    FilePath,
+                    contents).Returns(diff);
 
-                    var target = CreateTarget(sessionService: sessionService);
-                    var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var target = CreateTarget(sessionService: sessionService);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That(diff, Is.SameAs(file.Diff));
-                }
+                Assert.That(diff, Is.SameAs(file.Diff));
             }
 
             [Test]
             public async Task InlineCommentThreadsIsSet()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
-                    var threads = new List<IInlineCommentThreadModel>();
-                    var target = CreateTarget(sessionService: sessionService);
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>();
+                var target = CreateTarget(sessionService: sessionService);
 
-                    sessionService.BuildCommentThreads(
-                        target.CurrentSession.PullRequest,
-                        FilePath,
-                        Arg.Any<IReadOnlyList<DiffChunk>>(),
-                        Arg.Any<string>())
-                        .Returns(threads);
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    FilePath,
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
+                    .Returns(threads);
 
-                    var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That(threads, Is.SameAs(file.InlineCommentThreads));
-                }
+                Assert.That(threads, Is.SameAs(file.InlineCommentThreads));
             }
 
             [Test]
             public async Task CreatesTrackingPointsForThreads()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
-                    var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
-                    var target = CreateTarget(sessionService: sessionService);
+                var target = CreateTarget(sessionService: sessionService);
 
-                    sessionService.BuildCommentThreads(
-                        target.CurrentSession.PullRequest,
-                        FilePath,
-                        Arg.Any<IReadOnlyList<DiffChunk>>(),
-                        Arg.Any<string>())
-                        .Returns(threads);
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    FilePath,
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
+                    .Returns(threads);
 
-                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That(2, Is.EqualTo(file.TrackingPoints.Count));
-                }
+                Assert.That(2, Is.EqualTo(file.TrackingPoints.Count));
             }
 
             [Test]
             public async Task MovingToNoRepositoryShouldNullOutProperties()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
-                    var threads = new List<IInlineCommentThreadModel>();
-                    var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var threads = new List<IInlineCommentThreadModel>();
+                var teamExplorerContext = CreateTeamExplorerContext(CreateRepositoryModel());
 
-                    var target = CreateTarget(
-                        sessionService: sessionService,
-                        teamExplorerContext: teamExplorerContext);
+                var target = CreateTarget(
+                    sessionService: sessionService,
+                    teamExplorerContext: teamExplorerContext);
 
-                    sessionService.BuildCommentThreads(
-                        target.CurrentSession.PullRequest,
-                        FilePath,
-                        Arg.Any<IReadOnlyList<DiffChunk>>(),
-                        Arg.Any<string>())
-                        .Returns(threads);
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    FilePath,
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
+                    .Returns(threads);
 
-                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That(file.BaseSha, Is.Not.Null);
-                    Assert.That(file.CommitSha, Is.Not.Null);
-                    Assert.That(file.Diff, Is.Not.Null);
-                    Assert.That(file.InlineCommentThreads, Is.Not.Null);
-                    Assert.That(file.TrackingPoints, Is.Not.Null);
+                Assert.That(file.BaseSha, Is.Not.Null);
+                Assert.That(file.CommitSha, Is.Not.Null);
+                Assert.That(file.Diff, Is.Not.Null);
+                Assert.That(file.InlineCommentThreads, Is.Not.Null);
+                Assert.That(file.TrackingPoints, Is.Not.Null);
 
-                    SetActiveRepository(teamExplorerContext, null);
+                SetActiveRepository(teamExplorerContext, null);
 
-                    Assert.That(file.BaseSha, Is.Null);
-                    Assert.That(file.CommitSha, Is.Null);
-                    Assert.That(file.Diff, Is.Null);
-                    Assert.That(file.InlineCommentThreads, Is.Null);
-                    Assert.That(file.TrackingPoints, Is.Null);
-                }
+                Assert.That(file.BaseSha, Is.Null);
+                Assert.That(file.CommitSha, Is.Null);
+                Assert.That(file.Diff, Is.Null);
+                Assert.That(file.InlineCommentThreads, Is.Null);
+                Assert.That(file.TrackingPoints, Is.Null);
             }
 
             [Test]
             public async Task ModifyingBufferMarksThreadsAsStaleAndSignalsRebuild()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
-                    var rebuild = Substitute.For<ISubject<ITextSnapshot, ITextSnapshot>>();
-                    sessionService.CreateRebuildSignal().Returns(rebuild);
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                var rebuild = Substitute.For<ISubject<ITextSnapshot, ITextSnapshot>>();
+                sessionService.CreateRebuildSignal().Returns(rebuild);
 
-                    var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                var threads = new List<IInlineCommentThreadModel>
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
-                    var target = CreateTarget(sessionService: sessionService);
+                var target = CreateTarget(sessionService: sessionService);
 
-                    sessionService.BuildCommentThreads(
-                        target.CurrentSession.PullRequest,
-                        FilePath,
-                        Arg.Any<IReadOnlyList<DiffChunk>>(),
-                        Arg.Any<string>())
-                        .Returns(threads);
+                sessionService.BuildCommentThreads(
+                    target.CurrentSession.PullRequest,
+                    FilePath,
+                    Arg.Any<IReadOnlyList<DiffChunk>>(),
+                    Arg.Any<string>())
+                    .Returns(threads);
 
-                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
-                    var linesChangedReceived = false;
-                    file.LinesChanged.Subscribe(x => linesChangedReceived = true);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var linesChangedReceived = false;
+                file.LinesChanged.Subscribe(x => linesChangedReceived = true);
 
-                    // Make the first tracking points return a different value so that the thread is marked as stale.
-                    var snapshot = textView.TextSnapshot;
-                    file.TrackingPoints[file.InlineCommentThreads[0]].GetPosition(snapshot).ReturnsForAnyArgs(5);
+                // Make the first tracking points return a different value so that the thread is marked as stale.
+                var snapshot = textView.TextSnapshot;
+                file.TrackingPoints[file.InlineCommentThreads[0]].GetPosition(snapshot).ReturnsForAnyArgs(5);
 
-                    SignalTextChanged(textView.TextBuffer);
+                SignalTextChanged(textView.TextBuffer);
 
-                    threads[0].Received().IsStale = true;
-                    threads[1].DidNotReceive().IsStale = true;
+                threads[0].Received().IsStale = true;
+                threads[1].DidNotReceive().IsStale = true;
 
-                    Assert.That(linesChangedReceived, Is.True);
-                    file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
-                }
+                Assert.That(linesChangedReceived, Is.True);
+                file.Rebuild.Received().OnNext(Arg.Any<ITextSnapshot>());
             }
 
             [Test]
             public async Task RebuildSignalUpdatesCommitSha()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
-                    sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
+                sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
 
-                    var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                var threads = new List<IInlineCommentThreadModel>
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
-                    var target = CreateTarget(sessionService: sessionService);
-                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var target = CreateTarget(sessionService: sessionService);
+                var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
+                Assert.That("TIPSHA", Is.SameAs(file.CommitSha));
 
-                    sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
-                    file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
+                sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
+                file.Rebuild.OnNext(textView.TextBuffer.CurrentSnapshot);
 
-                    Assert.That(file.CommitSha, Is.Null);
-                }
+                Assert.That(file.CommitSha, Is.Null);
             }
 
             [Test]
@@ -473,151 +413,142 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public async Task InlineCommentThreadsAreLoadedFromCurrentSession()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var baseContents = @"Line 1
+                var baseContents = @"Line 1
 Line 2
 Line 3
 Line 4";
-                    var contents = @"Line 1
+                var contents = @"Line 1
 Line 2
 Line 3 with comment
 Line 4";
-                    var thread = CreateCommentThread(@"@@ -1,4 +1,4 @@
+                var thread = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment");
 
-                    using (var diffService = new FakeDiffService())
-                    {
-                        var textView = CreateTextView(contents);
-                        var pullRequest = CreatePullRequestModel(
-                            CurrentBranchPullRequestNumber,
-                            thread);
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        thread);
 
-                        diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                        var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
-                        var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                    var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                        Assert.That(file.InlineCommentThreads.Count, Is.EqualTo(1));
-                        Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
-                    }
+                    Assert.That(file.InlineCommentThreads.Count, Is.EqualTo(1));
+                    Assert.That(file.InlineCommentThreads[0].LineNumber, Is.EqualTo(2));
                 }
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var baseContents = @"Line 1
+                var baseContents = @"Line 1
 Line 2
 Line 3
 Line 4";
-                    var contents = @"Line 1
+                var contents = @"Line 1
 Line 2
 Line 3 with comment
 Line 4";
-                    var editorContents = @"New Line 1
+                var editorContents = @"New Line 1
 New Line 2
 Line 1
 Line 2
 Line 3 with comment
 Line 4";
-                    var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment");
 
-                    using (var diffService = new FakeDiffService())
-                    {
-                        var textView = CreateTextView(contents);
-                        var pullRequest = CreatePullRequestModel(
-                            CurrentBranchPullRequestNumber,
-                            comment);
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        comment);
 
-                        diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                        var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
-                        var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                    var target = CreateTarget(sessionService: CreateRealSessionService(diffService, pullRequest));
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                        Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
-                        Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
+                    Assert.That(2, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
 
-                        textView.TextSnapshot.GetText().Returns(editorContents);
-                        SignalTextChanged(textView.TextBuffer);
+                    textView.TextSnapshot.GetText().Returns(editorContents);
+                    SignalTextChanged(textView.TextBuffer);
 
-                        var linesChanged = await file.LinesChanged.Take(1);
+                    var linesChanged = await file.LinesChanged.Take(1);
 
-                        Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
-                        Assert.That(4, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
-                        Assert.That(
-                            new[]
-                            {
-                                    Tuple.Create(2, DiffSide.Right),
-                                    Tuple.Create(4, DiffSide.Right),
-                            },
-                            Is.EqualTo(linesChanged.ToArray()));
-                    }
+                    Assert.That(1, Is.EqualTo(file.InlineCommentThreads.Count));
+                    Assert.That(4, Is.EqualTo(file.InlineCommentThreads[0].LineNumber));
+                    Assert.That(
+                        new[]
+                        {
+                                Tuple.Create(2, DiffSide.Right),
+                                Tuple.Create(4, DiffSide.Right),
+                        },
+                        Is.EqualTo(linesChanged.ToArray()));
                 }
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
             public async Task UpdatesReviewCommentWithNewBody()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var baseContents = @"Line 1
+                var baseContents = @"Line 1
 Line 2
 Line 3
 Line 4";
-                    var contents = @"Line 1
+                var contents = @"Line 1
 Line 2
 Line 3 with comment
 Line 4";
-                    var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
+                var comment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment", "Original Comment");
-                    var updatedComment = CreateCommentThread(@"@@ -1,4 +1,4 @@
+                var updatedComment = CreateCommentThread(@"@@ -1,4 +1,4 @@
  Line 1
  Line 2
 -Line 3
 +Line 3 with comment", "Updated Comment");
 
-                    using (var diffService = new FakeDiffService())
-                    {
-                        var textView = CreateTextView(contents);
-                        var pullRequest = CreatePullRequestModel(
-                            CurrentBranchPullRequestNumber,
-                            comment);
-                        var sessionService = CreateRealSessionService(diffService, pullRequest);
+                using (var diffService = new FakeDiffService())
+                {
+                    var textView = CreateTextView(contents);
+                    var pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        comment);
+                    var sessionService = CreateRealSessionService(diffService, pullRequest);
 
-                        diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
+                    diffService.AddFile(FilePath, baseContents, "MERGE_BASE");
 
-                        var target = CreateTarget(sessionService: sessionService);
-                        var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                    var target = CreateTarget(sessionService: sessionService);
+                    var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                        Assert.That(file.InlineCommentThreads[0].Comments[0].Comment.Body, Is.EqualTo("Original Comment"));
+                    Assert.That(file.InlineCommentThreads[0].Comments[0].Comment.Body, Is.EqualTo("Original Comment"));
 
-                        pullRequest = CreatePullRequestModel(
-                            CurrentBranchPullRequestNumber,
-                            updatedComment);
-                        sessionService.ReadPullRequestDetail(
-                            Arg.Any<HostAddress>(),
-                            Arg.Any<string>(),
-                            Arg.Any<string>(),
-                            Arg.Any<int>()).Returns(pullRequest);
-                        await target.CurrentSession.Refresh();
+                    pullRequest = CreatePullRequestModel(
+                        CurrentBranchPullRequestNumber,
+                        updatedComment);
+                    sessionService.ReadPullRequestDetail(
+                        Arg.Any<HostAddress>(),
+                        Arg.Any<string>(),
+                        Arg.Any<string>(),
+                        Arg.Any<int>()).Returns(pullRequest);
+                    await target.CurrentSession.Refresh();
 
-                        await file.LinesChanged.Take(1);
+                    await file.LinesChanged.Take(1);
 
-                        Assert.That("Updated Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Comment.Body));
-                    }
+                    Assert.That("Updated Comment", Is.EqualTo(file.InlineCommentThreads[0].Comments[0].Comment.Body));
                 }
             }
 
@@ -681,21 +612,18 @@ Line 4";
             [Test]
             public async Task CommitShaIsUpdatedOnTextChange()
             {
-                using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-                {
-                    var textView = CreateTextView();
-                    var sessionService = CreateSessionService();
+                var textView = CreateTextView();
+                var sessionService = CreateSessionService();
 
-                    var target = CreateTarget(sessionService: sessionService);
-                    var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
+                var target = CreateTarget(sessionService: sessionService);
+                var file = await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
 
-                    Assert.That("TIPSHA", Is.EqualTo(file.CommitSha));
+                Assert.That("TIPSHA", Is.EqualTo(file.CommitSha));
 
-                    sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
-                    SignalTextChanged(textView.TextBuffer);
+                sessionService.IsUnmodifiedAndPushed(null, null, null).ReturnsForAnyArgs(false);
+                SignalTextChanged(textView.TextBuffer);
 
-                    Assert.That(file.CommitSha, Is.Null);
-                }
+                Assert.That(file.CommitSha, Is.Null);
             }
 
             [Test]
