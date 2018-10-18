@@ -16,6 +16,7 @@ using GitHub.Models;
 using GitHub.Logging;
 using Serilog;
 using ReactiveUI;
+using GitHub.VisualStudio;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -36,6 +37,7 @@ namespace GitHub.InlineReviews.Services
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IConnectionManager> connectionManager;
+        readonly Lazy<IVsTippingService> tippingService;
 
         IDisposable currentSessionSubscription;
 
@@ -46,7 +48,8 @@ namespace GitHub.InlineReviews.Services
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
             Lazy<ITeamExplorerContext> teamExplorerContext,
-            Lazy<IConnectionManager> connectionManager)
+            Lazy<IConnectionManager> connectionManager,
+            Lazy<IVsTippingService> tippingService)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(usageTracker,
                 x => x.NumberOfStatusBarOpenPullRequestList, openPullRequestsCommand);
@@ -56,6 +59,7 @@ namespace GitHub.InlineReviews.Services
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.teamExplorerContext = teamExplorerContext;
             this.connectionManager = connectionManager;
+            this.tippingService = tippingService;
         }
 
         /// <summary>
@@ -97,12 +101,28 @@ namespace GitHub.InlineReviews.Services
                 }
 
                 var viewModel = CreatePullRequestStatusViewModel(session);
-                ShowStatus(viewModel);
+                var view = ShowStatus(viewModel);
+                if (view != null)
+                {
+                    view.Loaded += (s, e) => ShowCallout(view, repository);
+                }
             }
             catch (Exception e)
             {
                 log.Error(e, nameof(RefreshCurrentSession));
             }
+        }
+
+        void ShowCallout(FrameworkElement view, ILocalRepositoryModel repository)
+        {
+            var calloutId = new Guid("63b813cd-9292-4c0f-aa49-ebd888b791f9");
+            var title = "GitHub repository opened";
+            var message = repository.CloneUrl;
+            var isDismissable = true;
+            var commandSet = new Guid("E234E66E-BA64-4D71-B304-16F0A4C793F5");
+            var commandId = (uint)0x4010; // View.TfsTeamExplorer
+            tippingService.Value.RequestCalloutDisplay(calloutId, title, message,
+                    isDismissable, view, commandSet, commandId);
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
@@ -140,7 +160,7 @@ namespace GitHub.InlineReviews.Services
             return pullRequestStatusViewModel;
         }
 
-        void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
+        PullRequestStatusView ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
         {
             var statusBar = FindSccStatusBar(Application.Current.MainWindow);
             if (statusBar != null)
@@ -156,8 +176,11 @@ namespace GitHub.InlineReviews.Services
                 {
                     githubStatusBar = new PullRequestStatusView { DataContext = pullRequestStatusViewModel };
                     statusBar.Items.Insert(0, githubStatusBar);
+                    return githubStatusBar;
                 }
             }
+
+            return null;
         }
 
         static T Find<T>(StatusBar statusBar)
