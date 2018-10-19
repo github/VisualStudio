@@ -128,7 +128,7 @@ public class ListenerCollectionTests : TestBase
         CollectionAssert.AreEqual(source, target);
     }
 
-    TrackingCollection<Thing> CreateSource()
+    static TrackingCollection<Thing> CreateSource()
     {
         var result = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         result.Subscribe();
