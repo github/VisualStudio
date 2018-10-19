@@ -12,10 +12,11 @@ namespace GitHub.Helpers
     {
         static readonly ILogger log = LogManager.ForContext(typeof(BindingPathUtilities));
 
-        public static void RationalizeBindingPaths(string assemblyLocation, List<string> bindingPaths = null)
+        public static bool RationalizeBindingPaths(string assemblyLocation, List<string> bindingPaths = null)
         {
             bindingPaths = bindingPaths ?? FindBindingPaths();
 
+            var isAlreadyLoaded = false;
             var fileName = Path.GetFileName(assemblyLocation);
             bindingPaths
                 .Select(p => new { path = p, file = Path.Combine(p, fileName) })
@@ -27,12 +28,15 @@ namespace GitHub.Helpers
                     var loaded = IsAssemblyLoaded(pf.file);
                     if (loaded)
                     {
+                        isAlreadyLoaded = true;
                         log.Error("Assembly has already been loaded from {Location}", pf.file);
                     }
 
                     log.Warning("Removing duplicate binding path {BindingPath}", pf.path);
                     bindingPaths.Remove(pf.path);
                 });
+
+            return !isAlreadyLoaded;
         }
 
         public static bool IsAssemblyLoaded(string assemblyLocation)
@@ -47,8 +51,9 @@ namespace GitHub.Helpers
         public static List<string> FindBindingPaths()
         {
             var manager = AppDomain.CurrentDomain.DomainManager;
-            var property = manager.GetType().GetProperty("BindingPaths", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (List<string>)property?.GetValue(manager);
+            var property = manager?.GetType().GetProperty("BindingPaths", BindingFlags.NonPublic | BindingFlags.Instance);
+            var bindingPaths = property?.GetValue(manager) as List<string>;
+            return bindingPaths ?? new List<string>(0);
         }
     }
 }
