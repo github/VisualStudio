@@ -8,9 +8,9 @@ using Serilog;
 
 namespace GitHub.Helpers
 {
-    public class BindingPathUtilities
+    public static class BindingPathUtilities
     {
-        static readonly ILogger log = LogManager.ForContext<BindingPathUtilities>();
+        static readonly ILogger log = LogManager.ForContext(typeof(BindingPathUtilities));
 
         public static void RationalizeBindingPaths(string assemblyLocation, List<string> bindingPaths = null)
         {
