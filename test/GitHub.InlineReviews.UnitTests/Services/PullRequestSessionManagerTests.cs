@@ -872,7 +872,7 @@ Line 4";
             }
             else
             {
-                result.Reviews = new PullRequestReviewModel[0];
+                result.Reviews = Array.Empty<PullRequestReviewModel>();
             }
 
             return result;

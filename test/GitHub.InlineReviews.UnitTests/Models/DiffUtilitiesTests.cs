@@ -295,8 +295,8 @@ index b02decb..f7dadae 100644
             [Test]
             public void NoLineMatchesFromNoLines()
             {
-                var chunks = new DiffChunk[0];
-                var lines = new DiffLine[0];
+                var chunks = Array.Empty<DiffChunk>();
+                var lines = Array.Empty<DiffLine>();
 
                 var line = DiffUtilities.Match(chunks, lines);
 
