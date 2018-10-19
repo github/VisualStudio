@@ -47,7 +47,7 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(draftStore, nameof(draftStore));
 
-            this.DraftStore = draftStore;
+            DraftStore = draftStore;
             this.timerScheduler = timerScheduler;
         }
 
@@ -63,13 +63,13 @@ namespace GitHub.ViewModels
         protected IMessageDraftStore DraftStore { get; }
 
         /// <inheritdoc/>
-        public abstract Task PostComment(string body);
+        public abstract Task PostComment(ICommentViewModel comment);
 
         /// <inheritdoc/>
-        public abstract Task EditComment(string id, string body);
+        public abstract Task EditComment(ICommentViewModel comment);
 
         /// <inheritdoc/>
-        public abstract Task DeleteComment(int pullRequestId, int commentId);
+        public abstract Task DeleteComment(ICommentViewModel comment);
 
         /// <summary>
         /// Adds a placeholder comment that will allow the user to enter a reply, and wires up
@@ -106,6 +106,18 @@ namespace GitHub.ViewModels
                 null;
         }
 
+        protected async Task DeleteDraft(ICommentViewModel comment)
+        {
+            if (draftThrottles.TryGetValue(comment, out var throttle))
+            {
+                throttle.OnCompleted();
+                draftThrottles.Remove(comment);
+            }
+
+            var (key, secondaryKey) = GetDraftKeys(comment);
+            await DraftStore.DeleteDraft(key, secondaryKey).ConfigureAwait(false);
+        }
+
         protected abstract (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment);
 
         void PlaceholderChanged(ICommentViewModel placeholder, CommentEditState state, string body)
@@ -124,14 +136,7 @@ namespace GitHub.ViewModels
             }
             else if (state != CommentEditState.Editing)
             {
-                if (draftThrottles.TryGetValue(placeholder, out var throttle))
-                {
-                    throttle.OnCompleted();
-                    draftThrottles.Remove(placeholder);
-                }
-
-                var (key, secondaryKey) = GetDraftKeys(placeholder);
-                DraftStore.DeleteDraft(key, secondaryKey).Forget();
+                DeleteDraft(placeholder).Forget();
             }
         }
 

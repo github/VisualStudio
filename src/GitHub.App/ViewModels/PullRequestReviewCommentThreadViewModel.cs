@@ -153,9 +153,9 @@ namespace GitHub.ViewModels
             AddPlaceholder(vm);
         }
 
-        public override async Task PostComment(string body)
+        public override async Task PostComment(ICommentViewModel comment)
         {
-            Guard.ArgumentNotNull(body, nameof(body));
+            Guard.ArgumentNotNull(comment, nameof(comment));
 
             if (IsNewThread)
             {
@@ -173,7 +173,7 @@ namespace GitHub.ViewModels
                 }
 
                 await Session.PostReviewComment(
-                    body,
+                    comment.Body,
                     File.CommitSha,
                     File.RelativePath.Replace("\\", "/"),
                     File.Diff,
@@ -182,21 +182,24 @@ namespace GitHub.ViewModels
             else
             {
                 var replyId = Comments[0].Id;
-                await Session.PostReviewComment(body, replyId).ConfigureAwait(false);
+                await Session.PostReviewComment(comment.Body, replyId).ConfigureAwait(false);
             }
+
+            await DeleteDraft(comment).ConfigureAwait(false);
         }
 
-        public override async Task EditComment(string id, string body)
+        public override async Task EditComment(ICommentViewModel comment)
         {
-            Guard.ArgumentNotNull(id, nameof(id));
-            Guard.ArgumentNotNull(body, nameof(body));
+            Guard.ArgumentNotNull(comment, nameof(comment));
 
-            await Session.EditComment(id, body).ConfigureAwait(false);
+            await Session.EditComment(comment.Id, comment.Body).ConfigureAwait(false);
         }
 
-        public override async Task DeleteComment(int pullRequestId, int commentId)
+        public override async Task DeleteComment(ICommentViewModel comment)
         {
-            await Session.DeleteComment(pullRequestId, commentId).ConfigureAwait(false);
+            Guard.ArgumentNotNull(comment, nameof(comment));
+
+            await Session.DeleteComment(comment.PullRequestId, comment.DatabaseId).ConfigureAwait(false);
         }
 
         public static (string key, string secondaryKey) GetDraftKeys(

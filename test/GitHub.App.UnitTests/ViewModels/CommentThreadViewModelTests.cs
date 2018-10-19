@@ -56,6 +56,23 @@ namespace GitHub.App.UnitTests.ViewModels
         }
 
         [Test]
+        public async Task CommitEditDeletesDraft()
+        {
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var drafts = Substitute.For<IMessageDraftStore>();
+                var target = CreateTarget(drafts: drafts);
+
+                await target.AddPlaceholder(false);
+
+                drafts.ClearReceivedCalls();
+                await target.Comments[0].CommitEdit.Execute();
+
+                await drafts.Received().DeleteDraft("file.cs", "10");
+            }
+        }
+
+        [Test]
         public async Task CancelEditDeletesDraft()
         {
             using (TestUtils.WithScheduler(Scheduler.CurrentThread))
@@ -94,9 +111,9 @@ namespace GitHub.App.UnitTests.ViewModels
                 AddPlaceholder(c);
             }
 
-            public override Task DeleteComment(int pullRequestId, int commentId) => throw new NotImplementedException();
-            public override Task EditComment(string id, string body) => throw new NotImplementedException();
-            public override Task PostComment(string body) => throw new NotImplementedException();
+            public override Task DeleteComment(ICommentViewModel comment) => Task.CompletedTask;
+            public override Task EditComment(ICommentViewModel comment) => Task.CompletedTask;
+            public override Task PostComment(ICommentViewModel comment) => Task.CompletedTask;
             protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment) => ("file.cs", "10");
         }
 

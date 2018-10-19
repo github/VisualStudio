@@ -165,8 +165,6 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task UpdateThread()
         {
-            var placeholderBody = GetPlaceholderBodyToPreserve();
-
             Thread = null;
             threadSubscription?.Dispose();
 
@@ -190,17 +188,6 @@ namespace GitHub.InlineReviews.ViewModels
                 await vm.InitializeNewAsync(session, file, lineNumber, side, true);
             }
 
-            if (!string.IsNullOrWhiteSpace(placeholderBody))
-            {
-                var placeholder = vm.Comments.LastOrDefault();
-
-                if (placeholder?.EditState == CommentEditState.Placeholder)
-                {
-                    await placeholder.BeginEdit.Execute();
-                    placeholder.Body = placeholderBody;
-                }
-            }
-
             Thread = vm;
         }
 
@@ -219,18 +206,6 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 await UpdateThread();
             }
-        }
-
-        string GetPlaceholderBodyToPreserve()
-        {
-            var lastComment = Thread?.Comments.LastOrDefault();
-
-            if (lastComment?.EditState == CommentEditState.Editing)
-            {
-                if (!lastComment.IsSubmitting) return lastComment.Body;
-            }
-
-            return null;
         }
     }
 }

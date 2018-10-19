@@ -174,42 +174,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         }
 
         [Test]
-        public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
-        {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var sessionManager = CreateSessionManager();
-                var peekSession = CreatePeekSession();
-                var target = new InlineCommentPeekViewModel(
-                    CreatePeekService(lineNumber: 10),
-                    CreatePeekSession(),
-                    sessionManager,
-                    Substitute.For<INextInlineCommentCommand>(),
-                    Substitute.For<IPreviousInlineCommentCommand>(),
-                    CreateFactory());
-
-                await target.Initialize();
-
-                Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
-
-                var placeholder = target.Thread.Comments.Last();
-                placeholder.BeginEdit.Execute().Subscribe();
-                placeholder.Body = "Comment being edited";
-
-                var file = await sessionManager.GetLiveFile(
-                    RelativePath,
-                    peekSession.TextView,
-                    peekSession.TextView.TextBuffer);
-                AddCommentToExistingThread(file);
-
-                placeholder = target.Thread.Comments.Last();
-                Assert.That(target.Thread.Comments.Count, Is.EqualTo(3));
-                Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Editing));
-                Assert.That(placeholder.Body, Is.EqualTo("Comment being edited"));
-            }
-        }
-
-        [Test]
         public async Task CommittingEditDoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
             using (TestUtils.WithScheduler(Scheduler.CurrentThread))
