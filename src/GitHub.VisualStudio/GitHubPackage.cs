@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using System.IO;
 
 namespace GitHub.VisualStudio
 {
@@ -201,8 +202,38 @@ namespace GitHub.VisualStudio
         [System.Diagnostics.Conditional("DEBUG")]
         void RationalizeBindingPaths()
         {
-            log.Information("Rationalizing any duplicate binding paths");
-            BindingPathUtilities.RationalizeBindingPaths(GetType().Assembly.Location);
+            try
+            {
+                log.Information("Searching for duplicate binding paths");
+                var assemblyLocation = GetType().Assembly.Location;
+                var bindingPaths = BindingPathUtilities.FindBindingPaths();
+                var redundantPaths = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
+                if (redundantPaths.Count == 0)
+                {
+                    log.Information("No duplicate binding paths found");
+                    return;
+                }
+
+                // Log what has been detected
+                foreach (var redundantPath in redundantPaths)
+                {
+                    log.Warning("Found redundant binding path {BindingPath}", redundantPath);
+
+                    var redundantFile = Path.Combine(redundantPath, Path.GetFileName(assemblyLocation));
+                    var loaded = BindingPathUtilities.IsAssemblyLoaded(redundantFile);
+                    if (loaded)
+                    {
+                        log.Error("Assembly has already been loaded from {Location}", redundantFile);
+                    }
+                }
+
+                // Try to fix
+                BindingPathUtilities.RemoveRedundantBindingPaths(bindingPaths, assemblyLocation, redundantPaths);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(RationalizeBindingPaths));
+            }
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)

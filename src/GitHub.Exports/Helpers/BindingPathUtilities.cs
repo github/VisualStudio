@@ -27,7 +27,7 @@ namespace GitHub.Helpers
     /// same time as the extension being developed. This can happen when an assembly
     /// is loaded from XAML or an .imagemanifest.
     /// 
-    /// This is a workaround for that issue. The <see cref="RationalizeBindingPaths(string, List{string})"/>
+    /// This is a workaround for that issue. The <see cref="RationalizeBindingPaths( List{string},string)"/>
     /// method will check to see if a reference assembly could be loaded from an alternative
     /// binding path. It will remove any alternative paths that is finds so that XAML or
     /// .imagemanifest won't end up loading the wrong assembly.
@@ -39,34 +39,31 @@ namespace GitHub.Helpers
         /// <summary>
         /// Remove alternative binding path that might have been installed by an AllUsers extension.
         /// </summary>
+        /// <param name="bindingPaths">A list of binding paths to rationalize</param>
         /// <param name="assemblyLocation">A reference assembly that has been loaded from the correct path.</param>
-        /// <param name="bindingPaths">A list of binding paths to rationalize (only used when testing)</param>
-        /// <returns>True if assembly hasn't been loaded from an alternative path.</returns>
-        public static bool RationalizeBindingPaths(string assemblyLocation, List<string> bindingPaths = null)
+        /// <returns>True if binding path was removed.</returns>
+        public static bool RationalizeBindingPaths(List<string> bindingPaths, string assemblyLocation)
         {
-            bindingPaths = bindingPaths ?? FindBindingPaths();
+            var redundantBindingPaths = FindRedundantBindingPaths(bindingPaths, assemblyLocation);
+            RemoveRedundantBindingPaths(bindingPaths, assemblyLocation, redundantBindingPaths);
+            return redundantBindingPaths.Any();
+        }
 
-            var isAlreadyLoaded = false;
+        /// <summary>
+        /// Find any alternative binding path that might have been installed by an AllUsers extension.
+        /// </summary>
+        /// <param name="bindingPaths">A list of binding paths to search</param>
+        /// <param name="assemblyLocation">A reference assembly that has been loaded from the correct path.</param>
+        /// <returns>A list of redundant binding paths.</returns>
+        public static IList<string> FindRedundantBindingPaths(List<string> bindingPaths, string assemblyLocation)
+        {
             var fileName = Path.GetFileName(assemblyLocation);
-            bindingPaths
-                .Select(p => new { path = p, file = Path.Combine(p, fileName) })
+            return bindingPaths
+                .Select(p => (path: p, file: Path.Combine(p, fileName)))
                 .Where(pf => File.Exists(pf.file))
                 .Where(pf => !pf.file.Equals(assemblyLocation, StringComparison.OrdinalIgnoreCase))
-                .ToList()
-                .ForEach(pf =>
-                {
-                    var loaded = IsAssemblyLoaded(pf.file);
-                    if (loaded)
-                    {
-                        isAlreadyLoaded = true;
-                        log.Error("Assembly has already been loaded from {Location}", pf.file);
-                    }
-
-                    log.Warning("Removing duplicate binding path {BindingPath}", pf.path);
-                    bindingPaths.Remove(pf.path);
-                });
-
-            return !isAlreadyLoaded;
+                .Select(pf => pf.path)
+                .ToList();
         }
 
         /// <summary>
@@ -93,6 +90,13 @@ namespace GitHub.Helpers
             var property = manager?.GetType().GetProperty("BindingPaths", BindingFlags.NonPublic | BindingFlags.Instance);
             var bindingPaths = property?.GetValue(manager) as List<string>;
             return bindingPaths ?? new List<string>(0);
+        }
+
+        public static void RemoveRedundantBindingPaths(List<string> bindingPaths, string assemblyLocation,
+            IList<string> redundantBindingPaths)
+        {
+            redundantBindingPaths
+                .ForEach(p => bindingPaths.Remove(p));
         }
     }
 }
