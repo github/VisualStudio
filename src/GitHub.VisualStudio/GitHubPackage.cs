@@ -9,6 +9,7 @@ using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Info;
 using GitHub.Exports;
+using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;

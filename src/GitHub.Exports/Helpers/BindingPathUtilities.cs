@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using GitHub.Logging;
 using Serilog;
 
-namespace GitHub.VisualStudio
+namespace GitHub.Helpers
 {
     public class BindingPathUtilities
     {
