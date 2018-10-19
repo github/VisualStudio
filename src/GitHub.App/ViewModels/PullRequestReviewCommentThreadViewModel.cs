@@ -106,7 +106,12 @@ namespace GitHub.ViewModels
             if (addPlaceholder)
             {
                 var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
-                await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(true);
+
+                await vm.InitializeAsPlaceholderAsync(
+                    session,
+                    this,
+                    review.State == PullRequestReviewState.Pending,
+                    false).ConfigureAwait(true);
 
                 var (key, secondaryKey) = GetDraftKeys(vm);
                 var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
@@ -140,7 +145,7 @@ namespace GitHub.ViewModels
             IsNewThread = true;
 
             var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
-            await vm.InitializeAsPlaceholderAsync(session, this, isEditing).ConfigureAwait(false);
+            await vm.InitializeAsPlaceholderAsync(session, this, session.HasPendingReview, isEditing).ConfigureAwait(false);
 
             var (key, secondaryKey) = GetDraftKeys(vm);
             var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
