@@ -80,6 +80,22 @@ namespace GitHub.Helpers
                 .Any();
         }
 
+        public static Assembly FindAssemblyWithDifferentCodeBase(Assembly assembly)
+        {
+            var simpleName = assembly.GetName().Name;
+            var resolvedAssembly = Assembly.Load(simpleName);
+            return resolvedAssembly != assembly ? resolvedAssembly : null;
+        }
+
+        public static Assembly FindLoadedAssemblyWithSameName(Assembly assembly)
+        {
+            var prefix = assembly.GetName().Name + ',';
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => a.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                .Where(a => a != assembly)
+                .FirstOrDefault();
+        }
+
         /// <summary>
         /// Use reflection to find Visual Studio's list of binding paths.
         /// </summary>

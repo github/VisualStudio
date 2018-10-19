@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics;
 using GitHub.Helpers;
 using GitHub.Logging;
 using Microsoft.VisualStudio.Shell;
@@ -22,50 +21,30 @@ namespace GitHub.VisualStudio.Helpers
             JoinableTaskFactory jtf,
             IServiceProvider serviceProvider)
         {
-            log.Information("Searching for duplicate binding paths");
-            var assemblyLocation = assembly.Location;
+            log.Information("Looking for assembly on wrong binding path");
+
             var bindingPaths = BindingPathUtilities.FindBindingPaths();
-            var redundantPaths = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
-            if (redundantPaths.Count == 0)
+            var bindingPath = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assembly.Location)
+                .FirstOrDefault();
+            if (bindingPath == null)
             {
-                log.Information("No duplicate binding paths found");
+                log.Information("No incorrect binding path found");
                 return;
             }
 
             // Log what has been detected
-            foreach (var redundantPath in redundantPaths)
-            {
-                log.Warning("Found redundant binding path {BindingPath}", redundantPath);
-
-                var redundantFile = Path.Combine(redundantPath, Path.GetFileName(assemblyLocation));
-                var loaded = BindingPathUtilities.IsAssemblyLoaded(redundantFile);
-                if (loaded)
-                {
-                    log.Error("Assembly has already been loaded from {Location}", redundantFile);
-                }
-            }
+            log.Warning("Found assembly on wrong binding path {BindingPath}", bindingPath);
 
             await jtf.SwitchToMainThreadAsync();
-            var message = string.Format(@"Redundant binding path found at:
+            var message = string.Format(@"Found assembly on wrong binding path:
 {0}
 
-Would like to:
-[Abort]  - Learn more about this issue
-[Retry]  - Attempt a fix (this might not work)
-[Ignore] - Don't do anything
-", redundantPaths.First());
-            var action = VsShellUtilities.ShowMessageBox(serviceProvider, message, "Redundant Binding Path", OLEMSGICON.OLEMSGICON_WARNING,
-                OLEMSGBUTTON.OLEMSGBUTTON_ABORTRETRYIGNORE, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_SECOND);
-            switch (action)
+Would you like to learn more about this issue?", bindingPath);
+            var action = VsShellUtilities.ShowMessageBox(serviceProvider, message, "GitHub for Visual Studio", OLEMSGICON.OLEMSGICON_WARNING,
+                OLEMSGBUTTON.OLEMSGBUTTON_YESNO, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            if (action == 6) // Yes = 6, No = 7
             {
-                case 3: // Abort
-                    Process.Start("https://github.com/github/VisualStudio/issues/1995");
-                    break;
-                case 4: // Retry - Try to fix
-                    BindingPathUtilities.RemoveRedundantBindingPaths(bindingPaths, assemblyLocation, redundantPaths);
-                    break;
-                case 5: // Ignore
-                    break;
+                Process.Start("https://github.com/github/VisualStudio/issues/1995");
             }
         }
     }

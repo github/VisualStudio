@@ -1,13 +1,61 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Reflection;
 using System.Collections.Generic;
 using GitHub.Helpers;
 using NUnit.Framework;
-using NSubstitute;
-using Serilog;
 
 public static class BindingPathUtilitiesTests
 {
+    public class TheFindAssemblyWithDifferentCodeBaseMethod
+    {
+        [Test]
+        public void Current_Assembly_Has_No_Twin()
+        {
+            var assembly = GetType().Assembly;
+
+            var foundAssembly = BindingPathUtilities.FindAssemblyWithDifferentCodeBase(assembly);
+
+            Assert.That(foundAssembly, Is.Null);
+        }
+
+        [Test]
+        public void Assembly_Loaded_From_Bytes_Has_Twin()
+        {
+            var expectAssembly = GetType().Assembly;
+            var bytes = File.ReadAllBytes(expectAssembly.Location);
+            var assembly = Assembly.Load(bytes);
+
+            var foundAssembly = BindingPathUtilities.FindAssemblyWithDifferentCodeBase(assembly);
+
+            Assert.That(foundAssembly, Is.EqualTo(expectAssembly));
+        }
+    }
+
+    public class TheFindLoadedAssemblyWithSameName
+    {
+        [Test]
+        public void Mscorlib_Has_No_Twin()
+        {
+            var assembly = typeof(object).Assembly;
+
+            var foundAssembly = BindingPathUtilities.FindLoadedAssemblyWithSameName(assembly);
+
+            Assert.That(foundAssembly, Is.Null);
+        }
+
+        [Test]
+        public void Assembly_Loaded_From_Bytes_Has_Twin()
+        {
+            var expectAssembly = typeof(BindingPathUtilities).Assembly;
+            var bytes = File.ReadAllBytes(expectAssembly.Location);
+            var assembly = Assembly.Load(bytes);
+
+            var foundAssembly = BindingPathUtilities.FindLoadedAssemblyWithSameName(assembly);
+
+            Assert.That(foundAssembly, Is.EqualTo(expectAssembly));
+        }
+    }
+
     public class TheRationalizeBindingPathsMethod
     {
         [TestCase]
