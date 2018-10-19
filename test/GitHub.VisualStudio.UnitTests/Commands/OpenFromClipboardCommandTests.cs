@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using GitHub;
 using GitHub.Exports;
@@ -43,7 +44,7 @@ public class OpenFromClipboardCommandTests
         public async Task UnknownLinkType()
         {
             var context = new GitHubContext { LinkType = LinkType.Unknown };
-            var expectMessage = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
+            var expectMessage = string.Format(CultureInfo.InvariantCulture, Resources.UnknownLinkTypeMessage, context.Url);
             var activeRepositoryDir = "activeRepositoryDir";
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: context, repositoryDir: activeRepositoryDir);
@@ -68,7 +69,7 @@ public class OpenFromClipboardCommandTests
 
             if (expectMessage != null)
             {
-                vsServices.Received(1).ShowMessageBoxInfo(string.Format(expectMessage, context.RepositoryName));
+                vsServices.Received(1).ShowMessageBoxInfo(string.Format(CultureInfo.InvariantCulture, expectMessage, context.RepositoryName));
             }
             else
             {

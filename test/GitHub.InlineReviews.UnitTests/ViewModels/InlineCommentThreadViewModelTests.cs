@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using GitHub.InlineReviews.Services;
@@ -89,7 +90,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             foreach (var body in bodies)
             {
-                yield return CreateComment((id++).ToString(), body);
+                yield return CreateComment((id++).ToString(CultureInfo.InvariantCulture), body);
             }
         }
 

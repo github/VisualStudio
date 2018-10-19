@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Reactive.Subjects;
 using System.Text;
 
@@ -41,8 +42,8 @@ public class TestBase
 
     protected void Dump(object prefix, object thing)
     {
-        output?.WriteLine(string.Format("{0} - {1}", prefix, thing));
-        testOutput.AppendLine(string.Format("{0} - {1}", prefix, thing));
+        output?.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0} - {1}", prefix, thing));
+        testOutput.AppendLine(string.Format(CultureInfo.InvariantCulture, "{0} - {1}", prefix, thing));
     }
 
     protected void Dump(object thing)
