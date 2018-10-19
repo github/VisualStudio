@@ -552,7 +552,7 @@ Line 4";
                 }
             }
 
-            [Test, Ignore("Flaky test, see https://github.com/github/VisualStudio/issues/1795")]
+            [Test]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
