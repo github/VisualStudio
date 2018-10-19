@@ -39,7 +39,7 @@ namespace GitHub.VisualStudio
         {
             var prefix = Path.GetFileNameWithoutExtension(assemblyLocation) + ",";
             return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.FullName.StartsWith(prefix))
+                .Where(a => a.FullName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 .Where(a => a.Location.Equals(assemblyLocation, StringComparison.OrdinalIgnoreCase))
                 .Any();
         }
