@@ -8,10 +8,10 @@ using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Info;
 using GitHub.Exports;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.ViewModels.GitHubPane;
@@ -23,7 +23,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
-using System.IO;
 
 namespace GitHub.VisualStudio
 {
@@ -168,11 +167,15 @@ namespace GitHub.VisualStudio
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         static readonly ILogger log = LogManager.ForContext<ServiceProviderPackage>();
 
-        protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            // Ensure there is only one active binding path for the extension.
-            // This is necessary when the regular (AllUsers) extension is installed.
-            RationalizeBindingPaths();
+#if DEBUG
+            // When running in the Exp instance, ensure there is only one active binding path.
+            // This is necessary when the regular (AllUsers) extension is also installed.
+            // See: https://github.com/github/VisualStudio/issues/1995
+            await BindingPathHelper.RationalizeBindingPathsAsync(
+                GetType().Assembly, JoinableTaskFactory, this);
+#endif
 
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
@@ -181,7 +184,6 @@ namespace GitHub.VisualStudio
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
-            return Task.CompletedTask;
         }
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()
@@ -197,43 +199,6 @@ namespace GitHub.VisualStudio
 
             var gitHubPane = (GitHubPane)pane;
             return await gitHubPane.GetViewModelAsync();
-        }
-
-        [System.Diagnostics.Conditional("DEBUG")]
-        void RationalizeBindingPaths()
-        {
-            try
-            {
-                log.Information("Searching for duplicate binding paths");
-                var assemblyLocation = GetType().Assembly.Location;
-                var bindingPaths = BindingPathUtilities.FindBindingPaths();
-                var redundantPaths = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
-                if (redundantPaths.Count == 0)
-                {
-                    log.Information("No duplicate binding paths found");
-                    return;
-                }
-
-                // Log what has been detected
-                foreach (var redundantPath in redundantPaths)
-                {
-                    log.Warning("Found redundant binding path {BindingPath}", redundantPath);
-
-                    var redundantFile = Path.Combine(redundantPath, Path.GetFileName(assemblyLocation));
-                    var loaded = BindingPathUtilities.IsAssemblyLoaded(redundantFile);
-                    if (loaded)
-                    {
-                        log.Error("Assembly has already been loaded from {Location}", redundantFile);
-                    }
-                }
-
-                // Try to fix
-                BindingPathUtilities.RemoveRedundantBindingPaths(bindingPaths, assemblyLocation, redundantPaths);
-            }
-            catch (Exception e)
-            {
-                log.Error(e, nameof(RationalizeBindingPaths));
-            }
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
