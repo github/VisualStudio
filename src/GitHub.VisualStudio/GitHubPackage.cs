@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel.Design;
@@ -170,7 +169,9 @@ namespace GitHub.VisualStudio
 
         protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            BindingPathUtilities.RationalizeBindingPaths(GetType().Assembly.Location);
+            // Ensure there is only one active binding path for the extension.
+            // This is necessary when the regular (AllUsers) extension is installed.
+            RationalizeBindingPaths();
 
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
@@ -195,6 +196,13 @@ namespace GitHub.VisualStudio
 
             var gitHubPane = (GitHubPane)pane;
             return await gitHubPane.GetViewModelAsync();
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        void RationalizeBindingPaths()
+        {
+            log.Information("Rationalizing any duplicate binding paths");
+            BindingPathUtilities.RationalizeBindingPaths(GetType().Assembly.Location);
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
