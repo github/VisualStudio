@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -42,12 +43,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the user whose reviews are being shown.
         /// </summary>
-        IAccount User { get; }
+        IActorViewModel User { get; }
 
         /// <summary>
         /// Gets a command that navigates to the parent pull request in the GitHub pane.
         /// </summary>
-        ReactiveCommand<object> NavigateToPullRequest { get; }
+        ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
         /// Initializes the view model, loading data from the API.

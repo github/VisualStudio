@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.ComponentModel.Composition;
 using GitHub.Services;
 using GitHub.Extensions;
@@ -10,6 +11,7 @@ using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Differencing;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Commands
@@ -40,6 +42,8 @@ namespace GitHub.Commands
         readonly Lazy<IVsEditorAdaptersFactoryService> editorAdapter;
         readonly Lazy<IPullRequestSessionManager> sessionManager;
         readonly Lazy<IPullRequestEditorService> pullRequestEditorService;
+        readonly Lazy<ITeamExplorerContext> teamExplorerContext;
+        readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IStatusBarNotificationService> statusBar;
         readonly Lazy<IUsageTracker> usageTracker;
 
@@ -49,6 +53,8 @@ namespace GitHub.Commands
             Lazy<IVsEditorAdaptersFactoryService> editorAdapter,
             Lazy<IPullRequestSessionManager> sessionManager,
             Lazy<IPullRequestEditorService> pullRequestEditorService,
+            Lazy<ITeamExplorerContext> teamExplorerContext,
+            Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IStatusBarNotificationService> statusBar,
             Lazy<IUsageTracker> usageTracker) : base(CommandSet, CommandId)
         {
@@ -56,6 +62,8 @@ namespace GitHub.Commands
             this.editorAdapter = editorAdapter;
             this.sessionManager = sessionManager;
             this.pullRequestEditorService = pullRequestEditorService;
+            this.gitHubContextService = gitHubContextService;
+            this.teamExplorerContext = teamExplorerContext;
             this.statusBar = statusBar;
             this.usageTracker = usageTracker;
 
@@ -93,7 +101,7 @@ namespace GitHub.Commands
                 {
                     if (!info.Session.IsCheckedOut)
                     {
-                        ShowInfoMessage(App.Resources.NavigateToEditorNotCheckedOutInfoMessage);
+                        ShowInfoMessage(Resources.NavigateToEditorNotCheckedOutInfoMessage);
                         return;
                     }
 
@@ -109,6 +117,11 @@ namespace GitHub.Commands
 
                     var fileView = editorAdapter.Value.GetViewAdapter(fileTextView);
                     pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, fileView);
+                    return;
+                }
+
+                if (TryNavigateFromHistoryFile(sourceView))
+                {
                     return;
                 }
 
@@ -189,6 +202,11 @@ namespace GitHub.Commands
                         return;
                     }
                 }
+
+                if (TryNavigateFromHistoryFileQueryStatus(sourceView))
+                {
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -196,6 +214,65 @@ namespace GitHub.Commands
             }
 
             Visible = false;
+        }
+
+        // Set command Text/Visible properties and return true when active
+        bool TryNavigateFromHistoryFileQueryStatus(IVsTextView sourceView)
+        {
+            if (teamExplorerContext.Value.ActiveRepository?.LocalPath is string && // Check there is an active repo
+                FindObjectishForTFSTempFile(sourceView) is string) // Looks like a history file
+            {
+                // Navigate from history file is active
+                Text = "Open File in Solution";
+                Visible = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        // Attempt navigation to historical file
+        bool TryNavigateFromHistoryFile(IVsTextView sourceView)
+        {
+            if (teamExplorerContext.Value.ActiveRepository?.LocalPath is string repositoryDir &&
+                FindObjectishForTFSTempFile(sourceView) is string objectish)
+            {
+                var (_, blobPath) = gitHubContextService.Value.ResolveBlobFromHistory(repositoryDir, objectish);
+                if (blobPath is string)
+                {
+                    var workingFile = Path.Combine(repositoryDir, blobPath);
+                    VsShellUtilities.OpenDocument(serviceProvider, workingFile, VSConstants.LOGVIEWID.TextView_guid,
+                        out IVsUIHierarchy hierarchy, out uint itemID, out IVsWindowFrame windowFrame, out IVsTextView targetView);
+
+                    pullRequestEditorService.Value.NavigateToEquivalentPosition(sourceView, targetView);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Find the blob SHA in a file name if any
+        string FindObjectishForTFSTempFile(IVsTextView sourceView)
+        {
+            return
+                FindPath(sourceView) is string path &&
+                gitHubContextService.Value.FindObjectishForTFSTempFile(path) is string objectish ?
+                objectish : null;
+        }
+
+        // See http://microsoft.public.vstudio.extensibility.narkive.com/agfoD1GO/full-pathname-of-file-shown-in-current-view-of-core-editor#post2
+        static string FindPath(IVsTextView textView)
+        {
+            ErrorHandler.ThrowOnFailure(textView.GetBuffer(out IVsTextLines buffer));
+            var userData = buffer as IVsUserData;
+            if (userData == null)
+            {
+                return null;
+            }
+
+            ErrorHandler.ThrowOnFailure(userData.GetData(typeof(IVsUserData).GUID, out object data));
+            return data as string;
         }
 
         ITextView FindActiveTextView(IDifferenceViewer diffViewer)

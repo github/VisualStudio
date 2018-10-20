@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using GitHub.Api;
+using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
-using Octokit;
 using NUnit.Framework;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
@@ -18,12 +17,13 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesComments()
         {
             var target = new InlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 CreateComments("Comment 1", "Comment 2"));
 
             Assert.That(3, Is.EqualTo(target.Comments.Count));
             Assert.That(
-                new[] 
+                new[]
                 {
                     "Comment 1",
                     "Comment 2",
@@ -45,7 +45,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void PlaceholderCommitEnabledWhenCommentHasBody()
         {
             var target = new InlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 CreateComments("Comment 1"));
 
             Assert.That(target.Comments[1].CommitEdit.CanExecute(null), Is.False);
@@ -59,51 +60,51 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var target = new InlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
                 session,
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
-            target.Comments[2].CommitEdit.Execute(null);
+            target.Comments[2].CommitEdit.Execute();
 
-            session.Received(1).PostReviewComment("New Comment", 1, "node1");
+            session.Received(1).PostReviewComment("New Comment", "1");
         }
 
-        IApiClient CreateApiClient()
+        InlineCommentModel CreateComment(string id, string body)
         {
-            var result = Substitute.For<IApiClient>();
-            result.CreatePullRequestReviewComment(null, null, 0, null, 0)
-                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
-            return result;
+            return new InlineCommentModel
+            {
+                Comment = new PullRequestReviewCommentModel
+                {
+                    Id = id,
+                    Body = body,
+                },
+                Review = new PullRequestReviewModel(),
+            };
         }
 
-        IPullRequestReviewCommentModel CreateComment(int id, string body)
-        {
-            var comment = Substitute.For<IPullRequestReviewCommentModel>();
-            comment.Body.Returns(body);
-            comment.Id.Returns(id);
-            comment.NodeId.Returns("node" + id);
-            return comment;
-        }
-
-        IEnumerable<IPullRequestReviewCommentModel> CreateComments(params string[] bodies)
+        IEnumerable<InlineCommentModel> CreateComments(params string[] bodies)
         {
             var id = 1;
 
             foreach (var body in bodies)
             {
-                yield return CreateComment(id++, body);
+                yield return CreateComment((id++).ToString(), body);
             }
         }
 
         IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
+            result.User.Returns(new ActorModel { Login = "Viewer" });
             result.RepositoryOwner.Returns("owner");
             result.LocalRepository.Name.Returns("repo");
             result.LocalRepository.Owner.Returns("shouldnt-be-used");
-            result.PullRequest.Number.Returns(47);
+            result.PullRequest.Returns(new PullRequestDetailModel
+            {
+                Number = 47,
+            });
             return result;
         }
-
     }
 }

@@ -62,6 +62,6 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command which, when invoked, directs the user to a learn more page
         /// </summary>
-        IReactiveCommand<Unit> NavigateLearnMore { get; }
+        ReactiveCommand<Unit, Unit> NavigateLearnMore { get; }
     }
 }

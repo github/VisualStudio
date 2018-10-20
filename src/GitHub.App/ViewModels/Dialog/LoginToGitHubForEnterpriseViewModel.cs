@@ -65,16 +65,16 @@ namespace GitHub.ViewModels.Dialog
             this.WhenAnyValue(x => x.EnterpriseUrl, x => x.EnterpriseUrlValidator.ValidationResult)
                 .Throttle(TimeSpan.FromMilliseconds(500), scheduler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
+                .Subscribe(x => UpdatingProbeStatus = EnterpriseUrlChanged(x.Item1, x.Item2?.IsValid ?? false));
 
-            NavigateLearnMore = ReactiveCommand.CreateAsyncObservable(_ =>
+            NavigateLearnMore = ReactiveCommand.CreateFromObservable(() =>
             {
                 browser.OpenUrl(GitHubUrls.LearnMore);
                 return Observable.Return(Unit.Default);
             });
         }
 
-        protected override Task<IConnection> LogIn(object args)
+        protected override Task<IConnection> LogIn()
         {
             if (string.IsNullOrWhiteSpace(UsernameOrEmail))
             {
@@ -86,7 +86,7 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        protected override Task<IConnection> LogInViaOAuth(object args)
+        protected override Task<IConnection> LogInViaOAuth()
         {
             return LoginToHostViaOAuth(HostAddress.Create(EnterpriseUrl));
         }
@@ -117,9 +117,15 @@ namespace GitHub.ViewModels.Dialog
         [SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings")]
         protected override Uri BaseUri => new UriBuilder(EnterpriseUrl).Uri;
 
-        public IReactiveCommand<Unit> NavigateLearnMore
+        public ReactiveCommand<Unit, Unit> NavigateLearnMore
         {
             get;
+        }
+
+        public Task UpdatingProbeStatus
+        {
+            get;
+            private set;
         }
 
         protected override async Task ResetValidation()
@@ -128,7 +134,7 @@ namespace GitHub.ViewModels.Dialog
             await EnterpriseUrlValidator.ResetAsync();
         }
 
-        async void EnterpriseUrlChanged(string url, bool valid)
+        async Task EnterpriseUrlChanged(string url, bool valid)
         {
             if (!valid)
             {

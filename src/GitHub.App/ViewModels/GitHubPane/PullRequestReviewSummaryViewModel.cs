@@ -12,10 +12,10 @@ namespace GitHub.ViewModels.GitHubPane
     public class PullRequestReviewSummaryViewModel : IPullRequestReviewSummaryViewModel
     {
         /// <inheritdoc/>
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         /// <inheritdoc/>
-        public IAccount User { get; set; }
+        public IActorViewModel User { get; set; }
 
         /// <inheritdoc/>
         public PullRequestReviewState State { get; set; }
@@ -36,45 +36,42 @@ namespace GitHub.ViewModels.GitHubPane
         /// right of the Pull Request page on GitHub.
         /// </remarks>
         public static IEnumerable<PullRequestReviewSummaryViewModel> BuildByUser(
-            IAccount currentUser,
-            IPullRequestModel pullRequest)
+            ActorModel currentUser,
+            PullRequestDetailModel pullRequest)
         {
             var existing = new Dictionary<string, PullRequestReviewSummaryViewModel>();
 
-            foreach (var review in pullRequest.Reviews.OrderBy(x => x.Id))
+            foreach (var review in pullRequest.Reviews.OrderBy(x => x.SubmittedAt))
             {
-                if (review.State == PullRequestReviewState.Pending && review.User.Login != currentUser.Login)
+                if (review.State == PullRequestReviewState.Pending && review.Author.Login != currentUser.Login)
                     continue;
 
                 PullRequestReviewSummaryViewModel previous;
-                existing.TryGetValue(review.User.Login, out previous);
+                existing.TryGetValue(review.Author.Login, out previous);
 
                 var previousPriority = ToPriority(previous);
                 var reviewPriority = ToPriority(review.State);
 
                 if (reviewPriority >= previousPriority)
                 {
-                    var count = pullRequest.ReviewComments
-                        .Where(x => x.PullRequestReviewId == review.Id)
-                        .Count();
-                    existing[review.User.Login] = new PullRequestReviewSummaryViewModel
+                    existing[review.Author.Login] = new PullRequestReviewSummaryViewModel
                     {
                         Id = review.Id,
-                        User = review.User,
+                        User = new ActorViewModel(review.Author),
                         State = review.State,
-                        FileCommentCount = count
+                        FileCommentCount = review.Comments.Count,
                     };
                 }
             }
 
-            var result = existing.Values.OrderBy(x => x.User).AsEnumerable();
+            var result = existing.Values.OrderBy(x => x.User.Login).AsEnumerable();
 
             if (!result.Any(x => x.State == PullRequestReviewState.Pending))
             {
                 var newReview = new PullRequestReviewSummaryViewModel
                 {
                     State = PullRequestReviewState.Pending,
-                    User = currentUser,
+                    User = new ActorViewModel(currentUser),
                 };
                 result = result.Concat(new[] { newReview });
             }
@@ -93,6 +90,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 case PullRequestReviewState.Approved:
                 case PullRequestReviewState.ChangesRequested:
+                case PullRequestReviewState.Dismissed:
                     return 1;
                 case PullRequestReviewState.Pending:
                     return 2;

@@ -3,6 +3,9 @@
   xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+  <!-- Import the standard ImageCatalogGuid monikers -->
+  <Include href="KnownImageIds.vsct"/>
+  
   <!--  This is the file that defines the actual layout and type of the commands.
         It is divided in different sections (e.g. command definition, command
         placement, ...), with each defining a specific set of properties.
@@ -112,9 +115,33 @@
         </Strings>
       </Button>
 
+      <Button guid="guidGitHubCmdSet" id="openFromUrlCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <Strings>
+          <ButtonText>Open from GitHub...</ButtonText>
+          <CanonicalName>.GitHub.OpenFromUrl</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromUrl</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <Button guid="guidGitHubCmdSet" id="openFromClipboardCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>AllowParams</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Open from clipboard</ButtonText>
+          <CanonicalName>.GitHub.OpenFromClipboard</CanonicalName>
+          <LocCanonicalName>.GitHub.OpenFromClipboard</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!--- Toolbar buttons -->
       <Button guid="guidGitHubToolbarCmdSet" id="backCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_left" />
+        <Icon guid="ImageCatalogGuid" id="Backwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -125,7 +152,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="forwardCommand" type="Button">
-        <Icon guid="guidImages" id="arrow_right" />
+        <Icon guid="ImageCatalogGuid" id="Forwards" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -147,7 +174,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="refreshCommand" type="Button">
-        <Icon guid="guidImages" id="refresh" />
+        <Icon guid="ImageCatalogGuid" id="Refresh" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -158,7 +185,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="githubCommand" type="Button">
-        <Icon guid="guidImages" id="logo_toolbar" />
+        <Icon guid="ImageCatalogGuid" id="OpenWebSite" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
@@ -169,7 +196,7 @@
       </Button>
 
       <Button guid="guidGitHubToolbarCmdSet" id="helpCommand" type="Button">
-        <Icon guid="guidImages" id="question" />
+        <Icon guid="ImageCatalogGuid" id="StatusHelp" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Help</ButtonText>
@@ -190,8 +217,20 @@
         </Strings>
       </Button>
 
+      <Button guid="guidContextMenuSet" id="idCreateGistEnterpriseCommand" priority="0x0101" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Create an Enterprise Gist</ButtonText>
+          <CanonicalName>.GitHub.CreateGistEnterprise</CanonicalName>
+          <LocCanonicalName>.GitHub.CreateGistEnterprise</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <Button guid="guidContextMenuSet" id="openLinkCommand" type="Button">
-        <Icon guid="guidImages" id="link_external" />
+        <Icon guid="ImageCatalogGuid" id="OpenWebSite" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -271,11 +310,19 @@
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x102">
+    <CommandPlacement guid="guidGitHubCmdSet" id="openFromClipboardCommand" priority="0x0102">
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
-    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x103">
+    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistCommand" priority="0x103">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idCreateGistEnterpriseCommand" priority="0x104">
+      <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidContextMenuSet" id="idBlameCommand" priority="0x105">
       <Parent guid="guidContextMenuSet" id="idGitHubContextSubMenuGroup"/>
     </CommandPlacement>
 
@@ -314,6 +361,11 @@
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
     </CommandPlacement>
 
+    <!-- Open from GitHub command -->
+    <CommandPlacement guid="guidGitHubCmdSet" id="openFromUrlCommand" priority="0x0100">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_FILE_OPENSCC_CASCADE"/>
+    </CommandPlacement>
+
     <!-- Add Connection (Team Explorer) command -->
     <CommandPlacement guid="guidGitHubCmdSet" id="addConnectionCommand" priority="0x0100">
       <Parent guid="guidGitHubCmdSet" id="idGitHubMenuGroup"/>
@@ -333,6 +385,8 @@
       <IDSymbol name="showGitHubPaneCommand" value="0x200"/>
       <IDSymbol name="showCurrentPullRequestCommand" value="0x202"/>
       <IDSymbol name="syncSubmodulesCommand" value="0x0203" />
+      <IDSymbol name="openFromUrlCommand" value="0x0204" />
+      <IDSymbol name="openFromClipboardCommand" value="0x0205" />      
     </GuidSymbol>
 
     <!-- This is the Manage Connections menu -->
@@ -373,6 +427,7 @@
       <IDSymbol name="copyLinkCommand" value="0x101"/>
       <IDSymbol name="goToSolutionOrPullRequestFileCommand" value="0x0102" />
       <IDSymbol name="idCreateGistCommand" value="0x0400" />
+      <IDSymbol name="idCreateGistEnterpriseCommand" value="0x0401" />
       <IDSymbol name="idBlameCommand" value="0x0500" />
     </GuidSymbol>
 

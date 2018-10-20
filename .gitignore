@@ -232,6 +232,12 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+#OpenCover output
+coverage.xml
+
+#Msbuild binary log output
+output.binlog
+
 AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt

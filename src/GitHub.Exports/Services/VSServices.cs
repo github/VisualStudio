@@ -1,12 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using GitHub.Logging;
-using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell;
@@ -40,6 +36,7 @@ namespace GitHub.Services
         }
 
         string vsVersion;
+        /// <inheritdoc/>
         public string VSVersion
         {
             get
@@ -48,6 +45,13 @@ namespace GitHub.Services
                     vsVersion = GetVSVersion();
                 return vsVersion;
             }
+        }
+
+        /// <inheritdoc/>
+        public VSConstants.MessageBoxResult ShowMessageBoxInfo(string message)
+        {
+            return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         /// <summary>Open a repository in Team Explorer</summary>
@@ -74,8 +78,9 @@ namespace GitHub.Services
                 return false;
             }
 
-            var repoDir = os.Directory.GetDirectory(repoPath);
-            if (!repoDir.Exists)
+            var gitPath = Path.Combine(repoPath, ".git");
+            var gitDir = os.Directory.GetDirectory(gitPath);
+            if (!gitDir.Exists)
             {
                 return false;
             }

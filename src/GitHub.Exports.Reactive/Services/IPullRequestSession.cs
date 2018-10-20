@@ -19,12 +19,12 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the current user.
         /// </summary>
-        IAccount User { get; }
+        ActorModel User { get; }
 
         /// <summary>
         /// Gets the pull request.
         /// </summary>
-        IPullRequestModel PullRequest { get; }
+        PullRequestDetailModel PullRequest { get; }
 
         /// <summary>
         /// Gets an observable that indicates that<see cref="PullRequest"/> has been updated.
@@ -34,7 +34,7 @@ namespace GitHub.Services
         /// pull request model may be updated in-place which will not result in a PropertyChanged
         /// notification.
         /// </remarks>
-        IObservable<IPullRequestModel> PullRequestChanged { get; }
+        IObservable<PullRequestDetailModel> PullRequestChanged { get; }
 
         /// <summary>
         /// Gets the local repository.
@@ -60,7 +60,7 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the ID of the current pending pull request review for the user.
         /// </summary>
-        long PendingReviewId { get; }
+        string PendingReviewId { get; }
 
         /// <summary>
         /// Gets all files touched by the pull request.
@@ -97,8 +97,7 @@ namespace GitHub.Services
         /// <param name="path">The relative path of the file to comment on.</param>
         /// <param name="fileDiff">The diff between the PR head and base.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
-        /// <returns>A comment model.</returns>
-        Task<IPullRequestReviewCommentModel> PostReviewComment(
+        Task PostReviewComment(
             string body,
             string commitId,
             string path,
@@ -109,18 +108,16 @@ namespace GitHub.Services
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The REST ID of the comment to reply to.</param>
-        /// <param name="inReplyToNodeId">The GraphQL ID of the comment to reply to.</param>
+        /// <param name="inReplyTo">The GraphQL ID of the comment to reply to.</param>
         /// <returns></returns>
-        Task<IPullRequestReviewCommentModel> PostReviewComment(
+        Task PostReviewComment(
             string body,
-            int inReplyTo,
-            string inReplyToNodeId);
+            string inReplyTo);
 
         /// <summary>
         /// Starts a new pending pull request review.
         /// </summary>
-        Task<IPullRequestReviewModel> StartReview();
+        Task StartReview();
 
         /// <summary>
         /// Cancels the currently pending review.
@@ -134,16 +131,30 @@ namespace GitHub.Services
         /// Posts the currently pending review.
         /// </summary>
         /// <param name="body">The review body.</param>
-        /// <param name="state">The review event.</param>
+        /// <param name="e">The review event.</param>
         /// <returns>The review model.</returns>
-        Task<IPullRequestReviewModel> PostReview(string body, PullRequestReviewEvent e);
+        Task PostReview(string body, PullRequestReviewEvent e);
 
         /// <summary>
-        /// Updates the pull request session with a new pull request model in response to a refresh
-        /// from the server.
+        /// Deletes a pull request comment.
         /// </summary>
-        /// <param name="pullRequest">The new pull request model.</param>
+        /// <param name="pullRequestId">The number of the pull request id of the comment</param>
+        /// <param name="commentDatabaseId">The number of the pull request comment to delete</param>
         /// <returns>A task which completes when the session has completed updating.</returns>
-        Task Update(IPullRequestModel pullRequest);
+        Task DeleteComment(int pullRequestId, int commentDatabaseId);
+
+        /// <summary>
+        /// Edit a PR review comment reply.
+        /// </summary>
+        /// <param name="commentNodeId">The node id of the pull request comment</param>
+        /// <param name="body">The replacement comment body.</param>
+        /// <returns>A comment model.</returns>
+        Task EditComment(string commentNodeId, string body);
+
+        /// <summary>
+        /// Refreshes the pull request session.
+        /// </summary>
+        /// <returns>A task which completes when the session has completed refreshing.</returns>
+        Task Refresh();
     }
 }

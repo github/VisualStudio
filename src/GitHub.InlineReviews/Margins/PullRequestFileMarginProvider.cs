@@ -3,6 +3,8 @@ using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
@@ -19,18 +21,19 @@ namespace GitHub.InlineReviews.Margins
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     internal sealed class PullRequestFileMarginProvider : IWpfTextViewMarginProvider
     {
-        readonly IPullRequestSessionManager sessionManager;
-        readonly IToggleInlineCommentMarginCommand enableInlineCommentsCommand;
-        readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
-        readonly IPackageSettings packageSettings;
+        readonly Lazy<IPullRequestSessionManager> sessionManager;
+        readonly Lazy<IToggleInlineCommentMarginCommand> enableInlineCommentsCommand;
+        readonly Lazy<IGoToSolutionOrPullRequestFileCommand> goToSolutionOrPullRequestFileCommand;
+        readonly Lazy<IPackageSettings> packageSettings;
         readonly Lazy<IUsageTracker> usageTracker;
+        readonly UIContext uiContext;
 
         [ImportingConstructor]
         public PullRequestFileMarginProvider(
-            IToggleInlineCommentMarginCommand enableInlineCommentsCommand,
-            IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
-            IPullRequestSessionManager sessionManager,
-            IPackageSettings packageSettings,
+            Lazy<IToggleInlineCommentMarginCommand> enableInlineCommentsCommand,
+            Lazy<IGoToSolutionOrPullRequestFileCommand> goToSolutionOrPullRequestFileCommand,
+            Lazy<IPullRequestSessionManager> sessionManager,
+            Lazy<IPackageSettings> packageSettings,
             Lazy<IUsageTracker> usageTracker)
         {
             this.enableInlineCommentsCommand = enableInlineCommentsCommand;
@@ -38,6 +41,8 @@ namespace GitHub.InlineReviews.Margins
             this.sessionManager = sessionManager;
             this.packageSettings = packageSettings;
             this.usageTracker = usageTracker;
+
+            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
         }
 
         /// <summary>
@@ -50,8 +55,14 @@ namespace GitHub.InlineReviews.Margins
         /// </returns>
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin marginContainer)
         {
+            if (!uiContext.IsActive)
+            {
+                // Only create margin when in the context of a Git repository
+                return null;
+            }
+
             // Comments in the editor feature flag
-            if (!packageSettings.EditorComments)
+            if (!packageSettings.Value.EditorComments)
             {
                 return null;
             }
@@ -63,7 +74,11 @@ namespace GitHub.InlineReviews.Margins
             }
 
             return new PullRequestFileMargin(
-                wpfTextViewHost.TextView, enableInlineCommentsCommand, goToSolutionOrPullRequestFileCommand, sessionManager, usageTracker);
+                wpfTextViewHost.TextView,
+                enableInlineCommentsCommand.Value,
+                goToSolutionOrPullRequestFileCommand.Value,
+                sessionManager.Value,
+                usageTracker);
         }
 
         bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");

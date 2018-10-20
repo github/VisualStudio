@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.Dialog.Clone;
 
 namespace GitHub.Services
 {
@@ -27,18 +29,26 @@ namespace GitHub.Services
             this.showDialog = showDialog;
         }
 
-        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection)
+        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
+            if (url != null)
+            {
+                viewModel.UrlTab.Url = url;
+            }
 
             if (connection != null)
             {
-                await viewModel.InitializeAsync(connection);
-                return (CloneDialogResult)await showDialog.Show(viewModel);
+                return (CloneDialogResult)await showDialog.Show(
+                    viewModel,
+                    connection,
+                    ApiClientConfiguration.RequestedScopes)
+                    .ConfigureAwait(false);
             }
             else
             {
-                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel);
+                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -51,10 +61,19 @@ namespace GitHub.Services
             return (string)await showDialog.ShowWithFirstConnection(viewModel);
         }
 
-        public async Task ShowCreateGist()
+        public async Task ShowCreateGist(IConnection connection)
         {
             var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
-            await showDialog.ShowWithFirstConnection(viewModel);
+
+            if (connection != null)
+            {
+                await viewModel.InitializeAsync(connection);
+                await showDialog.Show(viewModel);
+            }
+            else
+            {
+                await showDialog.ShowWithFirstConnection(viewModel);
+            }
         }
 
         public async Task ShowCreateRepositoryDialog(IConnection connection)

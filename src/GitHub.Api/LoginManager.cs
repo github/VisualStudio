@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 using Serilog;
@@ -24,7 +25,8 @@ namespace GitHub.Api
         readonly Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
-        readonly IReadOnlyList<string> scopes;
+        readonly IReadOnlyList<string> minimumScopes;
+        readonly IReadOnlyList<string> requestedScopes;
         readonly string authorizationNote;
         readonly string fingerprint;
         IOAuthCallbackListener oauthListener;
@@ -34,8 +36,11 @@ namespace GitHub.Api
         /// </summary>
         /// <param name="keychain">The keychain in which to store credentials.</param>
         /// <param name="twoFactorChallengeHandler">The handler for 2FA challenges.</param>
+        /// <param name="oauthListener">The callback listener to signal successful login.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
+        /// <param name="minimumScopes">The minimum acceptable scopes.</param>
+        /// <param name="requestedScopes">The scopes to request when logging in.</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
@@ -44,7 +49,8 @@ namespace GitHub.Api
             IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
-            IReadOnlyList<string> scopes,
+            IReadOnlyList<string> minimumScopes,
+            IReadOnlyList<string> requestedScopes,
             string authorizationNote = null,
             string fingerprint = null)
         {
@@ -58,13 +64,14 @@ namespace GitHub.Api
             this.oauthListener = oauthListener;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
-            this.scopes = scopes;
+            this.minimumScopes = minimumScopes;
+            this.requestedScopes = requestedScopes;
             this.authorizationNote = authorizationNote;
             this.fingerprint = fingerprint;
         }
 
         /// <inheritdoc/>
-        public async Task<User> Login(
+        public async Task<LoginResult> Login(
             HostAddress hostAddress,
             IGitHubClient client,
             string userName,
@@ -81,7 +88,7 @@ namespace GitHub.Api
 
             var newAuth = new NewAuthorization
             {
-                Scopes = scopes,
+                Scopes = requestedScopes,
                 Note = authorizationNote,
                 Fingerprint = fingerprint,
             };
@@ -108,7 +115,9 @@ namespace GitHub.Api
                     // be using a personal access token as the password.
                     if (EnterpriseWorkaround(hostAddress, e))
                     {
-                        auth = new ApplicationAuthorization(password);
+                        auth = new ApplicationAuthorization(0, 
+                            null, null, null, null, null, null, null,
+                            DateTimeOffset.MinValue, DateTimeOffset.MinValue, null, password);
                     }
                     else
                     {
@@ -119,11 +128,11 @@ namespace GitHub.Api
             } while (auth == null);
 
             await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
-            return await ReadUserWithRetry(client);
+            return await ReadUserWithRetry(client).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public async Task<User> LoginViaOAuth(
+        public async Task<LoginResult> LoginViaOAuth(
             HostAddress hostAddress,
             IGitHubClient client,
             IOauthClient oauthClient,
@@ -141,18 +150,18 @@ namespace GitHub.Api
 
             openBrowser(loginUrl);
 
-            var code = await listen;
+            var code = await listen.ConfigureAwait(false);
             var request = new OauthTokenRequest(clientId, clientSecret, code);
-            var token = await oauthClient.CreateAccessToken(request);
+            var token = await oauthClient.CreateAccessToken(request).ConfigureAwait(false);
 
             await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
-            var user = await ReadUserWithRetry(client);
-            await keychain.Save(user.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
-            return user;
+            var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+            await keychain.Save(result.User.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
+            return result;
         }
 
         /// <inheritdoc/>
-        public async Task<User> LoginWithToken(
+        public async Task<LoginResult> LoginWithToken(
             HostAddress hostAddress,
             IGitHubClient client,
             string token)
@@ -165,19 +174,19 @@ namespace GitHub.Api
 
             try
             {
-                var user = await ReadUserWithRetry(client);
-                await keychain.Save(user.Login, token, hostAddress).ConfigureAwait(false);
-                return user;
+                var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+                await keychain.Save(result.User.Login, token, hostAddress).ConfigureAwait(false);
+                return result;
             }
             catch
             {
-                await keychain.Delete(hostAddress);
+                await keychain.Delete(hostAddress).ConfigureAwait(false);
                 throw;
             }
         }
 
         /// <inheritdoc/>
-        public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
+        public Task<LoginResult> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
@@ -191,41 +200,7 @@ namespace GitHub.Api
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            await keychain.Delete(hostAddress);
-        }
-
-        /// <summary>
-        /// Tests if received API scopes match the required API scopes.
-        /// </summary>
-        /// <param name="required">The required API scopes.</param>
-        /// <param name="received">The received API scopes.</param>
-        /// <returns>True if all required scopes are present, otherwise false.</returns>
-        public static bool ScopesMatch(IReadOnlyList<string> required, IReadOnlyList<string> received)
-        {
-            foreach (var scope in required)
-            {
-                var found = received.Contains(scope);
-
-                if (!found && 
-                    (scope.StartsWith("read:", StringComparison.Ordinal) ||
-                     scope.StartsWith("write:", StringComparison.Ordinal)))
-                {
-                    // NOTE: Scopes are actually more complex than this, for example
-                    // `user` encompasses `read:user` and `user:email` but just use
-                    // this simple rule for now as it works for the scopes we require.
-                    var adminScope = scope
-                        .Replace("read:", "admin:")
-                        .Replace("write:", "admin:");
-                    found = received.Contains(adminScope);
-                }
-
-                if (!found)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            await keychain.Delete(hostAddress).ConfigureAwait(false);
         }
 
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
@@ -254,18 +229,18 @@ namespace GitHub.Api
                         twoFactorAuthenticationCode).ConfigureAwait(false);
                 }
 
-                if (result.Token == string.Empty)
+                if (string.IsNullOrEmpty(result.Token))
                 {
                     if (twoFactorAuthenticationCode == null)
                     {
-                        await client.Authorization.Delete(result.Id);
+                        await client.Authorization.Delete(result.Id).ConfigureAwait(false);
                     }
                     else
                     {
-                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode);
+                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode).ConfigureAwait(false);
                     }
                 }
-            } while (result.Token == string.Empty && retry++ == 0);
+            } while (string.IsNullOrEmpty(result.Token) && retry++ == 0);
 
             return result;
         }
@@ -278,7 +253,7 @@ namespace GitHub.Api
         {
             for (;;)
             {
-                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception);
+                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception).ConfigureAwait(false);
 
                 if (challengeResult == null)
                 {
@@ -302,7 +277,7 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        await twoFactorChallengeHandler.Value.ChallengeFailed(e);
+                        await twoFactorChallengeHandler.Value.ChallengeFailed(e).ConfigureAwait(false);
                         await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
@@ -343,7 +318,7 @@ namespace GitHub.Api
                  apiException?.StatusCode == (HttpStatusCode)422);
         }
 
-        async Task<User> ReadUserWithRetry(IGitHubClient client)
+        async Task<LoginResult> ReadUserWithRetry(IGitHubClient client)
         {
             var retry = 0;
 
@@ -360,29 +335,29 @@ namespace GitHub.Api
 
                 // It seems that attempting to use a token immediately sometimes fails, retry a few
                 // times with a delay of of 1s to allow the token to propagate.
-                await Task.Delay(1000);
+                await Task.Delay(1000).ConfigureAwait(false);
             }
         }
 
-        async Task<User> GetUserAndCheckScopes(IGitHubClient client)
+        async Task<LoginResult> GetUserAndCheckScopes(IGitHubClient client)
         {
             var response = await client.Connection.Get<User>(
                 UserEndpoint, null, null).ConfigureAwait(false);
 
             if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
             {
-                var returnedScopes = response.HttpResponse.Headers[ScopesHeader]
+                var returnedScopes = new ScopesCollection(response.HttpResponse.Headers[ScopesHeader]
                     .Split(',')
                     .Select(x => x.Trim())
-                    .ToArray();
+                    .ToArray());
 
-                if (ScopesMatch(scopes, returnedScopes))
+                if (returnedScopes.Matches(minimumScopes))
                 {
-                    return response.Body;
+                    return new LoginResult(response.Body, returnedScopes);
                 }
                 else
                 {
-                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", scopes, returnedScopes);
+                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", minimumScopes, returnedScopes);
                 }
             }
             else
@@ -391,7 +366,7 @@ namespace GitHub.Api
             }
 
             throw new IncorrectScopesException(
-                "Incorrect API scopes. Required: " + string.Join(",", scopes));
+                "Incorrect API scopes. Required: " + string.Join(",", minimumScopes));
         }
 
         Uri GetLoginUrl(IOauthClient client, string state)
@@ -400,7 +375,7 @@ namespace GitHub.Api
 
             request.State = state;
 
-            foreach (var scope in scopes)
+            foreach (var scope in requestedScopes)
             {
                 request.Scopes.Add(scope);
             }

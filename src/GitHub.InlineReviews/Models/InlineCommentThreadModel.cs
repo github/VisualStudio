@@ -20,17 +20,15 @@ namespace GitHub.InlineReviews.Models
         /// </summary>
         /// <param name="relativePath">The relative path to the file that the thread is on.</param>
         /// <param name="commitSha">The SHA of the commit that the thread appears on.</param>
-        /// <param name="originalPosition">
-        /// The 1-based line number in the original diff that the thread was left on.
-        /// </param>
         /// <param name="diffMatch">
         /// The last five lines of the thread's diff hunk, in reverse order.
         /// </param>
+        /// <param name="comments">The comments in the thread</param>
         public InlineCommentThreadModel(
             string relativePath,
             string commitSha,
             IList<DiffLine> diffMatch,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments)
         {
             Guard.ArgumentNotNull(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
@@ -41,10 +39,15 @@ namespace GitHub.InlineReviews.Models
             DiffLineType = diffMatch[0].Type;
             CommitSha = commitSha;
             RelativePath = relativePath;
+
+            foreach (var comment in comments)
+            {
+                comment.Thread = this;
+            }
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
+        public IReadOnlyList<InlineCommentModel> Comments { get; }
 
         /// <inheritdoc/>
         public IList<DiffLine> DiffMatch { get; }

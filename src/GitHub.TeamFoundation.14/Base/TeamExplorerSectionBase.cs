@@ -118,7 +118,8 @@ namespace GitHub.VisualStudio.Base
 
         protected ITeamExplorerSection GetSection(Guid section)
         {
-            var tep = (ITeamExplorerPage)TEServiceProvider.GetServiceSafe(typeof(ITeamExplorerPage));
+            // Return null if section hasn't been initialized yet
+            var tep = (ITeamExplorerPage)TEServiceProvider?.GetServiceSafe(typeof(ITeamExplorerPage));
             return tep?.GetSection(section);
         }
     }

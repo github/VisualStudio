@@ -12,6 +12,7 @@ namespace GitHub.Services
         /// is null or no remote exists, this method returns null
         /// </summary>
         /// <param name="repository">The repository to look at for the remote.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
         UriString GetUri(IRepository repository, string remote = "origin");
 
@@ -24,9 +25,10 @@ namespace GitHub.Services
         /// walks up the parent directories until it either finds a repository, or reaches the root disk.
         /// </remarks>
         /// <param name="path">The path to start probing</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns>A <see cref="UriString"/> representing the origin or null if none found.</returns>
         UriString GetUri(string path, string remote = "origin");
-        
+
         /// <summary>
         /// Probes for a git repository and if one is found, returns a <see cref="IRepositoryModel"/> instance for the
         /// repository.
@@ -42,7 +44,8 @@ namespace GitHub.Services
         /// <summary>
         /// Returns a <see cref="UriString"/> representing the uri of a remote.
         /// </summary>
-        /// <param name="repo"></param>
+        /// <param name="repo">The repository to look at for the remote.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns></returns>
         UriString GetRemoteUri(IRepository repo, string remote = "origin");
 
@@ -51,7 +54,8 @@ namespace GitHub.Services
         /// been found in any remote branches or the current local branch. 
         /// </summary>
         /// <param name="path">The local path of a repository or a file inside a repository. This cannot be null.</param>
+        /// <param name="remote">The remote name to look for</param>
         /// <returns></returns>
-        Task<string> GetLatestPushedSha(string path);
+        Task<string> GetLatestPushedSha(string path, string remote = "origin");
     }
 }

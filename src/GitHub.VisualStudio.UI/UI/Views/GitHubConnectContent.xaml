@@ -5,9 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" d:DesignBackground="White"
+             mc:Ignorable="d"
              KeyboardNavigation.TabNavigation="Local"
              DataContext="{Binding ViewModel}"
              Background="{DynamicResource GitHubVsToolWindowBackground}" >
@@ -15,7 +13,10 @@
   <d:DesignProperties.DataContext>
     <Binding>
       <Binding.Source>
-        <ghfvs:GitHubConnectSectionDesigner />
+        <ghfvs:GitHubConnectSectionDesigner ErrorMessage="Could not connect."
+                                            ShowLogin="True"
+                                            ShowLogout="True"
+                                            ShowRetry="True"/>
       </Binding.Source>
     </Binding>
   </d:DesignProperties.DataContext>
@@ -142,23 +143,31 @@
 
   </UserControl.Resources>
   
-  <DockPanel>
-    <WrapPanel Orientation="Horizontal" Margin="6,0,0,6" DockPanel.Dock="Top">
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+      
+    <WrapPanel Orientation="Horizontal"
+               Margin="6,0,0,6"
+               Visibility="{Binding SectionConnection.IsLoggedIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static ghfvs:Resources.CloneLink}"              
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static ghfvs:Resources.CreateLink}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateHyperlink}"/>
       <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static ghfvs:Resources.SignOutLink}"
               Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignOutHyperlink}"/>
-      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static ghfvs:Resources.LoginLink}"
               Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"
               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignInHyperlink}"/>
     </WrapPanel>
  
     <ListView x:Name="repositories"
+              Grid.Row="1"
               ItemsSource="{Binding Repositories}"
               SelectedItem="{Binding Path=SelectedRepository}"
               Margin="5,0,6,0"
@@ -166,8 +175,6 @@
               ItemContainerStyle="{StaticResource RepositoriesListItemContainerStyle}"
               Background="Transparent"
               BorderBrush="Transparent"
-              VerticalAlignment="Top"
-              HorizontalContentAlignment="Stretch"
               TextSearch.TextPath="Name"
               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
               VirtualizingPanel.IsVirtualizing="True"
@@ -202,7 +209,7 @@
                     <RowDefinition Height="Auto" />
                   </Grid.RowDefinitions>
                   <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">
-                    <Run Text="{x:Static prop:Resources.nameText}"/>:
+                    <Run Text="{x:Static ghfvs:Resources.nameText}"/>:
                   </TextBlock>
                   <TextBlock Grid.Row="0" Grid.Column="1">
                     <TextBlock.Text>
@@ -213,7 +220,7 @@
                     </TextBlock.Text>
                   </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">
-                    <Run Text="{x:Static prop:Resources.pathText}"/>:
+                    <Run Text="{x:Static ghfvs:Resources.pathText}"/>:
                   </TextBlock>
                   <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=LocalPath}" />
                 </Grid>
@@ -223,6 +230,48 @@
         </DataTemplate>
       </ListView.ItemTemplate>
     </ListView>
+
+    <TextBlock Grid.Row="1"
+               Visibility="{Binding IsLoggingIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
+      Logging in...
+    </TextBlock>
+
+    <Grid Grid.Row="1"
+          Visibility="{Binding ErrorMessage, Converter={ghfvs:NotEqualsToVisibilityConverter {x:Null}}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <ghfvs:OcticonImage Grid.Column="0"
+                          Grid.RowSpan="3"
+                          Icon="alert"
+                          Margin="8"/>
+
+      <TextBlock Grid.Column="1"
+                 Grid.Row="0"
+                 Text="{Binding ErrorMessage}"
+                 TextWrapping="Wrap"/>
+
+      <StackPanel Grid.Column="1"
+                  Grid.Row="1"
+                  Margin="0,8,0,0"
+                  Orientation="Horizontal">
+        <Button Style="{StaticResource ActionLinkButton}"
+                Content="{x:Static ghfvs:Resources.Retry}"
+                Click="retry_Click"
+                Margin="0,0,8,0"
+                Visibility="{Binding ShowRetry, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Button Style="{StaticResource ActionLinkButton}"
+                Click="signOut_Click"
+                Content="{x:Static ghfvs:Resources.SignOutLink}"
+                Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+      </StackPanel>
+    </Grid>
     
-  </DockPanel>
+  </Grid>
 </UserControl>

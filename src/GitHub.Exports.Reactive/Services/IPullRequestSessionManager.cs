@@ -14,7 +14,7 @@ namespace GitHub.Services
     /// If the currently checked out branch represents a pull request then <see cref="CurrentSession"/>
     /// will return an <see cref="IPullRequestSession"/> containing the details of that pull request.
     /// A session for any other pull request can also be retrieved by calling
-    /// <see cref="GetSession(IPullRequestModel)"/>.
+    /// <see cref="GetSession(string, string, int)"/>.
     /// 
     /// Calling <see cref="GetLiveFile(string, ITextView, ITextBuffer)"/> will return an
     /// <see cref="IPullRequestSessionFile"/> which tracks both the contents of a text buffer and the
@@ -66,15 +66,13 @@ namespace GitHub.Services
         string GetRelativePath(ITextBuffer buffer);
 
         /// <summary>
-        /// Gets a pull request session for a pull request that may not be checked out.
+        /// Gets an <see cref="IPullRequestSession"/> for a pull request.
         /// </summary>
-        /// <param name="pullRequest">The pull request model.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request number.</param>
         /// <returns>An <see cref="IPullRequestSession"/>.</returns>
-        /// <remarks>
-        /// If the provided pull request model represents the current session then that will be
-        /// returned. If not, a new pull request session object will be created.
-        /// </remarks>
-        Task<IPullRequestSession> GetSession(IPullRequestModel pullRequest);
+        Task<IPullRequestSession> GetSession(string owner, string name, int number);
 
         /// <summary>
         /// Gets information about the pull request that a Visual Studio text buffer is a part of.

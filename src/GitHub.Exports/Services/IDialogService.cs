@@ -16,11 +16,14 @@ namespace GitHub.Services
         /// The connection to use. If null, the first connection will be used, or the user promted
         /// to log in if there are no connections.
         /// </param>
+        /// <param name="url">
+        /// The URL to prepopulate URL field with or null.
+        /// </param>
         /// <returns>
         /// A task that returns an instance of <see cref="CloneDialogResult"/> on success,
         /// or null if the dialog was cancelled.
         /// </returns>
-        Task<CloneDialogResult> ShowCloneDialog(IConnection connection);
+        Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null);
 
         /// <summary>
         /// Shows the re-clone dialog.
@@ -39,7 +42,11 @@ namespace GitHub.Services
         /// <summary>
         /// Shows the Create Gist dialog.
         /// </summary>
-        Task ShowCreateGist();
+        /// <param name="connection">
+        /// The connection to use. If null, the first connection will be used, or the user promted
+        /// to log in if there are no connections.
+        /// </param>
+        Task ShowCreateGist(IConnection connection);
 
         /// <summary>
         /// Shows the Create Repository dialog.

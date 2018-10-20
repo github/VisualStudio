@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Extensions;
 using ReactiveUI;
@@ -46,9 +47,9 @@ namespace GitHub.ViewModels.GitHubPane
                   x[1]?.Activated();
               });
 
-            NavigateBack = ReactiveCommand.Create(pos.Select(x => x.Index > 0));
+            NavigateBack = ReactiveCommand.Create(() => { }, pos.Select(x => x.Index > 0));
             NavigateBack.Subscribe(_ => Back());
-            NavigateForward = ReactiveCommand.Create(pos.Select(x => x.Index < x.Count - 1));
+            NavigateForward = ReactiveCommand.Create(() => { }, pos.Select(x => x.Index < x.Count - 1));
             NavigateForward.Subscribe(_ => Forward());
         }
 
@@ -66,10 +67,10 @@ namespace GitHub.ViewModels.GitHubPane
         public IReadOnlyReactiveList<IPanePageViewModel> History => history;
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> NavigateBack { get; }
+        public ReactiveCommand<Unit, Unit> NavigateBack { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> NavigateForward { get; }
+        public ReactiveCommand<Unit, Unit> NavigateForward { get; }
 
         /// <inheritdoc/>
         public void NavigateTo(IPanePageViewModel page)

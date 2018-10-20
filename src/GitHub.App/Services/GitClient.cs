@@ -96,20 +96,30 @@ namespace GitHub.Services
 
         public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
         {
-            var httpsUrl = UriString.ToUriString(cloneUrl.ToRepositoryUrl());
-
-            var originRemote = repo.Network.Remotes[defaultOriginName];
-            if (originRemote != null && originRemote.Url == httpsUrl)
+            foreach (var remote in repo.Network.Remotes)
             {
-                return Fetch(repo, defaultOriginName, refspecs);
+                if (UriString.RepositoryUrlsAreEqual(new UriString(remote.Url), cloneUrl))
+                {
+                    return Fetch(repo, remote.Name, refspecs);
+                }
             }
 
             return Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    var tempRemoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
-                    var remote = repo.Network.Remotes.Add(tempRemoteName, httpsUrl);
+                    var remoteName = cloneUrl.Owner;
+                    var remoteUri = cloneUrl.ToRepositoryUrl();
+
+                    var removeRemote = false;
+                    if (repo.Network.Remotes[remoteName] != null)
+                    {
+                        // If a remote with this neme already exists, use a unique name and remove remote afterwards
+                        remoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
+                        removeRemote = true;
+                    }
+
+                    var remote = repo.Network.Remotes.Add(remoteName, remoteUri.ToString());
                     try
                     {
 #pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
@@ -118,7 +128,10 @@ namespace GitHub.Services
                     }
                     finally
                     {
-                        repo.Network.Remotes.Remove(tempRemoteName);
+                        if (removeRemote)
+                        {
+                            repo.Network.Remotes.Remove(remoteName);
+                        }
                     }
                 }
                 catch (Exception ex)

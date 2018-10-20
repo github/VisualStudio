@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -37,11 +38,12 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IUsageTracker usageTracker;
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
+        readonly IViewViewModelFactory viewViewModelFactory;
         IModelService modelService;
-        IPullRequestModel model;
+        PullRequestDetailModel model;
+        IActorViewModel author;
         string sourceBranchDisplayName;
         string targetBranchDisplayName;
-        int commentCount;
         string body;
         IReadOnlyList<IPullRequestReviewSummaryViewModel> reviews;
         IPullRequestCheckoutState checkoutState;
@@ -54,16 +56,18 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
+        IReadOnlyList<IPullRequestCheckViewModel> checks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
         /// </summary>
-        /// <param name="localRepository">The local repository.</param>
-        /// <param name="modelService">The model service.</param>
         /// <param name="pullRequestsService">The pull requests service.</param>
         /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="modelServiceFactory">The model service factory</param>
         /// <param name="usageTracker">The usage tracker.</param>
         /// <param name="teamExplorerContext">The context for tracking repo changes</param>
+        /// <param name="files">The view model which will display the changed files</param>
+        /// <param name="syncSubmodulesCommand">A command that will be run when <see cref="SyncSubmodules"/> is executed</param>
         [ImportingConstructor]
         public PullRequestDetailViewModel(
             IPullRequestService pullRequestsService,
@@ -72,7 +76,8 @@ namespace GitHub.ViewModels.GitHubPane
             IUsageTracker usageTracker,
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
-            ISyncSubmodulesCommand syncSubmodulesCommand)
+            ISyncSubmodulesCommand syncSubmodulesCommand,
+            IViewViewModelFactory viewViewModelFactory)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -80,6 +85,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
+            Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -87,46 +93,52 @@ namespace GitHub.ViewModels.GitHubPane
             this.usageTracker = usageTracker;
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
+            this.viewViewModelFactory = viewViewModelFactory;
             Files = files;
 
-            Checkout = ReactiveCommand.CreateAsyncObservable(
+            Checkout = ReactiveCommand.CreateFromObservable(
+                DoCheckout,
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.IsEnabled),
-                DoCheckout);
+                    .Select(x => x != null && x.IsEnabled));
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
             SubscribeOperationError(Checkout);
 
-            Pull = ReactiveCommand.CreateAsyncObservable(
+            Pull = ReactiveCommand.CreateFromObservable(
+                DoPull,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PullEnabled),
-                DoPull);
+                    .Select(x => x != null && x.PullEnabled));
             SubscribeOperationError(Pull);
 
-            Push = ReactiveCommand.CreateAsyncObservable(
+            Push = ReactiveCommand.CreateFromObservable(
+                DoPush,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PushEnabled),
-                DoPush);
+                    .Select(x => x != null && x.PushEnabled));
             SubscribeOperationError(Push);
 
-            SyncSubmodules = ReactiveCommand.CreateAsyncTask(
+            SyncSubmodules = ReactiveCommand.CreateFromTask(
+                DoSyncSubmodules,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.SyncSubmodulesEnabled),
-                DoSyncSubmodules);
+                    .Select(x => x != null && x.SyncSubmodulesEnabled));
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
-            OpenOnGitHub = ReactiveCommand.Create();
-            ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
+            OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
+            ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
+        }
+
+        private void DoOpenDetailsUrl()
+        {
+            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
 
         /// <summary>
         /// Gets the underlying pull request model.
         /// </summary>
-        public IPullRequestModel Model
+        public PullRequestDetailModel Model
         {
             get { return model; }
             private set
@@ -163,6 +175,15 @@ namespace GitHub.ViewModels.GitHubPane
         public int Number { get; private set; }
 
         /// <summary>
+        /// Gets the Pull Request author.
+        /// </summary>
+        public IActorViewModel Author
+        {
+            get { return author; }
+            private set { this.RaiseAndSetIfChanged(ref author, value); }
+        }
+
+        /// <summary>
         /// Gets the session for the pull request.
         /// </summary>
         public IPullRequestSession Session { get; private set; }
@@ -186,14 +207,6 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <summary>
-        /// Gets the number of comments made on the pull request.
-        /// </summary>
-        public int CommentCount
-        {
-            get { return commentCount; }
-            private set { this.RaiseAndSetIfChanged(ref commentCount, value); }
-        }
-
         /// Gets a value indicating whether the pull request branch is checked out.
         /// </summary>
         public bool IsCheckedOut
@@ -274,32 +287,38 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
-        public ReactiveCommand<Unit> Checkout { get; }
+        public ReactiveCommand<Unit, Unit> Checkout { get; }
 
         /// <summary>
         /// Gets a command that pulls changes to the current branch.
         /// </summary>
-        public ReactiveCommand<Unit> Pull { get; }
+        public ReactiveCommand<Unit, Unit> Pull { get; }
 
         /// <summary>
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
-        public ReactiveCommand<Unit> Push { get; }
+        public ReactiveCommand<Unit, Unit> Push { get; }
 
         /// <summary>
         /// Sync submodules for PR branch.
         /// </summary>
-        public ReactiveCommand<Unit> SyncSubmodules { get; }
+        public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
-        public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Gets a command that navigates to a pull request review.
         /// </summary>
-        public ReactiveCommand<object> ShowReview { get; }
+        public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
+
+        public IReadOnlyList<IPullRequestCheckViewModel> Checks
+        {
+            get { return checks; }
+            private set { this.RaiseAndSetIfChanged(ref checks, value); }
+        }
 
         /// <summary>
         /// Initializes the view model.
@@ -328,10 +347,10 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 Number = number;
-                WebUrl = LocalRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + number);
+                WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
                 modelService = await modelServiceFactory.CreateAsync(connection);
-
-                await Refresh();
+                Session = await sessionManager.GetSession(owner, repo, number);
+                await Load(Session.PullRequest);
                 teamExplorerContext.StatusChanged += RefreshIfActive;
             }
             catch (Exception ex)
@@ -360,22 +379,23 @@ namespace GitHub.ViewModels.GitHubPane
         /// Loads the view model from octokit models.
         /// </summary>
         /// <param name="pullRequest">The pull request model.</param>
-        public async Task Load(IPullRequestModel pullRequest)
+        public async Task Load(PullRequestDetailModel pullRequest)
         {
             try
             {
                 var firstLoad = (Model == null);
                 Model = pullRequest;
-                Session = await sessionManager.GetSession(pullRequest);
+                Author = new ActorViewModel(pullRequest.Author);
                 Title = Resources.PullRequestNavigationItemText + " #" + pullRequest.Number;
 
                 IsBusy = true;
-                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, Model);
-                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Head?.Label);
-                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.Base?.Label);
-                CommentCount = pullRequest.Comments.Count + pullRequest.ReviewComments.Count;
+                IsFromFork = !pullRequestsService.IsPullRequestFromRepository(LocalRepository, pullRequest);
+                SourceBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.HeadRepositoryOwner, pullRequest.HeadRefName);
+                TargetBranchDisplayName = GetBranchDisplayName(IsFromFork, pullRequest.BaseRepositoryOwner, pullRequest.BaseRefName);
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
+
+                Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
 
                 await Files.InitializeAsync(Session);
 
@@ -433,7 +453,7 @@ namespace GitHub.ViewModels.GitHubPane
                     var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
-                    if (pullRequest.Head == null || !pullRequest.Head.RepositoryCloneUrl.IsValidUri)
+                    if (pullRequest.HeadRepositoryOwner == null)
                     {
                         disabled = Resources.SourceRepositoryNoLongerAvailable;
                     }
@@ -479,8 +499,8 @@ namespace GitHub.ViewModels.GitHubPane
                 Error = null;
                 OperationError = null;
                 IsBusy = true;
-                var pullRequest = await modelService.GetPullRequest(RemoteRepositoryOwner, LocalRepository.Name, Number);
-                await Load(pullRequest);
+                await Session.Refresh();
+                await Load(Session.PullRequest);
             }
             catch (Exception ex)
             {
@@ -532,17 +552,16 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void SubscribeOperationError(ReactiveCommand<Unit> command)
+        void SubscribeOperationError(ReactiveCommand<Unit, Unit> command)
         {
             command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
-            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
-        static string GetBranchDisplayName(bool isFromFork, string targetBranchLabel)
+        static string GetBranchDisplayName(bool isFromFork, string owner, string label)
         {
-            if (targetBranchLabel != null)
+            if (owner != null)
             {
-                return isFromFork ? targetBranchLabel : targetBranchLabel.Split(':')[1];
+                return isFromFork ? owner + ':' + label : label;
             }
             else
             {
@@ -550,8 +569,10 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        IObservable<Unit> DoCheckout(object unused)
+        IObservable<Unit> DoCheckout()
         {
+            OperationError = null;
+
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, Model).ToList();
@@ -575,8 +596,10 @@ namespace GitHub.ViewModels.GitHubPane
             });
         }
 
-        IObservable<Unit> DoPull(object unused)
+        IObservable<Unit> DoPull()
         {
+            OperationError = null;
+
             return pullRequestsService.Pull(LocalRepository)
                 .Do(_ =>
                 {
@@ -587,8 +610,10 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        IObservable<Unit> DoPush(object unused)
+        IObservable<Unit> DoPush()
         {
+            OperationError = null;
+
             return pullRequestsService.Push(LocalRepository)
                 .Do(_ =>
                 {
@@ -599,11 +624,12 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        async Task DoSyncSubmodules(object unused)
+        async Task DoSyncSubmodules()
         {
             try
             {
                 IsBusy = true;
+                OperationError = null;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
                 var result = await syncSubmodulesCommand.SyncSubmodules();
@@ -620,9 +646,9 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowReview(object item)
+        void DoShowReview(IPullRequestReviewSummaryViewModel item)
         {
-            var review = (PullRequestReviewSummaryViewModel)item;
+            var review = item;
 
             if (review.State == PullRequestReviewState.Pending)
             {

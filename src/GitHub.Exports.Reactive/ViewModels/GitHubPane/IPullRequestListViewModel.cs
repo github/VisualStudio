@@ -1,49 +1,22 @@
-﻿using System.Collections.Generic;
-using GitHub.Collections;
-using GitHub.Models;
+﻿using System;
+using System.Reactive;
 using ReactiveUI;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace GitHub.ViewModels.GitHubPane
 {
-    public class PullRequestState
+    /// <summary>
+    /// Represents a view model which displays a pull request list.
+    /// </summary>
+    public interface IPullRequestListViewModel : IIssueListViewModelBase, IOpenInBrowser
     {
-        public PullRequestState()
-        {
-        }
+        /// <summary>
+        /// Gets a command which navigates to the "Create Pull Request" view.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
 
-        public PullRequestState(bool isOpen, string name)
-        {
-            IsOpen = isOpen;
-            Name = name;
-        }
-
-        public bool? IsOpen;
-        public string Name;
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
-
-    public interface IPullRequestListViewModel : ISearchablePageViewModel, IOpenInBrowser
-    {
-        IReadOnlyList<IRemoteRepositoryModel> Repositories { get; }
-        IRemoteRepositoryModel SelectedRepository { get; set; }
-        ITrackingCollection<IPullRequestModel> PullRequests { get; }
-        IPullRequestModel SelectedPullRequest { get; }
-        IPullRequestModel CheckedOutPullRequest { get; }
-        IReadOnlyList<PullRequestState> States { get; set; }
-        PullRequestState SelectedState { get; set; }
-        ObservableCollection<IAccount> Authors { get; }
-        IAccount SelectedAuthor { get; set; }
-        ObservableCollection<IAccount> Assignees { get; }
-        IAccount SelectedAssignee { get; set; }
-        ReactiveCommand<object> OpenPullRequest { get; }
-        ReactiveCommand<object> CreatePullRequest { get; }
-        ReactiveCommand<object> OpenPullRequestOnGitHub { get; }
-
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        /// <summary>
+        /// Gets a command that opens pull request item on GitHub.
+        /// </summary>
+        ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
     }
 }

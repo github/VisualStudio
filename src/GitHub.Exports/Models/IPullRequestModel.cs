@@ -9,8 +9,16 @@ namespace GitHub.Models
     public enum PullRequestStateEnum
     {
         Open,
-        Merged,
         Closed,
+        Merged,
+    }
+
+    public enum PullRequestChecksState
+    {
+        None,
+        Pending,
+        Success,
+        Failure
     }
 
     public interface IPullRequestModel : ICopyable<IPullRequestModel>,
@@ -31,9 +39,5 @@ namespace GitHub.Models
         DateTimeOffset UpdatedAt { get; }
         IAccount Author { get; }
         IAccount Assignee { get; }
-        IReadOnlyList<IPullRequestFileModel> ChangedFiles { get; }
-        IReadOnlyList<ICommentModel> Comments { get; }
-        IReadOnlyList<IPullRequestReviewModel> Reviews { get; set; }
-        IReadOnlyList<IPullRequestReviewCommentModel> ReviewComments { get; set; }
     }
 }

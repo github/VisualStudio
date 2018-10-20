@@ -55,7 +55,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource GHLinkButtonTextBrush}"/>
         <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="Padding" Value="0,0,12,0"/>
+        <Setter Property="Padding" Value="0,2,12,2"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="Template">
@@ -63,7 +63,7 @@
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid
                         x:Name="templateRoot"
-                        Margin="0,2,0,2"
+                        Margin="{TemplateBinding Padding}"
                         SnapsToDevicePixels="true"
                         Background="{TemplateBinding Background}">
                         <Grid.RowDefinitions>

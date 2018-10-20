@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 using Microsoft.VisualStudio.Text;
 using Octokit;
 
@@ -54,7 +55,7 @@ namespace GitHub.InlineReviews.Services
         /// A collection of <see cref="IInlineCommentThreadModel"/> objects with updated line numbers.
         /// </returns>
         IReadOnlyList<IInlineCommentThreadModel> BuildCommentThreads(
-            IPullRequestModel pullRequest,
+            PullRequestDetailModel pullRequest,
             string relativePath,
             IReadOnlyList<DiffChunk> diff,
             string headSha);
@@ -90,7 +91,8 @@ namespace GitHub.InlineReviews.Services
         /// Extracts a file at a specified commit from the repository.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="commitSha">The SHA of the commit.</param>
+        /// <param name="pullRequestNumber">The pull request number</param>
+        /// <param name="sha">The SHA of the commit.</param>
         /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <returns>
         /// The contents of the file, or null if the file was not found at the specified commit.
@@ -134,6 +136,26 @@ namespace GitHub.InlineReviews.Services
         Task<byte[]> ReadFileAsync(string path);
 
         /// <summary>
+        /// Reads a <see cref="PullRequestDetailModel"/> for a specified pull request.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        /// <param name="number">The pull request number.</param>
+        /// <returns>A task returning the pull request model.</returns>
+        Task<PullRequestDetailModel> ReadPullRequestDetail(HostAddress address, string owner, string name, int number);
+
+        /// <summary>
+        /// Reads the current viewer for the specified address..
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <returns>A task returning the viewer.</returns>
+        /// <remarks>
+        /// A "Viewer" is the GraphQL term for the currently authenticated user.
+        /// </remarks>
+        Task<ActorModel> ReadViewer(HostAddress address);
+
+        /// <summary>
         /// Find the merge base for a pull request.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -141,12 +163,12 @@ namespace GitHub.InlineReviews.Services
         /// <returns>
         /// The merge base SHA for the PR.
         /// </returns>
-        Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest);
+        Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Gets the GraphQL ID for a pull request.
         /// </summary>
-        /// <param name="repository">The local repository.</param>
+        /// <param name="localRepository">The local repository.</param>
         /// <param name="repositoryOwner">The owner of the remote fork.</param>
         /// <param name="number">The pull request number.</param>
         /// <returns></returns>
@@ -175,17 +197,18 @@ namespace GitHub.InlineReviews.Services
         /// <param name="localRepository">The local repository.</param>
         /// <param name="user">The user posting the review.</param>
         /// <param name="pullRequestId">The GraphQL ID of the pull request.</param>
-        /// <returns></returns>
-        Task<IPullRequestReviewModel> CreatePendingReview(
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> CreatePendingReview(
             ILocalRepositoryModel localRepository,
-            IAccount user,
             string pullRequestId);
 
         /// <summary>
         /// Cancels a pending review on the server.
         /// </summary>
+        /// <param name="localRepository">The local repository.</param>
         /// <param name="reviewId">The GraphQL ID of the review.</param>
-        Task CancelPendingReview(
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> CancelPendingReview(
             ILocalRepositoryModel localRepository,
             string reviewId);
 
@@ -193,17 +216,14 @@ namespace GitHub.InlineReviews.Services
         /// Posts PR review with no comments.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
-        /// <param name="user">The user posting the review.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <param name="pullRequestId">The GraphQL ID of the pull request.</param>
         /// <param name="commitId">The SHA of the commit being reviewed.</param>
         /// <param name="body">The review body.</param>
         /// <param name="e">The review event.</param>
-        Task<IPullRequestReviewModel> PostReview(
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> PostReview(
             ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
-            IAccount user,
-            int number,
+            string pullRequestId,
             string commitId,
             string body,
             PullRequestReviewEvent e);
@@ -212,13 +232,12 @@ namespace GitHub.InlineReviews.Services
         /// Submits a pending PR review.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="user">The user posting the review.</param>
         /// <param name="pendingReviewId">The GraphQL ID of the pending review.</param>
         /// <param name="body">The review body.</param>
         /// <param name="e">The review event.</param>
-        Task<IPullRequestReviewModel> SubmitPendingReview(
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> SubmitPendingReview(
             ILocalRepositoryModel localRepository,
-            IAccount user,
             string pendingReviewId,
             string body,
             PullRequestReviewEvent e);
@@ -227,29 +246,38 @@ namespace GitHub.InlineReviews.Services
         /// Posts a new pending PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="user">The user posting the comment.</param>
         /// <param name="pendingReviewId">The GraphQL ID of the pending review.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
-        /// <returns>A model representing the posted comment.</returns>
+        /// <returns>The updated state of the pull request.</returns>
         /// <remarks>
-        /// The method posts a new pull request comment to a pending review started by
-        /// <see cref="CreatePendingReview(ILocalRepositoryModel, IAccount, string)"/>.
+        /// This method posts a new pull request comment to a pending review started by
+        /// <see cref="CreatePendingReview(ILocalRepositoryModel, string)"/>.
         /// </remarks>
-        Task<IPullRequestReviewCommentModel> PostPendingReviewComment(
+        Task<PullRequestDetailModel> PostPendingReviewComment(
             ILocalRepositoryModel localRepository,
-            IAccount user,
             string pendingReviewId,
             string body,
             string commitId,
             string path,
             int position);
 
-        Task<IPullRequestReviewCommentModel> PostPendingReviewCommentReply(
+        /// <summary>
+        /// Posts a new pending PR review comment reply.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="pendingReviewId">The GraphQL ID of the pending review.</param>
+        /// <param name="body">The comment body.</param>
+        /// <param name="inReplyTo">The GraphQL ID of the comment to reply to.</param>
+        /// <returns>The updated state of the pull request.</returns>
+        /// <remarks>
+        /// The method posts a new pull request comment to a pending review started by
+        /// <see cref="CreatePendingReview(ILocalRepositoryModel, string)"/>.
+        /// </remarks>
+        Task<PullRequestDetailModel> PostPendingReviewCommentReply(
             ILocalRepositoryModel localRepository,
-            IAccount user,
             string pendingReviewId,
             string body,
             string inReplyTo);
@@ -258,23 +286,19 @@ namespace GitHub.InlineReviews.Services
         /// Posts a new standalone PR review comment.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
-        /// <param name="user">The user posting the comment.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <param name="pullRequestId">The GraphQL ID of the pull request.</param>
         /// <param name="body">The comment body.</param>
         /// <param name="commitId">THe SHA of the commit to comment on.</param>
         /// <param name="path">The relative path of the file to comment on.</param>
         /// <param name="position">The line index in the diff to comment on.</param>
-        /// <returns>A model representing the posted comment.</returns>
+        /// <returns>The updated state of the pull request.</returns>
         /// <remarks>
         /// The method posts a new standalone pull request comment that is not attached to a pending
         /// pull request review.
         /// </remarks>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewComment(
+        Task<PullRequestDetailModel> PostStandaloneReviewComment(
             ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
-            IAccount user,
-            int number,
+            string pullRequestId,
             string body,
             string commitId,
             string path,
@@ -284,18 +308,40 @@ namespace GitHub.InlineReviews.Services
         /// Posts a PR review comment reply.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
-        /// <param name="remoteRepositoryOwner">The owner of the repository fork to post to.</param>
-        /// <param name="user">The user posting the comment.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <param name="pullRequestId">The GraphQL ID of the pull request.</param>
         /// <param name="body">The comment body.</param>
-        /// <param name="inReplyTo">The comment ID to reply to.</param>
-        /// <returns>A model representing the posted comment.</returns>
-        Task<IPullRequestReviewCommentModel> PostStandaloneReviewCommentRepy(
+        /// <param name="inReplyTo">The GraphQL ID of the comment to reply to.</param>
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> PostStandaloneReviewCommentReply(
             ILocalRepositoryModel localRepository,
-            string remoteRepositoryOwner,
-            IAccount user,
-            int number,
+            string pullRequestId,
             string body,
-            int inReplyTo);
+            string inReplyTo);
+
+        /// <summary>
+        /// Delete a PR review comment.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository.</param>
+        /// <param name="pullRequestId">The pull request id of the comment</param>
+        /// <param name="commentDatabaseId">The pull request comment number.</param>
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> DeleteComment(ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            int pullRequestId,
+            int commentDatabaseId);
+
+        /// <summary>
+        /// Edit a PR review comment.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepositoryOwner">The owner of the repository.</param>
+        /// <param name="commentNodeId">The pull request comment node id.</param>
+        /// <param name="body">The replacement comment body.</param>
+        /// <returns>The updated state of the pull request.</returns>
+        Task<PullRequestDetailModel> EditComment(ILocalRepositoryModel localRepository,
+            string remoteRepositoryOwner,
+            string commentNodeId,
+            string body);
     }
 }

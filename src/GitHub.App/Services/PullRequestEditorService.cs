@@ -336,6 +336,7 @@ namespace GitHub.Services
         /// <param name="fromLines">The document we're navigating from.</param>
         /// <param name="toLines">The document we're navigating to.</param>
         /// <param name="line">The 0-based line we're navigating from.</param>
+        /// <param name="matchLinesAbove"></param>
         /// <returns>The best matching line in <see cref="toLines"/></returns>
         public int FindMatchingLine(IList<string> fromLines, IList<string> toLines, int line, int matchLinesAbove = 0)
         {
@@ -546,7 +547,7 @@ namespace GitHub.Services
             var textView = vsEditorAdaptersFactory.GetWpfTextView(vsTextView);
 
             var statusMessage = session.IsCheckedOut ?
-                App.Resources.NavigateToEditorStatusMessage : App.Resources.NavigateToEditorNotCheckedOutStatusMessage;
+                Resources.NavigateToEditorStatusMessage : Resources.NavigateToEditorNotCheckedOutStatusMessage;
 
             textView.GotAggregateFocus += (s, e) =>
                 statusBar.ShowMessage(statusMessage);

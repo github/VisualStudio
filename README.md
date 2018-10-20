@@ -17,8 +17,9 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
-
 [![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/github-visual-studio/localized.svg)](https://crowdin.com/project/github-visual-studio)
+[![codecov](https://codecov.io/gh/GitHub/VisualStudio/branch/master/graph/badge.svg)](https://codecov.io/gh/GitHub/VisualStudio)
 
 [![Join the chat at freenode:github-vs](https://img.shields.io/badge/irc-freenode:%20%23github--vs-blue.svg)](http://webchat.freenode.net/?channels=%23github-vs) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -35,7 +36,7 @@ Beta releases will have `(beta)` in their title in the gallery, following the ve
 
 ## Build requirements
 
-* Visual Studio 2015+
+* Visual Studio 2017 (15.7.4)+
 * Visual Studio SDK
 
 ## Build
@@ -50,13 +51,13 @@ git submodule deinit script
 git submodule update
 ```
 
-Open the `GitHubVS.sln` solution with Visual Studio 2015+.
+Open the `GitHubVS.sln` solution with Visual Studio 2017+.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
 - Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
 
-Build using Visual Studio 2015 or:
+Build using Visual Studio 2017 or:
 
 ```txt
 build.cmd
@@ -85,6 +86,10 @@ To build and install a `Release` configuration VSIX:
 build.cmd Release
 install.cmd Release
 ```
+## Logs
+Logs can be viewed at the following location:
+
+`%LOCALAPPDATA%\GitHubVisualStudio\extension.log`
 
 ## More information
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
@@ -95,7 +100,7 @@ Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contri
 
 ## Copyright
 
-Copyright 2015 - 2017 GitHub, Inc.
+Copyright 2015 - 2018 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
 

@@ -2,11 +2,17 @@
 using System.Linq;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Logging;
 using GitHub.Primitives;
+using GitHub.Extensions;
 using Serilog;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -27,8 +33,9 @@ namespace GitHub.Services
     {
         static ILogger log = LogManager.ForContext<TeamExplorerContext>();
 
-        readonly DTE dte;
+        readonly AsyncLazy<DTE> dteAsync;
         readonly IVSGitExt gitExt;
+        readonly IPullRequestService pullRequestService;
 
         string solutionPath;
         string repositoryPath;
@@ -36,33 +43,66 @@ namespace GitHub.Services
         string branchName;
         string headSha;
         string trackedSha;
+        Tuple<string, int> pullRequest;
 
         ILocalRepositoryModel repositoryModel;
+        JoinableTask refreshJoinableTask;
 
         [ImportingConstructor]
-        public TeamExplorerContext(IGitHubServiceProvider serviceProvider, IVSGitExt gitExt)
-            : this(gitExt, serviceProvider)
+        TeamExplorerContext(
+            IVSGitExt gitExt,
+            [Import(typeof(SVsServiceProvider))] IServiceProvider sp,
+            IPullRequestService pullRequestService) : this(
+                gitExt,
+                new AsyncLazy<DTE>(async () =>
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    return (DTE)sp.GetService(typeof(DTE));
+                }),
+                pullRequestService,
+                ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public TeamExplorerContext(IVSGitExt gitExt, IGitHubServiceProvider serviceProvider)
+        public TeamExplorerContext(
+            IVSGitExt gitExt,
+            AsyncLazy<DTE> dteAsync,
+            IPullRequestService pullRequestService,
+            JoinableTaskContext joinableTaskContext)
         {
+            JoinableTaskCollection = joinableTaskContext.CreateCollection();
+            JoinableTaskCollection.DisplayName = nameof(TeamExplorerContext);
+            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
+
             this.gitExt = gitExt;
+            this.dteAsync = dteAsync;
+            this.pullRequestService = pullRequestService;
 
-            // This is a standard service which should always be available.
-            dte = serviceProvider.GetService<DTE>();
-
-            Refresh();
+            StartRefresh();
             gitExt.ActiveRepositoriesChanged += Refresh;
         }
 
-        void Refresh()
+        void StartRefresh() => JoinableTaskFactory.RunAsync(QueueRefreshAsync).Task.Forget(log);
+        void Refresh() => JoinableTaskFactory.Run(QueueRefreshAsync);
+
+        async Task QueueRefreshAsync()
+        {
+            if (refreshJoinableTask != null)
+            {
+                await refreshJoinableTask.JoinAsync(); // make sure StartRefresh has completed
+            }
+
+            await (refreshJoinableTask = JoinableTaskFactory.RunAsync(RefreshAsync));
+        }
+
+        async Task RefreshAsync()
         {
             try
             {
-                var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                var newSolutionPath = dte.Solution?.FullName;
+                await TaskScheduler.Default; // switch to threadpool
 
+                var repo = gitExt.ActiveRepositories?.FirstOrDefault();
+                string newSolutionPath = await GetSolutionPath();
                 if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
@@ -76,6 +116,7 @@ namespace GitHub.Services
                     var newBranchName = repo?.CurrentBranch?.Name;
                     var newHeadSha = repo?.CurrentBranch?.Sha;
                     var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
+                    var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : null;
 
                     if (newRepositoryPath != repositoryPath)
                     {
@@ -102,6 +143,11 @@ namespace GitHub.Services
                         log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
+                    else if (newPullRequest != pullRequest)
+                    {
+                        log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
 
                     repositoryPath = newRepositoryPath;
                     cloneUrl = newCloneUrl;
@@ -109,12 +155,20 @@ namespace GitHub.Services
                     headSha = newHeadSha;
                     solutionPath = newSolutionPath;
                     trackedSha = newTrackedSha;
+                    pullRequest = newPullRequest;
                 }
             }
             catch (Exception e)
             {
                 log.Error(e, "Refreshing active repository");
             }
+        }
+
+        async Task<string> GetSolutionPath()
+        {
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var dte = await dteAsync.GetValueAsync();
+            return dte.Solution?.FullName;
         }
 
         /// <summary>
@@ -146,5 +200,8 @@ namespace GitHub.Services
         /// Fired when the current branch, head SHA or tracked SHA changes.
         /// </summary>
         public event EventHandler StatusChanged;
+
+        public JoinableTaskCollection JoinableTaskCollection { get; }
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

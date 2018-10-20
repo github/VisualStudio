@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -26,28 +28,24 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IModelServiceFactory modelServiceFactory;
-        IModelService modelService;
         IPullRequestSession session;
-        IAccount user;
+        string login;
+        IActorViewModel user;
         string title;
         IReadOnlyList<IPullRequestReviewViewModel> reviews;
 
         [ImportingConstructor]
         public PullRequestUserReviewsViewModel(
             IPullRequestEditorService editorService,
-            IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory)
+            IPullRequestSessionManager sessionManager)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
 
             this.editorService = editorService;
             this.sessionManager = sessionManager;
-            this.modelServiceFactory = modelServiceFactory;
 
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
+            NavigateToPullRequest = ReactiveCommand.Create(() =>
                 NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
         }
 
@@ -60,7 +58,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public int PullRequestNumber { get; private set; }
 
-        public IAccount User
+        public IActorViewModel User
         {
             get { return user; }
             private set { this.RaiseAndSetIfChanged(ref user, value); }
@@ -81,9 +79,10 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <inheritdoc/>
+        [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "login")]
         public async Task InitializeAsync(
             ILocalRepositoryModel localRepository,
             IConnection connection,
@@ -104,9 +103,9 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
-                modelService = await modelServiceFactory.CreateAsync(connection);
-                User = await modelService.GetUser(login);
-                await Refresh();
+                this.login = login;
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                await Load(session.PullRequest);                
             }
             finally
             {
@@ -121,8 +120,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
-                var pullRequest = await modelService.GetPullRequest(RemoteRepositoryOwner, LocalRepository.Name, PullRequestNumber);
-                await Load(User, pullRequest);
+                await session.Refresh();
+                await Load(session.PullRequest);
             }
             catch (Exception ex)
             {
@@ -132,21 +131,20 @@ namespace GitHub.ViewModels.GitHubPane
                     RemoteRepositoryOwner,
                     LocalRepository.Name,
                     PullRequestNumber,
-                    modelService.ApiClient.HostAddress.Title);
+                    LocalRepository.CloneUrl.Host);
                 Error = ex;
                 IsBusy = false;
             }
         }
 
         /// <inheritdoc/>
-        async Task Load(IAccount author, IPullRequestModel pullRequest)
+        async Task Load(PullRequestDetailModel pullRequest)
         {
             IsBusy = true;
 
             try
             {
-                session = await sessionManager.GetSession(pullRequest);
-                User = author;
+                await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();
@@ -154,17 +152,29 @@ namespace GitHub.ViewModels.GitHubPane
 
                 foreach (var review in pullRequest.Reviews.OrderByDescending(x => x.SubmittedAt))
                 {
-                    if (review.User.Login == author.Login &&
-                        review.State != PullRequestReviewState.Pending)
+                    if (review.Author.Login == login)
                     {
-                        var vm = new PullRequestReviewViewModel(editorService, session, pullRequest, review);
-                        vm.IsExpanded = isFirst;
-                        reviews.Add(vm);
-                        isFirst = false;
+                        if (User == null)
+                        {
+                            User = new ActorViewModel(review.Author);
+                        }
+
+                        if (review.State != PullRequestReviewState.Pending)
+                        {
+                            var vm = new PullRequestReviewViewModel(editorService, session, review);
+                            vm.IsExpanded = isFirst;
+                            reviews.Add(vm);
+                            isFirst = false;
+                        }
                     }
                 }
 
                 Reviews = reviews;
+
+                if (User == null)
+                {
+                    User = new ActorViewModel(new ActorModel { Login = login });
+                }
             }
             finally
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -13,17 +13,19 @@ namespace GitHub.SampleData
     {
         public PullRequestReviewViewModelDesigner()
         {
-            PullRequestModel = new PullRequestModel(
-                419,
-                "Fix a ton of potential crashers, odd code and redundant calls in ModelService",
-                new AccountDesigner { Login = "Haacked", IsUser = true },
-                DateTimeOffset.Now - TimeSpan.FromDays(2));
+            PullRequestModel = new PullRequestDetailModel
+            {
+                Number = 419,
+                Title = "Fix a ton of potential crashers, odd code and redundant calls in ModelService",
+                Author = new ActorModel { Login = "Haacked" },
+                UpdatedAt = DateTimeOffset.Now - TimeSpan.FromDays(2),
+            };
 
             Model = new PullRequestReviewModel
             {
-                
+
                 SubmittedAt = DateTimeOffset.Now - TimeSpan.FromDays(1),
-                User = new AccountDesigner { Login = "Haacked", IsUser = true },
+                Author = new ActorModel { Login = "Haacked" },
             };
 
             Body = @"Just a few comments. I don't feel too strongly about them though.
@@ -63,10 +65,10 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public bool IsExpanded { get; set; }
         public bool HasDetails { get; set; }
         public ILocalRepositoryModel LocalRepository { get; set; }
-        public IPullRequestReviewModel Model { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public PullRequestReviewModel Model { get; set; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; set; }
-        public IPullRequestModel PullRequestModel { get; set; }
+        public PullRequestDetailModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public string StateDisplay { get; set; }
     }

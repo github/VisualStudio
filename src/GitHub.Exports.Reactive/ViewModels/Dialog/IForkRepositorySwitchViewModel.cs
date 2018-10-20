@@ -1,4 +1,5 @@
-﻿using GitHub.Models;
+﻿using System.Reactive;
+using GitHub.Models;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
@@ -15,7 +16,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user clicks the "Fork" button.
         /// </summary>
-        IReactiveCommand<object> SwitchFork { get; }
+        ReactiveCommand<Unit, Unit> SwitchFork { get; }
 
         bool ResetMasterTracking { get; set; }
 

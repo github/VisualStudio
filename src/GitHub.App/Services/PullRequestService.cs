@@ -1,23 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Diagnostics;
-using GitHub.Models;
-using System.Reactive.Linq;
-using Rothko;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
-using GitHub.Primitives;
-using System.Text.RegularExpressions;
-using System.Globalization;
 using System.Reactive;
-using System.Collections.Generic;
-using LibGit2Sharp;
-using GitHub.Logging;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using GitHub.Api;
+using GitHub.App.Services;
 using GitHub.Extensions;
+using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Primitives;
+using LibGit2Sharp;
+using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
+using Rothko;
 using static System.FormattableString;
+using static Octokit.GraphQL.Variable;
+using CheckConclusionState = GitHub.Models.CheckConclusionState;
+using CheckStatusState = GitHub.Models.CheckStatusState;
+using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
 {
@@ -30,6 +39,9 @@ namespace GitHub.Services
 
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
+        static ICompiledQuery<Page<ActorModel>> readAssignableUsers;
+        static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequests;
+        static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequestsEnterprise;
 
         static readonly string[] TemplatePaths = new[]
         {
@@ -41,16 +53,267 @@ namespace GitHub.Services
 
         readonly IGitClient gitClient;
         readonly IGitService gitService;
+        readonly IVSGitExt gitExt;
+        readonly IGraphQLClientFactory graphqlFactory;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public PullRequestService(IGitClient gitClient, IGitService gitService, IOperatingSystem os, IUsageTracker usageTracker)
+        public PullRequestService(
+            IGitClient gitClient,
+            IGitService gitService,
+            IVSGitExt gitExt,
+            IGraphQLClientFactory graphqlFactory,
+            IOperatingSystem os,
+            IUsageTracker usageTracker)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
+            this.gitExt = gitExt;
+            this.graphqlFactory = graphqlFactory;
             this.os = os;
             this.usageTracker = usageTracker;
+        }
+
+        public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
+            HostAddress address,
+            string owner,
+            string name,
+            string after,
+            PullRequestStateEnum[] states)
+        {
+
+            ICompiledQuery<Page<PullRequestListItemModel>> query;
+
+            if (address.IsGitHubDotCom())
+            {
+                if (readPullRequests == null)
+                {
+                    readPullRequests = new Query()
+                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .PullRequests(
+                              first: 100,
+                              after: Var(nameof(after)),
+                              orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
+                              states: Var(nameof(states)))
+                          .Select(page => new Page<PullRequestListItemModel>
+                          {
+                              EndCursor = page.PageInfo.EndCursor,
+                              HasNextPage = page.PageInfo.HasNextPage,
+                              TotalCount = page.TotalCount,
+                              Items = page.Nodes.Select(pr => new ListItemAdapter
+                              {
+                                  Id = pr.Id.Value,
+                                  LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                      new LastCommitSummaryAdapter
+                                      {
+                                          CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                              .Select(suite => new CheckSuiteSummaryModel
+                                              {
+                                                  CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                                      .Select(run => new CheckRunSummaryModel
+                                                      {
+                                                          Conclusion = run.Conclusion.FromGraphQl(),
+                                                          Status = run.Status.FromGraphQl()
+                                                      }).ToList()
+                                              }).ToList(),
+                                          Statuses = commit.Commit.Status
+                                                  .Select(context =>
+                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                      {
+                                                          State = statusContext.State.FromGraphQl(),
+                                                      }).ToList()
+                                                  ).SingleOrDefault()
+                                      }).ToList().FirstOrDefault(),
+                                  Author = new ActorModel
+                                  {
+                                      Login = pr.Author.Login,
+                                      AvatarUrl = pr.Author.AvatarUrl(null),
+                                  },
+                                  CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                  Number = pr.Number,
+                                  Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                  {
+                                      Body = review.Body,
+                                      CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                  }).ToList(),
+                                  State = pr.State.FromGraphQl(),
+                                  Title = pr.Title,
+                                  UpdatedAt = pr.UpdatedAt,
+                              }).ToList(),
+                          }).Compile();
+                }
+
+                query = readPullRequests;
+            }
+            else
+            {
+                if (readPullRequestsEnterprise == null)
+                {
+                    readPullRequestsEnterprise = new Query()
+                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .PullRequests(
+                              first: 100,
+                              after: Var(nameof(after)),
+                              orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
+                              states: Var(nameof(states)))
+                          .Select(page => new Page<PullRequestListItemModel>
+                          {
+                              EndCursor = page.PageInfo.EndCursor,
+                              HasNextPage = page.PageInfo.HasNextPage,
+                              TotalCount = page.TotalCount,
+                              Items = page.Nodes.Select(pr => new ListItemAdapter
+                              {
+                                  Id = pr.Id.Value,
+                                  LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                      new LastCommitSummaryAdapter
+                                      {
+                                          Statuses = commit.Commit.Status
+                                                  .Select(context =>
+                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                      {
+                                                          State = statusContext.State.FromGraphQl(),
+                                                      }).ToList()
+                                                  ).SingleOrDefault()
+                                      }).ToList().FirstOrDefault(),
+                                  Author = new ActorModel
+                                  {
+                                      Login = pr.Author.Login,
+                                      AvatarUrl = pr.Author.AvatarUrl(null),
+                                  },
+                                  CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                  Number = pr.Number,
+                                  Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                  {
+                                      Body = review.Body,
+                                      CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                  }).ToList(),
+                                  State = pr.State.FromGraphQl(),
+                                  Title = pr.Title,
+                                  UpdatedAt = pr.UpdatedAt,
+                              }).ToList(),
+                          }).Compile();
+                }
+
+                query = readPullRequestsEnterprise;
+            }
+
+            var graphql = await graphqlFactory.CreateConnection(address);
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(after), after },
+                { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
+            };
+
+            var result = await graphql.Run(query, vars);
+
+            foreach (var item in result.Items.Cast<ListItemAdapter>())
+            {
+                item.CommentCount += item.Reviews.Sum(x => x.Count);
+                item.Reviews = null;
+
+                var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+
+                var hasCheckRuns = checkRuns?.Any() ?? false;
+                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
+
+                if (!hasCheckRuns && !hasStatuses)
+                {
+                    item.Checks = PullRequestChecksState.None;
+                }
+                else
+                {
+                    var checksHasFailure = false;
+                    var checksHasCompleteSuccess = true;
+
+                    if (hasCheckRuns)
+                    {
+                        checksHasFailure = checkRuns
+                            .Any(model => model.Conclusion.HasValue 
+                                          && (model.Conclusion.Value == CheckConclusionState.Failure 
+                                              || model.Conclusion.Value == CheckConclusionState.ActionRequired));
+
+                        if (!checksHasFailure)
+                        {
+                            checksHasCompleteSuccess = checkRuns
+                                .All(model => model.Conclusion.HasValue
+                                              && (model.Conclusion.Value == CheckConclusionState.Success
+                                                  || model.Conclusion.Value == CheckConclusionState.Neutral));
+                        }
+                    }
+
+                    var statusHasFailure = false;
+                    var statusHasCompleteSuccess = true;
+
+                    if (!checksHasFailure && hasStatuses)
+                    {
+                        statusHasFailure = item.LastCommit
+                            .Statuses
+                            .Any(status => status.State == StatusState.Failure
+                                           || status.State == StatusState.Error);
+
+                        if (!statusHasFailure)
+                        {
+                            statusHasCompleteSuccess =
+                                item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
+                        }
+                    }
+
+                    if (checksHasFailure || statusHasFailure)
+                    {
+                        item.Checks = PullRequestChecksState.Failure;
+                    }
+                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
+                    {
+                        item.Checks = PullRequestChecksState.Success;
+                    }
+                    else
+                    {
+                        item.Checks = PullRequestChecksState.Pending;
+                    }
+                }
+
+                item.LastCommit = null;
+            }
+
+            return result;
+        }
+
+        public async Task<Page<ActorModel>> ReadAssignableUsers(
+            HostAddress address,
+            string owner,
+            string name,
+            string after)
+        {
+            if (readAssignableUsers == null)
+            {
+                readAssignableUsers = new Query()
+                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .AssignableUsers(first: 100, after: Var(nameof(after)))
+                    .Select(connection => new Page<ActorModel>
+                    {
+                        EndCursor = connection.PageInfo.EndCursor,
+                        HasNextPage = connection.PageInfo.HasNextPage,
+                        TotalCount = connection.TotalCount,
+                        Items = connection.Nodes.Select(user => new ActorModel
+                        {
+                            AvatarUrl = user.AvatarUrl(30),
+                            Login = user.Login,
+                        }).ToList(),
+                    }).Compile();
+            }
+
+            var graphql = await graphqlFactory.CreateConnection(address);
+            var vars = new Dictionary<string, object>
+            {
+                { nameof(owner), owner },
+                { nameof(name), name },
+                { nameof(after), after },
+            };
+
+            return await graphql.Run(readAssignableUsers, vars);
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
@@ -143,23 +406,38 @@ namespace GitHub.Services
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
                 var statusOptions = new StatusOptions { ExcludeSubmodules = true };
-                var isClean = !IsFilthy(repo.RetrieveStatus(statusOptions));
+                var status = repo.RetrieveStatus(statusOptions);
+                var isClean = !IsCheckoutBlockingDirty(status);
                 return Observable.Return(isClean);
             }
         }
 
-        static bool IsFilthy(RepositoryStatus status)
+        static bool IsCheckoutBlockingDirty(RepositoryStatus status)
         {
             if (status.IsDirty)
             {
-                // This is similar to IsDirty, but also allows NewInWorkdir files
-                return status.Any(entry =>
-                    entry.State != FileStatus.Ignored &&
-                    entry.State != FileStatus.Unaltered &&
-                    entry.State != FileStatus.NewInWorkdir);
+                return status.Any(entry => IsCheckoutBlockingChange(entry));
             }
 
             return false;
+        }
+
+        // This is similar to IsDirty, but also allows NewInWorkdir and DeletedFromWorkdir files
+        static bool IsCheckoutBlockingChange(StatusEntry entry)
+        {
+            switch (entry.State)
+            {
+                case FileStatus.Ignored:
+                    return false;
+                case FileStatus.Unaltered:
+                    return false;
+                case FileStatus.NewInWorkdir:
+                    return false;
+                case FileStatus.DeletedFromWorkdir:
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         public IObservable<Unit> Pull(ILocalRepositoryModel repository)
@@ -193,7 +471,7 @@ namespace GitHub.Services
             var exitCode = await Where("git");
             if (exitCode != 0)
             {
-                progress(App.Resources.CouldntFindGitOnPath);
+                progress(Resources.CouldntFindGitOnPath);
                 return false;
             }
 
@@ -251,7 +529,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> Checkout(ILocalRepositoryModel repository, IPullRequestModel pullRequest, string localBranchName)
+        public IObservable<Unit> Checkout(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName)
         {
             return Observable.Defer(async () =>
             {
@@ -263,7 +541,7 @@ namespace GitHub.Services
                     {
                         await gitClient.Checkout(repo, localBranchName);
                     }
-                    else if (repository.CloneUrl.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl())
+                    else if (string.Equals(repository.CloneUrl.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase))
                     {
                         var remote = await gitClient.GetHttpRemote(repo, "origin");
                         await gitClient.Fetch(repo, remote.Name);
@@ -271,18 +549,18 @@ namespace GitHub.Services
                     }
                     else
                     {
-                        var refSpec = $"{pullRequest.Head.Ref}:{localBranchName}";
-                        var remoteName = await CreateRemote(repo, pullRequest.Head.RepositoryCloneUrl);
+                        var refSpec = $"{pullRequest.HeadRefName}:{localBranchName}";
+                        var remoteName = await CreateRemote(repo, repository.CloneUrl.WithOwner(pullRequest.HeadRepositoryOwner));
 
                         await gitClient.Fetch(repo, remoteName);
                         await gitClient.Fetch(repo, remoteName, new[] { refSpec });
                         await gitClient.Checkout(repo, localBranchName);
-                        await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.Head.Ref}");
+                        await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.HeadRefName}");
                     }
 
                     // Store the PR number in the branch config with the key "ghfvs-pr".
                     var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
-                    await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
+                    await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest.BaseRepositoryOwner, pullRequest.Number));
 
                     return Observable.Return(Unit.Default);
                 }
@@ -328,21 +606,21 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<string> GetMergeBase(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public async Task<string> GetMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
                 return await gitClient.GetPullRequestMergeBase(
                     repo,
-                    pullRequest.Base.RepositoryCloneUrl,
-                    pullRequest.Base.Sha,
-                    pullRequest.Head.Sha,
-                    pullRequest.Base.Ref,
+                    repository.CloneUrl.WithOwner(pullRequest.BaseRepositoryOwner),
+                    pullRequest.BaseRefSha,
+                    pullRequest.HeadRefSha,
+                    pullRequest.BaseRefName,
                     pullRequest.Number);
             }
         }
 
-        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -351,13 +629,13 @@ namespace GitHub.Services
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
                     await gitClient.Fetch(repo, remote.Name);
-                    var changes = await gitClient.Compare(repo, pullRequest.Base.Sha, pullRequest.Head.Sha, detectRenames: true);
+                    var changes = await gitClient.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
                     return Observable.Return(changes);
                 }
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -370,7 +648,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -383,7 +661,7 @@ namespace GitHub.Services
                     {
                         if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest))
                         {
-                            await MarkBranchAsPullRequest(repo, branch.Name, pullRequest);
+                            await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.BaseRepositoryOwner, pullRequest.Number);
                             result = true;
                         }
                     }
@@ -393,17 +671,12 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
-            if (pullRequest.Head?.RepositoryCloneUrl != null)
-            {
-                return repository.CloneUrl?.ToRepositoryUrl() == pullRequest.Head.RepositoryCloneUrl.ToRepositoryUrl();
-            }
-
-            return false;
+            return string.Equals(repository.CloneUrl?.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase);
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, IPullRequestModel pullRequest)
+        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -437,7 +710,7 @@ namespace GitHub.Services
                         }
 
                         await gitClient.Checkout(repo, branchName);
-                        await MarkBranchAsPullRequest(repo, branchName, pullRequest);
+                        await MarkBranchAsPullRequest(repo, branchName, pullRequest.BaseRepositoryOwner, pullRequest.Number);
                     }
                 }
 
@@ -464,7 +737,7 @@ namespace GitHub.Services
 
         public async Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
-            IPullRequestModel pullRequest,
+            PullRequestDetailModel pullRequest,
             string relativePath,
             string commitSha,
             Encoding encoding)
@@ -542,11 +815,21 @@ namespace GitHub.Services
             });
         }
 
+        /// <inheritdoc />
+        public bool ConfirmCancelPendingReview()
+        {
+            return MessageBox.Show(
+                       Resources.CancelPendingReviewConfirmation,
+                       Resources.CancelPendingReviewConfirmationCaption,
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
         async Task<string> CreateRemote(IRepository repo, UriString cloneUri)
         {
             foreach (var remote in repo.Network.Remotes)
             {
-                if (remote.Url == cloneUri)
+                if (UriString.RepositoryUrlsAreEqual(new UriString(remote.Url), cloneUri))
                 {
                     return remote.Name;
                 }
@@ -580,7 +863,7 @@ namespace GitHub.Services
             string tempFilePath)
         {
             string contents;
-            
+
             try
             {
                 contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
@@ -600,15 +883,15 @@ namespace GitHub.Services
         IEnumerable<string> GetLocalBranchesInternal(
             ILocalRepositoryModel localRepository,
             IRepository repository,
-            IPullRequestModel pullRequest)
+            PullRequestDetailModel pullRequest)
         {
             if (IsPullRequestFromRepository(localRepository, pullRequest))
             {
-                return new[] { pullRequest.Head.Ref };
+                return new[] { pullRequest.HeadRefName };
             }
             else
             {
-                var key = BuildGHfVSConfigKeyValue(pullRequest);
+                var key = BuildGHfVSConfigKeyValue(pullRequest.BaseRepositoryOwner, pullRequest.Number);
 
                 return repository.Config
                     .Select(x => new { Branch = BranchCapture.Match(x.Key).Groups["branch"].Value, Value = x.Value })
@@ -617,20 +900,20 @@ namespace GitHub.Services
             }
         }
 
-        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
+        async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, PullRequestDetailModel pullRequest)
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
             return value != null &&
-                value.Item1 == pullRequest.Base.RepositoryCloneUrl.Owner &&
+                value.Item1 == pullRequest.BaseRepositoryOwner &&
                 value.Item2 == pullRequest.Number;
         }
 
-        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, IPullRequestModel pullRequest)
+        async Task MarkBranchAsPullRequest(IRepository repo, string branchName, string owner, int number)
         {
             // Store the PR number in the branch config with the key "ghfvs-pr".
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest));
+            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(owner, number));
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
@@ -648,10 +931,12 @@ namespace GitHub.Services
                     await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
 
                 // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
-                if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
+                if (!Splat.ModeDetector.InUnitTestRunner())
                     await Task.Delay(TimeSpan.FromSeconds(5));
 
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
+                await MarkBranchAsPullRequest(repo, sourceBranch.Name, targetRepository.CloneUrl.Owner, ret.Number);
+                gitExt.RefreshActiveRepositories();
                 await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
                 return ret;
             }
@@ -661,7 +946,7 @@ namespace GitHub.Services
         {
             var before = InvalidBranchCharsRegex.Replace(name, "-").TrimEnd('-');
 
-            for (;;)
+            for (; ; )
             {
                 string after = before.Replace("--", "-");
 
@@ -685,10 +970,9 @@ namespace GitHub.Services
             return Path.Combine(tempDir, tempFileName);
         }
 
-        static string BuildGHfVSConfigKeyValue(IPullRequestModel pullRequest)
+        static string BuildGHfVSConfigKeyValue(string owner, int number)
         {
-            return pullRequest.Base.RepositoryCloneUrl.Owner + '#' +
-                   pullRequest.Number.ToString(CultureInfo.InvariantCulture);
+            return owner + '#' + number.ToString(CultureInfo.InvariantCulture);
         }
 
         static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
@@ -710,6 +994,43 @@ namespace GitHub.Services
             }
 
             return null;
+        }
+
+        class ListItemAdapter : PullRequestListItemModel
+        {
+            public IList<ReviewAdapter> Reviews { get; set; }
+
+            public LastCommitSummaryAdapter LastCommit { get; set; }
+        }
+
+        class ReviewAdapter
+        {
+            public string Body { get; set; }
+            public int CommentCount { get; set; }
+            public int Count => CommentCount + (!string.IsNullOrWhiteSpace(Body) ? 1 : 0);
+        }
+
+        class LastCommitSummaryAdapter
+        {
+            public List<CheckSuiteSummaryModel> CheckSuites { get; set; }
+
+            public List<StatusSummaryModel> Statuses { get; set; }
+        }
+
+        class CheckSuiteSummaryModel
+        {
+            public List<CheckRunSummaryModel> CheckRuns { get; set; }
+        }
+
+        class CheckRunSummaryModel
+        {
+            public CheckConclusionState? Conclusion { get; set; }
+            public CheckStatusState Status { get; set; }
+        }
+
+        class StatusSummaryModel
+        {
+            public StatusState State { get; set; }
         }
     }
 }

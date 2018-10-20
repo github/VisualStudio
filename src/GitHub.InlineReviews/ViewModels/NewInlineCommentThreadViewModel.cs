@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -20,13 +21,14 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
+        /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
         /// <param name="file">The file being commented on.</param>
         /// <param name="lineNumber">The 0-based line number in the file.</param>
         /// <param name="leftComparisonBuffer">
-        /// True if the comment is being left on the left-hand-side of a diff; otherwise false.
+        ///     True if the comment is being left on the left-hand-side of a diff; otherwise false.
         /// </param>
-        public NewInlineCommentThreadViewModel(
+        public NewInlineCommentThreadViewModel(ICommentService commentService,
             IPullRequestSession session,
             IPullRequestSessionFile file,
             int lineNumber,
@@ -41,12 +43,15 @@ namespace GitHub.InlineReviews.ViewModels
             LineNumber = lineNumber;
             LeftComparisonBuffer = leftComparisonBuffer;
 
-            PostComment = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.NeedsPush, x => !x),
-                DoPostComment);
+            PostComment = ReactiveCommand.CreateFromTask<string>(
+                DoPostComment,
+                this.WhenAnyValue(x => x.NeedsPush, x => !x));
 
-            var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser);
-            placeholder.BeginEdit.Execute(null);
+            EditComment = ReactiveCommand.Create<Tuple<string, string>>(_ => { });
+            DeleteComment = ReactiveCommand.Create<Tuple<int, int>>(_ => { });
+
+            var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser);
+            placeholder.BeginEdit.Execute().Subscribe();
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 
@@ -83,15 +88,9 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
         }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
+        async Task DoPostComment(string body)
         {
-            throw new NotSupportedException("Cannot navigate to a non-posted comment.");
-        }
-
-        async Task<ICommentModel> DoPostComment(object parameter)
-        {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(body, nameof(body));
 
             var diffPosition = File.Diff
                 .SelectMany(x => x.Lines)
@@ -106,15 +105,12 @@ namespace GitHub.InlineReviews.ViewModels
                 throw new InvalidOperationException("Unable to locate line in diff.");
             }
 
-            var body = (string)parameter;
-            var model = await Session.PostReviewComment(
+            await Session.PostReviewComment(
                 body,
                 File.CommitSha,
                 File.RelativePath.Replace("\\", "/"),
                 File.Diff,
                 diffPosition.DiffLineNumber);
-
-            return model;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using GitHub.UI;
 using GitHub.Validation;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.Dialog.Clone;
 using GitHub.ViewModels.TeamExplorer;
 using GitHub.VisualStudio.TeamExplorer.Connect;
 using GitHub.VisualStudio.TeamExplorer.Home;
@@ -72,7 +74,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand BrowseForDirectory
+        public ReactiveCommand<Unit, Unit> BrowseForDirectory
         {
             get;
             private set;
@@ -84,7 +86,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReactiveCommand<Unit> CreateRepository
+        public ReactiveCommand<Unit, Unit> CreateRepository
         {
             get;
             private set;
@@ -197,12 +199,18 @@ namespace GitHub.SampleData
             public HostAddress HostAddress { get; set; }
 
             public string Username { get; set; }
-            public ObservableCollection<ILocalRepositoryModel> Repositories { get; set; }
-
             public Octokit.User User => null;
+            public ScopesCollection Scopes => null;
             public bool IsLoggedIn => true;
+            public bool IsLoggingIn => false;
 
             public Exception ConnectionError => null;
+
+            event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+            {
+                add { }
+                remove { }
+            }
         }
 
         public RepositoryPublishViewModelDesigner()
@@ -225,7 +233,7 @@ namespace GitHub.SampleData
             }
         }
 
-        public IReactiveCommand<ProgressState> PublishRepository
+        public ReactiveCommand<Unit, ProgressState> PublishRepository
         {
             get;
             private set;
@@ -252,187 +260,5 @@ namespace GitHub.SampleData
             owner = owner ?? "github";
             return new RemoteRepositoryModel(0, name, new UriString("http://github.com/" + name + "/" + owner), false, false, new AccountDesigner() { Login = owner }, null);
         }
-    }
-
-    public class RepositoryCloneViewModelDesigner : ViewModelBase, IRepositoryCloneViewModel
-    {
-        public RepositoryCloneViewModelDesigner()
-        {
-            Repositories = new ObservableCollection<IRemoteRepositoryModel>
-            {
-                RepositoryModelDesigner.Create("encourage", "haacked"),
-                RepositoryModelDesigner.Create("haacked.com", "haacked"),
-                RepositoryModelDesigner.Create("octokit.net", "octokit"),
-                RepositoryModelDesigner.Create("octokit.rb", "octokit"),
-                RepositoryModelDesigner.Create("octokit.objc", "octokit"),
-                RepositoryModelDesigner.Create("windows", "github"),
-                RepositoryModelDesigner.Create("mac", "github"),
-                RepositoryModelDesigner.Create("github", "github")
-            };
-
-            BrowseForDirectory = ReactiveCommand.Create();
-
-            BaseRepositoryPathValidator = ReactivePropertyValidator.ForObservable(this.WhenAny(x => x.BaseRepositoryPath, x => x.Value))
-                .IfNullOrEmpty("Please enter a repository path")
-                .IfTrue(x => x.Length > 200, "Path too long")
-                .IfContainsInvalidPathChars("Path contains invalid characters")
-                .IfPathNotRooted("Please enter a valid path");
-        }
-
-        public IReactiveCommand<object> CloneCommand
-        {
-            get;
-            private set;
-        }
-
-        public IRepositoryModel SelectedRepository { get; set; }
-
-        public ObservableCollection<IRemoteRepositoryModel> Repositories
-        {
-            get;
-            private set;
-        }
-
-        public bool FilterTextIsEnabled
-        {
-            get;
-            private set;
-        }
-
-        public string FilterText { get; set; }
-
-        public string Title { get { return "Clone a GitHub Repository"; } }
-
-        public IReactiveCommand<IReadOnlyList<IRemoteRepositoryModel>> LoadRepositoriesCommand
-        {
-            get;
-            private set;
-        }
-
-        public bool LoadingFailed
-        {
-            get { return false; }
-        }
-
-        public bool NoRepositoriesFound
-        {
-            get;
-            set;
-        }
-
-        public ICommand BrowseForDirectory
-        {
-            get;
-            private set;
-        }
-
-        public string BaseRepositoryPath
-        {
-            get;
-            set;
-        }
-
-        public bool CanClone
-        {
-            get;
-            private set;
-        }
-
-        public ReactivePropertyValidator<string> BaseRepositoryPathValidator
-        {
-            get;
-            private set;
-        }
-
-        public IObservable<object> Done { get; }
-
-        public Task InitializeAsync(IConnection connection) => Task.CompletedTask;
-    }
-
-    public class GitHubHomeSectionDesigner : IGitHubHomeSection
-    {
-        public GitHubHomeSectionDesigner()
-        {
-            Icon = Octicon.repo;
-            RepoName = "octokit";
-            RepoUrl = "https://github.com/octokit/something-really-long-here-to-check-for-trimming";
-            IsLoggedIn = false;
-        }
-
-        public Octicon Icon
-        {
-            get;
-            private set;
-        }
-
-        public bool IsLoggedIn
-        {
-            get;
-            private set;
-        }
-
-        public string RepoName
-        {
-            get;
-            set;
-        }
-
-        public string RepoUrl
-        {
-            get;
-            set;
-        }
-
-        public void Login()
-        {
-
-        }
-
-        public ICommand OpenOnGitHub { get; }
-    }
-
-    public class GitHubConnectSectionDesigner : IGitHubConnectSection
-    {
-        public GitHubConnectSectionDesigner()
-        {
-            Repositories = new ObservableCollection<ILocalRepositoryModel>();
-            Repositories.Add(new LocalRepositoryModel("octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\octokit.net", new GitServiceDesigner()));
-            Repositories.Add(new LocalRepositoryModel("cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\cefsharp", new GitServiceDesigner()));
-            Repositories.Add(new LocalRepositoryModel("git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\git-lfs", new GitServiceDesigner()));
-            Repositories.Add(new LocalRepositoryModel("another octokit", new UriString("https://github.com/octokit/octokit.net"), @"C:\Users\user\Source\Repos\another-octokit.net", new GitServiceDesigner()));
-            Repositories.Add(new LocalRepositoryModel("some cefsharp", new UriString("https://github.com/cefsharp/cefsharp"), @"C:\Users\user\Source\Repos\something-else", new GitServiceDesigner()));
-            Repositories.Add(new LocalRepositoryModel("even more git-lfs", new UriString("https://github.com/github/git-lfs"), @"C:\Users\user\Source\Repos\A different path", new GitServiceDesigner()));
-        }
-
-        public ObservableCollection<ILocalRepositoryModel> Repositories
-        {
-            get; set;
-        }
-
-        public void DoCreate()
-        {
-        }
-
-        public void SignOut()
-        {
-        }
-
-        public void Login()
-        {
-        }
-
-        public bool OpenRepository()
-        {
-            return true;
-        }
-
-        public IConnection SectionConnection { get; }
-        public ICommand Clone { get; }
-    }
-
-    public class InfoPanelDesigner
-    {
-        public string Message => "This is an informational message for the [info panel](link) to test things in design mode.";
-        public MessageType MessageType => MessageType.Information;
     }
 }

@@ -24,12 +24,11 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IModelServiceFactory modelServiceFactory;
-        IModelService modelService;
+        readonly IPullRequestService pullRequestService;
         IPullRequestSession session;
         IDisposable sessionSubscription;
-        IPullRequestReviewModel model;
-        IPullRequestModel pullRequestModel;
+        PullRequestReviewModel model;
+        PullRequestDetailModel pullRequestModel;
         string body;
         ObservableAsPropertyHelper<bool> canApproveRequestChanges;
         IReadOnlyList<IPullRequestReviewFileCommentViewModel> fileComments;
@@ -37,24 +36,23 @@ namespace GitHub.ViewModels.GitHubPane
 
         [ImportingConstructor]
         public PullRequestReviewAuthoringViewModel(
+            IPullRequestService pullRequestService,
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
-            IModelServiceFactory modelServiceFactory,
             IPullRequestFilesViewModel files)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(files, nameof(files));
 
+            this.pullRequestService = pullRequestService;
             this.editorService = editorService;
             this.sessionManager = sessionManager;
-            this.modelServiceFactory = modelServiceFactory;
 
             canApproveRequestChanges = this.WhenAnyValue(
                 x => x.Model,
                 x => x.PullRequestModel,
-                (review, pr) => review != null && pr != null && review.User.Login != pr.Author.Login)
+                (review, pr) => review != null && pr != null && review.Author.Login != pr.Author.Login)
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
@@ -64,16 +62,16 @@ namespace GitHub.ViewModels.GitHubPane
                 x => x.FileComments.Count,
                 (body, comments) => !string.IsNullOrWhiteSpace(body) || comments > 0);
 
-            Approve = ReactiveCommand.CreateAsyncTask(_ => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
-            Comment = ReactiveCommand.CreateAsyncTask(
-                hasBodyOrComments,
-                _ => DoSubmit(Octokit.PullRequestReviewEvent.Comment));
-            RequestChanges = ReactiveCommand.CreateAsyncTask(
-                hasBodyOrComments,
-                _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
-            Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
-                NavigateTo(Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
+            Approve = ReactiveCommand.CreateFromTask(() => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
+            Comment = ReactiveCommand.CreateFromTask(
+                () => DoSubmit(Octokit.PullRequestReviewEvent.Comment),
+                hasBodyOrComments);
+            RequestChanges = ReactiveCommand.CreateFromTask(
+                () => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges),
+                hasBodyOrComments);
+            Cancel = ReactiveCommand.CreateFromTask(DoCancel);
+            NavigateToPullRequest = ReactiveCommand.Create(() =>
+                NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
         }
 
         /// <inheritdoc/>
@@ -83,14 +81,14 @@ namespace GitHub.ViewModels.GitHubPane
         public string RemoteRepositoryOwner { get; private set; }
 
         /// <inheritdoc/>
-        public IPullRequestReviewModel Model
+        public PullRequestReviewModel Model
         {
             get { return model; }
             private set { this.RaiseAndSetIfChanged(ref model, value); }
         }
 
         /// <inheritdoc/>
-        public IPullRequestModel PullRequestModel
+        public PullRequestDetailModel PullRequestModel
         {
             get { return pullRequestModel; }
             private set { this.RaiseAndSetIfChanged(ref pullRequestModel, value); }
@@ -126,11 +124,11 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref fileComments, value); }
         }
 
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
-        public ReactiveCommand<Unit> Approve { get; }
-        public ReactiveCommand<Unit> Comment { get; }
-        public ReactiveCommand<Unit> RequestChanges { get; }
-        public ReactiveCommand<Unit> Cancel { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Approve { get; }
+        public ReactiveCommand<Unit, Unit> Comment { get; }
+        public ReactiveCommand<Unit, Unit> RequestChanges { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public async Task InitializeAsync(
             ILocalRepositoryModel localRepository,
@@ -150,12 +148,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
-                modelService = await modelServiceFactory.CreateAsync(connection);
-                var pullRequest = await modelService.GetPullRequest(
-                    RemoteRepositoryOwner,
-                    LocalRepository.Name,
-                    pullRequestNumber);
-                await Load(pullRequest);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                await Load(session.PullRequest);
             }
             finally
             {
@@ -170,11 +164,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
-                var pullRequest = await modelService.GetPullRequest(
-                    RemoteRepositoryOwner,
-                    LocalRepository.Name,
-                    PullRequestModel.Number);
-                await Load(pullRequest);
+                await session.Refresh();
+                await Load(session.PullRequest);
             }
             catch (Exception ex)
             {
@@ -185,25 +176,24 @@ namespace GitHub.ViewModels.GitHubPane
                     LocalRepository.Name,
                     PullRequestModel.Number,
                     Model.Id,
-                    modelService.ApiClient.HostAddress.Title);
+                    session.LocalRepository.CloneUrl.Host);
                 Error = ex;
                 IsBusy = false;
             }
         }
 
-        async Task Load(IPullRequestModel pullRequest)
+        async Task Load(PullRequestDetailModel pullRequest)
         {
             try
             {
-                session = await sessionManager.GetSession(pullRequest);
                 PullRequestModel = pullRequest;
 
                 Model = pullRequest.Reviews.FirstOrDefault(x =>
-                    x.State == PullRequestReviewState.Pending && x.User.Login == session.User.Login) ??
+                    x.State == PullRequestReviewState.Pending && x.Author.Login == session.User.Login) ??
                     new PullRequestReviewModel
                     {
                         Body = string.Empty,
-                        User = session.User,
+                        Author = session.User,
                         State = PullRequestReviewState.Pending,
                     };
 
@@ -221,16 +211,16 @@ namespace GitHub.ViewModels.GitHubPane
 
         bool FilterComments(IInlineCommentThreadModel thread)
         {
-            return thread.Comments.Any(x => x.PullRequestReviewId == Model.Id);
+            return thread.Comments.Any(x => x.Review.Id == Model.Id);
         }
 
         async Task UpdateFileComments()
         {
-            var result = new List<PullRequestReviewFileCommentViewModel>();
+            var result = new List<PullRequestReviewCommentViewModel>();
 
-            if (Model.Id == 0 && session.PendingReviewId != 0)
+            if (Model.Id == null && session.PendingReviewId != null)
             {
-                ((PullRequestReviewModel)Model).Id = session.PendingReviewId;
+                Model.Id = session.PendingReviewId;
             }
 
             foreach (var file in await session.GetAllFiles())
@@ -239,12 +229,13 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     foreach (var comment in thread.Comments)
                     {
-                        if (comment.PullRequestReviewId == Model.Id)
+                        if (comment.Review.Id == Model.Id)
                         {
-                            result.Add(new PullRequestReviewFileCommentViewModel(
+                            result.Add(new PullRequestReviewCommentViewModel(
                                 editorService,
                                 session,
-                                comment));
+                                thread.RelativePath,
+                                comment.Comment));
                         }
                     }
                 }
@@ -274,19 +265,26 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        async Task DoCancel(object arg)
+        async Task DoCancel()
         {
             OperationError = null;
             IsBusy = true;
 
             try
             {
-                if (Model?.Id != 0)
+                if (Model?.Id != null)
                 {
-                    await session.CancelReview();
+                    if (pullRequestService.ConfirmCancelPendingReview())
+                    {
+                        await session.CancelReview();
+                        Close();
+                    }
+                }
+                else
+                {
+                    Close();
                 }
 
-                Close();
             }
             catch (Exception ex)
             {

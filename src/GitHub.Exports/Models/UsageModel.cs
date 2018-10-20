@@ -32,6 +32,7 @@ namespace GitHub.Models
             public string VSVersion { get; set; }
             public string Lang { get; set; }
             public string CurrentLang { get; set; }
+            public string CurrentUILang { get; set; }
         }
 
         public class MeasuresModel
@@ -58,12 +59,17 @@ namespace GitHub.Models
             public int NumberOfWelcomeDocsClicks { get; set; }
             public int NumberOfWelcomeTrainingClicks { get; set; }
             public int NumberOfGitHubPaneHelpClicks { get; set; }
+            public int NumberOfPRDetailsOpenInGitHub { get; set; }
+            public int NumberOfPRStatusesOpenInGitHub { get; set; }
+            public int NumberOfPRChecksOpenInGitHub { get; set; }
             public int NumberOfPRDetailsViewChanges { get; set; }
             public int NumberOfPRDetailsViewFile { get; set; }
             public int NumberOfPRDetailsCompareWithSolution { get; set; }
             public int NumberOfPRDetailsOpenFileInSolution { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentOpen { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentPost { get; set; }
+            public int NumberOfPRReviewDiffViewInlineCommentDelete { get; set; }
+            public int NumberOfPRReviewDiffViewInlineCommentEdit { get; set; }
             public int NumberOfPRReviewDiffViewInlineCommentStartReview { get; set; }
             public int NumberOfPRReviewPosts { get; set; }
             public int NumberOfShowCurrentPullRequest { get; set; }
@@ -80,6 +86,14 @@ namespace GitHub.Models
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
             public int NumberOfPullRequestFileMarginToggleInlineCommentMargin { get; set; }
             public int NumberOfPullRequestFileMarginViewChanges { get; set; }
+            public int NumberOfCloneViewGitHubTab { get; set; }
+            public int NumberOfCloneViewEnterpriseTab { get; set; }
+            public int NumberOfCloneViewUrlTab { get; set; }
+            public int NumberOfGitHubClones { get; set; }
+            public int NumberOfEnterpriseClones { get; set; }
+            public int NumberOfGitHubOpens { get; set; }
+            public int NumberOfEnterpriseOpens { get; set; }
+            public int NumberOfClonesToDefaultClonePath { get; set; }
         }
     }
 }

@@ -9,9 +9,9 @@ namespace GitHub.Models
     public interface IInlineCommentThreadModel
     {
         /// <summary>
-        /// Gets or sets the comments in the thread.
+        /// Gets the comments in the thread.
         /// </summary>
-        IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
+        IReadOnlyList<InlineCommentModel> Comments { get; }
 
         /// <summary>
         /// Gets the last five lines of the thread's diff hunk, in reverse order.

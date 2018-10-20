@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
+    <Compile Include="..\Helpers\LazySubstitute.cs" />
+    <Compile Include="..\Helpers\ReactiveTestHelper.cs" />
+    <Compile Include="..\Helpers\RepositoryHelpers.cs" />
+    <Compile Include="..\Helpers\SimpleJson.cs" />
+    <Compile Include="..\Helpers\TestBaseClass.cs" />
+    <Compile Include="..\Helpers\TestImageCache.cs" />
+    <Compile Include="..\Helpers\TestSharedCache.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Testing\ReactiveUI.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Reactive.Testing" Version="4.0.0" />
+    <PackageReference Include="NSubstitute" Version="2.0.3" />
+    <PackageReference Include="NUnit" version="3.9.0" />
+  </ItemGroup>
+</Project>

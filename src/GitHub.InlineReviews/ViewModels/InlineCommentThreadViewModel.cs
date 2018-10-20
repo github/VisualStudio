@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.InlineReviews.Services;
 using GitHub.Models;
 using GitHub.Services;
-using Octokit;
 using ReactiveUI;
 
 namespace GitHub.InlineReviews.ViewModels
@@ -20,27 +19,33 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadViewModel"/> class.
         /// </summary>
-        /// <param name="apiClient">The API client to use to post/update comments.</param>
+        /// <param name="commentService">The comment service</param>
         /// <param name="session">The current PR review session.</param>
-        public InlineCommentThreadViewModel(
-            IPullRequestSession session,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+        /// <param name="comments">The comments to display in this inline review.</param>
+        public InlineCommentThreadViewModel(ICommentService commentService, IPullRequestSession session,
+            IEnumerable<InlineCommentModel> comments)
             : base(session.User)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
             Session = session;
 
-            PostComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(true),
-                DoPostComment);
+            PostComment = ReactiveCommand.CreateFromTask<string>(DoPostComment);
+            EditComment = ReactiveCommand.CreateFromTask<Tuple<string, string>>(DoEditComment);
+            DeleteComment = ReactiveCommand.CreateFromTask<Tuple<int, int>>(DoDeleteComment);
 
             foreach (var comment in comments)
             {
-                Comments.Add(new PullRequestReviewCommentViewModel(session, this, CurrentUser, comment));
+                Comments.Add(new PullRequestReviewCommentViewModel(
+                    session,
+                    commentService,
+                    this,
+                    CurrentUser,
+                    comment.Review,
+                    comment.Comment));
             }
 
-            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, this, CurrentUser));
+            Comments.Add(PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser));
         }
 
         /// <summary>
@@ -48,25 +53,26 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
-        /// <inheritdoc/>
-        public override Uri GetCommentUrl(int id)
+        async Task DoPostComment(string body)
         {
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}/pull/{1}#discussion_r{2}",
-                Session.LocalRepository.CloneUrl.ToRepositoryUrl(Session.RepositoryOwner),
-                Session.PullRequest.Number,
-                id));
+            Guard.ArgumentNotNull(body, nameof(body));
+
+            var replyId = Comments[0].Id;
+            await Session.PostReviewComment(body, replyId);
         }
 
-        async Task<ICommentModel> DoPostComment(object parameter)
+        async Task DoEditComment(Tuple<string, string> idAndBody)
         {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(idAndBody, nameof(idAndBody));
 
-            var body = (string)parameter;
-            var replyId = Comments[0].Id;
-            var nodeId = Comments[0].NodeId;
-            return await Session.PostReviewComment(body, replyId, nodeId);
+            await Session.EditComment(idAndBody.Item1, idAndBody.Item2);
+        }
+
+        async Task DoDeleteComment(Tuple<int, int> item)
+        {
+            Guard.ArgumentNotNull(item, nameof(item));
+
+            await Session.DeleteComment(item.Item1, item.Item2);
         }
     }
 }

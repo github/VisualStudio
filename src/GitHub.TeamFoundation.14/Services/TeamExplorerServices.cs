@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
-using GitHub.Extensions;
+using EnvDTE;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.Services
 {
@@ -19,7 +19,7 @@ namespace GitHub.Services
         /// that instances of this type cannot be created if the TeamFoundation dlls are not available
         /// (otherwise we'll have multiple instances of ITeamExplorerServices exports, and that would be Bad(tm))
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         ITeamExplorerNotificationManager manager;
 
         [ImportingConstructor]
@@ -28,11 +28,33 @@ namespace GitHub.Services
             this.serviceProvider = serviceProvider;
         }
 
+        public void OpenRepository(string repositoryPath)
+        {
+#if TEAMEXPLORER14
+            var vsServices = serviceProvider.GetService<IVSServices>();
+            vsServices.TryOpenRepository(repositoryPath);
+#else
+            OpenFolder(repositoryPath);
+#endif
+        }
+
+        public void ShowConnectPage()
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
+        }
+
+        public void ShowHomePage()
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            te.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+        }
+
         public void ShowPublishSection()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();
-            var foo = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
-            var publish = foo?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
+            var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
+            var publish = page?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
             publish?.Connect();
         }
 
@@ -81,6 +103,12 @@ namespace GitHub.Services
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             return manager?.IsNotificationVisible(guid) ?? false;
+        }
+
+        void OpenFolder(string repositoryPath)
+        {
+            var dte = serviceProvider.TryGetService<DTE>();
+            dte?.ExecuteCommand("File.OpenFolder", repositoryPath);
         }
     }
 }

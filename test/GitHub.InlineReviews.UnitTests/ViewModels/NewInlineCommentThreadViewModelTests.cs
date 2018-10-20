@@ -1,14 +1,12 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reactive.Linq;
-using GitHub.Api;
+using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
-using Octokit;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
@@ -18,14 +16,15 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public void CreatesReplyPlaceholder()
         {
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 Substitute.For<IPullRequestSessionFile>(),
                 10,
                 false);
 
             Assert.That(target.Comments, Has.One.Items);
-            Assert.That(string.Empty, Is.EqualTo(target.Comments[0].Body));
-            Assert.That(CommentEditState.Editing, Is.EqualTo(target.Comments[0].EditState));
+            Assert.That(target.Comments[0].Body, Is.EqualTo(string.Empty));
+            Assert.That(target.Comments[0].EditState, Is.EqualTo(CommentEditState.Editing));
         }
 
         [Test]
@@ -33,7 +32,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 file,
                 10,
                 false);
@@ -57,7 +57,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var file = CreateFile();
             var target = new NewInlineCommentThreadViewModel(
-                Substitute.For<IPullRequestSession>(),
+                Substitute.For<ICommentService>(),
+                CreateSession(),
                 file,
                 10,
                 false);
@@ -79,10 +80,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var session = CreateSession();
             var file = CreateFile();
-            var target = new NewInlineCommentThreadViewModel(session, file, 10, false);
+            var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
+                session, file, 10, false);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
+            target.Comments[0].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment(
                 "New Comment",
@@ -109,10 +112,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 }
             });
 
-            var target = new NewInlineCommentThreadViewModel(session, file, 16, true);
+            var target = new NewInlineCommentThreadViewModel(
+                Substitute.For<ICommentService>(),
+                session, file, 16, true);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
+            target.Comments[0].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment(
                 "New Comment",
@@ -120,14 +125,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 "file.cs",
                 Arg.Any<IReadOnlyList<DiffChunk>>(),
                 7);
-        }
-
-        IApiClient CreateApiClient()
-        {
-            var result = Substitute.For<IApiClient>();
-            result.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
-                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
-            return result;
         }
 
         IPullRequestSessionFile CreateFile()
@@ -154,7 +151,8 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             result.RepositoryOwner.Returns("owner");
             result.LocalRepository.Name.Returns("repo");
             result.LocalRepository.Owner.Returns("shouldnt-be-used");
-            result.PullRequest.Number.Returns(47);
+            result.PullRequest.Returns(new PullRequestDetailModel { Number = 47 });
+            result.User.Returns(new ActorModel());
             return result;
         }
 

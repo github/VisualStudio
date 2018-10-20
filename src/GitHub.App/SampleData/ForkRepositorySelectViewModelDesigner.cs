@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -38,9 +39,9 @@ namespace GitHub.SampleData
 
         public string Title => null;
 
-        public ReactiveCommand<object> SelectedAccount => null;
+        public ReactiveCommand<IAccount, Unit> SelectedAccount => null;
 
-        public ReactiveCommand<object> SwitchOrigin => null;
+        public ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin => null;
 
         public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
         {

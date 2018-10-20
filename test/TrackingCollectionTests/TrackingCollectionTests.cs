@@ -20,14 +20,6 @@ public class TrackingTests : TestBase
 {
     const int Timeout = 2000;
 
-#if !DISABLE_REACTIVE_UI
-    [OneTimeSetUp]
-    public void Setup()
-    {
-        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-    }
-#endif
-
     [Test]
     public void OrderByUpdatedNoFilter()
     {
@@ -1832,7 +1824,7 @@ public class TrackingTests : TestBase
         col.Dispose();
     }
 
-    [Test]
+    [Test, Category("CodeCoverageFlake")]
     public void RemovingFirstItemWithFilterWorks()
     {
         var source = new Subject<Thing>();

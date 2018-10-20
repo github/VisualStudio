@@ -85,12 +85,15 @@ namespace GitHub.VisualStudio
                     exports.GetExportedValue<IBlameLinkCommand>(),
                     exports.GetExportedValue<ICopyLinkCommand>(),
                     exports.GetExportedValue<ICreateGistCommand>(),
+                    exports.GetExportedValue<ICreateGistEnterpriseCommand>(),
                     exports.GetExportedValue<IOpenLinkCommand>(),
                     exports.GetExportedValue<IOpenPullRequestsCommand>(),
                     exports.GetExportedValue<IShowCurrentPullRequestCommand>(),
                     exports.GetExportedValue<IShowGitHubPaneCommand>(),
                     exports.GetExportedValue<IGoToSolutionOrPullRequestFileCommand>(),
-                    exports.GetExportedValue<ISyncSubmodulesCommand>()
+                    exports.GetExportedValue<ISyncSubmodulesCommand>(),
+                    exports.GetExportedValue<IOpenFromUrlCommand>(),
+                    exports.GetExportedValue<IOpenFromClipboardCommand>()
                 };
             }
             else
@@ -253,7 +256,8 @@ namespace GitHub.VisualStudio
                     oauthListener,
                     ApiClientConfiguration.ClientId,
                     ApiClientConfiguration.ClientSecret,
-                    ApiClientConfiguration.RequiredScopes,
+                    ApiClientConfiguration.MinimumScopes,
+                    ApiClientConfiguration.RequestedScopes,
                     ApiClientConfiguration.AuthorizationNote,
                     ApiClientConfiguration.MachineFingerprint);
             }
