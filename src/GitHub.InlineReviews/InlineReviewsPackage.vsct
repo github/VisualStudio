@@ -66,7 +66,7 @@
       </Button>
       <Button guid="guidPullRequestFilterCommandPackageCmdSet" id="PullRequestFilterCommandId" priority="0x0400" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLBAR_PROJWIN_FILTERS" />
-        <Icon guid="guidImages" id="pullrequest" />
+        <Icon guid="guidGitHubInlineReviews" id="pullrequest" />
         <Strings>
           <ButtonText>Pull Request Filter</ButtonText>
         </Strings>
@@ -83,9 +83,6 @@
         </Strings>
       </Button>
     </Buttons>
-    <Bitmaps>
-      <Bitmap guid="guidImages" href="Resources\PullRequestFilterCommand.png" usedList="pullrequest"/>
-    </Bitmaps>
   </Commands>
   <KeyBindings>
     <KeyBinding guid="guidGitHubCommandSet" id="NextInlineCommentId" editor="guidVSStd97" key1="VK_OEM_6" mod1="Alt"/>
@@ -108,7 +105,7 @@
       <IDSymbol name="PullRequestFilterCommandId" value="0x0100" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >
+    <GuidSymbol name="guidGitHubInlineReviews" value="{7b2a62fb-6aaa-4893-82c2-4895716a390c}" >
       <IDSymbol name="pullrequest" value="1" />
     </GuidSymbol>
   </Symbols>
