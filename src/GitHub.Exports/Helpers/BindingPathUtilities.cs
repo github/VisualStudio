@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell.Settings;
 
 namespace GitHub.Helpers
 {
@@ -37,7 +38,7 @@ namespace GitHub.Helpers
         /// <param name="bindingPaths">A list of binding paths to search</param>
         /// <param name="assemblyLocation">A reference assembly that has been loaded from the correct path.</param>
         /// <returns>A list of redundant binding paths.</returns>
-        public static IList<string> FindRedundantBindingPaths(List<string> bindingPaths, string assemblyLocation)
+        public static IList<string> FindRedundantBindingPaths(IEnumerable<string> bindingPaths, string assemblyLocation)
         {
             var fileName = Path.GetFileName(assemblyLocation);
             return bindingPaths
@@ -49,15 +50,22 @@ namespace GitHub.Helpers
         }
 
         /// <summary>
-        /// Use reflection to find Visual Studio's list of binding paths.
+        /// Find Visual Studio's list of binding paths.
         /// </summary>
-        /// <returns>A live list of binding paths or an empty list if not running in Visual Studio.</returns>
-        public static List<string> FindBindingPaths()
+        /// <returns>A list of binding paths.</returns>
+        public static IEnumerable<string> FindBindingPaths(IServiceProvider serviceProvider)
         {
-            var manager = AppDomain.CurrentDomain.DomainManager;
-            var property = manager?.GetType().GetProperty("BindingPaths", BindingFlags.NonPublic | BindingFlags.Instance);
-            var bindingPaths = property?.GetValue(manager) as List<string>;
-            return bindingPaths ?? new List<string>(0);
+            const string bindingPaths = "BindingPaths";
+            var manager = new ShellSettingsManager(serviceProvider);
+            var store = manager.GetReadOnlySettingsStore(SettingsScope.Configuration);
+            foreach (var guid in store.GetSubCollectionNames(bindingPaths))
+            {
+                var guidPath = Path.Combine(bindingPaths, guid);
+                foreach (var path in store.GetPropertyNames(guidPath))
+                {
+                    yield return path;
+                }
+            }
         }
     }
 }

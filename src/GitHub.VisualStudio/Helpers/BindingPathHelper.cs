@@ -23,7 +23,7 @@ namespace GitHub.VisualStudio.Helpers
         {
             log.Information("Looking for assembly on wrong binding path");
 
-            var bindingPaths = BindingPathUtilities.FindBindingPaths();
+            var bindingPaths = BindingPathUtilities.FindBindingPaths(serviceProvider);
             var bindingPath = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assembly.Location)
                 .FirstOrDefault();
             if (bindingPath == null)

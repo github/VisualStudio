@@ -35,15 +35,4 @@ public static class BindingPathUtilitiesTests
             Assert.That(paths, Does.Not.Contain(assemblyDir));
         }
     }
-
-    public class TheFindBindingPathsMethod
-    {
-        [TestCase]
-        public void Return_Empty_When_Not_In_Visual_Studio()
-        {
-            var bindingPaths = BindingPathUtilities.FindBindingPaths();
-
-            Assert.IsEmpty(bindingPaths);
-        }
-    }
 }
