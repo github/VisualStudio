@@ -187,7 +187,7 @@ namespace GitHub.VisualStudio
             {
                 // When running in the Exp instance, ensure there is only one active binding path.
                 // This is necessary when the regular (AllUsers) extension is also installed.
-                // See: https://github.com/github/VisualStudio/issues/1995
+                // See: https://github.com/github/VisualStudio/issues/2006
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
                 BindingPathHelper.CheckBindingPaths(GetType().Assembly, this);
             }

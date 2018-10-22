@@ -46,7 +46,7 @@ Would you like to learn more about this issue?", bindingPath);
                 OLEMSGBUTTON.OLEMSGBUTTON_YESNO, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             if (action == 6) // Yes = 6, No = 7
             {
-                Process.Start("https://github.com/github/VisualStudio/issues/1995");
+                Process.Start("https://github.com/github/VisualStudio/issues/2006");
             }
         }
     }
