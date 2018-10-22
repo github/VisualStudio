@@ -6,9 +6,7 @@ using GitHub.Helpers;
 using GitHub.Logging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
 using Serilog;
-using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Helpers
 {
@@ -23,13 +21,11 @@ namespace GitHub.VisualStudio.Helpers
     {
         static readonly ILogger log = LogManager.ForContext<BindingPathHelper>();
 
-        internal async static Task CheckBindingPathsAsync(
-            Assembly assembly,
-            JoinableTaskFactory jtf,
-            IServiceProvider serviceProvider)
+        internal static void CheckBindingPaths(Assembly assembly, IServiceProvider serviceProvider)
         {
             log.Information("Looking for assembly on wrong binding path");
 
+            ThreadHelper.CheckAccess();
             var bindingPaths = BindingPathUtilities.FindBindingPaths(serviceProvider);
             var bindingPath = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assembly.Location)
                 .FirstOrDefault();
@@ -42,7 +38,6 @@ namespace GitHub.VisualStudio.Helpers
             // Log what has been detected
             log.Warning("Found assembly on wrong binding path {BindingPath}", bindingPath);
 
-            await jtf.SwitchToMainThreadAsync();
             var message = string.Format(@"Found assembly on wrong binding path:
 {0}
 
