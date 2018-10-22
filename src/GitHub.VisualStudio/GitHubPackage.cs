@@ -169,14 +169,7 @@ namespace GitHub.VisualStudio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-#if DEBUG
-            // When running in the Exp instance, ensure there is only one active binding path.
-            // This is necessary when the regular (AllUsers) extension is also installed.
-            // See: https://github.com/github/VisualStudio/issues/1995
-            await BindingPathHelper.RationalizeBindingPathsAsync(
-                GetType().Assembly, JoinableTaskFactory, this);
-#endif
-
+            await CheckBindingPathsAsync();
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
@@ -184,6 +177,25 @@ namespace GitHub.VisualStudio
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
+        }
+
+        async Task CheckBindingPathsAsync()
+        {
+#if DEBUG
+            try
+            {
+                // When running in the Exp instance, ensure there is only one active binding path.
+                // This is necessary when the regular (AllUsers) extension is also installed.
+                // See: https://github.com/github/VisualStudio/issues/1995
+                await BindingPathHelper.CheckBindingPathsAsync(GetType().Assembly, JoinableTaskFactory, this);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(CheckBindingPathsAsync));
+            }
+#else
+            return Task.CompletedTask;
+#endif
         }
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()

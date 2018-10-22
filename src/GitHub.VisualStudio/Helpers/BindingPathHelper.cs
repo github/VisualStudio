@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.Helpers
     {
         static readonly ILogger log = LogManager.ForContext<BindingPathHelper>();
 
-        internal async static Task RationalizeBindingPathsAsync(
+        internal async static Task CheckBindingPathsAsync(
             Assembly assembly,
             JoinableTaskFactory jtf,
             IServiceProvider serviceProvider)
