@@ -12,6 +12,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Helpers
 {
+    /// <summary>
+    // When running in the Exp instance, ensure there is only one active binding path.
+    // This is necessary when the regular (AllUsers) extension is also installed.
+    /// </summary>
+    /// <remarks>
+    /// See https://github.com/github/VisualStudio/issues/1995
+    /// </remarks>
     class BindingPathHelper
     {
         static readonly ILogger log = LogManager.ForContext<BindingPathHelper>();

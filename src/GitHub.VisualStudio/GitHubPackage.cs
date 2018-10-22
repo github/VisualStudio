@@ -170,6 +170,7 @@ namespace GitHub.VisualStudio
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await CheckBindingPathsAsync();
+
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
