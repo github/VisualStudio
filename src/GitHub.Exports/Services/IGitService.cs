@@ -8,6 +8,13 @@ namespace GitHub.Services
     public interface IGitService
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
+        /// </summary>
+        /// <param name="localPath">The repository's local path.</param>
+        /// <returns>A repository model.</returns>
+        ILocalRepositoryModel CreateLocalRepositoryModel(string localPath);
+
+        /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote exists, this method returns null
         /// </summary>

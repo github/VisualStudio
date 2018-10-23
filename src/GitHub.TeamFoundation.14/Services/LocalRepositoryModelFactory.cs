@@ -7,7 +7,7 @@ namespace GitHub.TeamFoundation.Services
     {
         public ILocalRepositoryModel Create(string localPath)
         {
-            return new LocalRepositoryModel(localPath, GitService.GitServiceHelper);
+            return GitService.GitServiceHelper.CreateLocalRepositoryModel(localPath);
         }
     }
 }

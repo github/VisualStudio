@@ -20,6 +20,10 @@ namespace GitHub.Models
     {
         readonly IGitService gitService;
 
+        public LocalRepositoryModel()
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
@@ -35,28 +39,6 @@ namespace GitHub.Models
 
             this.gitService = gitService;
             LocalPath = localPath;
-            Icon = Octicon.repo;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
-        /// </summary>
-        /// <param name="localPath">The repository's local path.</param>
-        /// <param name="gitService">The service used to find the repository's URL.</param>
-        public LocalRepositoryModel(string localPath, IGitService gitService)
-        {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(localPath, nameof(localPath));
-            var dir = new DirectoryInfo(localPath);
-            if (!dir.Exists)
-            {
-                throw new ArgumentException("Path does not exist", nameof(localPath));
-            }
-
-            CloneUrl = gitService.GetUri(localPath);
-            LocalPath = localPath;
-            Name = CloneUrl?.RepositoryName ?? dir.Name;
-            this.gitService = gitService;
             Icon = Octicon.repo;
         }
 
@@ -164,7 +146,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the local path of the repository.
         /// </summary>
-        public string LocalPath { get; }
+        public string LocalPath { get; set; }
 
         /// <summary>
         /// Gets the head SHA of the repository.

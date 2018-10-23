@@ -38,7 +38,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the name of the repository.
         /// </summary>
-        public string Name { get; protected set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the repository clone URL.
@@ -46,7 +46,7 @@ namespace GitHub.Models
         public UriString CloneUrl
         {
             get { return cloneUrl; }
-            protected set
+            set
             {
                 if (cloneUrl != value)
                 {
@@ -67,7 +67,7 @@ namespace GitHub.Models
         public Octicon Icon
         {
             get { return icon; }
-            protected set
+            set
             {
                 if (icon != value)
                 {

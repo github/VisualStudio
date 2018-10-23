@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -40,7 +41,7 @@ namespace GitHub.TeamFoundation
                         {
                             var path = subkey?.GetValue("Path") as string;
                             if (path != null && Directory.Exists(path))
-                                return new LocalRepositoryModel(path, GitService.GitServiceHelper);
+                                return GitService.GitServiceHelper.CreateLocalRepositoryModel(path);
                         }
                         catch (Exception)
                         {

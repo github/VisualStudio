@@ -46,7 +46,7 @@ namespace GitHub.VisualStudio.Commands
                 if (!string.IsNullOrEmpty(path))
                 {
                     var repo = ServiceProvider.TryGetService<IGitService>().GetRepository(path);
-                    return new LocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'), GitService.GitServiceHelper);
+                    return GitService.GitServiceHelper.CreateLocalRepositoryModel(repo.Info.WorkingDirectory.TrimEnd('\\'));
                 }
             }
             catch (Exception ex)
@@ -66,7 +66,7 @@ namespace GitHub.VisualStudio.Commands
                 var path = ServiceProvider.TryGetService<IVSGitServices>()?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    activeRepo = !string.IsNullOrEmpty(path) ? new LocalRepositoryModel(path, GitService.GitServiceHelper) : null;
+                    activeRepo = !string.IsNullOrEmpty(path) ? GitService.GitServiceHelper.CreateLocalRepositoryModel(path) : null;
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +86,7 @@ namespace GitHub.VisualStudio.Commands
                 string path = vsGitServices?.GetActiveRepoPath() ?? String.Empty;
                 try
                 {
-                    ActiveRepo = !String.IsNullOrEmpty(path) ? new LocalRepositoryModel(path, GitService.GitServiceHelper) : null;
+                    ActiveRepo = !String.IsNullOrEmpty(path) ? GitService.GitServiceHelper.CreateLocalRepositoryModel(path) : null;
                 }
                 catch (Exception ex)
                 {

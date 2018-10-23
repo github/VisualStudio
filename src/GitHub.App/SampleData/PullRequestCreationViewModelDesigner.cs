@@ -15,15 +15,21 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
+            var repositoryModel = new LocalRepositoryModel
+            {
+                Name = "repo",
+                CloneUrl = "http://github.com/user/repo"
+            };
+
             Branches = new List<IBranch>
             {
-                new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("don/stub-ui", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("feature/pr/views", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("release-1.0.17.0", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
+                new BranchModel("master", repositoryModel),
+                new BranchModel("don/stub-ui", repositoryModel),
+                new BranchModel("feature/pr/views", repositoryModel),
+                new BranchModel("release-1.0.17.0", repositoryModel),
             }.AsReadOnly();
 
-            TargetBranch = new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner()));
+            TargetBranch = new BranchModel("master", repositoryModel);
             SourceBranch = Branches[2];
 
             SelectedAssignee = "Haacked (Phil Haack)";
