@@ -701,10 +701,10 @@ public class PullRequestServiceTests : TestBaseClass
         ms = Substitute.For<IModelService>();
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
-        sourceRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path", gitService);
+        sourceRepo = new LocalRepositoryModel { Name = "name", CloneUrl = "http://github.com/github/stuff", LocalPath = "c:\\path" };
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
-        targetRepo = new LocalRepositoryModel("name", new GitHub.Primitives.UriString("http://github.com/github/stuff"), "c:\\path", gitService);
+        targetRepo = new LocalRepositoryModel { Name = "name", CloneUrl = "http://github.com/github/stuff", LocalPath = "c:\\path" };
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 
         title = "a title";
