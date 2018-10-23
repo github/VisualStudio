@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using GitHub.Primitives;
-using GitHub.UI;
-using GitHub.Exports;
-using GitHub.Services;
-using GitHub.Extensions;
-using System.Threading.Tasks;
 
 namespace GitHub.Models
 {
@@ -18,16 +10,13 @@ namespace GitHub.Models
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class LocalRepositoryModel : RepositoryModel, ILocalRepositoryModel, IEquatable<LocalRepositoryModel>
     {
-        readonly IGitService gitService;
-
-        public LocalRepositoryModel()
-        {
-        }
-
         /// <summary>
         /// Gets the local path of the repository.
         /// </summary>
-        public string LocalPath { get; set; }
+        public string LocalPath
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets the current branch of the repository.
@@ -60,13 +49,13 @@ namespace GitHub.Models
             if (ReferenceEquals(this, other))
                 return true;
             return other != null &&
-                String.Equals(Name, other.Name) &&
-                String.Equals(Owner, other.Owner) &&
-                String.Equals(CloneUrl, other.CloneUrl) &&
-                String.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
+                string.Equals(Name, other.Name) &&
+                string.Equals(Owner, other.Owner) &&
+                string.Equals(CloneUrl, other.CloneUrl) &&
+                string.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 
-        internal string DebuggerDisplay => String.Format(
+        internal string DebuggerDisplay => string.Format(
             CultureInfo.InvariantCulture,
             "{4}\tOwner: {0} Name: {1} CloneUrl: {2} LocalPath: {3}",
             Owner,
