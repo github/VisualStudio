@@ -50,39 +50,6 @@ public class RepositoryModelTests
         }
     }
 
-    //[Collection("PackageServiceProvider global data tests")]
-    public class PathConstructorTests : TestBaseClass
-    {
-        [Test]
-        public void NoRemoteUrl()
-        {
-            using (var temp = new TempDirectory())
-            {
-                var gitService = new GitService(new RepositoryFacade());
-                var repo = Substitute.For<IRepository>();
-                var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitService.GetUri(path.FullName).Returns((UriString)null);
-                var model = gitService.CreateLocalRepositoryModel(path.FullName);
-                Assert.That("repo-name", Is.EqualTo(model.Name));
-            }
-        }
-
-        [Test]
-        public void WithRemoteUrl()
-        {
-            using (var temp = new TempDirectory())
-            {
-                var gitService = new GitService(new RepositoryFacade());
-                var repo = Substitute.For<IRepository>();
-                var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitService.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-                var model = gitService.CreateLocalRepositoryModel(path.FullName);
-                Assert.That("repo-name", Is.EqualTo(model.Name));
-                Assert.That("user", Is.EqualTo(model.Owner));
-            }
-        }
-    }
-
     public class HostAddressTests : TestBaseClass
     {
         [TestCase("https://github.com/owner/repo")]
