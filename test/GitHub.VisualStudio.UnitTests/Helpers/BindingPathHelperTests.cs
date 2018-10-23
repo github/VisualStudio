@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using System.Collections.Generic;
-using GitHub.Helpers;
+using GitHub.VisualStudio.Helpers;
 using NUnit.Framework;
 
-public static class BindingPathUtilitiesTests
+public static class BindingPathHelperTests
 {
-    public class TheRationalizeBindingPathsMethod
+    public class TheFindRedundantBindingPathsMethod
     {
         [TestCase]
         public void Redundant_Binding_Paths_Contains_Alternative_Path()
@@ -17,7 +17,7 @@ public static class BindingPathUtilitiesTests
             var assemblyLocation = Path.Combine(assemblyDir, fileName);
             var bindingPaths = new List<string> { alternativeDir, assemblyDir };
 
-            var paths = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
+            var paths = BindingPathHelper.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
 
             Assert.That(paths, Contains.Item(alternativeDir));
             Assert.That(paths, Does.Not.Contain(assemblyDir));
@@ -30,7 +30,7 @@ public static class BindingPathUtilitiesTests
             var assemblyDir = Path.GetDirectoryName(assemblyLocation);
             var bindingPaths = new List<string> { assemblyDir };
 
-            var paths = BindingPathUtilities.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
+            var paths = BindingPathHelper.FindRedundantBindingPaths(bindingPaths, assemblyLocation);
 
             Assert.That(paths, Does.Not.Contain(assemblyDir));
         }
