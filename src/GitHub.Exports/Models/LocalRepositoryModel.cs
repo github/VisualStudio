@@ -30,20 +30,6 @@ namespace GitHub.Models
         public string LocalPath { get; set; }
 
         /// <summary>
-        /// Gets the head SHA of the repository.
-        /// </summary>
-        public string HeadSha
-        {
-            get
-            {
-                using (var repo = gitService.GetRepository(LocalPath))
-                {
-                    return repo?.Commits.FirstOrDefault()?.Sha ?? string.Empty;
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets the current branch of the repository.
         /// </summary>
         public IBranch CurrentBranch
