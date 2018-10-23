@@ -41,15 +41,22 @@ namespace GitHub.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
         /// </summary>
-        /// <param name="path">The repository's local path.</param>
+        /// <param name="localPath">The repository's local path.</param>
         /// <param name="gitService">The service used to find the repository's URL.</param>
-        public LocalRepositoryModel(string path, IGitService gitService)
-            : base(path, gitService)
+        public LocalRepositoryModel(string localPath, IGitService gitService)
         {
             Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(localPath, nameof(localPath));
+            var dir = new DirectoryInfo(localPath);
+            if (!dir.Exists)
+            {
+                throw new ArgumentException("Path does not exist", nameof(localPath));
+            }
 
+            CloneUrl = gitService.GetUri(localPath);
+            LocalPath = localPath;
+            Name = CloneUrl?.RepositoryName ?? dir.Name;
             this.gitService = gitService;
-            LocalPath = path;
             Icon = Octicon.repo;
         }
 
