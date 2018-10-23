@@ -17,7 +17,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the repository clone URL.
         /// </summary>
-        UriString CloneUrl { get; }
+        UriString CloneUrl { get; set; }
 
         /// <summary>
         /// Gets the name of the owner of the repository, taken from the clone URL.

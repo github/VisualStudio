@@ -25,16 +25,6 @@ namespace GitHub.Models
         }
 
         /// <summary>
-        /// Updates the clone URL from the local repository.
-        /// </summary>
-        public void Refresh()
-        {
-            if (LocalPath == null)
-                return;
-            CloneUrl = gitService.GetUri(LocalPath);
-        }
-
-        /// <summary>
         /// Gets the local path of the repository.
         /// </summary>
         public string LocalPath { get; set; }

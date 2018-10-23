@@ -25,14 +25,15 @@ namespace GitHub.VisualStudio.Base
         bool activeRepoNotified = false;
 
         IServiceProvider serviceProvider;
-        readonly IVSGitExt gitService;
+        readonly IVSGitExt gitExt;
+        readonly IGitService gitService;
 
         /// <summary>
         /// This class relies on IVSGitExt that provides information when VS switches repositories.
         /// </summary>
-        /// <param name="gitService">Used for monitoring the active repository.</param>
+        /// <param name="gitExt">Used for monitoring the active repository.</param>
         [ImportingConstructor]
-        TeamExplorerServiceHolder(IVSGitExt gitService) : this(gitService, ThreadHelper.JoinableTaskContext)
+        TeamExplorerServiceHolder(IVSGitExt gitExt, IGitService gitService) : this(gitExt, gitService, ThreadHelper.JoinableTaskContext)
         {
         }
 
@@ -41,19 +42,23 @@ namespace GitHub.VisualStudio.Base
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         /// <param name="joinableTaskContext">Used for switching to the Main thread.</param>
-        public TeamExplorerServiceHolder(IVSGitExt gitService, JoinableTaskContext joinableTaskContext)
+        public TeamExplorerServiceHolder(IVSGitExt gitExt, IGitService gitService, JoinableTaskContext joinableTaskContext)
         {
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
 
-            // This might be null in Blend or SafeMode
-            if (gitService != null)
+            // HACK: This might be null in SafeMode.
+            // We should be throwing rather than returning a null MEF service.
+            if (gitExt == null)
             {
-                this.gitService = gitService;
-                UpdateActiveRepo();
-                gitService.ActiveRepositoriesChanged += UpdateActiveRepo;
+                return;
             }
+
+            this.gitExt = gitExt;
+            this.gitService = gitService;
+            UpdateActiveRepo();
+            gitExt.ActiveRepositoriesChanged += UpdateActiveRepo;
         }
 
         // set by the sections when they get initialized
@@ -106,7 +111,10 @@ namespace GitHub.VisualStudio.Base
 
             // the repo url might have changed and we don't get notifications
             // for that, so this is a good place to refresh it in case that happened
-            repo?.Refresh();
+            if (repo != null)
+            {
+                gitService.Refresh(repo);
+            }
 
             // if the active repo hasn't changed and there's notifications queued up,
             // notify the subscriber. If the repo has changed, the set above will trigger
@@ -152,7 +160,7 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateActiveRepo()
         {
-            var repo = gitService.ActiveRepositories.FirstOrDefault();
+            var repo = gitExt.ActiveRepositories.FirstOrDefault();
 
             if (!Equals(repo, ActiveRepo))
             {

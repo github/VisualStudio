@@ -1,7 +1,4 @@
-﻿using GitHub.Exports;
-using GitHub.Primitives;
-using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace GitHub.Models
 {
@@ -19,10 +16,5 @@ namespace GitHub.Models
         /// Gets the current branch.
         /// </summary>
         IBranch CurrentBranch { get; }
-
-        /// <summary>
-        /// Updates the url information based on the local path
-        /// </summary>
-        void Refresh();
     }
 }

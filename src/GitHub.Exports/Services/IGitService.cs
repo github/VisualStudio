@@ -24,6 +24,12 @@ namespace GitHub.Services
         ILocalRepositoryModel CreateLocalRepositoryModel(string name, UriString cloneUrl, string localPath);
 
         /// <summary>
+        /// Updates the ClonePath information based on the local path
+        /// </summary>
+        /// <param name="localRepositoryModel">The repository model to refresh.</param>
+        void Refresh(ILocalRepositoryModel localRepositoryModel);
+
+        /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote exists, this method returns null
         /// </summary>
