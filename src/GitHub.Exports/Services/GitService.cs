@@ -49,6 +49,8 @@ namespace GitHub.Services
                 Icon = Octicon.repo
             };
 
+            RefreshCurrentBranch(model);
+
             return model;
         }
 
@@ -195,6 +197,20 @@ namespace GitHub.Services
                     return null;
                 }
             });
+        }
+
+        void RefreshCurrentBranch(LocalRepositoryModel model)
+        {
+            var localPath = model.LocalPath;
+            using (var repo = GetRepository(localPath))
+            {
+                var headBranch = repo?.Head;
+                if (headBranch != null)
+                {
+                    // BranchModel doesn't keep a reference to Repository
+                    model.CurrentBranch = new BranchModel(headBranch, model, this);
+                }
+            }
         }
     }
 }

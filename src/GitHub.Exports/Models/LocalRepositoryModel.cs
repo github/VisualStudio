@@ -34,14 +34,7 @@ namespace GitHub.Models
         /// </summary>
         public IBranch CurrentBranch
         {
-            get
-            {
-                // BranchModel doesn't keep a reference to Repository
-                using (var repo = gitService.GetRepository(LocalPath))
-                {
-                    return new BranchModel(repo?.Head, this, gitService);
-                }
-            }
+            get; set;
         }
 
         /// <summary>
