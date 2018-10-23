@@ -459,7 +459,7 @@ namespace GitHub.InlineReviews.Services
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x));
-            return Subject.Create(input, output);
+            return Subject.Create<ITextSnapshot>(input, output);
         }
 
         /// <inheritdoc/>

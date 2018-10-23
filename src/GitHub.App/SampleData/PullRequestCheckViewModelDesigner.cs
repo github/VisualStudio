@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Reactive;
 using System.Windows.Media.Imaging;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -17,7 +18,7 @@ namespace GitHub.SampleData
 
         public Uri DetailsUrl { get; set; } = new Uri("http://github.com");
 
-        public ReactiveCommand<object> OpenDetailsUrl { get; set; } = null;
+        public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; set; } = null;
 
         public PullRequestCheckType CheckType { get; set; } = PullRequestCheckType.ChecksApi;
 

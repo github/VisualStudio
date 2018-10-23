@@ -62,15 +62,15 @@ namespace GitHub.ViewModels.GitHubPane
                 x => x.FileComments.Count,
                 (body, comments) => !string.IsNullOrWhiteSpace(body) || comments > 0);
 
-            Approve = ReactiveCommand.CreateAsyncTask(_ => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
-            Comment = ReactiveCommand.CreateAsyncTask(
-                hasBodyOrComments,
-                _ => DoSubmit(Octokit.PullRequestReviewEvent.Comment));
-            RequestChanges = ReactiveCommand.CreateAsyncTask(
-                hasBodyOrComments,
-                _ => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges));
-            Cancel = ReactiveCommand.CreateAsyncTask(DoCancel);
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
+            Approve = ReactiveCommand.CreateFromTask(() => DoSubmit(Octokit.PullRequestReviewEvent.Approve));
+            Comment = ReactiveCommand.CreateFromTask(
+                () => DoSubmit(Octokit.PullRequestReviewEvent.Comment),
+                hasBodyOrComments);
+            RequestChanges = ReactiveCommand.CreateFromTask(
+                () => DoSubmit(Octokit.PullRequestReviewEvent.RequestChanges),
+                hasBodyOrComments);
+            Cancel = ReactiveCommand.CreateFromTask(DoCancel);
+            NavigateToPullRequest = ReactiveCommand.Create(() =>
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{PullRequestModel.Number}")));
         }
 
@@ -124,11 +124,11 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref fileComments, value); }
         }
 
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
-        public ReactiveCommand<Unit> Approve { get; }
-        public ReactiveCommand<Unit> Comment { get; }
-        public ReactiveCommand<Unit> RequestChanges { get; }
-        public ReactiveCommand<Unit> Cancel { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Approve { get; }
+        public ReactiveCommand<Unit, Unit> Comment { get; }
+        public ReactiveCommand<Unit, Unit> RequestChanges { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public async Task InitializeAsync(
             ILocalRepositoryModel localRepository,
@@ -265,7 +265,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        async Task DoCancel(object arg)
+        async Task DoCancel()
         {
             OperationError = null;
             IsBusy = true;

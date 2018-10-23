@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Reactive;
 using System.Windows.Media.Imaging;
 using GitHub.Models;
 using ReactiveUI;
@@ -33,7 +34,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// A command that opens the DetailsUrl in a browser.
         /// </summary>
-        ReactiveCommand<object> OpenDetailsUrl { get; }
+        ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
 
         /// <summary>
         /// Gets the type of check run, Status/Check.

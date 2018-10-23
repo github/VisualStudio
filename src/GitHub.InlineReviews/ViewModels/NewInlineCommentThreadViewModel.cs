@@ -43,20 +43,15 @@ namespace GitHub.InlineReviews.ViewModels
             LineNumber = lineNumber;
             LeftComparisonBuffer = leftComparisonBuffer;
 
-            PostComment = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.NeedsPush, x => !x),
-                DoPostComment);
+            PostComment = ReactiveCommand.CreateFromTask<string>(
+                DoPostComment,
+                this.WhenAnyValue(x => x.NeedsPush, x => !x));
 
-            EditComment = ReactiveCommand.CreateAsyncTask<Unit>(
-                Observable.Return(false),
-                o => null);
-
-            DeleteComment = ReactiveCommand.CreateAsyncTask<Unit>(
-                Observable.Return(false),
-                o => null);
+            EditComment = ReactiveCommand.Create<Tuple<string, string>>(_ => { });
+            DeleteComment = ReactiveCommand.Create<Tuple<int, int>>(_ => { });
 
             var placeholder = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, this, CurrentUser);
-            placeholder.BeginEdit.Execute(null);
+            placeholder.BeginEdit.Execute().Subscribe();
             this.WhenAnyValue(x => x.NeedsPush).Subscribe(x => placeholder.IsReadOnly = x);
             Comments.Add(placeholder);
 
@@ -93,9 +88,9 @@ namespace GitHub.InlineReviews.ViewModels
             private set { this.RaiseAndSetIfChanged(ref needsPush, value); }
         }
 
-        async Task DoPostComment(object parameter)
+        async Task DoPostComment(string body)
         {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(body, nameof(body));
 
             var diffPosition = File.Diff
                 .SelectMany(x => x.Lines)
@@ -110,7 +105,6 @@ namespace GitHub.InlineReviews.ViewModels
                 throw new InvalidOperationException("Unable to locate line in diff.");
             }
 
-            var body = (string)parameter;
             await Session.PostReviewComment(
                 body,
                 File.CommitSha,

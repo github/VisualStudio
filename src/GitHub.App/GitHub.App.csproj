@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\src\common\signing.props" />
@@ -21,12 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\akavache\Akavache.Sqlite3\Akavache.Sqlite3.csproj" />
-    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj" />
+    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Sqlite3\Akavache.Sqlite3.csproj" />
+    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Core\Akavache.Core.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj" />
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj" />
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
@@ -50,11 +50,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />
-    <PackageReference Include="SQLitePCL.raw_basic" Version="0.7.3.0-vs2012" targetFramework="net45" />
     <PackageReference Include="Stateless" Version="2.5.56.0" targetFramework="net45" />
   </ItemGroup>
 </Project>

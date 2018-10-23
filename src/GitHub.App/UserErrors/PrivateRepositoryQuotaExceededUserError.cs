@@ -2,6 +2,9 @@ using System;
 using System.Globalization;
 using GitHub.Models;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace GitHub.UserErrors
 {

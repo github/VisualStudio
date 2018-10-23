@@ -1,5 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System.Reactive;
+using System.Windows.Input;
 using GitHub.Validation;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -18,6 +20,6 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Command that launches a dialog to browse for the directory in which to create the repository.
         /// </summary>
-        ICommand BrowseForDirectory { get; }
+        ReactiveCommand<Unit, Unit> BrowseForDirectory { get; }
     }
 }

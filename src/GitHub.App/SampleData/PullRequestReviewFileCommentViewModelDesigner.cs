@@ -8,6 +8,6 @@ namespace GitHub.SampleData
     {
         public string Body { get; set; }
         public string RelativePath { get; set; }
-        public ReactiveCommand<Unit> Open { get; }
+        public ReactiveCommand<Unit, Unit> Open { get; }
     }
 }
