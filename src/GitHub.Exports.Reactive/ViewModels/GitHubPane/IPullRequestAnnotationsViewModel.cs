@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -47,7 +49,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which navigates to the parent pull request.
         /// </summary>
-        ReactiveCommand<object> NavigateToPullRequest { get; }
+        ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
         /// Gets the list of annotations.

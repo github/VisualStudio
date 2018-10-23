@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="500">
     <UserControl.Resources>

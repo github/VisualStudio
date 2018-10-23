@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.App.ViewModels.GitHubPane;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.SampleData
 {
@@ -15,7 +17,7 @@ namespace GitHub.SampleData
         public string RemoteRepositoryOwner { get; set; }
         public int PullRequestNumber { get; set; } = 123;
         public int CheckRunId { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public string PullRequestTitle { get; } = "Fixing stuff in this PR";
         public string CheckSuiteName { get; } = "Awesome Check Suite";
         public string CheckRunName { get; } = "Psuedo Check Run";

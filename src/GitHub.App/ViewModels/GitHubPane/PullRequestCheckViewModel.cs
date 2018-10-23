@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;

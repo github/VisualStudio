@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace GitHub.App.ViewModels.GitHubPane
 {
@@ -31,8 +34,10 @@ namespace GitHub.App.ViewModels.GitHubPane
         public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager)
         {
             this.sessionManager = sessionManager;
-            NavigateToPullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ =>
-                NavigateTo(FormattableString.Invariant($"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}")));
+            NavigateToPullRequest = ReactiveCommand.Create(() => {
+                    NavigateTo(FormattableString.Invariant(
+                        $"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}"));
+                });
         }
 
         /// <inheritdoc/>
@@ -74,7 +79,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         public int CheckRunId { get; private set; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> NavigateToPullRequest { get; private set; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; private set; }
 
         /// <inheritdoc/>
         public string PullRequestTitle

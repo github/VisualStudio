@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.SampleData;
+using ReactiveUI.Legacy;
 
 namespace GitHub.SampleData
 {
@@ -122,10 +123,10 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit, Unit> Checkout { get; }
         public ReactiveCommand<Unit, Unit> Pull { get; }
         public ReactiveCommand<Unit, Unit> Push { get; }
-        public ReactiveCommand<Unit> SyncSubmodules { get; }
+        public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
         public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
-        public ReactiveCommand<object> ShowAnnotations { get; }
+        public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 

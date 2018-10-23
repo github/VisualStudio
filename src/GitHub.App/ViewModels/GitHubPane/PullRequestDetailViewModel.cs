@@ -18,8 +18,10 @@ using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 using Serilog;
 using static System.FormattableString;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -128,7 +130,7 @@ namespace GitHub.ViewModels.GitHubPane
         
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
 
-            ShowAnnotations = ReactiveCommand.Create().OnExecuteCompleted(DoShowAnnotations);
+            ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
         }
 
         private void DoOpenDetailsUrl()
@@ -267,7 +269,7 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> ShowAnnotations { get; }
+        public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<IPullRequestCheckViewModel> Checks
@@ -591,10 +593,8 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowReview(IPullRequestReviewSummaryViewModel item)
+        void DoShowReview(IPullRequestReviewSummaryViewModel review)
         {
-            var review = item;
-
             if (review.State == PullRequestReviewState.Pending)
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
@@ -605,9 +605,8 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowAnnotations(object item)
+        void DoShowAnnotations(IPullRequestCheckViewModel checkView)
         {
-            var checkView = (PullRequestCheckViewModel)item;
             NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/checkruns/{checkView.CheckRunId}"));
         }
 

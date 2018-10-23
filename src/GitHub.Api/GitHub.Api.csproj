@@ -32,6 +32,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
   </ItemGroup>
 </Project>
