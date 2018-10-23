@@ -25,24 +25,6 @@ namespace GitHub.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
-        /// </summary>
-        /// <param name="name">The repository name.</param>
-        /// <param name="cloneUrl">The repository's clone URL.</param>
-        /// <param name="localPath">The repository's local path.</param>
-        /// <param name="gitService">The service used to refresh the repository's URL.</param>
-        public LocalRepositoryModel(string name, UriString cloneUrl, string localPath, IGitService gitService)
-            : base(name, cloneUrl)
-        {
-            Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-
-            this.gitService = gitService;
-            LocalPath = localPath;
-            Icon = Octicon.repo;
-        }
-
-        /// <summary>
         /// Updates the clone URL from the local repository.
         /// </summary>
         public void Refresh()
