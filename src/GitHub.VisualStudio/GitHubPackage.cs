@@ -180,9 +180,9 @@ namespace GitHub.VisualStudio
             AddService(typeof(IPackageSettings), CreateService, true);
         }
 
+#if DEBUG
         async Task CheckBindingPathsAsync()
         {
-#if DEBUG
             try
             {
                 // When running in the Exp instance, ensure there is only one active binding path.
@@ -195,10 +195,10 @@ namespace GitHub.VisualStudio
             {
                 log.Error(e, nameof(CheckBindingPathsAsync));
             }
-#else
-            return Task.CompletedTask;
-#endif
         }
+#else
+        Task CheckBindingPathsAsync() => Task.CompletedTask;
+#endif
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()
         {
