@@ -15,15 +15,6 @@ namespace GitHub.Services
         ILocalRepositoryModel CreateLocalRepositoryModel(string localPath);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
-        /// </summary>
-        /// <param name="name">The repository name.</param>
-        /// <param name="cloneUrl">The repository's clone URL.</param>
-        /// <param name="localPath">The repository's local path.</param>
-        /// <returns>A repository model.</returns>
-        ILocalRepositoryModel CreateLocalRepositoryModel(string name, UriString cloneUrl, string localPath);
-
-        /// <summary>
         /// Updates the ClonePath information based on the local path
         /// </summary>
         /// <param name="localRepositoryModel">The repository model to refresh.</param>

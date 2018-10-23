@@ -40,37 +40,16 @@ namespace GitHub.Services
 
             var cloneUrl = GetUri(localPath);
             var name = cloneUrl?.RepositoryName ?? dir.Name;
-            var icon = Octicon.repo;
 
-            return new LocalRepositoryModel
-            {
-                LocalPath = localPath,
-                CloneUrl = cloneUrl,
-                Name = name,
-                Icon = icon
-            };
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LocalRepositoryModel"/> class.
-        /// </summary>
-        /// <param name="name">The repository name.</param>
-        /// <param name="cloneUrl">The repository's clone URL.</param>
-        /// <param name="localPath">The repository's local path.</param>
-        /// <returns>A repository model.</returns>
-        public ILocalRepositoryModel CreateLocalRepositoryModel(string name, UriString cloneUrl, string localPath)
-        {
-            Guard.ArgumentNotEmptyString(name, nameof(name));
-            Guard.ArgumentNotNull(cloneUrl, nameof(cloneUrl));
-            Guard.ArgumentNotEmptyString(localPath, nameof(localPath));
-
-            return new LocalRepositoryModel
+            var model = new LocalRepositoryModel
             {
                 LocalPath = localPath,
                 CloneUrl = cloneUrl,
                 Name = name,
                 Icon = Octicon.repo
             };
+
+            return model;
         }
 
         /// <summary>
