@@ -45,20 +45,19 @@ namespace GitHub.ViewModels.GitHubPane
 
             this.service = service;
 
-            DiffFile = ReactiveCommand.CreateAsyncTask(x =>
-                (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, "HEAD"));
-            ViewFile = ReactiveCommand.CreateAsyncTask(x =>
-                (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
-            DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
-                isBranchCheckedOut,
-                x => (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath));
-            OpenFileInWorkingDirectory = new NonDeletedFileCommand(
-                isBranchCheckedOut,
-                x => (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
+            DiffFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
+                editorService.OpenDiff(pullRequestSession, x.RelativePath, "HEAD"));
+            ViewFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
+                editorService.OpenFile(pullRequestSession, x.RelativePath, false));
+            DiffFileWithWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                x => editorService.OpenDiff(pullRequestSession, x.RelativePath),
+                isBranchCheckedOut);
+            OpenFileInWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                x => editorService.OpenFile(pullRequestSession, x.RelativePath, true),
+                isBranchCheckedOut);
 
-            OpenFirstComment = ReactiveCommand.CreateAsyncTask(async x =>
+            OpenFirstComment = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(async file =>
             {
-                var file = (IPullRequestFileNode)x;
                 var thread = await GetFirstCommentThread(file);
 
                 if (thread != null)
@@ -173,19 +172,19 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> DiffFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFile { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> ViewFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> ViewFile { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFileWithWorkingDirectory { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFileInWorkingDirectory { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFirstComment { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
@@ -266,12 +265,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// state depending on the parameter, so we override 
         /// <see cref="ICommand.CanExecute(object)"/> to do this ourselves.
         /// </remarks>
-        class NonDeletedFileCommand : ReactiveCommand<Unit>, ICommand
+        class NonDeletedFileCommand : ReactiveCommand<Unit, Unit>, ICommand
         {
             public NonDeletedFileCommand(
                 IObservable<bool> canExecute,
                 Func<object, Task> executeAsync)
-                : base(canExecute, x => executeAsync(x).ToObservable())
+                : base(x => executeAsync(x).ToObservable(), canExecute, null)
             {
             }
 
@@ -285,7 +284,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                 }
 
-                return CanExecute(parameter);
+                return true; ////CanExecute(parameter);
             }
         }
     }

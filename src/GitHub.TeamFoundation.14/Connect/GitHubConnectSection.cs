@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -133,7 +134,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             this.localRepositories = localRepositories;
             this.usageTracker = usageTracker;
 
-            Clone = CreateAsyncCommandHack(DoClone);
+            Clone = ReactiveCommand.CreateFromTask(DoClone);
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
@@ -508,20 +509,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         /// <see cref="ReactiveCommand.CreateAsyncTask"/> causes a weird UI hang in this situation
         /// where the UI runs but WhenAny no longer responds to property changed notifications.
         /// </remarks>
-        static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
-        {
-            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+        ////static ReactiveCommand<Unit,Unit> CreateAsyncCommandHack(Func<Task> executeAsync)
+        ////{
+        ////    Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
 
-            var enabled = new BehaviorSubject<bool>(true);
-            var command = ReactiveCommand.Create(enabled);
-            command.Subscribe(async _ =>
-            {
-                enabled.OnNext(false);
-                try { await executeAsync(); }
-                finally { enabled.OnNext(true); }
-            });
-            return command;
-        }
+        ////    var enabled = new BehaviorSubject<bool>(true);
+        ////    var command = ReactiveCommand.Create(enabled);
+        ////    command.Subscribe(async _ =>
+        ////    {
+        ////        enabled.OnNext(false);
+        ////        try { await executeAsync(); }
+        ////        finally { enabled.OnNext(true); }
+        ////    });
+        ////    return command;
+        ////}
 
         class SectionStateTracker
         {

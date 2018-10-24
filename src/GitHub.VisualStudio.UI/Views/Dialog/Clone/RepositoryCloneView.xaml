@@ -1,0 +1,90 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.Dialog.Clone.RepositoryCloneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
+             xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
+             mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
+    <d:DesignData.DataContext>
+        <ghfvs:RepositoryCloneViewModelDesigner/>
+    </d:DesignData.DataContext>
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <ghfvs:OcticonCircleButton
+                                   Margin="12"
+                                   HorizontalAlignment="Center"
+                                   Icon="check"
+                                   IsDefault="True"
+                                   Command="{Binding Clone}"
+                                   Content="Clone"
+                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+
+            <ghfvs:OcticonCircleButton
+                                   Margin="12"
+                                   HorizontalAlignment="Center"
+                                   Icon="check"
+                                   IsDefault="True"
+                                   Command="{Binding Open}"
+                                   Content="Open"
+                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+        </StackPanel>
+
+        <DockPanel DockPanel.Dock="Bottom"
+                   Margin="16">
+            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
+            <Button DockPanel.Dock="Right"
+                    Command="{Binding Browse}"
+                    Style="{DynamicResource GitHubBlueLinkButton}"
+                    VerticalContentAlignment="Center">
+                Browse
+            </Button>
+            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
+        </DockPanel>
+
+        <uic:InfoPanel Message="{Binding PathWarning}"
+                       DockPanel.Dock="Bottom"
+                       Margin="0"/>
+
+        <TabControl SelectedIndex="{Binding SelectedTabIndex}"
+                    Style="{StaticResource LightModalViewTabControl}">
+            <TabItem Header="GitHub.com"
+                     Style="{DynamicResource LightModalViewTabItem}"
+                     Visibility="{Binding GitHubTab.IsEnabled, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                <local:SelectPageView DataContext="{Binding GitHubTab}"/>
+            </TabItem>
+            <TabItem Header="Enterprise"
+                     Style="{DynamicResource LightModalViewTabItem}"
+                     Visibility="{Binding EnterpriseTab.IsEnabled, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                <local:SelectPageView DataContext="{Binding EnterpriseTab}"/>
+            </TabItem>
+            <TabItem Header="URL" Style="{DynamicResource LightModalViewTabItem}">
+                <DockPanel DataContext="{Binding UrlTab}"
+                           LastChildFill="False"
+                           Margin="8">
+                    <TextBlock DockPanel.Dock="Top">
+                        Repository URL or GitHub username and repository
+                        <LineBreak/>
+                        (<Run Background="#66d3d3d3" FontFamily="Consolas">hubot/cool-repo</Run>)
+                    </TextBlock>
+                    <ghfvs:PromptTextBox DockPanel.Dock="Top"
+                                         Margin="0 4"
+                                         PromptText="URL or username/repository"
+                                         Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

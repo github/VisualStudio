@@ -92,9 +92,10 @@ public class VSServicesTests
 
             if (repoDir != null)
             {
+                var gitDir = Path.Combine(repoDir, ".git");
                 var directoryInfo = Substitute.For<IDirectoryInfo>();
                 directoryInfo.Exists.Returns(repoDirExists);
-                os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
+                os.Directory.GetDirectory(gitDir).Returns(directoryInfo);
             }
 
             var provider = Substitute.For<IGitHubServiceProvider>();

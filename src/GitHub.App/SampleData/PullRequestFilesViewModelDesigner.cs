@@ -31,11 +31,11 @@ namespace GitHub.SampleData
 
         public int ChangedFilesCount { get; set; }
         public IReadOnlyList<IPullRequestChangeNode> Items { get; }
-        public ReactiveCommand<Unit> DiffFile { get; }
-        public ReactiveCommand<Unit> ViewFile { get; }
-        public ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
-        public ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
-        public ReactiveCommand<Unit> OpenFirstComment { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> ViewFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFileInWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
         public ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
         public ReactiveCommand<Unit> OpenFirstAnnotationWarning { get; }
         public ReactiveCommand<Unit> OpenFirstAnnotationFailure { get; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -9,7 +8,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio;
-using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.CodeContainerManagement;
 using Microsoft.VisualStudio.Threading;
@@ -59,7 +57,6 @@ namespace GitHub.StartPage
             try
             {
                 var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                await ShowTeamExplorerPage(uiProvider);
                 request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
             }
             catch (Exception e)
@@ -82,35 +79,6 @@ namespace GitHub.StartPage
                                                 DateTimeOffset.UtcNow),
                 isFavorite: false,
                 lastAccessed: DateTimeOffset.UtcNow);
-        }
-
-        async Task ShowTeamExplorerPage(IGitHubServiceProvider gitHubServiceProvider)
-        {
-            var te = gitHubServiceProvider?.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
-
-            if (te != null)
-            {
-                var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
-
-                if (page == null)
-                {
-                    var tcs = new TaskCompletionSource<ITeamExplorerPage>();
-                    PropertyChangedEventHandler handler = null;
-
-                    handler = new PropertyChangedEventHandler((s, e) =>
-                    {
-                        if (e.PropertyName == "CurrentPage")
-                        {
-                            tcs.SetResult(te.CurrentPage);
-                            te.PropertyChanged -= handler;
-                        }
-                    });
-
-                    te.PropertyChanged += handler;
-
-                    page = await tcs.Task;
-                }
-            }
         }
 
         async Task<CloneDialogResult> ShowCloneDialog(

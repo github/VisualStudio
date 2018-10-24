@@ -228,7 +228,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Approve.Execute(null);
+            await target.Approve.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Approve);
             Assert.True(closed);
@@ -244,7 +244,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsFalse(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsFalse(canExecute);
         }
 
         [Test]
@@ -258,7 +259,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Review body";
 
-            Assert.IsTrue(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -275,7 +277,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsTrue(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -291,7 +294,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Comment.Execute(null);
+            await target.Comment.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Comment);
             Assert.True(closed);
@@ -307,7 +310,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsFalse(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsFalse(canExecute);
         }
 
         [Test]
@@ -321,7 +325,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Review body";
 
-            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -338,7 +343,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -354,7 +360,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.RequestChanges.Execute(null);
+            await target.RequestChanges.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.RequestChanges);
             Assert.True(closed);
@@ -375,7 +381,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Cancel.Execute(null);
+            await target.Cancel.Execute();
 
             await session.Received(1).CancelReview();
             Assert.True(closed);
@@ -392,7 +398,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Cancel.Execute(null);
+            await target.Cancel.Execute();
 
             await session.Received(0).CancelReview();
             Assert.True(closed);

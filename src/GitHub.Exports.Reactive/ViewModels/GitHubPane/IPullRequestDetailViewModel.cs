@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -153,37 +154,37 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
-        ReactiveCommand<Unit> Checkout { get; }
+        ReactiveCommand<Unit, Unit> Checkout { get; }
 
         /// <summary>
         /// Gets a command that pulls changes to the current branch.
         /// </summary>
-        ReactiveCommand<Unit> Pull { get; }
+        ReactiveCommand<Unit, Unit> Pull { get; }
 
         /// <summary>
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
-        ReactiveCommand<Unit> Push { get; }
+        ReactiveCommand<Unit, Unit> Push { get; }
 
         /// <summary>
         /// Sync submodules for PR branch.
         /// </summary>
-        ReactiveCommand<Unit> SyncSubmodules { get; }
+        ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
-        ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Gets a command that navigates to a pull request review.
         /// </summary>
-        ReactiveCommand<object> ShowReview { get; }
+        ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <summary>
         /// Gets a command that navigates to a pull request's check run annotation list.
         /// </summary>
-        ReactiveCommand<object> ShowAnnotations { get; }
+        ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         /// <summary>
         /// Gets the latest pull request checks & statuses.

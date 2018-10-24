@@ -192,6 +192,10 @@ namespace GitHub.InlineReviews.Services
             {
                 await StatusChanged();
             }
+            else
+            {
+                initialized.TrySetResult(null);
+            }
         }
 
         async Task StatusChanged()

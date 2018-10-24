@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>为新版本库选择文件夹。</value>
+    <value>为新存储库选择包含文件夹。</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>克隆一个 版本库</value>
+    <value>克隆存储库</value>
   </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
-    <value>Open from GitHub</value>
+    <value>从 GitHub 打开</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>无法连接到github.com</value>
@@ -330,7 +330,7 @@
     <value>取消评审</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>A file exists at the destination path.</value>
+    <value>有一个文件在目标路径已存在。</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
     <value>需要注销</value>
@@ -824,15 +824,15 @@
     <value>无法在当前存储库中找到目标URL。在进行提取后再试一次。</value>
   </data>
   <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+    <value>此位置已经有一个目录, 但它不包含存储库。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
+    <value>此位置已存在存储库, 但它没有名为 "origin"的远端。</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>A repository already exists at this location, but it has a remote of {0}.</value>
+    <value>此位置已存在存储库, 但它具有 {0} 的远端。</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
-    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
+    <value>您已经克隆到此位置。单击 "打开" 打开本地存储库。</value>
   </data>
 </root>

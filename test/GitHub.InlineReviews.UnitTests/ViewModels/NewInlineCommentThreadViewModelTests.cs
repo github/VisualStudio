@@ -5,6 +5,7 @@ using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -12,11 +13,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
     public class NewInlineCommentThreadViewModelTests
     {
-        public NewInlineCommentThreadViewModelTests()
-        {
-            Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-        }
-
         [Test]
         public void CreatesReplyPlaceholder()
         {
@@ -91,7 +87,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 file, 10, false);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
+            target.Comments[0].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment(
                 "New Comment",
@@ -124,7 +120,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 file, 16, true);
 
             target.Comments[0].Body = "New Comment";
-            target.Comments[0].CommitEdit.Execute(null);
+            target.Comments[0].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment(
                 "New Comment",
