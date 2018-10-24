@@ -72,7 +72,7 @@ namespace GitHub.ViewModels.GitHubPane
             OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
                 async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
 
-            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+            OpenFirstAnnotationFailure = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
                 async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
         }
 
