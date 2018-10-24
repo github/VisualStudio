@@ -21,6 +21,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestEditorService pullRequestEditorService;
 
+        IPullRequestSession session;
         string title;
         string checkSuiteName;
         string checkRunName;
@@ -59,7 +60,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 CheckRunId = checkRunId;
-                var session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
                 Load(session.PullRequest);
             }
             finally
