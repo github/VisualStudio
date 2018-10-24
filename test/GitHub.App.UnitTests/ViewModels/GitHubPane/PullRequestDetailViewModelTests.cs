@@ -620,7 +620,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var author = Substitute.For<IAccount>();
 
-            reviews = reviews ?? new PullRequestReviewModel[0];
+            reviews = reviews ?? Array.Empty<PullRequestReviewModel>();
 
             return new PullRequestDetailModel
             {

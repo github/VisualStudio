@@ -72,7 +72,7 @@ namespace GitHub.ViewModels.TeamExplorer
                 .SelectMany(async c => (await modelServiceFactory.CreateAsync(c)).GetAccounts())
                 .Switch()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
+                .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
 
             this.WhenAny(x => x.Accounts, x => x.Value)
                 .WhereNotNull()

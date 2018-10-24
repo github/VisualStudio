@@ -52,7 +52,7 @@ namespace GitHub.Collections
         {
             if (stickieItemsOnTop == null)
             {
-                stickieItemsOnTop = new T[0];
+                stickieItemsOnTop = Array.Empty<T>();
             }
 
             var col = new ObservableCollection<T>(stickieItemsOnTop.Concat(tcol));

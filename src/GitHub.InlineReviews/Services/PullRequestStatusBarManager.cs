@@ -37,8 +37,6 @@ namespace GitHub.InlineReviews.Services
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IConnectionManager> connectionManager;
 
-        IDisposable currentSessionSubscription;
-
         [ImportingConstructor]
         public PullRequestStatusBarManager(
             Lazy<IUsageTracker> usageTracker,
@@ -68,9 +66,13 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository)
+                var activeReposities = teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository);
+                var sessions = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession);
+                activeReposities
+                    .CombineLatest(sessions, (r, s) => (r, s))
+                    .Throttle(TimeSpan.FromSeconds(1))
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => RefreshActiveRepository(x));
+                    .Subscribe(x => RefreshCurrentSession(x.r, x.s).Forget(log));
             }
             catch (Exception e)
             {
@@ -78,31 +80,17 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        void RefreshActiveRepository(ILocalRepositoryModel repository)
-        {
-            currentSessionSubscription?.Dispose();
-            currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
-                .Subscribe(x => RefreshCurrentSession(repository, x).Forget());
-        }
-
         async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
         {
-            try
+            var showStatus = await IsDotComOrEnterpriseRepository(repository);
+            if (!showStatus)
             {
-                var showStatus = await IsDotComOrEnterpriseRepository(repository);
-                if (!showStatus)
-                {
-                    ShowStatus(null);
-                    return;
-                }
+                ShowStatus(null);
+                return;
+            }
 
-                var viewModel = CreatePullRequestStatusViewModel(session);
-                ShowStatus(viewModel);
-            }
-            catch (Exception e)
-            {
-                log.Error(e, nameof(RefreshCurrentSession));
-            }
+            var viewModel = CreatePullRequestStatusViewModel(session);
+            ShowStatus(viewModel);
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
