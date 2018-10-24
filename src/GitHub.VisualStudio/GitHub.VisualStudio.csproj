@@ -345,6 +345,7 @@
     <Compile Include="Commands\GoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
     <Compile Include="GitHubPanePackage.cs" />
+    <Compile Include="Helpers\BindingPathHelper.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Commands\AddConnectionCommand.cs" />
