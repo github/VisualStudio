@@ -20,65 +20,56 @@ public class LoginCredentialsViewModelTests
         [Test]
         public async Task SucessfulGitHubLoginSignalsDoneAsync()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var connectionManager = Substitute.For<IConnectionManager>();
-                var connection = Substitute.For<IConnection>();
+            var connectionManager = Substitute.For<IConnectionManager>();
+            var connection = Substitute.For<IConnection>();
 
-                var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>(connection);
-                var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>();
-                var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
-                var signalled = false;
+            var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>(connection);
+            var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>();
+            var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
+            var signalled = false;
 
-                loginViewModel.Done.Subscribe(_ => signalled = true);
-                await gitHubLogin.Login.Execute();
+            loginViewModel.Done.Subscribe(_ => signalled = true);
+            await gitHubLogin.Login.Execute();
 
-                Assert.True(signalled);
-            }
+            Assert.True(signalled);
         }
 
         [Test]
         public async Task FailedGitHubLoginDoesNotSignalDoneAsync()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var connectionManager = Substitute.For<IConnectionManager>();
+            var connectionManager = Substitute.For<IConnectionManager>();
 
-                var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>();
-                var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>();
-                var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
-                var signalled = false;
+            var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>();
+            var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>();
+            var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
+            var signalled = false;
 
-                loginViewModel.Done.Subscribe(_ => signalled = true);
-                await gitHubLogin.Login.Execute();
+            loginViewModel.Done.Subscribe(_ => signalled = true);
+            await gitHubLogin.Login.Execute();
 
-                Assert.False(signalled);
-            }
+            Assert.False(signalled);
         }
 
         [Test]
         public async Task AllowsLoginFromEnterpriseAfterGitHubLoginHasFailedAsync()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var connectionManager = Substitute.For<IConnectionManager>();
-                var connection = Substitute.For<IConnection>();
+            var connectionManager = Substitute.For<IConnectionManager>();
+            var connection = Substitute.For<IConnection>();
 
-                var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>();
-                var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>(connection);
-                var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
-                var success = false;
+            var gitHubLogin = CreateLoginToHostViewModel<ILoginToGitHubViewModel>();
+            var enterpriseLogin = CreateLoginToHostViewModel<ILoginToGitHubForEnterpriseViewModel>(connection);
+            var loginViewModel = new LoginCredentialsViewModel(connectionManager, gitHubLogin, enterpriseLogin);
+            var success = false;
 
-                loginViewModel.Done
-                    .OfType<IConnection>()
-                    .Where(x => x != null)
-                    .Subscribe(_ => success = true);
+            loginViewModel.Done
+                .OfType<IConnection>()
+                .Where(x => x != null)
+                .Subscribe(_ => success = true);
 
-                await gitHubLogin.Login.Execute();
-                await enterpriseLogin.Login.Execute();
+            await gitHubLogin.Login.Execute();
+            await enterpriseLogin.Login.Execute();
 
-                Assert.True(success);
-            }
+            Assert.True(success);
         }
     }
 

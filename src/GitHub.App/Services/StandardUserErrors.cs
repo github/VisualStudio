@@ -189,7 +189,7 @@ namespace GitHub.Services
 
             return exception.DisplayErrorMessage(
                 errorType,
-                new object[] { },
+                Array.Empty<object>(),
                 new[] { OpenBrowser("View Plans", account.Billing()), Cancel });
         }
 

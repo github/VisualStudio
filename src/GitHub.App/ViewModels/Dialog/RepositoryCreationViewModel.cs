@@ -182,7 +182,7 @@ namespace GitHub.ViewModels.Dialog
 
             accounts = modelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] { }));
+                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
 
             this.WhenAny(x => x.Accounts, x => x.Value)
                 .Select(accts => accts?.FirstOrDefault())
