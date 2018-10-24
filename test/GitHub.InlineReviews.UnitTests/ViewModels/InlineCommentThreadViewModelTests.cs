@@ -65,7 +65,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
-            target.Comments[2].CommitEdit.Execute(null);
+            target.Comments[2].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment("New Comment", "1");
         }

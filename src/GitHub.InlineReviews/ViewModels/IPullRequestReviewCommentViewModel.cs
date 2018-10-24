@@ -32,6 +32,6 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets a command which will commit a new comment and start a review.
         /// </summary>
-        ReactiveCommand<Unit> StartReview { get; }
+        ReactiveCommand<Unit, Unit> StartReview { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using GitHub.ViewModels;
@@ -15,8 +16,8 @@ namespace GitHub.SampleData
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };
 
-        public ReactiveCommand<Unit> PostComment { get; }
-        public ReactiveCommand<Unit> EditComment { get; }
-        public ReactiveCommand<Unit> DeleteComment { get; }
+        public ReactiveCommand<string, Unit> PostComment { get; }
+        public ReactiveCommand<Tuple<string, string>, Unit> EditComment { get; }
+        public ReactiveCommand<Tuple<int, int>, Unit> DeleteComment { get; }
     }
 }

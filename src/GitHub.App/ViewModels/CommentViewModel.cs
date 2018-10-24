@@ -78,30 +78,30 @@ namespace GitHub.InlineReviews.ViewModels
 
             canDelete = canDeleteObservable.ToProperty(this, x => x.CanDelete);
 
-            Delete = ReactiveCommand.CreateAsyncTask(canDeleteObservable, DoDelete);
+            Delete = ReactiveCommand.CreateFromTask(DoDelete, canDeleteObservable);
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
                 x => x == CommentEditState.Placeholder || (x == CommentEditState.None && author.Login == currentUser.Login));
 
-            BeginEdit = ReactiveCommand.Create(canEdit);
-            BeginEdit.Subscribe(DoBeginEdit);
+            BeginEdit = ReactiveCommand.Create(DoBeginEdit, canEdit);
             AddErrorHandler(BeginEdit);
 
-            CommitEdit = ReactiveCommand.CreateAsyncTask(
+            CommitEdit = ReactiveCommand.CreateFromTask(
+                DoCommitEdit,
                 Observable.CombineLatest(
                     this.WhenAnyValue(x => x.IsReadOnly),
                     this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
-                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecuteObservable),
-                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost),
-                DoCommitEdit);
+                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecute),
+                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost));
             AddErrorHandler(CommitEdit);
 
-            CancelEdit = ReactiveCommand.Create(CommitEdit.IsExecuting.Select(x => !x));
-            CancelEdit.Subscribe(DoCancelEdit);
+            CancelEdit = ReactiveCommand.Create(DoCancelEdit, CommitEdit.IsExecuting.Select(x => !x));
             AddErrorHandler(CancelEdit);
 
-            OpenOnGitHub = ReactiveCommand.Create(this.WhenAnyValue(x => x.Id).Select(x => x != null));
+            OpenOnGitHub = ReactiveCommand.Create(
+                () => { },
+                this.WhenAnyValue(x => x.Id).Select(x => x != null));
         }
 
         /// <summary>
@@ -131,12 +131,12 @@ namespace GitHub.InlineReviews.ViewModels
         {
         }
 
-        protected void AddErrorHandler<T>(ReactiveCommand<T> command)
+        protected void AddErrorHandler(ReactiveCommand command)
         {
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
         }
 
-        async Task DoDelete(object unused)
+        async Task DoDelete()
         {
             if (commentService.ConfirmCommentDelete())
             {
@@ -145,7 +145,7 @@ namespace GitHub.InlineReviews.ViewModels
                     ErrorMessage = null;
                     IsSubmitting = true;
 
-                    await Thread.DeleteComment.ExecuteAsyncTask(new Tuple<int, int>(PullRequestId, DatabaseId));
+                    await Thread.DeleteComment.Execute(new Tuple<int, int>(PullRequestId, DatabaseId));
                 }
                 catch (Exception e)
                 {
@@ -160,7 +160,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        void DoBeginEdit(object unused)
+        void DoBeginEdit()
         {
             if (state != CommentEditState.Editing)
             {
@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        void DoCancelEdit(object unused)
+        void DoCancelEdit()
         {
             if (EditState == CommentEditState.Editing)
             {
@@ -181,7 +181,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        async Task DoCommitEdit(object unused)
+        async Task DoCommitEdit()
         {
             try
             {
@@ -190,11 +190,11 @@ namespace GitHub.InlineReviews.ViewModels
 
                 if (Id == null)
                 {
-                    await Thread.PostComment.ExecuteAsyncTask(Body);
+                    await Thread.PostComment.Execute(Body);
                 }
                 else
                 {
-                    await Thread.EditComment.ExecuteAsyncTask(new Tuple<string, string>(Id, Body));
+                    await Thread.EditComment.Execute(new Tuple<string, string>(Id, Body));
                 }
             }
             catch (Exception e)
@@ -278,18 +278,18 @@ namespace GitHub.InlineReviews.ViewModels
         public Uri WebUrl { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> BeginEdit { get; }
+        public ReactiveCommand<Unit, Unit> BeginEdit { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> CancelEdit { get; }
+        public ReactiveCommand<Unit, Unit> CancelEdit { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> CommitEdit { get; }
+        public ReactiveCommand<Unit, Unit> CommitEdit { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> Delete { get; }
+        public ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }

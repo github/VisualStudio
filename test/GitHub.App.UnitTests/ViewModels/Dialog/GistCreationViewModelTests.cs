@@ -12,6 +12,7 @@ using Octokit;
 using ReactiveUI;
 using UnitTests;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 public class GistCreationViewModelTests
 {
@@ -47,7 +48,7 @@ public class GistCreationViewModelTests
             var provider = Substitutes.ServiceProvider;
             var vm = CreateViewModel(provider, selectedText, fileName, isPrivate);
             var gistPublishService = provider.GetGistPublishService();
-            vm.CreateGist.Execute(null);
+            vm.CreateGist.Execute();
 
             gistPublishService
                 .Received()
@@ -61,12 +62,12 @@ public class GistCreationViewModelTests
         [TestCase(null, false)]
         [TestCase("", false)]
         [TestCase("Gist.cs", true)]
-        public void CannotCreateGistIfFileNameIsMissing(string fileName, bool expected)
+        public async Task CannotCreateGistIfFileNameIsMissing(string fileName, bool expected)
         {
             var provider = Substitutes.ServiceProvider;
             var vm = CreateViewModel(provider, fileName: fileName);
 
-            var actual = vm.CreateGist.CanExecute(null);
+            var actual = await vm.CreateGist.CanExecute.Take(1);
             Assert.That(expected, Is.EqualTo(actual));
         }
 

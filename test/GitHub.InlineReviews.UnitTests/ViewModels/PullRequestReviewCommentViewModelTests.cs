@@ -160,11 +160,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
         public class TheStartReviewCommand
         {
-            public TheStartReviewCommand()
-            {
-                Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-            }
-
             [Test]
             public void IsDisabledWhenSessionHasPendingReview()
             {
@@ -201,7 +196,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var target = CreateTarget(session);
 
                 target.Body = "body";
-                target.StartReview.Execute(null);
+                target.StartReview.Execute();
 
                 session.Received(1).StartReview();
             }
@@ -252,7 +247,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             bool canPost = true)
         {
             var result = Substitute.For<ICommentThreadViewModel>();
-            result.PostComment.Returns(ReactiveCommand.CreateAsyncTask(_ => Task.CompletedTask));
+            result.PostComment.Returns(ReactiveCommand.CreateFromTask<string>(_ => Task.CompletedTask));
             return result;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Windows.Media.Imaging;
 using GitHub.Models;
 using ReactiveUI;
@@ -34,7 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// A command that opens the DetailsUrl in a browser
         /// </summary>
 
-        ReactiveCommand<object> OpenDetailsUrl { get; }
+        ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
     }
 
     public enum PullRequestCheckStatus

@@ -74,7 +74,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ICommand BrowseForDirectory
+        public ReactiveCommand<Unit, Unit> BrowseForDirectory
         {
             get;
             private set;
@@ -86,7 +86,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public IReactiveCommand<Unit> CreateRepository
+        public ReactiveCommand<Unit, Unit> CreateRepository
         {
             get;
             private set;
@@ -233,7 +233,7 @@ namespace GitHub.SampleData
             }
         }
 
-        public IReactiveCommand<ProgressState> PublishRepository
+        public ReactiveCommand<Unit, ProgressState> PublishRepository
         {
             get;
             private set;

@@ -73,19 +73,19 @@ namespace GitHub.InlineReviews.ViewModels
                     ? x.Comments.Single().CancelEdit.SelectUnit()
                     : Observable.Never<Unit>());
 
-            NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.Enabled),
-                _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
+            NextComment = ReactiveCommand.CreateFromTask(
+                () => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
-                }));
+                }),
+                Observable.Return(nextCommentCommand.Enabled));
 
-            PreviousComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(previousCommentCommand.Enabled),
-                _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
+            PreviousComment = ReactiveCommand.CreateFromTask(
+                () => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
-                }));
+                }),
+                Observable.Return(previousCommentCommand.Enabled));
         }
 
         /// <summary>
@@ -100,12 +100,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets a command which moves to the next inline comment in the file.
         /// </summary>
-        public ReactiveCommand<Unit> NextComment { get; }
+        public ReactiveCommand<Unit, Unit> NextComment { get; }
 
         /// <summary>
         /// Gets a command which moves to the previous inline comment in the file.
         /// </summary>
-        public ReactiveCommand<Unit> PreviousComment { get; }
+        public ReactiveCommand<Unit, Unit> PreviousComment { get; }
 
         public IObservable<Unit> Close { get; }
 
@@ -197,7 +197,7 @@ namespace GitHub.InlineReviews.ViewModels
 
                 if (placeholder?.EditState == CommentEditState.Placeholder)
                 {
-                    await placeholder.BeginEdit.ExecuteAsync(null);
+                    await placeholder.BeginEdit.Execute();
                     placeholder.Body = placeholderBody;
                 }
             }

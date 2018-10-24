@@ -13,9 +13,9 @@ namespace GitHub.InlineReviews.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        ReactiveCommand<Unit> postComment;
-        ReactiveCommand<Unit> editComment;
-        ReactiveCommand<Unit> deleteComment;
+        ReactiveCommand<string, Unit> postComment;
+        ReactiveCommand<Tuple<string, string>, Unit> editComment;
+        ReactiveCommand<Tuple<int, int>, Unit> deleteComment;
 
         /// <summary>
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
@@ -33,7 +33,7 @@ namespace GitHub.InlineReviews.ViewModels
         public ObservableCollection<ICommentViewModel> Comments { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> PostComment
+        public ReactiveCommand<string, Unit> PostComment
         {
             get { return postComment; }
             protected set
@@ -47,7 +47,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<Unit> EditComment
+        public ReactiveCommand<Tuple<string, string>, Unit> EditComment
         {
             get { return editComment; }
             protected set
@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
         }
 
-        public ReactiveCommand<Unit> DeleteComment
+        public ReactiveCommand<Tuple<int, int>, Unit> DeleteComment
         {
             get { return deleteComment; }
             protected set

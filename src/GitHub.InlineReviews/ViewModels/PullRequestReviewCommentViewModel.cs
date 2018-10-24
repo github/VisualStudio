@@ -75,9 +75,7 @@ namespace GitHub.InlineReviews.ViewModels
                 .Select(arg => !arg.isNewComment ? Resources.UpdateComment : arg.hasPendingReview ? Resources.AddSingleComment : Resources.AddReviewComment)
                 .ToProperty(this, x => x.CommitCaption);
 
-            StartReview = ReactiveCommand.CreateAsyncTask(
-                CommitEdit.CanExecuteObservable,
-                DoStartReview);
+            StartReview = ReactiveCommand.CreateFromTask(DoStartReview, CommitEdit.CanExecute);
             AddErrorHandler(StartReview);
         }
 
@@ -154,16 +152,16 @@ namespace GitHub.InlineReviews.ViewModels
         public bool IsPending { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> StartReview { get; }
+        public ReactiveCommand<Unit, Unit> StartReview { get; }
 
-        async Task DoStartReview(object unused)
+        async Task DoStartReview()
         {
             IsSubmitting = true;
 
             try
             {
                 await session.StartReview();
-                await CommitEdit.ExecuteAsync(null);
+                await CommitEdit.Execute();
             }
             finally
             {

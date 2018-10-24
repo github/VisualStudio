@@ -45,14 +45,14 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IPullRequestFilesViewModel Files { get; }
         public ILocalRepositoryModel LocalRepository { get; set; }
         public PullRequestReviewModel Model { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public string OperationError { get; set; }
         public PullRequestDetailModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }
-        public ReactiveCommand<Unit> Approve { get; }
-        public ReactiveCommand<Unit> Comment { get; }
-        public ReactiveCommand<Unit> RequestChanges { get; }
-        public ReactiveCommand<Unit> Cancel { get; }
+        public ReactiveCommand<Unit, Unit> Approve { get; }
+        public ReactiveCommand<Unit, Unit> Comment { get; }
+        public ReactiveCommand<Unit, Unit> RequestChanges { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public Task InitializeAsync(
             ILocalRepositoryModel localRepository,

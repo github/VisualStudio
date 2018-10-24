@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Reactive;
 using ReactiveUI;
 
@@ -22,16 +23,16 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
-        ReactiveCommand<Unit> PostComment { get; }
+        ReactiveCommand<string, Unit> PostComment { get; }
 
         /// <summary>
         /// Called by a comment in the thread to post itself as an edit to a comment to the API.
         /// </summary>
-        ReactiveCommand<Unit> EditComment { get; }
+        ReactiveCommand<Tuple<string, string>, Unit> EditComment { get; }
 
         /// <summary>
         /// Called by a comment in the thread to send a delete of the comment to the API.
         /// </summary>
-        ReactiveCommand<Unit> DeleteComment { get; }
+        ReactiveCommand<Tuple<int, int>, Unit> DeleteComment { get; }
     }
 }

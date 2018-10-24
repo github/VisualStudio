@@ -1,4 +1,5 @@
-﻿using GitHub.Models;
+﻿using System.Reactive;
+using GitHub.Models;
 using Octokit;
 using ReactiveUI;
 
@@ -9,7 +10,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets the command to create a new gist.
         /// </summary>
-        IReactiveCommand<Gist> CreateGist { get; }
+        ReactiveCommand<Unit, Gist> CreateGist { get; }
 
         /// <summary>
         /// True if the gist should be private.
