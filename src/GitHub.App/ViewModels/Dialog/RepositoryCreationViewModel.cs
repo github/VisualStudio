@@ -197,7 +197,8 @@ namespace GitHub.ViewModels.Dialog
                 .Subscribe(x =>
                 {
                     var sorted = x
-                        .OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name))
+                        .Distinct()
+                        .OrderByDescending(item => item.Recommended)
                         .ThenBy(item => item.Name);
                     GitIgnoreTemplates = new[] { GitIgnoreItem.None }.Concat(sorted).ToList();
 
@@ -212,8 +213,9 @@ namespace GitHub.ViewModels.Dialog
                 .Subscribe(x =>
                 {
                     var sorted = x
-                        .OrderByDescending(item => LicenseItem.IsRecommended(item.Name))
-                        .ThenBy(item => item.Name);
+                        .Distinct()
+                        .OrderByDescending(item => item.Recommended)
+                        .ThenBy(item => item.Key);
                     Licenses = new[] { LicenseItem.None }.Concat(sorted).ToList();
                 });
         }

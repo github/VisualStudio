@@ -419,11 +419,11 @@ public class RepositoryCreationViewModelTests
             Assert.True(result[0].Recommended);
             Assert.That("apache-2.0", Is.EqualTo(result[1].Key));
             Assert.True(result[1].Recommended);
-            Assert.That("artistic-2.0", Is.EqualTo(result[2].Key));
+            Assert.That("mit", Is.EqualTo(result[2].Key));
             Assert.True(result[2].Recommended);
             Assert.That("agpl-3.0", Is.EqualTo(result[3].Key));
             Assert.False(result[3].Recommended);
-            Assert.That("mit", Is.EqualTo(result[4].Key));
+            Assert.That("artistic-2.0", Is.EqualTo(result[4].Key));
             Assert.False(result[4].Recommended);
             Assert.That(result[0], Is.EqualTo(vm.SelectedLicense));
         }
