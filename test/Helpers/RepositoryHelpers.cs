@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,6 +50,6 @@ public static class RepositoryHelpers
         var id = new ObjectId(sha);
         var mode = Mode.GitLink;
         index.GetType().InvokeMember("AddEntryToTheIndex", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod, null,
-            index, new object[] { path, id, mode });
+            index, new object[] { path, id, mode }, CultureInfo.InvariantCulture);
     }
 }

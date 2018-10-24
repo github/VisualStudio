@@ -488,7 +488,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 {
                     Login = authorLogin,
                 },
-                Reviews = (reviews ?? new PullRequestReviewModel[0]).ToList()
+                Reviews = (reviews ?? Array.Empty<PullRequestReviewModel>()).ToList()
             };
         }
 
