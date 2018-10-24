@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
+using System.Globalization;
 using System.Collections.Generic;
 using GitHub.Logging;
 using Microsoft.VisualStudio.Shell;
@@ -37,9 +38,9 @@ namespace GitHub.VisualStudio.Helpers
     /// binding path. It will return any alternative paths that is finds.
     /// See https://github.com/github/VisualStudio/issues/1995
     /// </remarks>
-    public class BindingPathHelper
+    public static class BindingPathHelper
     {
-        static readonly ILogger log = LogManager.ForContext<BindingPathHelper>();
+        static readonly ILogger log = LogManager.ForContext(typeof(BindingPathHelper));
 
         internal static void CheckBindingPaths(Assembly assembly, IServiceProvider serviceProvider)
         {
@@ -58,7 +59,7 @@ namespace GitHub.VisualStudio.Helpers
             // Log what has been detected
             log.Warning("Found assembly on wrong binding path {BindingPath}", bindingPath);
 
-            var message = string.Format(@"Found assembly on wrong binding path:
+            var message = string.Format(CultureInfo.CurrentCulture, @"Found assembly on wrong binding path:
 {0}
 
 Would you like to learn more about this issue?", bindingPath);
