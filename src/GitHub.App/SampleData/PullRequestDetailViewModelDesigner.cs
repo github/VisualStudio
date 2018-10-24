@@ -97,7 +97,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Files = new PullRequestFilesViewModelDesigner();
 
-            Checks = new PullRequestCheckViewModelDesigner[0];
+            Checks = Array.Empty<PullRequestCheckViewModelDesigner>();
         }
 
         public PullRequestDetailModel Model { get; }

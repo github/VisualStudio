@@ -12,8 +12,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
     public class PullRequestFilesViewModelTests
     {
-        static readonly Uri Uri = new Uri("http://foo");
-
         [Test]
         public async Task ShouldCreateChangesTreeAsync()
         {
