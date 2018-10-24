@@ -27,47 +27,47 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between BASE and HEAD.
         /// </summary>
-        ReactiveCommand<Unit> DiffFile { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> DiffFile { get; }
 
         /// <summary>
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> as it appears in the PR.
         /// </summary>
-        ReactiveCommand<Unit> ViewFile { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> ViewFile { get; }
 
         /// <summary>
         /// Gets a command that diffs an <see cref="IPullRequestFileNode"/> between the version in
         /// the working directory and HEAD.
         /// </summary>
-        ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> DiffFileWithWorkingDirectory { get; }
 
         /// <summary>
         /// Gets a command that opens an <see cref="IPullRequestFileNode"/> from disk.
         /// </summary>
-        ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFileInWorkingDirectory { get; }
 
         /// <summary>
         /// Gets a command that opens the first comment for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstComment { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
 
         /// <summary>
         /// Gets a command that opens the first annotation notice for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
 
         /// <summary>
         /// Gets a command that opens the first annotation warning for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationWarning { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
 
         /// <summary>
         /// Gets a command that opens the first annotation failure for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationFailure { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         /// <summary>
         /// Initializes the view model.

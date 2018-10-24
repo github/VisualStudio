@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive;
 using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -128,10 +129,10 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestCheckViewModel(IUsageTracker usageTracker)
         {
             this.usageTracker = usageTracker;
-            OpenDetailsUrl = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
+            OpenDetailsUrl = ReactiveCommand.Create(DoOpenDetailsUrl);
         }
 
-        private void DoOpenDetailsUrl(object obj)
+        private void DoOpenDetailsUrl()
         {
             Expression<Func<UsageModel.MeasuresModel, int>> expression;
             if (CheckType == PullRequestCheckType.StatusApi)
@@ -168,7 +169,7 @@ namespace GitHub.ViewModels.GitHubPane
         public Uri DetailsUrl { get; private set; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenDetailsUrl { get; }
+        public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
 
         public string AvatarUrl { get; private set; }
 

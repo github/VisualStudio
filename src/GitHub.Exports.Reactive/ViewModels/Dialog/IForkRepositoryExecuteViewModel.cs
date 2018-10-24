@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using Octokit;
@@ -21,9 +22,9 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user clicks the "Fork" button.
         /// </summary>
-        IReactiveCommand<Repository> CreateFork { get; }
+        ReactiveCommand<Unit, Repository> CreateFork { get; }
 
-        IReactiveCommand<object> BackCommand { get; }
+        ReactiveCommand<Unit, Unit> BackCommand { get; }
 
         bool ResetMasterTracking { get; set; }
 
@@ -36,7 +37,7 @@ namespace GitHub.ViewModels.Dialog
         bool CanResetMasterTracking { get; }
 
         string Error { get; }
-        IObservable<object> Back { get; }
+        IObservable<Unit> Back { get; }
 
         /// <summary>
         /// Initializes the view model.

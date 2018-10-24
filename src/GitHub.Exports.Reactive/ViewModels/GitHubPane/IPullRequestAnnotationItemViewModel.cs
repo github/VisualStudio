@@ -32,6 +32,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which opens the annotation in the diff view.
         /// </summary>
-        ReactiveCommand<Unit> OpenAnnotation { get; }
+        ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
     }
 }

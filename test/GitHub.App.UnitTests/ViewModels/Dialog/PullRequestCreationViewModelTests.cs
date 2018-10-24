@@ -13,6 +13,8 @@ using Octokit;
 using UnitTests;
 using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
+using ReactiveUI.Testing;
+using System.Reactive.Concurrency;
 
 /// <summary>
 /// All the tests in this class are split in subclasses so that when they run
@@ -185,7 +187,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
                 return Observable.Return(pr);
             });
 
-        await vm.CreatePullRequest.ExecuteAsync();
+        await vm.CreatePullRequest.Execute();
 
         var unused2 = gitClient.Received().Push(l2repo, sourceBranchName, remote);
         if (!sourceBranchIsTracking)

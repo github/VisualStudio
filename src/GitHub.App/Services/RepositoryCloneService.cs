@@ -151,6 +151,7 @@ namespace GitHub.Services
                 }
             }
 
+            // Give user a chance to choose a solution
             teamExplorerServices.ShowHomePage();
         }
 

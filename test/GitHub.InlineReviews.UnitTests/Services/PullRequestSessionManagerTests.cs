@@ -20,6 +20,8 @@ using NSubstitute;
 using NUnit.Framework;
 using System.ComponentModel;
 using GitHub.Api;
+using System.Reactive.Concurrency;
+using ReactiveUI.Testing;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -273,10 +275,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -337,10 +339,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(rebuild);
 
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -376,10 +378,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
 
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -490,8 +492,8 @@ Line 4";
                     Assert.That(
                         new[]
                         {
-                                    Tuple.Create(2, DiffSide.Right),
-                                    Tuple.Create(4, DiffSide.Right),
+                                Tuple.Create(2, DiffSide.Right),
+                                Tuple.Create(4, DiffSide.Right),
                         },
                         Is.EqualTo(linesChanged.ToArray()));
                 }
@@ -550,7 +552,7 @@ Line 4";
                 }
             }
 
-            [Test, Ignore("Flaky test, see https://github.com/github/VisualStudio/issues/1795")]
+            [Test]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -870,7 +872,7 @@ Line 4";
             }
             else
             {
-                result.Reviews = new PullRequestReviewModel[0];
+                result.Reviews = Array.Empty<PullRequestReviewModel>();
             }
 
             return result;

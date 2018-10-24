@@ -24,6 +24,7 @@ using ReactiveUI;
 using Rothko;
 using Serilog;
 using IConnection = GitHub.Models.IConnection;
+using UserError = ReactiveUI.Legacy.UserError;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -33,7 +34,7 @@ namespace GitHub.ViewModels.Dialog
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryCreationViewModel>();
 
-        readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<Unit, Unit> browseForDirectoryCommand = ReactiveCommand.Create(() => { });
         readonly IModelServiceFactory modelServiceFactory;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
@@ -119,7 +120,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Fires up a file dialog to select the directory to clone into
         /// </summary>
-        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
+        public ReactiveCommand<Unit, Unit> BrowseForDirectory { get { return browseForDirectoryCommand; } }
 
         /// <summary>
         /// Is running the creation process
@@ -169,7 +170,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Fires off the process of creating the repository remotely and then cloning it locally
         /// </summary>
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRepository { get; private set; }
 
         public IObservable<object> Done => CreateRepository.Select(_ => (object)null);
 
@@ -181,7 +182,7 @@ namespace GitHub.ViewModels.Dialog
 
             accounts = modelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] { }));
+                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
 
             this.WhenAny(x => x.Accounts, x => x.Value)
                 .Select(accts => accts?.FirstOrDefault())
@@ -267,7 +268,7 @@ namespace GitHub.ViewModels.Dialog
             return isAlreadyRepoAtPath;
         }
 
-        IObservable<Unit> OnCreateRepository(object state)
+        IObservable<Unit> OnCreateRepository()
         {
             var newRepository = GatherRepositoryInfo();
 
@@ -279,19 +280,21 @@ namespace GitHub.ViewModels.Dialog
                 .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposCreated).Forget());
         }
 
-        ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
+        ReactiveCommand<Unit, Unit> InitializeCreateRepositoryCommand()
         {
             var canCreate = this.WhenAny(
                 x => x.RepositoryNameValidator.ValidationResult.IsValid,
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value && y.Value);
-            var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
+            var createCommand = ReactiveCommand.CreateFromObservable(OnCreateRepository, canCreate);
             createCommand.ThrownExceptions.Subscribe(ex =>
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     log.Error(ex, "Error creating repository");
+#pragma warning disable CS0618 // Type or member is obsolete
                     UserError.Throw(TranslateRepositoryCreateException(ex));
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
             });
 

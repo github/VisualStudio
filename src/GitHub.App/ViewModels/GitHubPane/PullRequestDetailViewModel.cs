@@ -18,8 +18,10 @@ using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 using Serilog;
 using static System.FormattableString;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -94,44 +96,44 @@ namespace GitHub.ViewModels.GitHubPane
             this.viewViewModelFactory = viewViewModelFactory;
             Files = files;
 
-            Checkout = ReactiveCommand.CreateAsyncObservable(
+            Checkout = ReactiveCommand.CreateFromObservable(
+                DoCheckout,
                 this.WhenAnyValue(x => x.CheckoutState)
                     .Cast<CheckoutCommandState>()
-                    .Select(x => x != null && x.IsEnabled),
-                DoCheckout);
+                    .Select(x => x != null && x.IsEnabled));
             Checkout.IsExecuting.Subscribe(x => isInCheckout = x);
             SubscribeOperationError(Checkout);
 
-            Pull = ReactiveCommand.CreateAsyncObservable(
+            Pull = ReactiveCommand.CreateFromObservable(
+                DoPull,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PullEnabled),
-                DoPull);
+                    .Select(x => x != null && x.PullEnabled));
             SubscribeOperationError(Pull);
 
-            Push = ReactiveCommand.CreateAsyncObservable(
+            Push = ReactiveCommand.CreateFromObservable(
+                DoPush,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.PushEnabled),
-                DoPush);
+                    .Select(x => x != null && x.PushEnabled));
             SubscribeOperationError(Push);
 
-            SyncSubmodules = ReactiveCommand.CreateAsyncTask(
+            SyncSubmodules = ReactiveCommand.CreateFromTask(
+                DoSyncSubmodules,
                 this.WhenAnyValue(x => x.UpdateState)
                     .Cast<UpdateCommandState>()
-                    .Select(x => x != null && x.SyncSubmodulesEnabled),
-                DoSyncSubmodules);
+                    .Select(x => x != null && x.SyncSubmodulesEnabled));
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
-            OpenOnGitHub = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
+            OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
+        
+            ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
 
-            ShowReview = ReactiveCommand.Create().OnExecuteCompleted(DoShowReview);
-
-            ShowAnnotations = ReactiveCommand.Create().OnExecuteCompleted(DoShowAnnotations);
+            ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
         }
 
-        private void DoOpenDetailsUrl(object obj)
+        private void DoOpenDetailsUrl()
         {
             usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
@@ -249,25 +251,25 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> Checkout { get; }
+        public ReactiveCommand<Unit, Unit> Checkout { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> Pull { get; }
+        public ReactiveCommand<Unit, Unit> Pull { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> Push { get; }
+        public ReactiveCommand<Unit, Unit> Push { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> SyncSubmodules { get; }
+        public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> ShowReview { get; }
+        public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> ShowAnnotations { get; }
+        public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<IPullRequestCheckViewModel> Checks
@@ -497,10 +499,9 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void SubscribeOperationError(ReactiveCommand<Unit> command)
+        void SubscribeOperationError(ReactiveCommand<Unit, Unit> command)
         {
             command.ThrownExceptions.Subscribe(x => OperationError = x.Message);
-            command.IsExecuting.Select(x => x).Subscribe(x => OperationError = null);
         }
 
         static string GetBranchDisplayName(bool isFromFork, string owner, string label)
@@ -515,8 +516,10 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        IObservable<Unit> DoCheckout(object unused)
+        IObservable<Unit> DoCheckout()
         {
+            OperationError = null;
+
             return Observable.Defer(async () =>
             {
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, Model).ToList();
@@ -540,8 +543,10 @@ namespace GitHub.ViewModels.GitHubPane
             });
         }
 
-        IObservable<Unit> DoPull(object unused)
+        IObservable<Unit> DoPull()
         {
+            OperationError = null;
+
             return pullRequestsService.Pull(LocalRepository)
                 .Do(_ =>
                 {
@@ -552,8 +557,10 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        IObservable<Unit> DoPush(object unused)
+        IObservable<Unit> DoPush()
         {
+            OperationError = null;
+
             return pullRequestsService.Push(LocalRepository)
                 .Do(_ =>
                 {
@@ -564,11 +571,12 @@ namespace GitHub.ViewModels.GitHubPane
                 });
         }
 
-        async Task DoSyncSubmodules(object unused)
+        async Task DoSyncSubmodules()
         {
             try
             {
                 IsBusy = true;
+                OperationError = null;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
                 var result = await syncSubmodulesCommand.SyncSubmodules();
@@ -585,10 +593,8 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowReview(object item)
+        void DoShowReview(IPullRequestReviewSummaryViewModel review)
         {
-            var review = (PullRequestReviewSummaryViewModel)item;
-
             if (review.State == PullRequestReviewState.Pending)
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
@@ -599,9 +605,8 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowAnnotations(object item)
+        void DoShowAnnotations(IPullRequestCheckViewModel checkView)
         {
-            var checkView = (PullRequestCheckViewModel)item;
             NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/checkruns/{checkView.CheckRunId}"));
         }
 

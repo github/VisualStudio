@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
@@ -32,7 +33,7 @@ namespace GitHub.SampleData
 
         public IRepositoryModel DestinationRepository { get; }
 
-        public IReactiveCommand<object> SwitchFork => null;
+        public ReactiveCommand<Unit, Unit> SwitchFork => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Extensions;
@@ -71,7 +72,7 @@ namespace GitHub.ViewModels.TeamExplorer
                 .SelectMany(async c => (await modelServiceFactory.CreateAsync(c)).GetAccounts())
                 .Switch()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] {}));
+                .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
 
             this.WhenAny(x => x.Accounts, x => x.Value)
                 .WhereNotNull()
@@ -117,7 +118,7 @@ namespace GitHub.ViewModels.TeamExplorer
         public string Title { get { return title.Value; } }
         public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
-        public IReactiveCommand<ProgressState> PublishRepository { get; private set; }
+        public ReactiveCommand<Unit, ProgressState> PublishRepository { get; private set; }
         public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }
 
         bool isBusy;
@@ -144,13 +145,13 @@ namespace GitHub.ViewModels.TeamExplorer
             get { return isHostComboBoxVisible.Value; }
         }
 
-        ReactiveCommand<ProgressState> InitializePublishRepositoryCommand()
+        ReactiveCommand<Unit, ProgressState> InitializePublishRepositoryCommand()
         {
             var canCreate = this.WhenAny(x => x.RepositoryNameValidator.ValidationResult.IsValid, x => x.Value);
-            return ReactiveCommand.CreateAsyncObservable(canCreate, OnPublishRepository);
+            return ReactiveCommand.CreateFromObservable(OnPublishRepository, canCreate);
         }
 
-        IObservable<ProgressState> OnPublishRepository(object arg)
+        IObservable<ProgressState> OnPublishRepository()
         {
             var newRepository = GatherRepositoryInfo();
             var account = SelectedAccount;

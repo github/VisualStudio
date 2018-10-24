@@ -32,17 +32,9 @@ namespace GitHub.InlineReviews.ViewModels
 
             Session = session;
 
-            PostComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(true),
-                DoPostComment);
-
-            EditComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(true),
-                DoEditComment);
-
-            DeleteComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(true),
-                DoDeleteComment);
+            PostComment = ReactiveCommand.CreateFromTask<string>(DoPostComment);
+            EditComment = ReactiveCommand.CreateFromTask<Tuple<string, string>>(DoEditComment);
+            DeleteComment = ReactiveCommand.CreateFromTask<Tuple<int, int>>(DoDeleteComment);
 
             foreach (var comment in comments)
             {
@@ -63,28 +55,25 @@ namespace GitHub.InlineReviews.ViewModels
         /// </summary>
         public IPullRequestSession Session { get; }
 
-        async Task DoPostComment(object parameter)
+        async Task DoPostComment(string body)
         {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(body, nameof(body));
 
-            var body = (string)parameter;
             var replyId = Comments[0].Id;
             await Session.PostReviewComment(body, replyId);
         }
 
-        async Task DoEditComment(object parameter)
+        async Task DoEditComment(Tuple<string, string> idAndBody)
         {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(idAndBody, nameof(idAndBody));
 
-            var item = (Tuple<string, string>)parameter;
-            await Session.EditComment(item.Item1, item.Item2);
+            await Session.EditComment(idAndBody.Item1, idAndBody.Item2);
         }
 
-        async Task DoDeleteComment(object parameter)
+        async Task DoDeleteComment(Tuple<int, int> item)
         {
-            Guard.ArgumentNotNull(parameter, nameof(parameter));
+            Guard.ArgumentNotNull(item, nameof(item));
 
-            var item = (Tuple<int, int>)parameter;
             await Session.DeleteComment(item.Item1, item.Item2);
         }
     }

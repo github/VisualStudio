@@ -97,7 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which opens the item passed as a parameter.
         /// </summary>
-        ReactiveCommand<Unit> OpenItem { get; }
+        ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
 
         /// <summary>
         /// Initializes the view model.

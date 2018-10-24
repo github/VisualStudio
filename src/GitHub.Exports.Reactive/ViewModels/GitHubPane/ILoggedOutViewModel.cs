@@ -12,11 +12,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the command executed when the user clicks the "Sign in" link.
         /// </summary>
-        IReactiveCommand<object> SignIn { get; }
+        ReactiveCommand<Unit, Unit> SignIn { get; }
 
         /// <summary>
         /// Gets the command executed when the user clicks the "Create an Account" link.
         /// </summary>
-        IReactiveCommand<object> Register { get; }
+        ReactiveCommand<Unit, Unit> Register { get; }
     }
 }

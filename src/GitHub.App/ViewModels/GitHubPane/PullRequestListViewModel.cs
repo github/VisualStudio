@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -50,8 +51,8 @@ namespace GitHub.ViewModels.GitHubPane
             webUrl = this.WhenAnyValue(x => x.RemoteRepository)
                 .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("pulls"))
                 .ToProperty(this, x => x.WebUrl);
-            CreatePullRequest = ReactiveCommand.Create().OnExecuteCompleted(_ => NavigateTo("pull/new"));
-            OpenItemInBrowser = ReactiveCommand.Create();
+            CreatePullRequest = ReactiveCommand.Create(() => NavigateTo("pull/new"));
+            OpenItemInBrowser = ReactiveCommand.Create<IPullRequestListItemViewModel, IPullRequestListItemViewModel>(x => x);
         }
 
         /// <inheritdoc/>
@@ -61,10 +62,10 @@ namespace GitHub.ViewModels.GitHubPane
         public Uri WebUrl => webUrl.Value;
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenItemInBrowser { get; }
+        public ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
 
         /// <inheritdoc/>
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.ViewModels;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -63,7 +65,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateComments("Comment 1", "Comment 2"));
 
             target.Comments[2].Body = "New Comment";
-            target.Comments[2].CommitEdit.Execute(null);
+            target.Comments[2].CommitEdit.Execute();
 
             session.Received(1).PostReviewComment("New Comment", "1");
         }
@@ -87,7 +89,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             foreach (var body in bodies)
             {
-                yield return CreateComment((id++).ToString(), body);
+                yield return CreateComment((id++).ToString(CultureInfo.InvariantCulture), body);
             }
         }
 

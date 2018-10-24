@@ -13,6 +13,6 @@ namespace GitHub.SampleData
         public bool IsExpanded { get; set; }
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
         public bool IsFileInPullRequest { get; set;  }
-        public ReactiveCommand<Unit> OpenAnnotation { get; }
+        public ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
     }
 }
