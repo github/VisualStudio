@@ -20,7 +20,6 @@ namespace GitHub.App.ViewModels.GitHubPane
     {
         private readonly IPullRequestSessionManager sessionManager;
 
-        IPullRequestSession session;
         string title;
         string checkSuiteName;
         string checkRunName;
@@ -57,8 +56,8 @@ namespace GitHub.App.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 CheckRunId = checkRunId;
-                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
-                await Load(session.PullRequest);
+                var session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                Load(session.PullRequest);
             }
             finally
             {
@@ -109,19 +108,18 @@ namespace GitHub.App.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref annotations, value); }
         }
 
-        async Task Load(PullRequestDetailModel pullRequest)
+        void Load(PullRequestDetailModel pullRequest)
         {
             IsBusy = true;
 
             try
             {
-                await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
                 var checkSuiteRun = pullRequest
                     .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns
                             .Select(checkRun => new{checkSuite, checkRun}))
-                    .First(arg => arg.checkRun.DatabaseId == CheckRunId);
+                    .First(arg => arg.checkRun.Name == CheckRunName);
 
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
