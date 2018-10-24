@@ -131,6 +131,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Testing", "submo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Wpf", "submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj", "{E899B03C-6E8E-4375-AB65-FC925D721D8B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstallAndStart", "test\Launcher\InstallAndStart.csproj", "{79F32BE1-2764-4DBA-97F6-21053DE44270}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -530,6 +532,16 @@ Global
 		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{E899B03C-6E8E-4375-AB65-FC925D721D8B}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.DebugCodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.DebugCodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{79F32BE1-2764-4DBA-97F6-21053DE44270}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
