@@ -55,19 +55,19 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command that opens the first annotation notice for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
 
         /// <summary>
         /// Gets a command that opens the first annotation warning for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationWarning { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
 
         /// <summary>
         /// Gets a command that opens the first annotation failure for a <see cref="IPullRequestFileNode"/> in
         /// the diff viewer.
         /// </summary>
-        ReactiveCommand<Unit> OpenFirstAnnotationFailure { get; }
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         /// <summary>
         /// Initializes the view model.

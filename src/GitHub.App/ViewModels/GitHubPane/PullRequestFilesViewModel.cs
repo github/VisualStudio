@@ -66,20 +66,14 @@ namespace GitHub.ViewModels.GitHubPane
                 }
             });
 
-            OpenFirstAnnotationNotice = ReactiveCommand.CreateAsyncTask(async x =>
-            {
-                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Notice);
-            });
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice));
 
-            OpenFirstAnnotationWarning = ReactiveCommand.CreateAsyncTask(async x =>
-            {
-                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Warning);
-            });
+            OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
 
-            OpenFirstAnnotationFailure = ReactiveCommand.CreateAsyncTask(async x =>
-            {
-                await OpenFirstAnnotation(editorService, (IPullRequestFileNode) x, CheckAnnotationLevel.Failure);
-            });
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
         }
 
         private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
@@ -187,13 +181,13 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFirstAnnotationNotice { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFirstAnnotationWarning { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFirstAnnotationFailure { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         static int CountComments(
             IEnumerable<IInlineCommentThreadModel> thread,

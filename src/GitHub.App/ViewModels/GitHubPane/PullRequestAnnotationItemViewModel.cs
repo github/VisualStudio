@@ -41,10 +41,9 @@ namespace GitHub.App.ViewModels.GitHubPane
 
             IsFileInPullRequest = session.PullRequest.ChangedFiles.Any(model => model.FileName == annotation.Path);
 
-            OpenAnnotation = ReactiveCommand.CreateAsyncTask(Observable.Return(IsFileInPullRequest), async x =>
-            {
-                await editorService.OpenDiff(session, annotation.Path, checkSuite.HeadSha, annotation.EndLine - 1);
-            });
+            OpenAnnotation = ReactiveCommand.CreateFromTask<Unit>(
+                async _ => await editorService.OpenDiff(session, annotation.Path, checkSuite.HeadSha, annotation.EndLine - 1),
+                Observable.Return(IsFileInPullRequest));
         }
 
         /// <inheritdoc />
@@ -57,7 +56,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
 
         /// <inheritdoc />
-        public ReactiveCommand<Unit> OpenAnnotation { get; }
+        public ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
 
         /// <inheritdoc />
         public bool IsExpanded

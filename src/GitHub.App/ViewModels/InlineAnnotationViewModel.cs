@@ -1,4 +1,5 @@
 ﻿using GitHub.Models;
+using GitHub.ViewModels;
 
 namespace GitHub.InlineReviews.ViewModels
 {

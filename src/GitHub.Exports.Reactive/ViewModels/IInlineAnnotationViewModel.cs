@@ -1,6 +1,6 @@
 ﻿using GitHub.Models;
 
-namespace GitHub.InlineReviews.ViewModels
+namespace GitHub.ViewModels
 {
     /// <summary>
     /// A view model that represents a single inline annotation.
