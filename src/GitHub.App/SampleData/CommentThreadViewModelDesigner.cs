@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
+using GitHub.InlineReviews.ViewModels;
+using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
 

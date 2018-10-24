@@ -81,7 +81,6 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
-    <Compile Include="SampleData\InlineAnnotationViewModelDesigner.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -117,9 +116,6 @@
     <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
     <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
-    <Compile Include="Views\InlineAnnotationView.xaml.cs">
-      <DependentUpon>InlineAnnotationView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
       <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
     </Compile>
@@ -429,10 +425,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Tags\ShowInlineCommentAnnotationGlyph.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\InlineAnnotationView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

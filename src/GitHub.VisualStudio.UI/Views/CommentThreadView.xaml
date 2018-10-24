@@ -14,7 +14,7 @@
         <ItemsControl ItemsSource="{Binding Annotations}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:InlineAnnotationView Margin="0 4"/>
+                    <local:InlineAnnotationView />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

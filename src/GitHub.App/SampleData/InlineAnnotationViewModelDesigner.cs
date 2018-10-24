@@ -3,7 +3,7 @@ using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.ViewModels;
 
-namespace GitHub.InlineReviews.SampleData
+namespace GitHub.SampleData
 {
     public class InlineAnnotationViewModelDesigner : IInlineAnnotationViewModel
     {
