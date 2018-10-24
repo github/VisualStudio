@@ -148,7 +148,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Path_Is_Initialized()
+        public void Path_Is_Initialized()
         {
             var target = CreateTarget();
 
@@ -156,7 +156,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Owner_And_Repository_Name_Is_Appended_To_Base_Path()
+        public void Owner_And_Repository_Name_Is_Appended_To_Base_Path()
         {
             var owner = "owner";
             var repo = "repo";
@@ -169,7 +169,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Not_Set_When_No_Repository_Selected()
+        public void PathWarning_Is_Not_Set_When_No_Repository_Selected()
         {
             var target = CreateTarget();
 
@@ -179,7 +179,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_File_At_Destination()
+        public void PathWarning_Is_Set_For_Existing_File_At_Destination()
         {
             var target = CreateTarget();
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
@@ -189,7 +189,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_Clone_At_Destination()
+        public void PathWarning_Is_Set_For_Existing_Clone_At_Destination()
         {
             var owner = "owner";
             var repo = "repo";
@@ -203,7 +203,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Repository_With_No_Origin()
+        public void PathWarning_Is_Set_For_Repository_With_No_Origin()
         {
             var owner = "owner";
             var repo = "repo";
@@ -216,7 +216,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Directory_With_No_Repository()
+        public void PathWarning_Is_Set_For_Directory_With_No_Repository()
         {
             var owner = "owner";
             var repo = "repo";
@@ -229,7 +229,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_Repository_At_Destination_With_Different_Remote()
+        public void PathWarning_Is_Set_For_Existing_Repository_At_Destination_With_Different_Remote()
         {
             var originalOwner = "original_Owner";
             var forkedOwner = "forked_owner";
@@ -246,7 +246,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
+        public void Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
         {
             var target = CreateTarget();
 
@@ -281,7 +281,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Description = "Owner deleted")]
         [TestCase("c:\\base", "same/same", "c:\\base\\same\\same", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Owner and repo have same name")]
-        public async Task User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
+        public void User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
         {
             var target = CreateTarget(defaultClonePath: defaultClonePath);
             SetRepository(target.GitHubTab, CreateRepositoryModel(repo1));

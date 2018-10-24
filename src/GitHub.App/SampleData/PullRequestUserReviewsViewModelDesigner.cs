@@ -27,7 +27,7 @@ namespace GitHub.SampleData
                 {
                     IsExpanded = true,
                     HasDetails = true,
-                    FileComments = new IPullRequestReviewFileCommentViewModel[0],
+                    FileComments = Array.Empty<IPullRequestReviewFileCommentViewModel>(),
                     StateDisplay = "approved",
                     Model = new PullRequestReviewModel
                     {

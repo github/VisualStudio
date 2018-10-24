@@ -13,58 +13,46 @@ public class ListenerCollectionTests : TestBase
     [Test]
     public void StickyItemShouldNotBePresentInitiallyWhereNoSelectionHasHappened()
     {
-        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-        {
-            var source = CreateSource();
-            var stickie = new Thing();
-            var selection = Observable.Empty<Thing>();
-            var target = source.CreateListenerCollection(stickie, selection);
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = Observable.Empty<Thing>();
+        var target = source.CreateListenerCollection(stickie, selection);
 
-            CollectionAssert.AreEqual(source, target);
-        }
+        CollectionAssert.AreEqual(source, target);
     }
 
     [Test]
     public void StickyItemShouldNotBePresentAfterCreationWhenSelectionNull()
     {
-        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-        {
-            var source = CreateSource();
-            var stickie = new Thing();
-            var selection = Observable.Return<Thing>(null);
-            var target = source.CreateListenerCollection(stickie, selection);
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = Observable.Return<Thing>(null);
+        var target = source.CreateListenerCollection(stickie, selection);
 
-            CollectionAssert.AreEqual(source, target);
-        }
+        CollectionAssert.AreEqual(source, target);
     }
 
     [Test]
     public void StickyItemShouldBePresentAfterCreationWhenSelectionNotNull()
     {
-        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-        {
-            var source = CreateSource();
-            var stickie = new Thing();
-            var selection = Observable.Return(source[0]);
-            var target = source.CreateListenerCollection(stickie, selection);
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = Observable.Return(source[0]);
+        var target = source.CreateListenerCollection(stickie, selection);
 
-            var expected = new[] { stickie }.Concat(source);
-            CollectionAssert.AreEqual(expected, target);
-        }
+        var expected = new[] { stickie }.Concat(source);
+        CollectionAssert.AreEqual(expected, target);
     }
 
     [Test]
     public void StickyItemShouldNotBePresentAfterCreationWhenSelectionIsStickyItem()
     {
-        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-        {
-            var source = CreateSource();
-            var stickie = new Thing();
-            var selection = Observable.Return(stickie);
-            var target = source.CreateListenerCollection(stickie, selection);
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = Observable.Return(stickie);
+        var target = source.CreateListenerCollection(stickie, selection);
 
-            CollectionAssert.AreEqual(source, target);
-        }
+        CollectionAssert.AreEqual(source, target);
     }
 
     [Test]
@@ -129,21 +117,18 @@ public class ListenerCollectionTests : TestBase
     [Test]
     public void ResetingTrackingCollectionWorks()
     {
-        using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-        {
-            var source = CreateSource();
-            var stickie = new Thing();
-            var selection = new ReplaySubject<Thing>();
-            var target = source.CreateListenerCollection(stickie, selection);
-            selection.OnNext(stickie);
-            selection.OnNext(null);
-            CollectionAssert.AreEqual(source, target);
-            source.Filter = (a, b, c) => true;
-            CollectionAssert.AreEqual(source, target);
-        }
+        var source = CreateSource();
+        var stickie = new Thing();
+        var selection = new ReplaySubject<Thing>();
+        var target = source.CreateListenerCollection(stickie, selection);
+        selection.OnNext(stickie);
+        selection.OnNext(null);
+        CollectionAssert.AreEqual(source, target);
+        source.Filter = (a, b, c) => true;
+        CollectionAssert.AreEqual(source, target);
     }
 
-    TrackingCollection<Thing> CreateSource()
+    static TrackingCollection<Thing> CreateSource()
     {
         var result = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         result.Subscribe();
