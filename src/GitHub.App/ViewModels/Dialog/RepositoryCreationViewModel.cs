@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -176,7 +177,7 @@ namespace GitHub.ViewModels.Dialog
 
         public async Task InitializeAsync(IConnection connection)
         {
-            modelService = await modelServiceFactory.CreateAsync(connection);
+            modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, connection.HostAddress.Title);
 
@@ -189,20 +190,32 @@ namespace GitHub.ViewModels.Dialog
                 .WhereNotNull()
                 .Subscribe(a => SelectedAccount = a);
 
-            GitIgnoreTemplates = TrackingCollection.CreateListenerCollectionAndRun(
-                modelService.GetGitIgnoreTemplates(),
-                new[] { GitIgnoreItem.None },
-                OrderedComparer<GitIgnoreItem>.OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name)).Compare,
-                x =>
+            modelService.GetGitIgnoreTemplates()
+                .Where(x => x != null)
+                .ToList()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
                 {
-                    if (x.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase))
-                        SelectedGitIgnoreTemplate = x;
+                    var sorted = x
+                        .OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name))
+                        .ThenBy(item => item.Name);
+                    GitIgnoreTemplates = new[] { GitIgnoreItem.None }.Concat(sorted).ToList();
+
+                    SelectedGitIgnoreTemplate = GitIgnoreTemplates
+                        .FirstOrDefault(i => i?.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase) == true);
                 });
 
-            Licenses = TrackingCollection.CreateListenerCollectionAndRun(
-                modelService.GetLicenses(),
-                new[] { LicenseItem.None },
-                OrderedComparer<LicenseItem>.OrderByDescending(item => LicenseItem.IsRecommended(item.Name)).Compare);
+            modelService.GetLicenses()
+                .Where(x => x != null)
+                .ToList()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    var sorted = x
+                        .OrderByDescending(item => LicenseItem.IsRecommended(item.Name))
+                        .ThenBy(item => item.Name);
+                    Licenses = new[] { LicenseItem.None }.Concat(sorted).ToList();
+                });
         }
 
         protected override NewRepository GatherRepositoryInfo()

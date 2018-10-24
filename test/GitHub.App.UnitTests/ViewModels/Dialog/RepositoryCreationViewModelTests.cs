@@ -18,6 +18,7 @@ using UnitTests;
 using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
 using System.Windows.Input;
+using System.Reactive.Concurrency;
 
 public class RepositoryCreationViewModelTests
 {
@@ -375,18 +376,14 @@ public class RepositoryCreationViewModelTests
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
             var vm = GetMeAViewModel(provider, modelService: modelService);
-
-            // this is how long the default collection waits to process about 5 things with the default UI settings
-            await Task.Delay(100);
-
             var result = vm.GitIgnoreTemplates;
 
             Assert.That(5, Is.EqualTo(result.Count));
             Assert.That("None", Is.EqualTo(result[0].Name));
             Assert.True(result[0].Recommended);
-            Assert.That("VisualStudio", Is.EqualTo(result[1].Name));
+            Assert.That("Node", Is.EqualTo(result[1].Name));
             Assert.True(result[1].Recommended);
-            Assert.That("Node", Is.EqualTo(result[2].Name));
+            Assert.That("VisualStudio", Is.EqualTo(result[2].Name));
             Assert.True(result[2].Recommended);
             Assert.That("Waf", Is.EqualTo(result[3].Name));
             Assert.False(result[3].Recommended);
@@ -414,9 +411,6 @@ public class RepositoryCreationViewModelTests
                 .Returns(licenses.ToObservable());
             var vm = GetMeAViewModel(provider, modelService: modelService);
 
-            // this is how long the default collection waits to process about 5 things with the default UI settings
-            await Task.Delay(100);
-
             var result = vm.Licenses;
 
             Assert.That(5, Is.EqualTo(result.Count));
@@ -425,11 +419,11 @@ public class RepositoryCreationViewModelTests
             Assert.True(result[0].Recommended);
             Assert.That("apache-2.0", Is.EqualTo(result[1].Key));
             Assert.True(result[1].Recommended);
-            Assert.That("mit", Is.EqualTo(result[2].Key));
+            Assert.That("artistic-2.0", Is.EqualTo(result[2].Key));
             Assert.True(result[2].Recommended);
             Assert.That("agpl-3.0", Is.EqualTo(result[3].Key));
             Assert.False(result[3].Recommended);
-            Assert.That("artistic-2.0", Is.EqualTo(result[4].Key));
+            Assert.That("mit", Is.EqualTo(result[4].Key));
             Assert.False(result[4].Recommended);
             Assert.That(result[0], Is.EqualTo(vm.SelectedLicense));
         }
