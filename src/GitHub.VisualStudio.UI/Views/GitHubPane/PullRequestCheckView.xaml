@@ -22,7 +22,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid>
+    <Grid Margin="0 0 0 8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
@@ -42,7 +42,7 @@
             <Image Grid.Column="1" Source="{Binding Avatar}" Height="16" Width="16" />
         -->
         <TextBlock Grid.Column="1" Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold" LineHeight="20" Text="{Binding Title}" />
-        <TextBlock Grid.Column="1" Grid.Row="1" Opacity="60" Text="{Binding Description}" LineHeight="20" ToolTip="{Binding Description}" />
+        <TextBlock Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource VsBrush.GrayText}" Text="{Binding Description}" LineHeight="20" ToolTip="{Binding Description}" />
         <TextBlock Grid.Column="3" Grid.Row="1" LineHeight="20" HorizontalAlignment="Right"
                Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
             <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
