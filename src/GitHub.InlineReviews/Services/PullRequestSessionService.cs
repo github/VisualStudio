@@ -774,7 +774,9 @@ namespace GitHub.InlineReviews.Services
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
-                                                  Summary = run.Summary,
+                                                  Title = run.Title,
+                                                  StartedAt = run.StartedAt,
+                                                  CompletedAt = run.CompletedAt
                                               }).ToList()
                                       }).ToList(),
                                   Statuses = commit.Commit.Status

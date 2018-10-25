@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text;
 using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
@@ -92,7 +93,23 @@ namespace GitHub.ViewModels.GitHubPane
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
                     pullRequestCheckViewModel.Title = model.Name;
-                    pullRequestCheckViewModel.Description = model.Summary;
+
+                    var description = new StringBuilder(model.Conclusion.ToString());
+
+                    if (model.StartedAt.HasValue && model.CompletedAt.HasValue)
+                    {
+                        description.Append(" in ");
+                        var timeSpan = model.CompletedAt.Value - model.StartedAt.Value;
+                        description.Append(timeSpan.ToString());
+                    }
+
+                    if (!string.IsNullOrEmpty(model.Title))
+                    {
+                        description.Append(" - ");
+                        description.Append(model.Title);
+                    }
+
+                    pullRequestCheckViewModel.Description = description.ToString();
                     pullRequestCheckViewModel.Status = checkStatus;
                     pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
 

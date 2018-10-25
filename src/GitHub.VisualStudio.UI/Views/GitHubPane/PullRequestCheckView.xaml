@@ -22,6 +22,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
+    <StackPanel Orientation="Vertical">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
@@ -50,5 +51,9 @@
             <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>
     </Grid>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="{Binding Description}" />
+        </StackPanel>
+    </StackPanel>
 </local:GenericPullRequestCheckView>
 

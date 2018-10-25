@@ -17,6 +17,11 @@ namespace GitHub.Models
         public CheckStatusState Status { get; set; }
 
         /// <summary>
+        /// Identifies the date and time when the check run was started.
+        /// </summary>
+        public DateTimeOffset? StartedAt { get; set; }
+
+        /// <summary>
         /// Identifies the date and time when the check run was completed.
         /// </summary>
         public DateTimeOffset? CompletedAt { get; set; }
@@ -30,8 +35,8 @@ namespace GitHub.Models
         public string DetailsUrl { get; set; }
 
         /// <summary>
-        /// The summary of a Check Run.
+        /// The title of a Check Run.
         /// </summary>
-        public string Summary { get; set; }
+        public string Title { get; set; }
     }
 }
