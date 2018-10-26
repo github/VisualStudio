@@ -112,6 +112,7 @@
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static ghfvs:Resources.Open}" Command="{Binding OpenItem}"/>
+                        <MenuItem Header="{x:Static ghfvs:Resources.OpenConversation}" Command="{Binding OpenConversation}"/>
                         <MenuItem Header="{x:Static ghfvs:Resources.openInBrowser}" Command="{Binding OpenItemInBrowser}"/>
                     </ContextMenu>
                 </ListBox.ContextMenu>

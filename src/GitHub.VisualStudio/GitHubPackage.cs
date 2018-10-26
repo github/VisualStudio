@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using GitHub.ViewModels.Documents;
 
 namespace GitHub.VisualStudio
 {
@@ -161,6 +162,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
+    [ProvideToolWindow(typeof(IssueishDocumentPane), DocumentLikeTool = true)]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
@@ -215,6 +217,12 @@ namespace GitHub.VisualStudio
             return await gitHubPane.GetViewModelAsync();
         }
 
+        public async Task<IIssueishPaneViewModel> OpenIssueishDocumentPane()
+        {
+            var pane = (IssueishDocumentPane)ShowToolWindow(new Guid(IssueishDocumentPane.IssueishDocumentPaneGuid));
+            return await pane.GetViewModelAsync();
+        }
+
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
         {
             IVsWindowFrame frame;
@@ -236,7 +244,7 @@ namespace GitHub.VisualStudio
                 log.Error("Unable to grab instance of GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
-            return docView as GitHubPane;
+            return docView as ToolWindowPane;
         }
 
         async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)

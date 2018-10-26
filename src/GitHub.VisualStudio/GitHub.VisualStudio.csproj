@@ -338,6 +338,7 @@
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\OpenIssueishDocumentCommand.cs" />
     <Compile Include="Commands\SyncSubmodulesCommand.cs" />
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
@@ -373,7 +374,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\IssueishDocumentPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>

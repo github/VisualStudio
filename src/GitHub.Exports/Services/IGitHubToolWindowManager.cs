@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using GitHub.ViewModels.GitHubPane;
+using GitHub.ViewModels.Documents;
 
-namespace GitHub.ViewModels.GitHubPane
+namespace GitHub.Services
 {
     /// <summary>
     /// The Visual Studio service interface for accessing the GitHub Pane.
@@ -16,5 +18,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// </summary>
         /// <returns>The view model for the GitHub Pane.</returns>
         Task<IGitHubPaneViewModel> ShowGitHubPane();
+
+        /// <summary>
+        /// Opens a new issue or pull request document pane.
+        /// </summary>
+        /// <returns>>The view model for the document pane.</returns>
+        Task<IIssueishPaneViewModel> OpenIssueishDocumentPane();
     }
 }

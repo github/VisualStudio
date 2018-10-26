@@ -13,6 +13,7 @@ namespace GitHub.VisualStudio
         public const int syncSubmodulesCommand = 0x203;
         public const int openFromUrlCommand = 0x204;
         public const int openFromClipboardCommand = 0x205;
+        public const int showIssueishDocumentCommand = 0x206;
 
         public const int backCommand = 0x300;
         public const int forwardCommand = 0x301;

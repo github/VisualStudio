@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -26,6 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestService service;
         readonly IDisposable subscription;
+        readonly IOpenIssueishDocumentCommand openDocumentCommand;
         ObservableAsPropertyHelper<Uri> webUrl;
 
         /// <summary>
@@ -38,20 +40,24 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestListViewModel(
             IPullRequestSessionManager sessionManager,
             IRepositoryService repositoryService,
-            IPullRequestService service)
+            IPullRequestService service,
+            IOpenIssueishDocumentCommand openDocumentCommand)
             : base(repositoryService)
         {
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(openDocumentCommand, nameof(openDocumentCommand));
 
             this.sessionManager = sessionManager;
             this.service = service;
+            this.openDocumentCommand = openDocumentCommand;
 
             subscription = sessionManager.WhenAnyValue(x => x.CurrentSession.PullRequest.Number).Subscribe(UpdateCurrent);
             webUrl = this.WhenAnyValue(x => x.RemoteRepository)
                 .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("pulls"))
                 .ToProperty(this, x => x.WebUrl);
             CreatePullRequest = ReactiveCommand.Create(() => NavigateTo("pull/new"));
+            OpenConversation = ReactiveCommand.Create<IPullRequestListItemViewModel>(DoOpenConversation);
             OpenItemInBrowser = ReactiveCommand.Create<IPullRequestListItemViewModel, IPullRequestListItemViewModel>(x => x);
         }
 
@@ -63,6 +69,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestListItemViewModel, Unit> OpenConversation { get; }
 
         /// <inheritdoc/>
         public ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
@@ -89,6 +98,16 @@ namespace GitHub.ViewModels.GitHubPane
                 LocalRepository.Owner,
                 LocalRepository.Name,
                 after);
+        }
+
+        void DoOpenConversation(IIssueListItemViewModelBase item)
+        {
+            var p = new OpenIssueishParams(
+                HostAddress.Create(LocalRepository.CloneUrl),
+                RemoteRepository.Owner,
+                RemoteRepository.Name,
+                item.Number);
+            openDocumentCommand.Execute(p);
         }
 
         void UpdateCurrent(int number)

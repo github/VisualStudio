@@ -836,4 +836,7 @@ https://git-scm.com/download/win</value>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
+  <data name="OpenConversation" xml:space="preserve">
+    <value>Open Conversation</value>
+  </data>
 </root>
