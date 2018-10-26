@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.InlineReviews.Services;
-using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels;
@@ -10,36 +8,38 @@ using NSubstitute;
 using NUnit.Framework;
 using ReactiveUI;
 
-namespace GitHub.InlineReviews.UnitTests.ViewModels
+namespace GitHub.App.UnitTests.ViewModels
 {
     public class PullRequestReviewCommentViewModelTests
     {
         public class TheCanStartReviewProperty
         {
             [Test]
-            public void IsFalseWhenSessionHasPendingReview()
+            public async Task IsFalseWhenSessionHasPendingReview()
             {
-                var session = CreateSession(true);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(
+                    session: session,
+                    review: CreateReview(PullRequestReviewState.Pending));
 
                 Assert.That(target.CanStartReview, Is.False);
             }
 
             [Test]
-            public void IsTrueWhenSessionHasNoPendingReview()
+            public async Task IsTrueWhenSessionHasNoPendingReview()
             {
-                var session = CreateSession(false);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(session);
 
                 Assert.That(target.CanStartReview, Is.True);
             }
 
             [Test]
-            public void IsFalseWhenEditingExistingComment()
+            public async Task IsFalseWhenEditingExistingComment()
             {
-                var session = CreateSession(false);
+                var session = CreateSession();
                 var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
-                var target = CreateTarget(session, comment: pullRequestReviewCommentModel);
+                var target = await CreateTarget(session, comment: pullRequestReviewCommentModel);
 
                 Assert.That(target.CanStartReview, Is.False);
             }
@@ -48,18 +48,21 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public class TheBeginEditProperty
         {
             [Test]
-            public void CanBeExecutedForPlaceholders()
+            public async Task CanBeExecutedForPlaceholders()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IActorViewModel>();
                 var commentService = Substitute.For<ICommentService>();
-                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, thread, currentUser);
+                var target = new PullRequestReviewCommentViewModel(commentService);
+
+                await target.InitializeAsPlaceholderAsync(session, thread, false);
+
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
 
             [Test]
-            public void CanBeExecutedForCommentsByTheSameAuthor()
+            public async Task CanBeExecutedForCommentsByTheSameAuthor()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
@@ -67,12 +70,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var currentUser = new ActorModel { Login = "CurrentUser" };
                 var comment = new PullRequestReviewCommentModel { Author = currentUser };
 
-                var target = CreateTarget(session, null, thread, currentUser, null, comment);
+                var target = await CreateTarget(session, null, thread, currentUser, null, comment);
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
 
             [Test]
-            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            public async Task CannotBeExecutedForCommentsByAnotherAuthor()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
@@ -81,7 +84,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var otherUser = new ActorModel { Login = "OtherUser" };
                 var comment = new PullRequestReviewCommentModel { Author = otherUser };
 
-                var target = CreateTarget(session, null, thread, currentUser, null, comment);
+                var target = await CreateTarget(session, null, thread, currentUser, null, comment);
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.False);
             }
         }
@@ -89,18 +92,21 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public class TheDeleteProperty
         {
             [Test]
-            public void CannotBeExecutedForPlaceholders()
+            public async Task CannotBeExecutedForPlaceholders()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IActorViewModel>();
                 var commentService = Substitute.For<ICommentService>();
-                var target = PullRequestReviewCommentViewModel.CreatePlaceholder(session, commentService, thread, currentUser);
+                var target = new PullRequestReviewCommentViewModel(commentService);
+
+                await target.InitializeAsPlaceholderAsync(session, thread, false);
+
                 Assert.That(target.Delete.CanExecute(new object()), Is.False);
             }
 
             [Test]
-            public void CanBeExecutedForCommentsByTheSameAuthor()
+            public async Task CanBeExecutedForCommentsByTheSameAuthor()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
@@ -108,12 +114,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var currentUser = new ActorModel { Login = "CurrentUser" };
                 var comment = new PullRequestReviewCommentModel { Author = currentUser };
 
-                var target = CreateTarget(session, null, thread, currentUser, null, comment);
+                var target = await CreateTarget(session, null, thread, currentUser, null, comment);
                 Assert.That(target.Delete.CanExecute(new object()), Is.True);
             }
 
             [Test]
-            public void CannotBeExecutedForCommentsByAnotherAuthor()
+            public async Task CannotBeExecutedForCommentsByAnotherAuthor()
             {
                 var session = CreateSession();
                 var thread = CreateThread();
@@ -122,7 +128,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 var otherUser = new ActorModel { Login = "OtherUser" };
                 var comment = new PullRequestReviewCommentModel { Author = otherUser };
 
-                var target = CreateTarget(session, null, thread, currentUser, null, comment);
+                var target = await CreateTarget(session, null, thread, currentUser, null, comment);
                 Assert.That(target.Delete.CanExecute(new object()), Is.False);
             }
         }
@@ -130,29 +136,31 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public class TheCommitCaptionProperty
         {
             [Test]
-            public void IsAddReviewCommentWhenSessionHasPendingReview()
+            public async Task IsAddReviewCommentWhenSessionHasPendingReview()
             {
-                var session = CreateSession(true);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(
+                    session: session,
+                    review: CreateReview(PullRequestReviewState.Pending));
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Add review comment"));
             }
 
             [Test]
-            public void IsAddSingleCommentWhenSessionHasNoPendingReview()
+            public async Task IsAddSingleCommentWhenSessionHasNoPendingReview()
             {
-                var session = CreateSession(false);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(session);
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Add a single comment"));
             }
 
             [Test]
-            public void IsUpdateCommentWhenEditingExistingComment()
+            public async Task IsUpdateCommentWhenEditingExistingComment()
             {
-                var session = CreateSession(false);
+                var session = CreateSession();
                 var pullRequestReviewCommentModel = new PullRequestReviewCommentModel { Id = "1" };
-                var target = CreateTarget(session, comment: pullRequestReviewCommentModel);
+                var target = await CreateTarget(session, comment: pullRequestReviewCommentModel);
 
                 Assert.That(target.CommitCaption, Is.EqualTo("Update comment"));
             }
@@ -161,28 +169,30 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         public class TheStartReviewCommand
         {
             [Test]
-            public void IsDisabledWhenSessionHasPendingReview()
+            public async Task IsDisabledWhenSessionHasPendingReview()
             {
-                var session = CreateSession(true);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(
+                    session: session,
+                    review: CreateReview(PullRequestReviewState.Pending));
 
                 Assert.That(target.StartReview.CanExecute(null), Is.False);
             }
 
             [Test]
-            public void IsDisabledWhenSessionHasNoPendingReview()
+            public async Task IsDisabledWhenSessionHasNoPendingReview()
             {
-                var session = CreateSession(false);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(session);
 
                 Assert.That(target.StartReview.CanExecute(null), Is.False);
             }
 
             [Test]
-            public void IsEnabledWhenSessionHasNoPendingReviewAndBodyNotEmpty()
+            public async Task IsEnabledWhenSessionHasNoPendingReviewAndBodyNotEmpty()
             {
-                var session = CreateSession(false);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(session);
 
                 target.Body = "body";
 
@@ -190,10 +200,10 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             }
 
             [Test]
-            public void CallsSessionStartReview()
+            public async Task CallsSessionStartReview()
             {
-                var session = CreateSession(false);
-                var target = CreateTarget(session);
+                var session = CreateSession();
+                var target = await CreateTarget(session);
 
                 target.Body = "body";
                 target.StartReview.Execute();
@@ -202,7 +212,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             }
         }
 
-        static PullRequestReviewCommentViewModel CreateTarget(
+        static async Task<PullRequestReviewCommentViewModel> CreateTarget(
             IPullRequestSession session = null,
             ICommentService commentService = null,
             ICommentThreadViewModel thread = null,
@@ -215,30 +225,27 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             thread = thread ?? CreateThread();
             currentUser = currentUser ?? new ActorModel { Login = "CurrentUser" };
             comment = comment ?? new PullRequestReviewCommentModel();
-            review = review ?? CreateReview(comment);
+            review = review ?? CreateReview(PullRequestReviewState.Approved, comment);
 
-            return new PullRequestReviewCommentViewModel(
-                session,
-                commentService,
-                thread,
-                new ActorViewModel(currentUser),
-                review,
-                comment);
-        }
-
-        static IPullRequestSession CreateSession(
-            bool hasPendingReview = false)
-        {
-            var result = Substitute.For<IPullRequestSession>();
-            result.HasPendingReview.Returns(hasPendingReview);
-            result.User.Returns(new ActorModel());
+            var result = new PullRequestReviewCommentViewModel(commentService);
+            await result.InitializeAsync(session, thread, review, comment, CommentEditState.None);
             return result;
         }
 
-        static PullRequestReviewModel CreateReview(params PullRequestReviewCommentModel[] comments)
+        static IPullRequestSession CreateSession()
+        {
+            var result = Substitute.For<IPullRequestSession>();
+            result.User.Returns(new ActorModel { Login = "CurrentUser" });
+            return result;
+        }
+
+        static PullRequestReviewModel CreateReview(
+            PullRequestReviewState state,
+            params PullRequestReviewCommentModel[] comments)
         {
             return new PullRequestReviewModel
             {
+                State = state,
                 Comments = comments,
             };
         }
@@ -247,7 +254,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             bool canPost = true)
         {
             var result = Substitute.For<ICommentThreadViewModel>();
-            result.PostComment.Returns(ReactiveCommand.CreateFromTask<string>(_ => Task.CompletedTask));
             return result;
         }
     }
