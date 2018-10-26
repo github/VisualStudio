@@ -18,10 +18,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings settings,
-            IVSServices vsServices,
+            ITeamExplorerServices teamExplorerServices,
             ILocalRepositories localRepositories,
             IUsageTracker usageTracker)
-            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, localRepositories, usageTracker, 0)
+            : base(serviceProvider, apiFactory, holder, manager, settings, teamExplorerServices, localRepositories, usageTracker, 0)
         {
         }
     }
