@@ -54,7 +54,7 @@ public class VSGitExtTests
             gitExt.ActiveRepositories.Returns(x =>
             {
                 threadPool = Thread.CurrentThread.IsThreadPoolThread;
-                return new IGitRepositoryInfo[0];
+                return Array.Empty<IGitRepositoryInfo>();
             });
 
             var target = CreateVSGitExt(gitExt: gitExt);
@@ -273,7 +273,7 @@ public class VSGitExtTests
 
     class MockGitExt : IGitExt
     {
-        IReadOnlyList<IGitRepositoryInfo> activeRepositories = new IGitRepositoryInfo[0];
+        IReadOnlyList<IGitRepositoryInfo> activeRepositories = Array.Empty<IGitRepositoryInfo>();
 
         public IReadOnlyList<IGitRepositoryInfo> ActiveRepositories
         {

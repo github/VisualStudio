@@ -37,7 +37,7 @@ namespace GitHub.Services
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
-        readonly Lazy<IVSServices> vsServices;
+        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -50,11 +50,11 @@ namespace GitHub.Services
         [ImportingConstructor]
         public VSGitServices(IGitHubServiceProvider serviceProvider,
             Lazy<IStatusBarNotificationService> statusBar,
-            Lazy<IVSServices> vsServices)
+            Lazy<ITeamExplorerServices> teamExplorerServices)
         {
             this.serviceProvider = serviceProvider;
             this.statusBar = statusBar;
-            this.vsServices = vsServices;
+            this.teamExplorerServices = teamExplorerServices;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -90,7 +90,6 @@ namespace GitHub.Services
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
-            vsServices.Value.TryOpenRepository(clonePath); // Show the repository on Team Explorer - Home
 #else
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
@@ -100,6 +99,8 @@ namespace GitHub.Services
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await cloneTask;
 #endif
+            // Change Team Explorer context to the newly cloned repository
+            teamExplorerServices.Value.OpenRepository(clonePath);
         }
 
         static async Task StartClonenOnConnectPageAsync(

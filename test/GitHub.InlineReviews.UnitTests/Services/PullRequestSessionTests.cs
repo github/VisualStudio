@@ -18,8 +18,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
     public class PullRequestSessionTests
     {
         const int PullRequestNumber = 5;
-        const string PullRequestNodeId = "pull_request_id";
-        const string RepoUrl = "https://foo.bar/owner/repo";
         const string FilePath = "test.cs";
 
         public class TheHasPendingReviewProperty
@@ -418,7 +416,7 @@ Line 4";
                 var target = CreateTarget(service, "fork", "owner", false);
 
                 service.PostStandaloneReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
-                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", Array.Empty<DiffChunk>(), 1);
 
                 await service.Received(1).PostStandaloneReviewComment(
                     target.LocalRepository,
@@ -452,7 +450,7 @@ Line 4";
                 var target = CreateTarget(service, "fork", "owner", true);
 
                 service.PostPendingReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
-                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", Array.Empty<DiffChunk>(), 1);
 
                 await service.Received(1).PostPendingReviewComment(
                     target.LocalRepository,
@@ -689,7 +687,7 @@ Line 4";
 
         static PullRequestDetailModel CreatePullRequest()
         {
-            return CreatePullRequest(new PullRequestReviewModel[0]);
+            return CreatePullRequest(Array.Empty<PullRequestReviewModel>());
         }
 
         static PullRequestDetailModel CreatePullRequest(params PullRequestReviewModel[] reviews)
