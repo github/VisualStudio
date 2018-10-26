@@ -195,7 +195,7 @@ namespace GitHub.ViewModels
             CurrentUser = new ActorViewModel(currentUser);
             Id = comment?.Id;
             DatabaseId = comment?.DatabaseId ?? 0;
-            PullRequestId = comment?.PullRequestId ?? 0;
+            PullRequestId = (comment as PullRequestReviewCommentModel)?.PullRequestId ?? 0;
             Body = comment?.Body;
             EditState = state;
             Author = comment != null ? new ActorViewModel(comment.Author) : CurrentUser;

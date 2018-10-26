@@ -304,6 +304,19 @@ namespace GitHub.InlineReviews.Services
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
                         State = pr.State.FromGraphQl(),
                         UpdatedAt = pr.UpdatedAt,
+                        Comments = pr.Comments(null, null, null, null).AllPages().Select(comment => new CommentModel
+                        {
+                            Id = comment.Id.Value,
+                            Author = new ActorModel
+                            {
+                                Login = comment.Author.Login,
+                                AvatarUrl = comment.Author.AvatarUrl(null),
+                            },
+                            Body = comment.Body,
+                            CreatedAt = comment.CreatedAt,
+                            DatabaseId = comment.DatabaseId.Value,
+                            Url = comment.Url,
+                        }).ToList(),
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,

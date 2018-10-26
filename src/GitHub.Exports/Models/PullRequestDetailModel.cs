@@ -79,6 +79,11 @@ namespace GitHub.Models
         public IReadOnlyList<PullRequestFileModel> ChangedFiles { get; set; }
 
         /// <summary>
+        /// Gets or sets a collection of comments on the pull request.
+        /// </summary>
+        public IReadOnlyList<CommentModel> Comments { get; set; }
+
+        /// <summary>
         /// Gets or sets a collection of pull request reviews.
         /// </summary>
         public IReadOnlyList<PullRequestReviewModel> Reviews { get; set; }

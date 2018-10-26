@@ -10,6 +10,11 @@ namespace GitHub.ViewModels.Documents
     public interface IIssueishPaneViewModel : IPaneViewModel
     {
         /// <summary>
+        /// Gets the content to display in the document pane.
+        /// </summary>
+        IViewModel Content { get; }
+
+        /// <summary>
         /// Loads an issue or pull request into the view model.
         /// </summary>
         /// <param name="connection">The connection to use.</param>
