@@ -24,7 +24,7 @@ namespace GitHub.SampleData
         public bool IsSubmitting { get; set; }
         public bool CanDelete { get; } = true;
         public ICommentThreadViewModel Thread { get; }
-        public DateTimeOffset UpdatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
+        public DateTimeOffset CreatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IActorViewModel Author { get; set; }
         public Uri WebUrl { get; }
 
