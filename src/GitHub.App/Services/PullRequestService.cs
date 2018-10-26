@@ -80,7 +80,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states)
+            Models.PullRequestState[] states)
         {
 
             ICompiledQuery<Page<PullRequestListItemModel>> query;
@@ -204,7 +204,7 @@ namespace GitHub.Services
                 { nameof(owner), owner },
                 { nameof(name), name },
                 { nameof(after), after },
-                { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
+                { nameof(states), states.Select(x => (Octokit.GraphQL.Model.PullRequestState)x).ToList() },
             };
 
             var result = await graphql.Run(query, vars);

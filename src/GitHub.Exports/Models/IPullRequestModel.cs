@@ -4,9 +4,7 @@ using GitHub.Collections;
 
 namespace GitHub.Models
 {
-    /// TODO: A PullRequestState class already exists hence the ugly naming of this.
-    /// Merge the two when the maintainer workflow has been merged to master.
-    public enum PullRequestStateEnum
+    public enum PullRequestState
     {
         Open,
         Closed,
@@ -26,7 +24,7 @@ namespace GitHub.Models
     {
         int Number { get; }
         string Title { get; }
-        PullRequestStateEnum State { get; }
+        PullRequestState State { get; }
         int CommentCount { get; }
         int CommitCount { get; }
         bool IsOpen { get; }

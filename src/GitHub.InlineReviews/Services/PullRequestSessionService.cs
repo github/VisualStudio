@@ -317,6 +317,11 @@ namespace GitHub.InlineReviews.Services
                             DatabaseId = comment.DatabaseId.Value,
                             Url = comment.Url,
                         }).ToList(),
+                        Commits = pr.Commits(null, null, null, null).AllPages().Select(commit => new CommitModel
+                        {
+                            AbbreviatedOid = commit.Commit.AbbreviatedOid,
+                            MessageHeadline = commit.Commit.MessageHeadline,
+                        }).ToList(),
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,

@@ -442,7 +442,7 @@ namespace GitHub.Services
                 Head = Create(prCacheItem.Head),
                 State = prCacheItem.State.HasValue ?
                     prCacheItem.State.Value :
-                    prCacheItem.IsOpen.Value ? PullRequestStateEnum.Open : PullRequestStateEnum.Closed,
+                    prCacheItem.IsOpen.Value ? PullRequestState.Open : PullRequestState.Closed,
             };
         }
 
@@ -576,25 +576,25 @@ namespace GitHub.Services
             public string Body { get; set; }
             
             // Nullable for compatibility with old caches.
-            public PullRequestStateEnum? State { get; set; }
+            public PullRequestState? State { get; set; }
 
             // This fields exists only for compatibility with old caches. The State property should be used.
             public bool? IsOpen { get; set; }
             public bool? Merged { get; set; }
 
-            static PullRequestStateEnum GetState(PullRequest pullRequest)
+            static PullRequestState GetState(PullRequest pullRequest)
             {
                 if (pullRequest.State == ItemState.Open)
                 {
-                    return PullRequestStateEnum.Open;
+                    return PullRequestState.Open;
                 }
                 else if (pullRequest.Merged)
                 {
-                    return PullRequestStateEnum.Merged;
+                    return PullRequestState.Merged;
                 }
                 else
                 {
-                    return PullRequestStateEnum.Closed;
+                    return PullRequestState.Closed;
                 }
             }
         }

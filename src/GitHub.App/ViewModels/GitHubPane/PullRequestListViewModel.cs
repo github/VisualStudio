@@ -144,18 +144,18 @@ namespace GitHub.ViewModels.GitHubPane
 
             protected override async Task<Page<PullRequestListItemModel>> LoadPage(string after)
             {
-                PullRequestStateEnum[] states;
+                PullRequestState[] states;
 
                 switch (owner.SelectedState)
                 {
                     case "Open":
-                        states = new[] { PullRequestStateEnum.Open };
+                        states = new[] { PullRequestState.Open };
                         break;
                     case "Closed":
-                        states = new[] { PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        states = new[] { PullRequestState.Closed, PullRequestState.Merged };
                         break;
                     default:
-                        states = new[] { PullRequestStateEnum.Open, PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        states = new[] { PullRequestState.Open, PullRequestState.Closed, PullRequestState.Merged };
                         break;
                 }
 

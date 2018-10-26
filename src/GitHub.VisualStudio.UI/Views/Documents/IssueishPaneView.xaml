@@ -5,12 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
-             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
-             Content="{Binding Content}">
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <Control.Resources>
         <views:ViewLocator x:Key="viewLocator"/>
         <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
             <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
         </DataTemplate>
     </Control.Resources>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+        <ContentControl Margin="16" Content="{Binding Content}"/>
+    </ScrollViewer>
 </UserControl>

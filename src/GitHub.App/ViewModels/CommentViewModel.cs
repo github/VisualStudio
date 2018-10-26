@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -13,9 +14,11 @@ using Serilog;
 namespace GitHub.ViewModels
 {
     /// <summary>
-    /// Base view model for an issue or pull request comment.
+    /// An issue or pull request comment.
     /// </summary>
-    public abstract class CommentViewModel : ReactiveObject, ICommentViewModel
+    [Export(typeof(ICommentViewModel))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class CommentViewModel : ReactiveObject, ICommentViewModel
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
         readonly ICommentService commentService;
@@ -36,6 +39,7 @@ namespace GitHub.ViewModels
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service.</param>
+        [ImportingConstructor]
         public CommentViewModel(ICommentService commentService)
         {
             Guard.ArgumentNotNull(commentService, nameof(commentService));
@@ -175,14 +179,8 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Delete { get; }
 
-        /// <summary>
-        /// Initializes the view model with data.
-        /// </summary>
-        /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <param name="comment">The comment model. May be null.</param>
-        /// <param name="state">The comment edit state.</param>
-        protected Task InitializeAsync(
+        /// <inheritdoc/>
+        public Task InitializeAsync(
             ICommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,

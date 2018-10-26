@@ -25,7 +25,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states);
+            PullRequestState[] states);
 
         /// <summary>
         /// Reads a page of users that can be assigned to pull requests.

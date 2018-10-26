@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reactive;
+using System.Threading.Tasks;
+using GitHub.Models;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -11,8 +13,8 @@ namespace GitHub.ViewModels
         Placeholder,
     }
 
-	/// <summary>
-    /// View model for an issue or pull request comment.
+    /// <summary>
+    /// View model for an issue, pull request or pull request review comment.
     /// </summary>
     public interface ICommentViewModel : IViewModel
     {
@@ -106,5 +108,18 @@ namespace GitHub.ViewModels
         /// Deletes a comment.
         /// </summary>
         ReactiveCommand<Unit, Unit> Delete { get; }
+
+        /// <summary>
+        /// Initializes the view model with data.
+        /// </summary>
+        /// <param name="thread">The thread that the comment is a part of.</param>
+        /// <param name="currentUser">The current user.</param>
+        /// <param name="comment">The comment model. May be null.</param>
+        /// <param name="state">The comment edit state.</param>
+        Task InitializeAsync(
+            ICommentThreadViewModel thread,
+            ActorModel currentUser,
+            CommentModel comment,
+            CommentEditState state);
     }
 }

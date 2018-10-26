@@ -110,8 +110,8 @@ namespace GitHub.Models
             }
         }
 
-        PullRequestStateEnum status;
-        public PullRequestStateEnum State
+        PullRequestState status;
+        public PullRequestState State
         {
             get { return status; }
             set
@@ -126,8 +126,8 @@ namespace GitHub.Models
         }
 
         // TODO: Remove these property once maintainer workflow has been merged to master.
-        public bool IsOpen => State == PullRequestStateEnum.Open;
-        public bool Merged => State == PullRequestStateEnum.Merged;
+        public bool IsOpen => State == PullRequestState.Open;
+        public bool Merged => State == PullRequestState.Merged;
 
         int commentCount;
         public int CommentCount

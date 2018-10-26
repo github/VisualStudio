@@ -5,7 +5,6 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Documents
@@ -49,13 +48,8 @@ namespace GitHub.ViewModels.Documents
             try
             {
                 var session = await sessionManager.GetSession(owner, name, number).ConfigureAwait(true);
-                var vm = factory.CreateViewModel<IPullRequestDetailViewModel>();
-                await vm.InitializeAsync(
-                    session.LocalRepository,
-                    connection,
-                    owner,
-                    name,
-                    number).ConfigureAwait(true);
+                var vm = factory.CreateViewModel<IPullRequestPageViewModel>();
+                await vm.InitializeAsync(session.User, session.PullRequest).ConfigureAwait(true);
                 Content = vm;
             }
             catch (Exception ex)

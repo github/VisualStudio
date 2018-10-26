@@ -35,7 +35,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets or sets the pull request state (open, closed, merged).
         /// </summary>
-        public PullRequestStateEnum State { get; set; }
+        public PullRequestState State { get; set; }
 
         /// <summary>
         /// Gets the pull request checks and statuses summary

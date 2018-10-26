@@ -33,16 +33,16 @@ namespace GitHub.Services
             }
         }
 
-        public static PullRequestStateEnum FromGraphQl(this PullRequestState value)
+        public static Models.PullRequestState FromGraphQl(this Octokit.GraphQL.Model.PullRequestState value)
         {
             switch (value)
             {
-                case PullRequestState.Open:
-                    return PullRequestStateEnum.Open;
-                case PullRequestState.Closed:
-                    return PullRequestStateEnum.Closed;
-                case PullRequestState.Merged:
-                    return PullRequestStateEnum.Merged;
+                case Octokit.GraphQL.Model.PullRequestState.Open:
+                    return Models.PullRequestState.Open;
+                case Octokit.GraphQL.Model.PullRequestState.Closed:
+                    return Models.PullRequestState.Closed;
+                case Octokit.GraphQL.Model.PullRequestState.Merged:
+                    return Models.PullRequestState.Merged;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }

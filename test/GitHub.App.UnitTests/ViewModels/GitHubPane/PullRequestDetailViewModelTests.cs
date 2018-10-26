@@ -627,7 +627,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Number = number,
                 Title = "PR 1",
                 Author = new ActorModel(),
-                State = PullRequestStateEnum.Open,
+                State = PullRequestState.Open,
                 Body = string.Empty,
                 BaseRefName = "master",
                 BaseRefSha = "BASE_REF",
