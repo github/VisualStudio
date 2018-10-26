@@ -66,7 +66,7 @@
       </Button>
       <Button guid="guidPullRequestFilterCommandPackageCmdSet" id="PullRequestFilterCommandId" priority="0x0400" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLBAR_PROJWIN_FILTERS" />
-        <Icon guid="guidGitHubInlineReviews" id="pullrequest" />
+        <Icon guid="guidGitHubInlineReviews" id="pullrequestfilter" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Pull Request Filter</ButtonText>
@@ -107,7 +107,7 @@
     </GuidSymbol>
 
     <GuidSymbol name="guidGitHubInlineReviews" value="{7b2a62fb-6aaa-4893-82c2-4895716a390c}" >
-      <IDSymbol name="pullrequest" value="1" />
+      <IDSymbol name="pullrequestfilter" value="1" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

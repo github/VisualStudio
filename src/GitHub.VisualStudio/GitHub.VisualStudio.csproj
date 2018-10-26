@@ -446,6 +446,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\icons\git_pull_request_filter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\icons\link_external.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

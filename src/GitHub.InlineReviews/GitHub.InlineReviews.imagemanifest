@@ -6,11 +6,11 @@
     <String Name="Resources" Value="/GitHub.VisualStudio;Component/Resources/icons" />
 
     <Guid Name="guidGitHubInlineReviews" Value="{7b2a62fb-6aaa-4893-82c2-4895716a390c}" />
-    <ID Name="pullrequest" Value="1" />
+    <ID Name="pullrequestfilter" Value="1" />
   </Symbols>
   <Images>
-    <Image Guid="$(guidGitHubInlineReviews)" ID="$(pullrequest)">
-      <Source Uri="$(Resources)/git_pull_request.xaml" />
+    <Image Guid="$(guidGitHubInlineReviews)" ID="$(pullrequestfilter)">
+      <Source Uri="$(Resources)/git_pull_request_filter.xaml" />
     </Image>
   </Images>
   <ImageLists />
