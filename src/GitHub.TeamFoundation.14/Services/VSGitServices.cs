@@ -1,4 +1,4 @@
-﻿#if !TEAMEXPLORER14
+﻿#if TEAMEXPLORER15
 // Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
 extern alias SF15;
 using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
@@ -37,7 +37,7 @@ namespace GitHub.Services
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
-        readonly Lazy<IVSServices> vsServices;
+        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -50,11 +50,11 @@ namespace GitHub.Services
         [ImportingConstructor]
         public VSGitServices(IGitHubServiceProvider serviceProvider,
             Lazy<IStatusBarNotificationService> statusBar,
-            Lazy<IVSServices> vsServices)
+            Lazy<ITeamExplorerServices> teamExplorerServices)
         {
             this.serviceProvider = serviceProvider;
             this.statusBar = statusBar;
-            this.vsServices = vsServices;
+            this.teamExplorerServices = teamExplorerServices;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -90,8 +90,7 @@ namespace GitHub.Services
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
-            vsServices.Value.TryOpenRepository(clonePath); // Show the repository on Team Explorer - Home
-#else
+#elif TEAMEXPLORER15
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
             typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
@@ -99,7 +98,21 @@ namespace GitHub.Services
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await cloneTask;
+#elif TEAMEXPLORER16
+            // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
+            // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
+            // Progress won't be displayed on the status bar, but it appears prominently on the Team Explorer Home view.
+            var gitExt = serviceProvider.GetService<IGitActionsExt>();
+            var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
+            Assumes.NotNull(cloneAsyncMethod);
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), null };
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
+
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await cloneTask;
 #endif
+            // Change Team Explorer context to the newly cloned repository
+            teamExplorerServices.Value.OpenRepository(clonePath);
         }
 
         static async Task StartClonenOnConnectPageAsync(

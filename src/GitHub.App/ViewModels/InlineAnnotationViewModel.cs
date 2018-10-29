@@ -1,7 +1,7 @@
 ﻿using GitHub.Models;
 using GitHub.ViewModels;
 
-namespace GitHub.InlineReviews.ViewModels
+namespace GitHub.ViewModels
 {
     /// <inheritdoc />
     public class InlineAnnotationViewModel: IInlineAnnotationViewModel

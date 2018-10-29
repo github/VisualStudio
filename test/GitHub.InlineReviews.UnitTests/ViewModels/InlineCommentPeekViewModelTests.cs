@@ -21,6 +21,8 @@ using Octokit;
 using NUnit.Framework;
 using GitHub.Commands;
 using GitHub.ViewModels;
+using ReactiveUI.Testing;
+using System.Reactive.Concurrency;
 
 namespace GitHub.InlineReviews.UnitTests.ViewModels
 {
@@ -39,15 +41,15 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateSessionManager(),
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+                CreateFactory());
 
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread.IsNewThread, Is.False);
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
             Assert.That(target.Thread.Comments[0].Body, Is.EqualTo("Existing comment"));
-            Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(string.Empty));
+            Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(null));
             Assert.That(target.Thread.Comments[1].EditState, Is.EqualTo(CommentEditState.Placeholder));
         }
 
@@ -61,12 +63,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 CreateSessionManager(),
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+                CreateFactory());
 
             await target.Initialize();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
-            Assert.That(target.Thread.Comments[0].Body, Is.EqualTo(string.Empty));
+            Assert.That(target.Thread.IsNewThread, Is.True);
+            Assert.That(target.Thread.Comments[0].Body, Is.EqualTo(null));
             Assert.That(target.Thread.Comments[0].EditState, Is.EqualTo(CommentEditState.Editing));
         }
 
@@ -87,58 +89,61 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+                CreateFactory());
 
             await target.Initialize();
 
             // There should be an existing comment and a reply placeholder.
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread.IsNewThread, Is.False);
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
             Assert.That(target.Thread.Comments[0].Body, Is.EqualTo("Existing comment"));
-            Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(string.Empty));
+            Assert.That(target.Thread.Comments[1].Body, Is.EqualTo(null));
             Assert.That(target.Thread.Comments[1].EditState, Is.EqualTo(CommentEditState.Placeholder));
         }
 
         [Test]
         public async Task SwitchesFromNewThreadToExistingThreadWhenCommentPosted()
         {
-            var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
-                CreatePeekService(lineNumber: 8),
-                peekSession,
-                sessionManager,
-                Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var sessionManager = CreateSessionManager();
+                var peekSession = CreatePeekSession();
+                var target = new InlineCommentPeekViewModel(
+                    CreatePeekService(lineNumber: 8),
+                    peekSession,
+                    sessionManager,
+                    Substitute.For<INextInlineCommentCommand>(),
+                    Substitute.For<IPreviousInlineCommentCommand>(),
+                    CreateFactory());
 
-            await target.Initialize();
-            Assert.That(target.Thread, Is.InstanceOf(typeof(NewInlineCommentThreadViewModel)));
+                await target.Initialize();
+                Assert.That(target.Thread.IsNewThread, Is.True);
 
-            target.Thread.Comments[0].Body = "New Comment";
+                target.Thread.Comments[0].Body = "New Comment";
 
-            sessionManager.CurrentSession
-                .When(x => x.PostReviewComment(
-                    Arg.Any<string>(),
-                    Arg.Any<string>(),
-                    Arg.Any<string>(),
-                    Arg.Any<IReadOnlyList<DiffChunk>>(),
-                    Arg.Any<int>()))
-                .Do(async x =>
-                {
-                    // Simulate the thread being added to the session.
-                    var file = await sessionManager.GetLiveFile(
-                        RelativePath,
-                        peekSession.TextView,
-                        peekSession.TextView.TextBuffer);
-                    var newThread = CreateThread(8, "New Comment");
-                    file.InlineCommentThreads.Returns(new[] { newThread });
-                    RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
-                });
+                sessionManager.CurrentSession
+                    .When(x => x.PostReviewComment(
+                        Arg.Any<string>(),
+                        Arg.Any<string>(),
+                        Arg.Any<string>(),
+                        Arg.Any<IReadOnlyList<DiffChunk>>(),
+                        Arg.Any<int>()))
+                    .Do(async _ =>
+                    {
+                        // Simulate the thread being added to the session.
+                        var file = await sessionManager.GetLiveFile(
+                            RelativePath,
+                            peekSession.TextView,
+                            peekSession.TextView.TextBuffer);
+                        var newThread = CreateThread(8, "New Comment");
+                        file.InlineCommentThreads.Returns(new[] { newThread });
+                        RaiseLinesChanged(file, Tuple.Create(8, DiffSide.Right));
+                    });
 
-            await target.Thread.Comments[0].CommitEdit.Execute();
+                await target.Thread.Comments[0].CommitEdit.Execute();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+                Assert.That(target.Thread.IsNewThread, Is.False);
+            }
         }
 
         [Test]
@@ -152,11 +157,11 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 sessionManager,
                 Substitute.For<INextInlineCommentCommand>(),
                 Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+                CreateFactory());
 
             await target.Initialize();
 
-            Assert.That(target.Thread, Is.InstanceOf(typeof(InlineCommentThreadViewModel)));
+            Assert.That(target.Thread.IsNewThread, Is.False);
             Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
             var file = await sessionManager.GetLiveFile(
@@ -171,108 +176,117 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public async Task RetainsCommentBeingEditedWhenSessionRefreshed()
         {
-            var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
-                CreatePeekService(lineNumber: 10),
-                CreatePeekSession(),
-                sessionManager,
-                Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var sessionManager = CreateSessionManager();
+                var peekSession = CreatePeekSession();
+                var target = new InlineCommentPeekViewModel(
+                    CreatePeekService(lineNumber: 10),
+                    CreatePeekSession(),
+                    sessionManager,
+                    Substitute.For<INextInlineCommentCommand>(),
+                    Substitute.For<IPreviousInlineCommentCommand>(),
+                    CreateFactory());
 
-            await target.Initialize();
+                await target.Initialize();
 
-            Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
+                Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
-            var placeholder = target.Thread.Comments.Last();
-            placeholder.BeginEdit.Execute().Subscribe();
-            placeholder.Body = "Comment being edited";
+                var placeholder = target.Thread.Comments.Last();
+                placeholder.BeginEdit.Execute().Subscribe();
+                placeholder.Body = "Comment being edited";
 
-            var file = await sessionManager.GetLiveFile(
-                RelativePath,
-                peekSession.TextView,
-                peekSession.TextView.TextBuffer);
-            AddCommentToExistingThread(file);
+                var file = await sessionManager.GetLiveFile(
+                    RelativePath,
+                    peekSession.TextView,
+                    peekSession.TextView.TextBuffer);
+                AddCommentToExistingThread(file);
 
-            placeholder = target.Thread.Comments.Last();
-            Assert.That(target.Thread.Comments.Count, Is.EqualTo(3));
-            Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Editing));
-            Assert.That(placeholder.Body, Is.EqualTo("Comment being edited"));
+                placeholder = target.Thread.Comments.Last();
+                Assert.That(target.Thread.Comments.Count, Is.EqualTo(3));
+                Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Editing));
+                Assert.That(placeholder.Body, Is.EqualTo("Comment being edited"));
+            }
         }
 
         [Test]
         public async Task CommittingEditDoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
-            var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
-                CreatePeekService(lineNumber: 10),
-                peekSession,
-                sessionManager,
-                Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var sessionManager = CreateSessionManager();
+                var peekSession = CreatePeekSession();
+                var target = new InlineCommentPeekViewModel(
+                    CreatePeekService(lineNumber: 10),
+                    peekSession,
+                    sessionManager,
+                    Substitute.For<INextInlineCommentCommand>(),
+                    Substitute.For<IPreviousInlineCommentCommand>(),
+                    CreateFactory());
 
-            await target.Initialize();
+                await target.Initialize();
 
-            Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
+                Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
-            sessionManager.CurrentSession.PostReviewComment(null, null)
-                .ReturnsForAnyArgs(async x =>
-                {
-                    var file = await sessionManager.GetLiveFile(
-                        RelativePath,
-                        peekSession.TextView,
-                        peekSession.TextView.TextBuffer);
-                    AddCommentToExistingThread(file);
-                });
+                sessionManager.CurrentSession.PostReviewComment(null, null)
+                    .ReturnsForAnyArgs(async x =>
+                    {
+                        var file = await sessionManager.GetLiveFile(
+                            RelativePath,
+                            peekSession.TextView,
+                            peekSession.TextView.TextBuffer);
+                        AddCommentToExistingThread(file);
+                    });
 
-            var placeholder = target.Thread.Comments.Last();
-            await placeholder.BeginEdit.Execute();
-            placeholder.Body = "Comment being edited";
-            await placeholder.CommitEdit.Execute();
+                var placeholder = target.Thread.Comments.Last();
+                await placeholder.BeginEdit.Execute();
+                placeholder.Body = "Comment being edited";
+                await placeholder.CommitEdit.Execute();
 
-            placeholder = target.Thread.Comments.Last();
-            Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));
-            Assert.That(placeholder.Body, Is.EqualTo(string.Empty));
+                placeholder = target.Thread.Comments.Last();
+                Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));
+                Assert.That(placeholder.Body, Is.EqualTo(null));
+            }
         }
 
         [Test]
         public async Task StartingReviewDoesntRetainSubmittedCommentInPlaceholderAfterPost()
         {
-            var sessionManager = CreateSessionManager();
-            var peekSession = CreatePeekSession();
-            var target = new InlineCommentPeekViewModel(
-                CreatePeekService(lineNumber: 10),
-                peekSession,
-                sessionManager,
-                Substitute.For<INextInlineCommentCommand>(),
-                Substitute.For<IPreviousInlineCommentCommand>(),
-                Substitute.For<ICommentService>());
+            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
+            {
+                var sessionManager = CreateSessionManager();
+                var peekSession = CreatePeekSession();
+                var target = new InlineCommentPeekViewModel(
+                    CreatePeekService(lineNumber: 10),
+                    peekSession,
+                    sessionManager,
+                    Substitute.For<INextInlineCommentCommand>(),
+                    Substitute.For<IPreviousInlineCommentCommand>(),
+                    CreateFactory());
 
-            await target.Initialize();
+                await target.Initialize();
 
-            Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
+                Assert.That(target.Thread.Comments.Count, Is.EqualTo(2));
 
-            sessionManager.CurrentSession.StartReview()
-                .ReturnsForAnyArgs(async x =>
-                {
-                    var file = await sessionManager.GetLiveFile(
-                        RelativePath,
-                        peekSession.TextView,
-                        peekSession.TextView.TextBuffer);
-                    RaiseLinesChanged(file, Tuple.Create(10, DiffSide.Right));
-                });
+                sessionManager.CurrentSession.StartReview()
+                    .ReturnsForAnyArgs(async x =>
+                    {
+                        var file = await sessionManager.GetLiveFile(
+                            RelativePath,
+                            peekSession.TextView,
+                            peekSession.TextView.TextBuffer);
+                        RaiseLinesChanged(file, Tuple.Create(10, DiffSide.Right));
+                    });
 
-            var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
-            await placeholder.BeginEdit.Execute();
-            placeholder.Body = "Comment being edited";
-            await placeholder.StartReview.Execute();
+                var placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
+                await placeholder.BeginEdit.Execute();
+                placeholder.Body = "Comment being edited";
+                await placeholder.StartReview.Execute();
 
-            placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
-            Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));
-            Assert.That(placeholder.Body, Is.EqualTo(string.Empty));
+                placeholder = (IPullRequestReviewCommentViewModel)target.Thread.Comments.Last();
+                Assert.That(placeholder.EditState, Is.EqualTo(CommentEditState.Placeholder));
+                Assert.That(placeholder.Body, Is.EqualTo(null));
+            }
         }
 
         void AddCommentToExistingThread(IPullRequestSessionFile file)
@@ -309,6 +323,17 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 },
                 Review = new PullRequestReviewModel(),
             };
+        }
+
+        IViewViewModelFactory CreateFactory()
+        {
+            var commentService = Substitute.For<ICommentService>();
+            var result = Substitute.For<IViewViewModelFactory>();
+            result.CreateViewModel<IPullRequestReviewCommentViewModel>().Returns(_ =>
+                new PullRequestReviewCommentViewModel(commentService));
+            result.CreateViewModel<IPullRequestReviewCommentThreadViewModel>().Returns(_ =>
+                new PullRequestReviewCommentThreadViewModel(result));
+            return result;
         }
 
         IInlineCommentThreadModel CreateThread(int lineNumber, params string[] comments)

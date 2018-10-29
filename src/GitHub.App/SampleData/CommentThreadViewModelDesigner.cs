@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using GitHub.InlineReviews.ViewModels;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
 using ReactiveUI;
@@ -11,7 +8,7 @@ using ReactiveUI;
 namespace GitHub.SampleData
 {
     [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-    public class CommentThreadViewModelDesigner : ICommentThreadViewModel
+    public class CommentThreadViewModelDesigner : ViewModelBase, ICommentThreadViewModel
     {
         public CommentThreadViewModelDesigner()
         {
@@ -67,7 +64,7 @@ namespace GitHub.SampleData
                 new InlineAnnotationViewModel(new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel3)),
             };
 
-            Comments = new ObservableCollection<ICommentViewModel>(){new CommentViewModelDesigner()
+            Comments = new ReactiveList<ICommentViewModel>(){new CommentViewModelDesigner()
             {
                 Author = new ActorViewModel{ Login = "shana"},
                 Body = "You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds)."
@@ -75,16 +72,16 @@ namespace GitHub.SampleData
 
         }
 
-        public ObservableCollection<ICommentViewModel> Comments { get; }
-            = new ObservableCollection<ICommentViewModel>();
+        public IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
+            = new ReactiveList<ICommentViewModel>();
 
         public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
 
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };
 
-        public ReactiveCommand<string, Unit> PostComment { get; }
-        public ReactiveCommand<Tuple<string, string>, Unit> EditComment { get; }
-        public ReactiveCommand<Tuple<int, int>, Unit> DeleteComment { get; }
+        public Task DeleteComment(int pullRequestId, int commentId) => Task.CompletedTask;
+        public Task EditComment(string id, string body) => Task.CompletedTask;
+        public Task PostComment(string body) => Task.CompletedTask;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reactive;
+using System.Threading.Tasks;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -9,12 +8,12 @@ namespace GitHub.ViewModels
     /// <summary>
     /// A comment thread.
     /// </summary>
-    public interface ICommentThreadViewModel
+    public interface ICommentThreadViewModel : IViewModel
     {
         /// <summary>
         /// Gets the comments in the thread.
         /// </summary>
-        ObservableCollection<ICommentViewModel> Comments { get; }
+        IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
 
         /// <summary>
         /// Gets the current user under whos account new comments will be created.
@@ -24,17 +23,17 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
-        ReactiveCommand<string, Unit> PostComment { get; }
+        Task PostComment(string body);
 
         /// <summary>
         /// Called by a comment in the thread to post itself as an edit to a comment to the API.
         /// </summary>
-        ReactiveCommand<Tuple<string, string>, Unit> EditComment { get; }
+        Task EditComment(string id, string body);
 
         /// <summary>
-        /// Called by a comment in the thread to send a delete of the comment to the API.
+        /// Called by a comment in the thread to delete the comment on the API.
         /// </summary>
-        ReactiveCommand<Tuple<int, int>, Unit> DeleteComment { get; }
+        Task DeleteComment(int pullRequestId, int commentId);
 
         /// <summary>
         /// Gets the annotations displayed.

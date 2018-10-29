@@ -25,11 +25,11 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenGitSccProviderIsActive(bool isActive, string contextGuidString, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
-            var sp = Substitute.For<IAsyncServiceProvider>();
+            var sp = Substitute.For<IServiceProvider>();
 
             var target = CreateVSGitExt(context, sp: sp, contextGuidString: contextGuidString);
 
-            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
+            sp.Received(expectCalls).GetService(typeof(IGitExt));
         }
 
         [TestCase(true, 1)]
@@ -37,13 +37,13 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenUIContextChanged(bool activated, int expectCalls)
         {
             var context = CreateVSUIContext(false);
-            var sp = Substitute.For<IAsyncServiceProvider>();
+            var sp = Substitute.For<IServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
             context.IsActive = activated;
             target.JoinTillEmpty();
 
-            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
+            sp.Received(expectCalls).GetService(typeof(IGitExt));
         }
 
         [Test]
@@ -210,18 +210,18 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IAsyncServiceProvider sp = null,
+    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IServiceProvider sp = null,
         ILocalRepositoryModelFactory repoFactory = null, JoinableTaskContext joinableTaskContext = null, string contextGuidString = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
         var contextGuid = new Guid(contextGuidString ?? Guids.GitSccProviderId);
-        sp = sp ?? Substitute.For<IAsyncServiceProvider>();
+        sp = sp ?? Substitute.For<IServiceProvider>();
         repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
         joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
         var factory = Substitute.For<IVSUIContextFactory>();
         factory.GetUIContext(contextGuid).Returns(context);
-        sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
+        sp.GetService(typeof(IGitExt)).Returns(gitExt);
         var vsGitExt = new VSGitExt(sp, factory, repoFactory, joinableTaskContext);
         vsGitExt.JoinTillEmpty();
         return vsGitExt;

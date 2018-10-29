@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GitHub.InlineReviews.ViewModels;
 using GitHub.Models;
 using GitHub.ViewModels;
 

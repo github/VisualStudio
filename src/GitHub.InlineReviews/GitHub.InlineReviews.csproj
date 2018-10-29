@@ -112,9 +112,6 @@
     </Compile>
     <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestReviewCommentViewModel.cs" />
-    <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
     <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
       <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
@@ -139,7 +136,6 @@
     <Compile Include="Tags\ShowInlineCommentTag.cs" />
     <Compile Include="Tags\InlineCommentTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
-    <Compile Include="ViewModels\InlineCommentThreadViewModel.cs" />
     <Compile Include="Views\PullRequestStatusView.xaml.cs">
       <DependentUpon>PullRequestStatusView.xaml</DependentUpon>
     </Compile>
