@@ -11,7 +11,7 @@
         <ghfvs:InlineAnnotationViewModelDesigner />
     </d:DesignProperties.DataContext>
 
-    <Grid Margin="4">
+    <Grid Margin="0 0 0 4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4" />
             <ColumnDefinition Width="Auto" />
@@ -19,37 +19,48 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
 
         <StackPanel Background="Blue" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" />
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1">
-            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+        <Border Grid.Column="1" Padding="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions> 
 
-            <TextBlock FontWeight="SemiBold" Margin="2 0">
-                <Run Text="{Binding Model.CheckSuiteName, Mode=OneWay}"/>
-                <Run Text="/"/>
-                <Run Text="{Binding Model.CheckRunName, Mode=OneWay}"/>
-            </TextBlock>
-        </StackPanel>
-        
-        <TextBlock FontWeight="SemiBold" Margin="2 0" Grid.Column="1" Grid.Row="2">
-            <Run Text="{Binding Model.Title, Mode=OneWay}"/>
-        </TextBlock>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions> 
 
-        <TextBlock Margin="5 4 0 0" Grid.Column="1" Grid.Row="3">
-            <Run Text="{Binding Model.Path, Mode=OneWay}"/>
-            <Run FontWeight="SemiBold" Text="{Binding Model.LineDescription, Mode=OneWay}"/>
-        </TextBlock>
+                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
 
-        <markdig:MarkdownViewer  Grid.Column="1" Grid.Row="4" Margin="5 0 0 0" FontSize="12" Markdown="{Binding Model.Message}"/>
+                <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0">
+                    <Run Text="{Binding Model.Path, Mode=OneWay}"/>
+                    <Run FontWeight="SemiBold" Text="{Binding Model.LineDescription, Mode=OneWay}"/>
+                </TextBlock>
+
+                <TextBlock Grid.Column="1" Grid.Row="1" FontWeight="SemiBold" FontSize="14" Margin="4 8 0 8">
+                    <Run Text="{Binding Model.CheckSuiteName, Mode=OneWay}"/>
+                    <Run Text="/"/>
+                    <Run Text="{Binding Model.CheckRunName, Mode=OneWay}"/>
+                </TextBlock>
+
+                <!--
+                <TextBlock Grid.Column="1" Grid.Row="2" FontWeight="SemiBold" Margin="4 0 0 0">
+                    <Run Text="{Binding Model.Title, Mode=OneWay}"/>
+                </TextBlock>
+                -->
+
+                <TextBlock Grid.Column="1" Grid.Row="3" Margin="4 0 0 0" FontFamily="Consolas" FontSize="12" Text="{Binding Model.Message}"/>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
 
