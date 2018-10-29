@@ -1,10 +1,10 @@
 ﻿using System;
-using GitHub.InlineReviews.Tags;
+using GitHub.Models;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
-namespace GitHub.InlineReviews.Services
+namespace GitHub.Services
 {
     /// <summary>
     /// Shows inline comments in a peek view.
@@ -29,17 +29,10 @@ namespace GitHub.InlineReviews.Services
         void Hide(ITextView textView);
 
         /// <summary>
-        /// Shows the peek view for a <see cref="ShowInlineCommentTag"/>.
+        /// Shows the peek view for on an <see cref="ITextView"/>.
         /// </summary>
         /// <param name="textView">The text view.</param>
         /// <param name="tag">The tag.</param>
-        ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag);
-
-        /// <summary>
-        /// Shows the peek view for an <see cref="AddInlineCommentTag"/>.
-        /// </summary>
-        /// <param name="textView">The text view.</param>
-        /// <param name="tag">The tag.</param>
-        ITrackingPoint Show(ITextView textView, AddInlineCommentTag tag);
+        ITrackingPoint Show(ITextView textView, DiffSide side, int lineNumber);
     }
 }

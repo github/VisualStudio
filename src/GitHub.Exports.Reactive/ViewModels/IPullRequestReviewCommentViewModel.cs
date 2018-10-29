@@ -55,10 +55,12 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
+        /// <param name="isPending">Whether the comment thread is a pending review thread.</param>
         /// <param name="isEditing">Whether to start the placeholder in edit mode.</param>
         Task InitializeAsPlaceholderAsync(
             IPullRequestSession session,
             ICommentThreadViewModel thread,
+            bool isPending,
             bool isEditing);
     }
 }
