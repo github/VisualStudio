@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Input;
-using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
@@ -70,6 +69,12 @@ namespace GitHub.VisualStudio.Views
             {
                 GetBrowser().OpenUrl(uri);
             }
+        }
+
+        private void body_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var textBox = (PromptTextBox)sender;
+            textBox.SelectAll();
         }
     }
 }

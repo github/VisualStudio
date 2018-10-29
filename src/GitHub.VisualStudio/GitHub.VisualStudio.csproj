@@ -345,6 +345,7 @@
     <Compile Include="Commands\GoToSolutionOrPullRequestFileCommand.cs" />
     <Compile Include="GitContextPackage.cs" />
     <Compile Include="GitHubPanePackage.cs" />
+    <Compile Include="Helpers\BindingPathHelper.cs" />
     <Compile Include="IServiceProviderPackage.cs" />
     <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
     <Compile Include="Commands\AddConnectionCommand.cs" />
@@ -613,6 +614,13 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
       <Aliases>TF15</Aliases>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.16\GitHub.TeamFoundation.16.csproj">
+      <Project>{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}</Project>
+      <Name>GitHub.TeamFoundation.16</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+      <Aliases>TF16</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>

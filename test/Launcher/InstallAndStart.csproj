@@ -3,7 +3,7 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="VsixTesting.Installer" Version="0.1.36-beta-g2c36f902a0" />
+    <PackageReference Include="VsixTesting.Installer" Version="0.1.38-beta-g6b91b368d9" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj" />

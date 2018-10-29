@@ -6,6 +6,7 @@ using GitHub.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
 using GitHub.Logging;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio;
@@ -236,7 +237,8 @@ namespace GitHub.InlineReviews.Commands
                 }
             }
 
-            var point = peekService.Show(textView, tag);
+            var side = tag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+            var point = peekService.Show(textView, side, tag.LineNumber);
 
             if (parameter?.MoveCursor != false)
             {
