@@ -17,74 +17,62 @@ namespace GitHub.App.UnitTests.ViewModels
         [Test]
         public async Task SavesDraftForEditingComment()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var scheduler = new HistoricalScheduler();
-                var drafts = Substitute.For<IMessageDraftStore>();
-                var target = CreateTarget(drafts: drafts, scheduler: scheduler);
+            var scheduler = new HistoricalScheduler();
+            var drafts = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(drafts: drafts, scheduler: scheduler);
 
-                await target.AddPlaceholder(true);
-                target.Comments[0].Body = "Edited comment.";
+            await target.AddPlaceholder(true);
+            target.Comments[0].Body = "Edited comment.";
 
-                await drafts.DidNotReceiveWithAnyArgs().UpdateDraft<CommentDraft>(null, null, null);
+            await drafts.DidNotReceiveWithAnyArgs().UpdateDraft<CommentDraft>(null, null, null);
 
-                scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
+            scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
 
-                await drafts.Received().UpdateDraft(
-                    "file.cs",
-                    "10",
-                    Arg.Is<CommentDraft>(x => x.Body == "Edited comment."));
-            }
+            await drafts.Received().UpdateDraft(
+                "file.cs",
+                "10",
+                Arg.Is<CommentDraft>(x => x.Body == "Edited comment."));
         }
 
         [Test]
         public async Task DoesntSaveDraftForNonEditingComment()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var scheduler = new HistoricalScheduler();
-                var drafts = Substitute.For<IMessageDraftStore>();
-                var target = CreateTarget(drafts: drafts, scheduler: scheduler);
+            var scheduler = new HistoricalScheduler();
+            var drafts = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(drafts: drafts, scheduler: scheduler);
 
-                await target.AddPlaceholder(false);
-                target.Comments[0].Body = "Edited comment.";
+            await target.AddPlaceholder(false);
+            target.Comments[0].Body = "Edited comment.";
 
-                scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
+            scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
 
-                await drafts.DidNotReceiveWithAnyArgs().UpdateDraft<CommentDraft>(null, null, null);
-            }
+            await drafts.DidNotReceiveWithAnyArgs().UpdateDraft<CommentDraft>(null, null, null);
         }
 
         [Test]
         public async Task CommitEditDeletesDraft()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var drafts = Substitute.For<IMessageDraftStore>();
-                var target = CreateTarget(drafts: drafts);
+            var drafts = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(drafts: drafts);
 
-                await target.AddPlaceholder(false);
+            await target.AddPlaceholder(false);
 
-                drafts.ClearReceivedCalls();
-                await target.Comments[0].CommitEdit.Execute();
+            drafts.ClearReceivedCalls();
+            await target.Comments[0].CommitEdit.Execute();
 
-                await drafts.Received().DeleteDraft("file.cs", "10");
-            }
+            await drafts.Received().DeleteDraft("file.cs", "10");
         }
 
         [Test]
         public async Task CancelEditDeletesDraft()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var drafts = Substitute.For<IMessageDraftStore>();
-                var target = CreateTarget(drafts: drafts);
+            var drafts = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(drafts: drafts);
 
-                await target.AddPlaceholder(false);
-                await target.Comments[0].CancelEdit.Execute();
+            await target.AddPlaceholder(false);
+            await target.Comments[0].CancelEdit.Execute();
 
-                await drafts.Received().DeleteDraft("file.cs", "10");
-            }
+            await drafts.Received().DeleteDraft("file.cs", "10");
         }
 
         static Target CreateTarget(

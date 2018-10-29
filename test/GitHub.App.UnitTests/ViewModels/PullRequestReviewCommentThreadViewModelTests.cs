@@ -58,60 +58,51 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public async Task PostsCommentInReplyToCorrectComment()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var session = CreateSession();
-                var target = await CreateTarget(
-                    session: session,
-                    comments: CreateComments("Comment 1", "Comment 2"));
+            var session = CreateSession();
+            var target = await CreateTarget(
+                session: session,
+                comments: CreateComments("Comment 1", "Comment 2"));
 
-                target.Comments[2].Body = "New Comment";
-                await target.Comments[2].CommitEdit.Execute();
+            target.Comments[2].Body = "New Comment";
+            await target.Comments[2].CommitEdit.Execute();
 
-                session.Received(1).PostReviewComment("New Comment", "1");
-            }
+            session.Received(1).PostReviewComment("New Comment", "1");
         }
 
         [Test]
         public async Task LoadsDraftForNewThread()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var draftStore = Substitute.For<IMessageDraftStore>();
+            var draftStore = Substitute.For<IMessageDraftStore>();
 
-                draftStore.GetDraft<PullRequestReviewCommentDraft>(
-                    "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
-                    .Returns(new PullRequestReviewCommentDraft
-                    {
-                        Body = "Draft comment.",
-                        Side = DiffSide.Right,
-                    });
+            draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                .Returns(new PullRequestReviewCommentDraft
+                {
+                    Body = "Draft comment.",
+                    Side = DiffSide.Right,
+                });
 
-                var target = await CreateTarget(draftStore: draftStore, newThread: true);
+            var target = await CreateTarget(draftStore: draftStore, newThread: true);
 
-                Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
-            }
+            Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
         }
 
         [Test]
         public async Task LoadsDraftForExistingThread()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var draftStore = Substitute.For<IMessageDraftStore>();
+            var draftStore = Substitute.For<IMessageDraftStore>();
 
-                draftStore.GetDraft<PullRequestReviewCommentDraft>(
-                    "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
-                    .Returns(new PullRequestReviewCommentDraft
-                    {
-                        Body = "Draft comment.",
-                        Side = DiffSide.Right,
-                    });
+            draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                .Returns(new PullRequestReviewCommentDraft
+                {
+                    Body = "Draft comment.",
+                    Side = DiffSide.Right,
+                });
 
-                var target = await CreateTarget(draftStore: draftStore);
+            var target = await CreateTarget(draftStore: draftStore);
 
-                Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
-            }
+            Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
         }
 
         async Task<PullRequestReviewCommentThreadViewModel> CreateTarget(
