@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+ * Commented out to avoid:
+ * 1>TeamExplorer\Home\GraphsNavigationItemTests.cs(24,44,24,64): 
+ * error CS0433: The type 'GraphsNavigationItem' exists in both
+ * 'GitHub.TeamFoundation.14, Version=2.5.9.0, Culture=neutral, PublicKeyToken=bc1bd09f2901c82e' and
+ * 'GitHub.TeamFoundation.16, Version=2.5.9.0, Culture=neutral, PublicKeyToken=bc1bd09f2901c82e'
+
+using System;
 using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio.TeamExplorer.Home;
@@ -32,3 +39,4 @@ public class GraphsNavigationItemTests
         }
     }
 }
+*/
