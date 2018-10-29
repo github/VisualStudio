@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
-    <Compile Include="..\Helpers\CommandTestHelpers.cs" />
     <Compile Include="..\Helpers\LazySubstitute.cs" />
     <Compile Include="..\Helpers\ReactiveTestHelper.cs" />
     <Compile Include="..\Helpers\RepositoryHelpers.cs" />
@@ -25,12 +25,12 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Testing\ReactiveUI.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Reactive.Testing" Version="4.0.0" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
-    <PackageReference Include="Rx-Testing" Version="2.2.5-custom" targetFramework="net45" />
   </ItemGroup>
 </Project>

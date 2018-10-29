@@ -2,19 +2,20 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj" />
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI\ReactiveUI.csproj" />
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" />
   </ItemGroup>
 </Project>

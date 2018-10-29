@@ -32,6 +32,11 @@ namespace GitHub.ViewModels
         int PullRequestId { get; }
 
         /// <summary>
+        /// Gets the author of the comment.
+        /// </summary>
+        IActorViewModel Author { get; }
+
+        /// <summary>
         /// Gets or sets the body of the comment.
         /// </summary>
         string Body { get; set; }
@@ -63,14 +68,9 @@ namespace GitHub.ViewModels
         bool CanDelete { get; }
 
         /// <summary>
-        /// Gets the modified date of the comment.
+        /// Gets the creation date of the comment.
         /// </summary>
-        DateTimeOffset UpdatedAt { get; }
-
-        /// <summary>
-        /// Gets the author of the comment.
-        /// </summary>
-        IActorViewModel Author { get; }
+        DateTimeOffset CreatedAt { get; }
 
         /// <summary>
         /// Gets the thread that the comment is a part of.
@@ -85,26 +85,26 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
-        ReactiveCommand<object> BeginEdit { get; }
+        ReactiveCommand<Unit, Unit> BeginEdit { get; }
 
         /// <summary>
         /// Gets a command which will cancel editing of the comment.
         /// </summary>
-        ReactiveCommand<object> CancelEdit { get; }
+        ReactiveCommand<Unit, Unit> CancelEdit { get; }
 
         /// <summary>
         /// Gets a command which will commit edits to the comment.
         /// </summary>
-        ReactiveCommand<Unit> CommitEdit { get; }
+        ReactiveCommand<Unit, Unit> CommitEdit { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.
         /// </summary>
-        ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Deletes a comment.
         /// </summary>
-        ReactiveCommand<Unit> Delete { get; }
+        ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }

@@ -96,7 +96,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Files = new PullRequestFilesViewModelDesigner();
 
-            Checks = new PullRequestCheckViewModelDesigner[0];
+            Checks = Array.Empty<PullRequestCheckViewModelDesigner>();
         }
 
         public PullRequestDetailModel Model { get; }
@@ -119,11 +119,11 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string ErrorMessage { get; set; }
         public Uri WebUrl { get; set; }
 
-        public ReactiveCommand<Unit> Checkout { get; }
-        public ReactiveCommand<Unit> Pull { get; }
-        public ReactiveCommand<Unit> Push { get; }
-        public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> ShowReview { get; }
+        public ReactiveCommand<Unit, Unit> Checkout { get; }
+        public ReactiveCommand<Unit, Unit> Pull { get; }
+        public ReactiveCommand<Unit, Unit> Push { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 

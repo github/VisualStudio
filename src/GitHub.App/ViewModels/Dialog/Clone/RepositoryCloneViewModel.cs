@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -76,13 +77,13 @@ namespace GitHub.ViewModels.Dialog.Clone
                 repository, this.WhenAnyValue(x => x.Path),
                 (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
 
-            Browse = ReactiveCommand.Create().OnExecuteCompleted(_ => BrowseForDirectory());
-            Clone = ReactiveCommand.CreateAsyncObservable(
-                canClone,
-                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
-            Open = ReactiveCommand.CreateAsyncObservable(
-                canOpen,
-                _ => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)));
+            Browse = ReactiveCommand.Create(() => BrowseForDirectory());
+            Clone = ReactiveCommand.CreateFromObservable(
+                () => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)),
+                canClone);
+            Open = ReactiveCommand.CreateFromObservable(
+                () => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)),
+                canOpen);
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
@@ -107,11 +108,11 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public IObservable<object> Done => Observable.Merge(Clone, Open);
 
-        public ReactiveCommand<object> Browse { get; }
+        public ReactiveCommand<Unit, Unit> Browse { get; }
 
-        public ReactiveCommand<CloneDialogResult> Clone { get; }
+        public ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
 
-        public ReactiveCommand<CloneDialogResult> Open { get; }
+        public ReactiveCommand<Unit, CloneDialogResult> Open { get; }
 
         public async Task InitializeAsync(IConnection connection)
         {

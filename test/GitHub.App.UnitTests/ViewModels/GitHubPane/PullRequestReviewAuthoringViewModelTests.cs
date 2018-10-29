@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
@@ -228,7 +231,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Approve.Execute(null);
+            await target.Approve.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Approve);
             Assert.True(closed);
@@ -244,7 +247,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsFalse(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsFalse(canExecute);
         }
 
         [Test]
@@ -258,7 +262,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Review body";
 
-            Assert.IsTrue(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -275,7 +280,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsTrue(target.Comment.CanExecute(null));
+            var canExecute = await target.Comment.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -291,7 +297,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Comment.Execute(null);
+            await target.Comment.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.Comment);
             Assert.True(closed);
@@ -307,7 +313,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsFalse(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsFalse(canExecute);
         }
 
         [Test]
@@ -321,7 +328,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Review body";
 
-            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -338,7 +346,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var target = CreateTarget(model, session);
             await InitializeAsync(target);
 
-            Assert.IsTrue(target.RequestChanges.CanExecute(null));
+            var canExecute = await target.RequestChanges.CanExecute.Take(1);
+            Assert.IsTrue(canExecute);
         }
 
         [Test]
@@ -354,7 +363,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
             target.Body = "Post review";
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.RequestChanges.Execute(null);
+            await target.RequestChanges.Execute();
 
             await session.Received(1).PostReview("Post review", Octokit.PullRequestReviewEvent.RequestChanges);
             Assert.True(closed);
@@ -375,7 +384,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Cancel.Execute(null);
+            await target.Cancel.Execute();
 
             await session.Received(1).CancelReview();
             Assert.True(closed);
@@ -392,10 +401,72 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             await InitializeAsync(target);
 
             target.CloseRequested.Subscribe(_ => closed = true);
-            target.Cancel.Execute(null);
+            await target.Cancel.Execute();
 
             await session.Received(0).CancelReview();
             Assert.True(closed);
+        }
+
+        [Test]
+        public async Task Loads_Draft()
+        {
+            var draftStore = Substitute.For<IMessageDraftStore>();
+            draftStore.GetDraft<PullRequestReviewDraft>("pr-review|https://github.com/owner/repo|5", string.Empty)
+                .Returns(new PullRequestReviewDraft
+                {
+                    Body = "This is a review.",
+                });
+
+            var target = CreateTarget(draftStore: draftStore);
+            await InitializeAsync(target);
+
+            Assert.That(target.Body, Is.EqualTo("This is a review."));
+        }
+
+        [Test]
+        public async Task Updates_Draft_When_Body_Changes()
+        {
+            var scheduler = new HistoricalScheduler();
+            var draftStore = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(draftStore: draftStore, timerScheduler: scheduler);
+            await InitializeAsync(target);
+
+            target.Body = "Body changed.";
+
+            await draftStore.DidNotReceiveWithAnyArgs().UpdateDraft<PullRequestReviewDraft>(null, null, null);
+
+            scheduler.AdvanceBy(TimeSpan.FromSeconds(1));
+
+            await draftStore.Received().UpdateDraft(
+                "pr-review|https://github.com/owner/repo|5",
+                string.Empty,
+                Arg.Is<PullRequestReviewDraft>(x => x.Body == "Body changed."));
+        }
+
+        [Test]
+        public async Task Deletes_Draft_When_Review_Approved()
+        {
+            var scheduler = new HistoricalScheduler();
+            var draftStore = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(draftStore: draftStore, timerScheduler: scheduler);
+            await InitializeAsync(target);
+
+            await target.Approve.Execute();
+
+            await draftStore.Received().DeleteDraft("pr-review|https://github.com/owner/repo|5", string.Empty);
+        }
+
+        [Test]
+        public async Task Deletes_Draft_When_Canceled()
+        {
+            var scheduler = new HistoricalScheduler();
+            var draftStore = Substitute.For<IMessageDraftStore>();
+            var target = CreateTarget(draftStore: draftStore, timerScheduler: scheduler);
+            await InitializeAsync(target);
+
+            await target.Cancel.Execute();
+
+            await draftStore.Received().DeleteDraft("pr-review|https://github.com/owner/repo|5", string.Empty);
         }
 
         static PullRequestReviewAuthoringViewModel CreateTarget(
@@ -414,17 +485,23 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             IPullRequestService pullRequestService = null,
             IPullRequestEditorService editorService = null,
             IPullRequestSessionManager sessionManager = null,
-            IPullRequestFilesViewModel files = null)
+            IMessageDraftStore draftStore = null,
+            IPullRequestFilesViewModel files = null,
+            IScheduler timerScheduler = null)
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
             sessionManager = sessionManager ?? CreateSessionManager();
+            draftStore = draftStore ?? Substitute.For<IMessageDraftStore>();
             files = files ?? Substitute.For<IPullRequestFilesViewModel>();
+            timerScheduler = timerScheduler ?? DefaultScheduler.Instance;
 
             return new PullRequestReviewAuthoringViewModel(
                 pullRequestService,
                 editorService,
                 sessionManager,
-                files);
+                draftStore,
+                files,
+                timerScheduler);
         }
 
         static PullRequestReviewModel CreateReview(
@@ -482,7 +559,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 {
                     Login = authorLogin,
                 },
-                Reviews = (reviews ?? new PullRequestReviewModel[0]).ToList()
+                Reviews = (reviews ?? Array.Empty<PullRequestReviewModel>()).ToList()
             };
         }
 
@@ -531,6 +608,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         static ILocalRepositoryModel CreateLocalRepositoryModel()
         {
             var result = Substitute.For<ILocalRepositoryModel>();
+            result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
             result.Owner.Returns("owner");
             result.Name.Returns("repo");
             return result;

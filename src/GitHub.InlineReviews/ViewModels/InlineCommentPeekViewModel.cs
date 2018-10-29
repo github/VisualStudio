@@ -4,17 +4,13 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
-using GitHub.InlineReviews.Commands;
-using GitHub.InlineReviews.Peek;
 using GitHub.InlineReviews.Services;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -33,10 +29,10 @@ namespace GitHub.InlineReviews.ViewModels
         readonly IInlineCommentPeekService peekService;
         readonly IPeekSession peekSession;
         readonly IPullRequestSessionManager sessionManager;
-        readonly ICommentService commentService;
+        readonly IViewViewModelFactory factory;
         IPullRequestSession session;
         IPullRequestSessionFile file;
-        ICommentThreadViewModel thread;
+        IPullRequestReviewCommentThreadViewModel thread;
         IDisposable fileSubscription;
         IDisposable sessionSubscription;
         IDisposable threadSubscription;
@@ -52,46 +48,48 @@ namespace GitHub.InlineReviews.ViewModels
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
-            ICommentService commentService)
+            IViewViewModelFactory factory)
         {
             Guard.ArgumentNotNull(peekService, nameof(peekService));
             Guard.ArgumentNotNull(peekSession, nameof(peekSession));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(nextCommentCommand, nameof(nextCommentCommand));
             Guard.ArgumentNotNull(previousCommentCommand, nameof(previousCommentCommand));
+            Guard.ArgumentNotNull(factory, nameof(factory));
 
             this.peekService = peekService;
             this.peekSession = peekSession;
             this.sessionManager = sessionManager;
-            this.commentService = commentService;
+            this.factory = factory;
             triggerPoint = peekSession.GetTriggerPoint(peekSession.TextView.TextBuffer);
 
             peekSession.Dismissed += (s, e) => Dispose();
 
             Close = this.WhenAnyValue(x => x.Thread)
-                .SelectMany(x => x is NewInlineCommentThreadViewModel
+                .Where(x => x != null)
+                .SelectMany(x => x.IsNewThread
                     ? x.Comments.Single().CancelEdit.SelectUnit()
                     : Observable.Never<Unit>());
 
-            NextComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(nextCommentCommand.Enabled),
-                _ => nextCommentCommand.Execute(new InlineCommentNavigationParams
+            NextComment = ReactiveCommand.CreateFromTask(
+                () => nextCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
-                }));
+                }),
+                Observable.Return(nextCommentCommand.Enabled));
 
-            PreviousComment = ReactiveCommand.CreateAsyncTask(
-                Observable.Return(previousCommentCommand.Enabled),
-                _ => previousCommentCommand.Execute(new InlineCommentNavigationParams
+            PreviousComment = ReactiveCommand.CreateFromTask(
+                () => previousCommentCommand.Execute(new InlineCommentNavigationParams
                 {
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
-                }));
+                }),
+                Observable.Return(previousCommentCommand.Enabled));
         }
 
         /// <summary>
         /// Gets the thread of comments to display.
         /// </summary>
-        public ICommentThreadViewModel Thread
+        public IPullRequestReviewCommentThreadViewModel Thread
         {
             get { return thread; }
             private set { this.RaiseAndSetIfChanged(ref thread, value); }
@@ -100,12 +98,12 @@ namespace GitHub.InlineReviews.ViewModels
         /// <summary>
         /// Gets a command which moves to the next inline comment in the file.
         /// </summary>
-        public ReactiveCommand<Unit> NextComment { get; }
+        public ReactiveCommand<Unit, Unit> NextComment { get; }
 
         /// <summary>
         /// Gets a command which moves to the previous inline comment in the file.
         /// </summary>
-        public ReactiveCommand<Unit> PreviousComment { get; }
+        public ReactiveCommand<Unit, Unit> PreviousComment { get; }
 
         public IObservable<Unit> Close { get; }
 
@@ -145,7 +143,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             fileSubscription?.Dispose();
-            fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(LinesChanged);
         }
 
         async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
@@ -167,8 +165,6 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task UpdateThread()
         {
-            var placeholderBody = GetPlaceholderBodyToPreserve();
-
             Thread = null;
             threadSubscription?.Dispose();
 
@@ -181,26 +177,18 @@ namespace GitHub.InlineReviews.ViewModels
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
+            var vm = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
 
-            if (thread != null)
+            if (thread?.Comments.Count > 0)
             {
-                Thread = new InlineCommentThreadViewModel(commentService, session, thread.Comments);
+                await vm.InitializeAsync(session, file, thread.Comments[0].Review, thread, true);
             }
             else
             {
-                Thread = new NewInlineCommentThreadViewModel(commentService, session, file, lineNumber, leftBuffer);
+                await vm.InitializeNewAsync(session, file, lineNumber, side, true);
             }
 
-            if (!string.IsNullOrWhiteSpace(placeholderBody))
-            {
-                var placeholder = Thread.Comments.LastOrDefault();
-
-                if (placeholder?.EditState == CommentEditState.Placeholder)
-                {
-                    await placeholder.BeginEdit.ExecuteAsync(null);
-                    placeholder.Body = placeholderBody;
-                }
-            }
+            Thread = vm;
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)
@@ -218,18 +206,6 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 await UpdateThread();
             }
-        }
-
-        string GetPlaceholderBodyToPreserve()
-        {
-            var lastComment = Thread?.Comments.LastOrDefault();
-
-            if (lastComment?.EditState == CommentEditState.Editing)
-            {
-                if (!lastComment.IsSubmitting) return lastComment.Body;
-            }
-
-            return null;
         }
     }
 }

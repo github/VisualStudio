@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GitHub.Collections;
 using NUnit.Framework;
+using ReactiveUI.Testing;
 
 [TestFixture]
 public class ListenerCollectionTests : TestBase
 {
-#if !DISABLE_REACTIVE_UI
-    [OneTimeSetUp]
-    public void Setup()
-    {
-        Splat.ModeDetector.Current.SetInUnitTestRunner(true);
-    }
-#endif
-
     [Test]
     public void StickyItemShouldNotBePresentInitiallyWhereNoSelectionHasHappened()
     {
@@ -130,11 +124,11 @@ public class ListenerCollectionTests : TestBase
         selection.OnNext(stickie);
         selection.OnNext(null);
         CollectionAssert.AreEqual(source, target);
-        source.Filter = (a,b,c) => true;
+        source.Filter = (a, b, c) => true;
         CollectionAssert.AreEqual(source, target);
     }
 
-    TrackingCollection<Thing> CreateSource()
+    static TrackingCollection<Thing> CreateSource()
     {
         var result = new TrackingCollection<Thing>(Observable.Empty<Thing>());
         result.Subscribe();

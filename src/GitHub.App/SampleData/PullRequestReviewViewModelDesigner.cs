@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -65,7 +66,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public bool HasDetails { get; set; }
         public ILocalRepositoryModel LocalRepository { get; set; }
         public PullRequestReviewModel Model { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; set; }
         public PullRequestDetailModel PullRequestModel { get; set; }
         public string RemoteRepositoryOwner { get; set; }

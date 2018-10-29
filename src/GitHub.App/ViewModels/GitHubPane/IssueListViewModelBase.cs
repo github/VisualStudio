@@ -47,7 +47,7 @@ namespace GitHub.ViewModels.GitHubPane
         public IssueListViewModelBase(IRepositoryService repositoryService)
         {
             this.repositoryService = repositoryService;
-            OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+            OpenItem = ReactiveCommand.CreateFromTask<IIssueListItemViewModelBase>(OpenItemImpl);
             stateCaption = this.WhenAnyValue(
                 x => x.Items.Count,
                 x => x.SelectedState,
@@ -123,7 +123,7 @@ namespace GitHub.ViewModels.GitHubPane
         public string StateCaption => stateCaption.Value;
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenItem { get; }
+        public ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
 
         /// <inheritdoc/>
         public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
@@ -295,9 +295,8 @@ namespace GitHub.ViewModels.GitHubPane
             return result;
         }
 
-        async Task OpenItemImpl(object i)
+        async Task OpenItemImpl(IIssueListItemViewModelBase item)
         {
-            var item = i as IIssueListItemViewModelBase;
             if (item != null) await DoOpenItem(item);
         }
 

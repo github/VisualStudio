@@ -35,10 +35,10 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>False</DeployExtension>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -47,8 +47,6 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCodeAnalysis|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -57,7 +55,6 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -84,6 +81,7 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
+    <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -91,7 +89,6 @@
     <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Services\PullRequestStatusBarManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
-    <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSourceProvider.cs" />
     <Compile Include="Peek\InlineCommentPeekableResultSource.cs" />
@@ -100,18 +97,13 @@
     <Compile Include="Peek\InlineCommentPeekResultPresentation.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IInlineCommentPeekService.cs" />
     <Compile Include="Services\IPullRequestSessionService.cs" />
-    <Compile Include="Services\InlineCommentPeekService.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
     <Compile Include="Margins\InlineCommentMarginProvider.cs" />
     <Compile Include="Services\PullRequestSessionService.cs" />
     <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
-    <Compile Include="ViewModels\IPullRequestReviewCommentViewModel.cs" />
-    <Compile Include="ViewModels\NewInlineCommentThreadViewModel.cs" />
-    <Compile Include="ViewModels\PullRequestReviewCommentViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
     <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
       <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
@@ -136,7 +128,6 @@
     <Compile Include="Tags\ShowInlineCommentTag.cs" />
     <Compile Include="Tags\InlineCommentTagger.cs" />
     <Compile Include="Tags\InlineCommentTaggerProvider.cs" />
-    <Compile Include="ViewModels\InlineCommentThreadViewModel.cs" />
     <Compile Include="Views\PullRequestStatusView.xaml.cs">
       <DependentUpon>PullRequestStatusView.xaml</DependentUpon>
     </Compile>
@@ -152,13 +143,17 @@
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
-      <Project>{1CE2D235-8072-4649-BA5A-CFB1AF8776E0}</Project>
-      <Name>ReactiveUI_Net45</Name>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj">
+      <Project>{e899b03c-6e8e-4375-ab65-fc925d721d8b}</Project>
+      <Name>ReactiveUI.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
-      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
-      <Name>Splat-Net45</Name>
+    <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI\ReactiveUI.csproj">
+      <Project>{a4f579f3-77d3-450a-aacc-f2653ef11e69}</Project>
+      <Name>ReactiveUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj">
+      <Project>{ad0306b7-f88e-44a4-ab36-1d04822e9234}</Project>
+      <Name>Splat</Name>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
@@ -356,9 +351,8 @@
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.14.1.111\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Octokit.GraphQL, Version=0.1.1.0, Culture=neutral, PublicKeyToken=0be8860aee462442, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Octokit.GraphQL.0.1.1-beta\lib\netstandard1.1\Octokit.GraphQL.dll</HintPath>
@@ -382,25 +376,13 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5-custom\lib\net45\System.Reactive.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5-custom\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5-custom\lib\net45\System.Reactive.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=62aa029873c516b4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5-custom\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Reactive, Version=4.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Reactive.4.0.0\lib\net46\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />

@@ -931,7 +931,7 @@ namespace GitHub.Services
                     await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
 
                 // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
-                if (!Splat.ModeDetector.Current.InUnitTestRunner().GetValueOrDefault())
+                if (!Splat.ModeDetector.InUnitTestRunner())
                     await Task.Delay(TimeSpan.FromSeconds(5));
 
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);

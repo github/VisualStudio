@@ -8,6 +8,7 @@ using System.Windows.Media;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.UI
 {
@@ -75,6 +76,7 @@ namespace GitHub.UI
             private set { SetValue(IsShowingMessageProperty, value); }
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         public static readonly DependencyProperty UserErrorProperty = DependencyProperty.Register("UserError", typeof(UserError), typeof(UserErrorMessages));
         public UserError UserError
         {
@@ -95,5 +97,6 @@ namespace GitHub.UI
                     .Select(x => RecoveryOptionResult.CancelOperation);
             });
         }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

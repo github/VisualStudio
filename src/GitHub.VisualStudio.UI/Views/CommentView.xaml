@@ -154,6 +154,7 @@
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
                               GotFocus="ReplyPlaceholder_GotFocus"
+                              Loaded="body_Loaded"
                               SpellCheck.IsEnabled="True">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">

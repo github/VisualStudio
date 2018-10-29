@@ -11,6 +11,9 @@ using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace GitHub.Services
 {
@@ -186,7 +189,7 @@ namespace GitHub.Services
 
             return exception.DisplayErrorMessage(
                 errorType,
-                new object[] { },
+                Array.Empty<object>(),
                 new[] { OpenBrowser("View Plans", account.Billing()), Cancel });
         }
 

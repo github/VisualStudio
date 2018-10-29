@@ -1,14 +1,14 @@
-﻿#if !TEAMEXPLORER14
+﻿#if TEAMEXPLORER15
 // Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
 extern alias SF15;
 using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
 #endif
 
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -17,15 +17,12 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
-#if TEAMEXPLORER14
+using Microsoft.TeamFoundation.Controls;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using ReactiveUI;
-#else
-using Microsoft.VisualStudio.Shell.Interop;
-using System.Threading;
-#endif
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
+using ReactiveUI;
 using Serilog;
+using Microsoft;
 
 namespace GitHub.Services
 {
@@ -39,6 +36,8 @@ namespace GitHub.Services
 
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
+        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -49,10 +48,13 @@ namespace GitHub.Services
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSGitServices(IGitHubServiceProvider serviceProvider, Lazy<IStatusBarNotificationService> statusBar)
+        public VSGitServices(IGitHubServiceProvider serviceProvider,
+            Lazy<IStatusBarNotificationService> statusBar,
+            Lazy<ITeamExplorerServices> teamExplorerServices)
         {
             this.serviceProvider = serviceProvider;
             this.statusBar = statusBar;
+            this.teamExplorerServices = teamExplorerServices;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -81,23 +83,79 @@ namespace GitHub.Services
             bool recurseSubmodules,
             object progress = null)
         {
-#if TEAMEXPLORER14
-            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
-            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+            var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
+            Assumes.Present(teamExplorer);
 
-            // The operation will have completed when CanClone goes false and then true again.
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
-#else
+#if TEAMEXPLORER14
+            await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await WaitForCloneOnHomePageAsync(teamExplorer);
+#elif TEAMEXPLORER15
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
+            typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
+            var cloneTask = gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
 
-            await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-            {
-                typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
-                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
-            });
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await cloneTask;
+#elif TEAMEXPLORER16
+            // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
+            // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
+            // Progress won't be displayed on the status bar, but it appears prominently on the Team Explorer Home view.
+            var gitExt = serviceProvider.GetService<IGitActionsExt>();
+            var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
+            Assumes.NotNull(cloneAsyncMethod);
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), null };
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
+
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await cloneTask;
 #endif
+            // Change Team Explorer context to the newly cloned repository
+            teamExplorerServices.Value.OpenRepository(clonePath);
+        }
+
+        static async Task StartClonenOnConnectPageAsync(
+            ITeamExplorer teamExplorer, string cloneUrl, string clonePath, bool recurseSubmodules)
+        {
+            var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect));
+            Assumes.Present(connectPage);
+            var gitExt = connectPage.GetService<IGitRepositoriesExt>();
+            Assumes.Present(gitExt);
+
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+        }
+
+        static async Task WaitForCloneOnHomePageAsync(ITeamExplorer teamExplorer)
+        {
+            // The clone progress bar appears on the GettingStartedSection of the Home page,
+            // so we wait for this to be hidden before continuing.
+            var sectionId = new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"); // GettingStartedSection
+            await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(p => p.GetId() == new Guid(TeamExplorerPageIds.Home))
+                .Select(p => p.GetSection(sectionId))
+                .Where(s => s != null)
+                .Select(s => s.WhenAnyValue(x => x.IsVisible))
+                .Switch()                           // Watch the topmost section
+                .StartWith(false)                   // If no events arrive default to invisible
+                .Throttle(TimeSpan.FromSeconds(1))  // Ignore glitch where section starts invisible
+                .Any(x => x == false);
+        }
+
+        static void NavigateToHomePage(ITeamExplorer teamExplorer)
+        {
+            teamExplorer.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+        }
+
+        static async Task<ITeamExplorerPage> NavigateToPageAsync(ITeamExplorer teamExplorer, Guid pageId)
+        {
+            teamExplorer.NavigateToPage(pageId, null);
+            var page = await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(x => x?.GetId() == pageId)
+                .Take(1);
+            return page;
         }
 
         IGitRepositoryInfo GetRepoFromVS()

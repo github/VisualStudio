@@ -182,7 +182,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             pullRequest = pullRequest ?? new PullRequestDetailModel
             {
-                Reviews = new PullRequestReviewModel[0],
+                Reviews = Array.Empty<PullRequestReviewModel>(),
             };
 
             var session = Substitute.For<IPullRequestSession>();

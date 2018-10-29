@@ -2,9 +2,9 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Api;
@@ -14,7 +14,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Settings;
-using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI;
@@ -30,7 +29,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     {
         static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
         readonly IPackageSettings packageSettings;
-        readonly IVSServices vsServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly int sectionIndex;
         readonly ILocalRepositories localRepositories;
         readonly IUsageTracker usageTracker;
@@ -109,7 +108,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
-            IVSServices vsServices,
+            ITeamExplorerServices teamExplorerServices,
             ILocalRepositories localRepositories,
             IUsageTracker usageTracker,
             int index)
@@ -119,7 +118,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(manager, nameof(manager));
             Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
-            Guard.ArgumentNotNull(vsServices, nameof(vsServices));
+            Guard.ArgumentNotNull(teamExplorerServices, nameof(teamExplorerServices));
             Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
@@ -129,11 +128,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             sectionIndex = index;
 
             this.packageSettings = packageSettings;
-            this.vsServices = vsServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.localRepositories = localRepositories;
             this.usageTracker = usageTracker;
 
-            Clone = CreateAsyncCommandHack(DoClone);
+            Clone = ReactiveCommand.CreateFromTask(DoClone);
 
             connectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
@@ -461,15 +460,27 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
             if (!Equals(SelectedRepository, old))
             {
-                var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
-                if (!opened)
+                try
                 {
-                    // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.
-                    opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
-                    if (!opened)
+                    var repositoryPath = SelectedRepository.LocalPath;
+                    if (Directory.Exists(repositoryPath))
                     {
-                        return false;
+                        teamExplorerServices.OpenRepository(SelectedRepository.LocalPath);
                     }
+                    else
+                    {
+                        // If directory no longer exists, let user find solution themselves
+                        var opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
+                        if (!opened)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.Error(e, nameof(OpenRepository));
+                    return false;
                 }
             }
 
@@ -508,20 +519,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         /// <see cref="ReactiveCommand.CreateAsyncTask"/> causes a weird UI hang in this situation
         /// where the UI runs but WhenAny no longer responds to property changed notifications.
         /// </remarks>
-        static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
-        {
-            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+        ////static ReactiveCommand<Unit,Unit> CreateAsyncCommandHack(Func<Task> executeAsync)
+        ////{
+        ////    Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
 
-            var enabled = new BehaviorSubject<bool>(true);
-            var command = ReactiveCommand.Create(enabled);
-            command.Subscribe(async _ =>
-            {
-                enabled.OnNext(false);
-                try { await executeAsync(); }
-                finally { enabled.OnNext(true); }
-            });
-            return command;
-        }
+        ////    var enabled = new BehaviorSubject<bool>(true);
+        ////    var command = ReactiveCommand.Create(enabled);
+        ////    command.Subscribe(async _ =>
+        ////    {
+        ////        enabled.OnNext(false);
+        ////        try { await executeAsync(); }
+        ////        finally { enabled.OnNext(true); }
+        ////    });
+        ////    return command;
+        ////}
 
         class SectionStateTracker
         {

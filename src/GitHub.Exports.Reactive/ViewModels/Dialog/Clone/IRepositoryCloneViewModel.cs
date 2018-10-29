@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -45,11 +46,11 @@ namespace GitHub.ViewModels.Dialog.Clone
         /// <summary>
         /// Gets the command executed when the user clicks "Browse".
         /// </summary>
-        ReactiveCommand<object> Browse { get; }
+        ReactiveCommand<Unit, Unit> Browse { get; }
 
         /// <summary>
         /// Gets the command executed when the user clicks "Clone".
         /// </summary>
-        ReactiveCommand<CloneDialogResult> Clone { get; }
+        ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
     }
 }

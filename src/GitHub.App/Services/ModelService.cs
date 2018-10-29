@@ -320,7 +320,7 @@ namespace GitHub.Services
                         log.Error(e,
                             "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache",
                             repositoryType);
-                        return Observable.Return(new IRemoteRepositoryModel[] {});
+                        return Observable.Return(Array.Empty<IRemoteRepositoryModel>());
                     });
         }
 
@@ -355,7 +355,7 @@ namespace GitHub.Services
                     {
                         log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache",
                             organization);
-                        return Observable.Return(new IRemoteRepositoryModel[] {});
+                        return Observable.Return(Array.Empty<IRemoteRepositoryModel>());
                     });
         }
 

@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -14,12 +15,15 @@ using GitHub.Extensions.Reactive;
 using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
 using Octokit;
 using ReactiveUI;
 using Serilog;
 using IConnection = GitHub.Models.IConnection;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -33,6 +37,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<bool> isExecuting;
         readonly IPullRequestService service;
         readonly IModelServiceFactory modelServiceFactory;
+        readonly IMessageDraftStore draftStore;
+        readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         ILocalRepositoryModel activeLocalRepo;
         ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
@@ -42,14 +48,29 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestCreationViewModel(
             IModelServiceFactory modelServiceFactory,
             IPullRequestService service,
-            INotificationService notifications)
+            INotificationService notifications,
+            IMessageDraftStore draftStore)
+            : this(modelServiceFactory, service, notifications, draftStore, DefaultScheduler.Instance)
+        {
+        }
+
+        public PullRequestCreationViewModel(
+            IModelServiceFactory modelServiceFactory,
+            IPullRequestService service,
+            INotificationService notifications,
+            IMessageDraftStore draftStore,
+            IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(notifications, nameof(notifications));
+            Guard.ArgumentNotNull(draftStore, nameof(draftStore));
+            Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.service = service;
             this.modelServiceFactory = modelServiceFactory;
+            this.draftStore = draftStore;
+            this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
                 .WhereNotNull()
@@ -73,8 +94,8 @@ namespace GitHub.ViewModels.GitHubPane
                 .Where(x => !x.IsValid && x.DisplayValidationError)
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
-            CreatePullRequest = ReactiveCommand.CreateAsyncObservable(whenAnyValidationResultChanges,
-                _ => service
+            CreatePullRequest = ReactiveCommand.CreateFromObservable(
+                () => service
                     .CreatePullRequest(modelService, activeLocalRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
@@ -85,22 +106,30 @@ namespace GitHub.ViewModels.GitHubPane
                         var error = apiException?.ApiError?.Errors?.FirstOrDefault();
                         notifications.ShowError(error?.Message ?? ex.Message);
                         return Observable.Empty<IPullRequestModel>();
-                    }))
-            .OnExecuteCompleted(pr =>
+                    }),
+                whenAnyValidationResultChanges);
+            CreatePullRequest.Subscribe(pr =>
             {
                 notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, SourceBranch.DisplayName, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name + "#" + pr.Number,
                     TargetBranch.Repository.CloneUrl.ToRepositoryUrl().Append("pull/" + pr.Number)));
                 NavigateTo("/pulls?refresh=true");
-                Cancel.Execute(null);
+                Cancel.Execute();
+                draftStore.DeleteDraft(GetDraftKey(), string.Empty).Forget();
+                Close();
             });
 
-            Cancel = ReactiveCommand.Create();
-            Cancel.Subscribe(_ => Close());
+            Cancel = ReactiveCommand.Create(() => { });
+            Cancel.Subscribe(_ =>
+            {
+                Close();
+                draftStore.DeleteDraft(GetDraftKey(), string.Empty).Forget();
+            });
 
             isExecuting = CreatePullRequest.IsExecuting.ToProperty(this, x => x.IsExecuting);
 
             this.WhenAnyValue(x => x.Initialized, x => x.GitHubRepository, x => x.IsExecuting)
                 .Select(x => !(x.Item1 && x.Item2 != null && !x.Item3))
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => IsBusy = x);
         }
 
@@ -145,6 +174,39 @@ namespace GitHub.ViewModels.GitHubPane
                 Initialized = true;
             });
 
+            var draftKey = GetDraftKey();
+            await LoadInitialState(draftKey).ConfigureAwait(true);
+
+            this.WhenAnyValue(
+                x => x.PRTitle,
+                x => x.Description,
+                (t, d) => new PullRequestDraft { Title = t, Body = d })
+                .Throttle(TimeSpan.FromSeconds(1), timerScheduler)
+                .Subscribe(x => draftStore.UpdateDraft(draftKey, string.Empty, x));
+
+            Initialized = true;
+        }
+
+        async Task LoadInitialState(string draftKey)
+        {
+            if (activeLocalRepo.CloneUrl == null)
+                return;
+
+            var draft = await draftStore.GetDraft<PullRequestDraft>(draftKey, string.Empty).ConfigureAwait(true);
+
+            if (draft != null)
+            {
+                PRTitle = draft.Title;
+                Description = draft.Body;
+            }
+            else
+            {
+                LoadDescriptionFromCommits();
+            }
+        }
+
+        void LoadDescriptionFromCommits()
+        {
             SourceBranch = activeLocalRepo.CurrentBranch;
 
             var uniqueCommits = this.WhenAnyValue(
@@ -175,7 +237,7 @@ namespace GitHub.ViewModels.GitHubPane
             Observable.CombineLatest(
                 this.WhenAnyValue(x => x.SourceBranch),
                 uniqueCommits,
-                service.GetPullRequestTemplate(repository).DefaultIfEmpty(string.Empty),
+                service.GetPullRequestTemplate(activeLocalRepo).DefaultIfEmpty(string.Empty),
                 (compare, commits, template) => new { compare, commits, template })
                 .Subscribe(x =>
                 {
@@ -202,8 +264,6 @@ namespace GitHub.ViewModels.GitHubPane
                     PRTitle = prTitle;
                     Description = prDescription;
                 });
-
-            Initialized = true;
         }
 
         void SetupValidators()
@@ -238,6 +298,20 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
+        public static string GetDraftKey(
+            UriString cloneUri,
+            string branchName)
+        {
+            return Invariant($"pr|{cloneUri}|{branchName}");
+        }
+
+        protected string GetDraftKey()
+        {
+            return GetDraftKey(
+                activeLocalRepo.CloneUrl,
+                SourceBranch.Name);
+        }
+
         public IRemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
         bool IsExecuting { get { return isExecuting.Value; } }
 
@@ -269,8 +343,8 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref branches, value); }
         }
 
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
-        public IReactiveCommand<object> Cancel { get; }
+        public ReactiveCommand<Unit, IPullRequestModel> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         string title;
         public string PRTitle

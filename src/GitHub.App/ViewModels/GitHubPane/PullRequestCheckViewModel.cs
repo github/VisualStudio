@@ -51,7 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(model.TargetUrl) ? new Uri(model.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
-            }) ?? new PullRequestCheckViewModel[0];
+            }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
                 .Select(model =>
@@ -97,7 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
 
                     return pullRequestCheckViewModel;
-                }) ?? new PullRequestCheckViewModel[0];
+                }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             return statuses.Concat(checks).OrderBy(model => model.Title);
         }
@@ -106,10 +106,10 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestCheckViewModel(IUsageTracker usageTracker)
         {
             this.usageTracker = usageTracker;
-            OpenDetailsUrl = ReactiveCommand.Create().OnExecuteCompleted(DoOpenDetailsUrl);
+            OpenDetailsUrl = ReactiveCommand.Create(DoOpenDetailsUrl);
         }
 
-        private void DoOpenDetailsUrl(object obj)
+        private void DoOpenDetailsUrl()
         {
             Expression<Func<UsageModel.MeasuresModel, int>> expression;
             if (CheckType == PullRequestCheckType.StatusApi)
@@ -134,6 +134,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         public Uri DetailsUrl { get; private set; }
 
-        public ReactiveCommand<object> OpenDetailsUrl { get; }
+        public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
     }
 }

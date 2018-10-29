@@ -47,7 +47,7 @@ namespace UnitTests.GitHub.App.ViewModels.Dialog
         public class TheStartWithConnectionMethod
         {
             [Test]
-            public async Task ShowsLoginDialogWhenNoConnectionsAvailableAsync()
+            public void ShowsLoginDialogWhenNoConnectionsAvailableAsync()
             {
                 var target = CreateTarget();
                 var content = Substitute.For<ITestViewModel>();

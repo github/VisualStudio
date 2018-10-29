@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -29,9 +30,9 @@ namespace GitHub.ViewModels.Dialog
             this.executePage = executePage;
             this.switchPage = switchPage;
 
-            Completed = ReactiveCommand.Create();
+            Completed = ReactiveCommand.Create(() => { });
 
-            selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
+            //selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
             executePage.Back.Subscribe(x => ShowSelectPage().Forget());
         }
@@ -40,7 +41,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IConnection Connection { get; private set; }
 
-        private ReactiveCommand<object> Completed { get; }
+        private ReactiveCommand<Unit, Unit> Completed { get; }
 
         public override IObservable<object> Done => executePage.Done;
 

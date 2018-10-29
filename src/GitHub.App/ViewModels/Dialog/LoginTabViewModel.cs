@@ -17,6 +17,12 @@ using GitHub.Services;
 using GitHub.Validation;
 using ReactiveUI;
 using Serilog;
+using IRecoveryCommand = ReactiveUI.Legacy.IRecoveryCommand;
+using RecoveryCommand = ReactiveUI.Legacy.RecoveryCommand;
+using RecoveryOptionResult = ReactiveUI.Legacy.RecoveryOptionResult;
+using UserError = ReactiveUI.Legacy.UserError;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -47,16 +53,16 @@ namespace GitHub.ViewModels.Dialog
                 x => x.PasswordValidator.ValidationResult.IsValid,
                 (x, y) => x.Value && y.Value).ToProperty(this, x => x.CanLogin);
 
-            Login = ReactiveCommand.CreateAsyncTask(this.WhenAny(x => x.CanLogin, x => x.Value), LogIn);
+            Login = ReactiveCommand.CreateFromTask(LogIn, this.WhenAny(x => x.CanLogin, x => x.Value));
             Login.ThrownExceptions.Subscribe(HandleError);
             isLoggingIn = Login.IsExecuting.ToProperty(this, x => x.IsLoggingIn);
 
-            LoginViaOAuth = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.IsLoggingIn, x => !x),
-                LogInViaOAuth);
+            LoginViaOAuth = ReactiveCommand.CreateFromTask(
+                LogInViaOAuth,
+                this.WhenAnyValue(x => x.IsLoggingIn, x => !x));
             LoginViaOAuth.ThrownExceptions.Subscribe(HandleError);
 
-            Reset = ReactiveCommand.CreateAsyncTask(_ => Clear());
+            Reset = ReactiveCommand.CreateFromTask(Clear);
 
             NavigateForgotPassword = new RecoveryCommand(Resources.ForgotPasswordLink, _ =>
             {
@@ -64,7 +70,7 @@ namespace GitHub.ViewModels.Dialog
                 return RecoveryOptionResult.RetryOperation;
             });
 
-            SignUp = ReactiveCommand.CreateAsyncObservable(_ =>
+            SignUp = ReactiveCommand.CreateFromObservable(() =>
             {
                 browser.OpenUrl(GitHubUrls.Plans);
                 return Observable.Return(Unit.Default);
@@ -72,12 +78,14 @@ namespace GitHub.ViewModels.Dialog
         }
         protected IConnectionManager ConnectionManager { get; }
         protected abstract Uri BaseUri { get; }
-        public IReactiveCommand<Unit> SignUp { get; }
+        public ReactiveCommand<Unit, Unit> SignUp { get; }
 
-        public IReactiveCommand<IConnection> Login { get; }
-        public IReactiveCommand<IConnection> LoginViaOAuth { get; }
-        public IReactiveCommand<Unit> Reset { get; }
+        public ReactiveCommand<Unit, IConnection> Login { get; }
+        public ReactiveCommand<Unit, IConnection> LoginViaOAuth { get; }
+        public ReactiveCommand<Unit, Unit> Reset { get; }
+#pragma warning disable CS0618 // Type or member is obsolete
         public IRecoveryCommand NavigateForgotPassword { get; }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         string usernameOrEmail;
         public string UsernameOrEmail
@@ -125,17 +133,19 @@ namespace GitHub.ViewModels.Dialog
             get { return canSsoLogin.Value; }
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         UserError error;
         public UserError Error
         {
             get { return error; }
             set { this.RaiseAndSetIfChanged(ref error, value); }
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public void Deactivated() => oauthCancel?.Cancel();
 
-        protected abstract Task<IConnection> LogIn(object args);
-        protected abstract Task<IConnection> LogInViaOAuth(object args);
+        protected abstract Task<IConnection> LogIn();
+        protected abstract Task<IConnection> LogInViaOAuth();
 
         protected async Task<IConnection> LogInToHost(HostAddress hostAddress)
         {
@@ -184,6 +194,7 @@ namespace GitHub.ViewModels.Dialog
             return Task.FromResult(0);
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         void HandleError(Exception ex)
         {
             // The Windows ERROR_OPERATION_ABORTED error code.
@@ -210,5 +221,6 @@ namespace GitHub.ViewModels.Dialog
                 Error = new UserError(ex.Message);
             }
         }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />
   </ItemGroup>
 
@@ -14,7 +15,5 @@
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
-    <PackageReference Include="Rx-Main" Version="2.2.5-custom" targetFramework="net45" />
-    <PackageReference Include="Rx-Testing" Version="2.2.5-custom" targetFramework="net45" />
   </ItemGroup>
 </Project>

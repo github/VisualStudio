@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)\src\common\signing.props" />
@@ -15,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI.Events\ReactiveUI.Events_Net45.csproj" />
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj" />
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj" />
   </ItemGroup>
@@ -27,6 +28,5 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.ImageCatalog" version="14.3.25407" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime" version="14.3.25407" />
-    <PackageReference Include="Rx-XAML" version="2.2.5-custom" />
   </ItemGroup>
 </Project>

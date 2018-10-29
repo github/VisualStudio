@@ -15,14 +15,14 @@ public class TestBaseClass
     {
         return new User("https://url", "bio", "blog", 1, "GitHub",
             DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, 0, "email", 100, 100, true, url,
-            10, 42, "location", login, "name", 1, new Plan(),
+            10, 42, "location", login, "name", null, 0, new Plan(),
             1, 1, 1, "https://url", new RepositoryPermissions(true, true, true),
             false, null, null);
     }
 
     protected static Organization CreateOctokitOrganization(string login)
     {
-        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
+        return new Organization("https://url", "", "", 1, "GitHub", DateTimeOffset.UtcNow, 0, "email", 100, 100, true, "http://url", 10, 42, null, "somewhere", login, "Who cares", 1, new Plan(), 1, 1, 1, "https://url", "billing");
     }
 
     protected static Repository CreateRepository(string owner, string name, string domain = "github.com", long id = 1, Repository parent = null)
@@ -30,10 +30,10 @@ public class TestBaseClass
         var cloneUrl = "https://" + domain + "/" + owner + "/" + name;
         string notCloneUrl = cloneUrl + "-x";
         return new Repository(notCloneUrl, notCloneUrl, cloneUrl, notCloneUrl, notCloneUrl, notCloneUrl, notCloneUrl,
-            id, CreateOctokitUser(owner),
+            id, null, CreateOctokitUser(owner),
             name, "fullname", "description", notCloneUrl, "c#", false, parent != null, 0, 0, "master",
             0, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow,
-            new RepositoryPermissions(), parent, null, null, true, false, false, false, 0, 0, null, null, null);
+            new RepositoryPermissions(), parent, null, null, true, false, false, false, 0, 0, null, null, null, false);
     }
 
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
@@ -42,21 +42,21 @@ public class TestBaseClass
         var uri = new Uri("https://url");
         var uris = uri.ToString();
         var repo = new Repository(uris, uris, uris, uris, uris, uris, uris,
-            1, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
+            1, null, user, "Repo", "Repo", string.Empty, string.Empty, string.Empty,
             false, false, 0, 0, "master",
             0, null, createdAt, updatedAt,
             null, null, null, null,
             false, false, false,
             false, 0, 0,
-            null, null, null);
-        return new PullRequest(0, uris, uris, uris, uris, uris, uris,
+            null, null, null, false);
+        return new PullRequest(0, null, uris, uris, uris, uris, uris, uris,
             id, state, title, "", createdAt, updatedAt,
             null, null,
-            new GitReference(uri.ToString(), "foo:bar", "bar", "123", user, repo),
-            new GitReference(uri.ToString(), "foo:baz", "baz", "123", user, repo),
+            new GitReference(null, uri.ToString(), "foo:bar", "bar", "123", user, repo),
+            new GitReference(null, uri.ToString(), "foo:baz", "baz", "123", user, repo),
             user, null, null, false, null, null, null,
             commentCount, 0, 0, 0, 0,
-            null, false, null);
+            null, false, null, null);
     }
 
     protected class TempDirectory : IDisposable

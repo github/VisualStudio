@@ -12,6 +12,7 @@ using GitHub.Services;
 using NSubstitute;
 using UnitTests.Helpers;
 using NUnit.Framework;
+using System.Globalization;
 
 public class AvatarProviderTests
 {
@@ -25,14 +26,14 @@ public class AvatarProviderTests
             sharedCache.LocalMachine.Returns(blobCache);
             var imageCache = new TestImageCache();
             var avatarProvider = new AvatarProvider(sharedCache, imageCache);
-            var expected = avatarProvider.DefaultOrgBitmapImage.ToString();
+            var expected = avatarProvider.DefaultOrgBitmapImage.ToString(CultureInfo.InvariantCulture);
             int mainThreadId = Thread.CurrentThread.ManagedThreadId;
             int otherThreadId = mainThreadId;
 
             var actual = await Task.Run(() =>
             {
                 otherThreadId = Thread.CurrentThread.ManagedThreadId;
-                return avatarProvider.DefaultOrgBitmapImage.ToString();
+                return avatarProvider.DefaultOrgBitmapImage.ToString(CultureInfo.InvariantCulture);
             });
 
             Assert.That(expected, Is.EqualTo(actual));
@@ -50,14 +51,14 @@ public class AvatarProviderTests
             sharedCache.LocalMachine.Returns(blobCache);
             var imageCache = new TestImageCache();
             var avatarProvider = new AvatarProvider(sharedCache, imageCache);
-            var expected = avatarProvider.DefaultUserBitmapImage.ToString();
+            var expected = avatarProvider.DefaultUserBitmapImage.ToString(CultureInfo.InvariantCulture);
             int mainThreadId = Thread.CurrentThread.ManagedThreadId;
             int otherThreadId = mainThreadId;
 
             var actual = await Task.Run(() =>
             {
                 otherThreadId = Thread.CurrentThread.ManagedThreadId;
-                return avatarProvider.DefaultUserBitmapImage.ToString();
+                return avatarProvider.DefaultUserBitmapImage.ToString(CultureInfo.InvariantCulture);
             });
 
             Assert.That(expected, Is.EqualTo(actual));
@@ -130,7 +131,7 @@ public class AvatarProviderTests
         public void DoesNotThrowOnNullUserOrAvatarUrl()
         {
             var blobStore = Substitute.For<IBlobCache>();
-            blobStore.Invalidate(null).Returns(_ => { throw new ArgumentNullException(); });
+            blobStore.Invalidate(null).Returns(_ => { throw new ArgumentNullException("key"); });
             var sharedCache = Substitute.For<ISharedCache>();
             sharedCache.LocalMachine.Returns(blobStore);
 
