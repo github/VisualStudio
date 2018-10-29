@@ -115,6 +115,7 @@ namespace GitHub.ViewModels.GitHubPane
                 NavigateTo("/pulls?refresh=true");
                 Cancel.Execute();
                 draftStore.DeleteDraft(GetDraftKey(), string.Empty).Forget();
+                Close();
             });
 
             Cancel = ReactiveCommand.Create(() => { });
