@@ -1,6 +1,7 @@
 ﻿using GitHub.Collections;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 
 public class Thing : ICopyable<Thing>, IEquatable<Thing>, IComparable<Thing>, INotifyPropertyChanged
 {
@@ -105,7 +106,7 @@ public class Thing : ICopyable<Thing>, IEquatable<Thing>, IComparable<Thing>, IN
 
     public override string ToString()
     {
-        return string.Format("id:{0} title:{1} created:{2:u} updated:{3:u}", Number, Title, CreatedAt, UpdatedAt);
+        return string.Format(CultureInfo.InvariantCulture, "id:{0} title:{1} created:{2:u} updated:{3:u}", Number, Title, CreatedAt, UpdatedAt);
     }
 
     public int CompareTo(Thing other)

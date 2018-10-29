@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="VsixTesting.Installer" Version="0.1.38-beta-g6b91b368d9" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj" />
+  </ItemGroup>
+</Project>

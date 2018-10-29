@@ -32,6 +32,11 @@ namespace GitHub.ViewModels
         int PullRequestId { get; }
 
         /// <summary>
+        /// Gets the author of the comment.
+        /// </summary>
+        IActorViewModel Author { get; }
+
+        /// <summary>
         /// Gets or sets the body of the comment.
         /// </summary>
         string Body { get; set; }
@@ -63,14 +68,9 @@ namespace GitHub.ViewModels
         bool CanDelete { get; }
 
         /// <summary>
-        /// Gets the modified date of the comment.
+        /// Gets the creation date of the comment.
         /// </summary>
-        DateTimeOffset UpdatedAt { get; }
-
-        /// <summary>
-        /// Gets the author of the comment.
-        /// </summary>
-        IActorViewModel Author { get; }
+        DateTimeOffset CreatedAt { get; }
 
         /// <summary>
         /// Gets the thread that the comment is a part of.
