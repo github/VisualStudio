@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -66,7 +67,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             target.Comments[2].Body = "New Comment";
             await target.Comments[2].CommitEdit.Execute();
 
-            session.Received(1).PostReviewComment("New Comment", "1");
+            await session.Received(1).PostReviewComment("New Comment", "1");
         }
 
         [Test]
@@ -158,18 +159,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             foreach (var body in bodies)
             {
-                yield return CreateComment((id++).ToString(), body);
+                yield return CreateComment((id++).ToString(CultureInfo.InvariantCulture), body);
             }
         }
 
-        IPullRequestSessionFile CreateFile(string relativePath = "file.cs")
+        static IPullRequestSessionFile CreateFile(string relativePath = "file.cs")
         {
             var result = Substitute.For<IPullRequestSessionFile>();
             result.RelativePath.Returns(relativePath);
             return result;
         }
 
-        IViewViewModelFactory CreateFactory()
+        static IViewViewModelFactory CreateFactory()
         {
             var result = Substitute.For<IViewViewModelFactory>();
             var commentService = Substitute.For<ICommentService>();
@@ -178,7 +179,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IPullRequestSession CreateSession()
+        static IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
             result.User.Returns(new ActorModel { Login = "Viewer" });

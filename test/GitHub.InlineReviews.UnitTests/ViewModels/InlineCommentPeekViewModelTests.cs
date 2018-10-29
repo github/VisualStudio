@@ -255,20 +255,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             RaiseLinesChanged(file, Tuple.Create(thread.LineNumber, DiffSide.Right));
         }
 
-        IApiClientFactory CreateApiClientFactory()
-        {
-            var apiClient = Substitute.For<IApiClient>();
-            apiClient.CreatePullRequestReviewComment(null, null, 0, null, 0)
-                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
-            apiClient.CreatePullRequestReviewComment(null, null, 0, null, null, null, 0)
-                .ReturnsForAnyArgs(_ => Observable.Return(new PullRequestReviewComment()));
-
-            var result = Substitute.For<IApiClientFactory>();
-            result.Create(null).ReturnsForAnyArgs(apiClient);
-            return result;
-        }
-
-        InlineCommentModel CreateComment(string body)
+        static InlineCommentModel CreateComment(string body)
         {
             return new InlineCommentModel
             {
@@ -280,7 +267,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             };
         }
 
-        IViewViewModelFactory CreateFactory()
+        static IViewViewModelFactory CreateFactory()
         {
             var draftStore = Substitute.For<IMessageDraftStore>();
             var commentService = Substitute.For<ICommentService>();
@@ -292,7 +279,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IInlineCommentThreadModel CreateThread(int lineNumber, params string[] comments)
+        static IInlineCommentThreadModel CreateThread(int lineNumber, params string[] comments)
         {
             var result = Substitute.For<IInlineCommentThreadModel>();
             var commentList = comments.Select(x => CreateComment(x)).ToList();
@@ -301,14 +288,14 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IInlineCommentPeekService CreatePeekService(int lineNumber)
+        static IInlineCommentPeekService CreatePeekService(int lineNumber)
         {
             var result = Substitute.For<IInlineCommentPeekService>();
             result.GetLineNumber(null, null).ReturnsForAnyArgs(Tuple.Create(lineNumber, false));
             return result;
         }
 
-        IPeekSession CreatePeekSession()
+        static IPeekSession CreatePeekSession()
         {
             var document = Substitute.For<ITextDocument>();
             document.FilePath.Returns(FullPath);
@@ -322,7 +309,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IPullRequestSession CreateSession()
+        static IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
             result.PullRequest.Returns(new PullRequestDetailModel());
@@ -331,7 +318,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IPullRequestSessionManager CreateSessionManager(
+        static IPullRequestSessionManager CreateSessionManager(
             string commitSha = "COMMIT",
             string relativePath = RelativePath,
             IPullRequestSession session = null,
@@ -378,13 +365,13 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        void RaiseLinesChanged(IPullRequestSessionFile file, params Tuple<int, DiffSide>[] lineNumbers)
+        static void RaiseLinesChanged(IPullRequestSessionFile file, params Tuple<int, DiffSide>[] lineNumbers)
         {
             var subject = (Subject<IReadOnlyList<Tuple<int, DiffSide>>>)file.LinesChanged;
             subject.OnNext(lineNumbers);
         }
 
-        void RaisePropertyChanged<T>(T o, string propertyName)
+        static void RaisePropertyChanged<T>(T o, string propertyName)
             where T : INotifyPropertyChanged
         {
             o.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(new PropertyChangedEventArgs(propertyName));
