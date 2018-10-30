@@ -2,7 +2,7 @@
 using GitHub.Models;
 using GitHub.ViewModels;
 
-namespace GitHub.App.ViewModels.Documents
+namespace GitHub.ViewModels.Documents
 {
     public class CommitSummaryViewModel : ViewModelBase
     {

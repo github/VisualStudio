@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GitHub.Models;
 
 namespace GitHub.ViewModels.Documents
@@ -9,9 +10,9 @@ namespace GitHub.ViewModels.Documents
     public interface IPullRequestPageViewModel : IPullRequestViewModelBase
     {
         /// <summary>
-        /// Gets the pull request's comment thread.
+        /// Gets the pull request's timeline.
         /// </summary>
-        IIssueishCommentThreadViewModel Thread { get; }
+        IReadOnlyList<IViewModel> Timeline { get; }
 
         /// <summary>
         /// Initializes the view model with data.

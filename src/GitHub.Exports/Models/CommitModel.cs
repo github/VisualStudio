@@ -8,6 +8,11 @@ namespace GitHub.Models
     public class CommitModel
     {
         /// <summary>
+        /// Gets or sets the author of the commit.
+        /// </summary>
+        public ActorModel Author { get; set; }
+
+        /// <summary>
         /// Gets the abbreviated git object ID for the commit.
         /// </summary>
         public string AbbreviatedOid { get; set; }

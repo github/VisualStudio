@@ -7,7 +7,7 @@
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
-             mc:Ignorable="d"  d:DesignHeight="1024" d:DesignWidth="800"
+             mc:Ignorable="d"  d:DesignHeight="2048" d:DesignWidth="800"
              MaxWidth="800">
     <d:DesignData.DataContext>
         <ghfvs:PullRequestPageViewModelDesigner/>
@@ -84,8 +84,45 @@
 
         <markdig:MarkdownViewer Name="bodyMarkdown" Markdown="{Binding Body}"/>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0,16"/>
+        <ItemsControl ItemsSource="{Binding Timeline}">
+            <ItemsControl.Resources>
+                <DataTemplate DataType="{x:Type ghfvs:CommitSummariesViewModel}">
+                    <ItemsControl ItemsSource="{Binding Commits}"/>
+                </DataTemplate>
 
-        <v:CommentThreadView DataContext="{Binding Thread}"/>
+                <DataTemplate DataType="{x:Type ghfvs:CommitSummaryViewModel}">
+                    <DockPanel>
+                        <ghfvs:OcticonImage DockPanel.Dock="Left"
+                                            Margin="0,0,2,0"
+                                            Icon="git_commit"/>
+                        <v:ActorAvatarView DockPanel.Dock="Left"
+                                           Width="16"
+                                           Height="16"
+                                           Margin="2"
+                                           ViewModel="{Binding Author}"/>
+                        <TextBlock DockPanel.Dock="Right">
+                            <Hyperlink>
+                                <Run Text="{Binding AbbreviatedOid, Mode=OneWay}"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Text="{Binding Header}"/>
+                    </DockPanel>
+                </DataTemplate>
+                
+                <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
+                    <v:CommentView/>
+                </DataTemplate>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="0,1,0,0"
+                            BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
+                            Margin="0,16,0,0"
+                            Padding="0,16,0,0">
+                        <ContentControl Content="{Binding}"/>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </StackPanel>
 </UserControl>

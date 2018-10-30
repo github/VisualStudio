@@ -33,7 +33,7 @@ namespace GitHub.SampleData
         public ReactiveCommand<Unit, Unit> BeginEdit { get; }
         public ReactiveCommand<Unit, Unit> CancelEdit { get; }
         public ReactiveCommand<Unit, Unit> CommitEdit { get; }
-        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; } = ReactiveCommand.Create(() => { });
         public ReactiveCommand<Unit, Unit> Delete { get; }
 
         public Task InitializeAsync(ICommentThreadViewModel thread, ActorModel currentUser, CommentModel comment, CommentEditState state)

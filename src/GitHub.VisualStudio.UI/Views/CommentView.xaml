@@ -51,9 +51,9 @@
 
             <DockPanel>
               <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
-                <controls:AccountAvatar Width="16" 
-                                        Height="16" 
-                                        Account="{Binding Author}"/>
+                <views:ActorAvatarView Width="16" 
+                                       Height="16" 
+                                       ViewModel="{Binding Author}"/>
 
                 <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
                 <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
