@@ -10,6 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2FA6-4A22-8B33-69F698A18CF1}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -132,6 +133,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUI.Wpf", "submodules\reactiveui\src\ReactiveUI.Wpf\ReactiveUI.Wpf.csproj", "{E899B03C-6E8E-4375-AB65-FC925D721D8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstallAndStart", "test\Launcher\InstallAndStart.csproj", "{79F32BE1-2764-4DBA-97F6-21053DE44270}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.16", "src\GitHub.TeamFoundation.16\GitHub.TeamFoundation.16.csproj", "{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -542,6 +545,16 @@ Global
 		{79F32BE1-2764-4DBA-97F6-21053DE44270}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79F32BE1-2764-4DBA-97F6-21053DE44270}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{79F32BE1-2764-4DBA-97F6-21053DE44270}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.DebugCodeAnalysis|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.DebugCodeAnalysis|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugCodeAnalysis|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.DebugWithoutVsix|Any CPU.Build.0 = DebugCodeAnalysis|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

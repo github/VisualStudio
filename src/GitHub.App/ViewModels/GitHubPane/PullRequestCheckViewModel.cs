@@ -51,7 +51,7 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(model.TargetUrl) ? new Uri(model.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
-            }) ?? new PullRequestCheckViewModel[0];
+            }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
                 .Select(model =>
@@ -97,7 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
 
                     return pullRequestCheckViewModel;
-                }) ?? new PullRequestCheckViewModel[0];
+                }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             return statuses.Concat(checks).OrderBy(model => model.Title);
         }

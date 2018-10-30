@@ -245,7 +245,7 @@ namespace GitHub.App.UnitTests.Services
 
         static void SetActiveRepository(IVSGitExt gitExt, ILocalRepositoryModel repo)
         {
-            var repos = repo != null ? new[] { repo } : new ILocalRepositoryModel[0];
+            var repos = repo != null ? new[] { repo } : Array.Empty<ILocalRepositoryModel>();
             gitExt.ActiveRepositories.Returns(repos);
             gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
         }
