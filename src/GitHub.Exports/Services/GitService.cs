@@ -55,7 +55,7 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Updates the CloneUrl from the local repository.
+        /// Updates the CloneUrl and CurrentBranch from the local repository.
         /// </summary>
         public void Refresh(ILocalRepositoryModel localRepositoryModel)
         {
@@ -64,6 +64,8 @@ namespace GitHub.Services
                 return;
 
             localRepositoryModel.CloneUrl = GetUri(localPath);
+
+            RefreshCurrentBranch(localRepositoryModel);
         }
 
         /// <summary>
@@ -199,7 +201,7 @@ namespace GitHub.Services
             });
         }
 
-        void RefreshCurrentBranch(LocalRepositoryModel model)
+        void RefreshCurrentBranch(ILocalRepositoryModel model)
         {
             var localPath = model.LocalPath;
             using (var repo = GetRepository(localPath))

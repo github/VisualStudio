@@ -15,6 +15,6 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the current branch.
         /// </summary>
-        IBranch CurrentBranch { get; }
+        IBranch CurrentBranch { get; set; }
     }
 }
