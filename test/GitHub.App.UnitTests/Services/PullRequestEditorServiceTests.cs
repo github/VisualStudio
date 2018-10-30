@@ -56,6 +56,8 @@ public class PullRequestEditorServiceTests
         var statusBar = Substitute.For<IStatusBarNotificationService>();
         var openFileInSolutionCommand = Substitute.For<IGoToSolutionOrPullRequestFileCommand>();
         var editorOptionsFactoryService = Substitute.For<IEditorOptionsFactoryService>();
+        var draftStore = Substitute.For<IMessageDraftStore>();
+        var peekService = Substitute.For<IInlineCommentPeekService>();
         var usageTracker = Substitute.For<IUsageTracker>();
         return new PullRequestEditorService(
             sp,
@@ -64,6 +66,8 @@ public class PullRequestEditorServiceTests
             statusBar,
             openFileInSolutionCommand,
             editorOptionsFactoryService,
+            draftStore,
+            peekService,
             usageTracker);
     }
 }
