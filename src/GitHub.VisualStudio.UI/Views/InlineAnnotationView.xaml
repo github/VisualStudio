@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"  
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
@@ -38,9 +40,11 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions> 
 
-                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                    <StackPanel Grid.Column="0" Grid.Row="0" Background="Transparent" VerticalAlignment="Center">
+                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                    </StackPanel>
 
                     <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0">
                         <Run FontWeight="SemiBold" Text="{Binding Model.Path, Mode=OneWay}"/>
