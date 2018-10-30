@@ -46,21 +46,21 @@
                         <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0">
+                    <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0" Foreground="{DynamicResource VsBrush.ToolWindowText}">
                         <Run FontWeight="SemiBold" Text="{Binding Model.Path, Mode=OneWay}"/>
                     </TextBlock>
 
-                    <TextBlock Grid.Column="1" Grid.Row="1" FontSize="14" Margin="4 8 0 8">
+                    <TextBlock Grid.Column="1" Grid.Row="1" FontSize="14" Margin="4 8 0 8" Foreground="{DynamicResource VsBrush.ToolWindowText}">
                         <Run FontWeight="SemiBold" Text="{Binding Model.CheckSuiteName, Mode=OneWay}"/>
                         <Run Text="/"/>
                         <Run Text="{Binding Model.CheckRunName, Mode=OneWay}"/>
                     </TextBlock>
 
-                    <TextBlock Grid.Column="1" Grid.Row="2" FontWeight="SemiBold" Margin="4 0 0 8">
+                    <TextBlock Grid.Column="1" Grid.Row="2" FontWeight="SemiBold" Margin="4 0 0 8" Foreground="{DynamicResource VsBrush.ToolWindowText}">
                         <Run Text="{Binding Model.Title, Mode=OneWay}"/>
                     </TextBlock>
 
-                    <TextBlock HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Column="1" Grid.Row="3" Margin="4 0 0 0" FontFamily="Consolas" FontSize="12" Text="{Binding Model.Message}"/>
+                    <TextBlock HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Column="1" Grid.Row="3" Margin="4 0 0 0" FontFamily="Consolas" FontSize="12" Text="{Binding Model.Message}" Foreground="{DynamicResource VsBrush.ToolWindowText}" />
                 </Grid>
             </Border>
         </Grid>
