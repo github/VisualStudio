@@ -69,4 +69,4 @@ csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
 
 # Spacing options
-csharp_space_after_keywords_in_control_flow_statements = true:warning
+csharp_space_after_keywords_in_control_flow_statements = true
