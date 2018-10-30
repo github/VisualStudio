@@ -24,7 +24,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel Background="#f8d45c" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" />
+            <StackPanel Background="#23a1d0" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}" />
+            <StackPanel Background="#f8d45c" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+            <StackPanel Background="#cc180e" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
 
             <Border Grid.Column="1" Padding="8">
                 <Grid>
