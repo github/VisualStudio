@@ -300,7 +300,7 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int fromLine)
         {
-            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDiff: false);
+            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false);
 
             var param = (object) new InlineCommentNavigationParams
             {
