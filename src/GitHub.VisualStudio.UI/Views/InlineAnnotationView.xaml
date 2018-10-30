@@ -11,56 +11,55 @@
         <ghfvs:InlineAnnotationViewModelDesigner />
     </d:DesignProperties.DataContext>
 
-    <Grid Margin="0 0 0 4">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
+    <Border BorderBrush="{DynamicResource VsBrush.ButtonBorder}" BorderThickness="1" HorizontalAlignment="Stretch" Margin="0 0 0 4">
+        <Grid Background="{DynamicResource VsBrush.ToolWindowBackground}" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <StackPanel Background="Blue" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" />
+            <StackPanel Background="#f8d45c" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" />
 
-        <Border Grid.Column="1" Padding="8">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions> 
+            <Border Grid.Column="1" Padding="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions> 
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions> 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions> 
 
-                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-                <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                    <ghfvs:OcticonImage Margin="0 0 0 0" Grid.Column="0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
 
-                <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0">
-                    <Run Text="{Binding Model.Path, Mode=OneWay}"/>
-                    <Run FontWeight="SemiBold" Text="{Binding Model.LineDescription, Mode=OneWay}"/>
-                </TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="0" Margin="4 0 0 0">
+                        <Run FontWeight="SemiBold" Text="{Binding Model.Path, Mode=OneWay}"/>
+                    </TextBlock>
 
-                <TextBlock Grid.Column="1" Grid.Row="1" FontWeight="SemiBold" FontSize="14" Margin="4 8 0 8">
-                    <Run Text="{Binding Model.CheckSuiteName, Mode=OneWay}"/>
-                    <Run Text="/"/>
-                    <Run Text="{Binding Model.CheckRunName, Mode=OneWay}"/>
-                </TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="1" FontSize="14" Margin="4 8 0 8">
+                        <Run FontWeight="SemiBold" Text="{Binding Model.CheckSuiteName, Mode=OneWay}"/>
+                        <Run Text="/"/>
+                        <Run Text="{Binding Model.CheckRunName, Mode=OneWay}"/>
+                    </TextBlock>
 
-                <!--
-                <TextBlock Grid.Column="1" Grid.Row="2" FontWeight="SemiBold" Margin="4 0 0 0">
-                    <Run Text="{Binding Model.Title, Mode=OneWay}"/>
-                </TextBlock>
-                -->
+                    <TextBlock Grid.Column="1" Grid.Row="2" FontWeight="SemiBold" Margin="4 0 0 8">
+                        <Run Text="{Binding Model.Title, Mode=OneWay}"/>
+                    </TextBlock>
 
-                <TextBlock Grid.Column="1" Grid.Row="3" Margin="4 0 0 0" FontFamily="Consolas" FontSize="12" Text="{Binding Model.Message}"/>
-            </Grid>
-        </Border>
-    </Grid>
+                    <TextBlock HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Column="1" Grid.Row="3" Margin="4 0 0 0" FontFamily="Consolas" FontSize="12" Text="{Binding Model.Message}"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 </UserControl>
 
