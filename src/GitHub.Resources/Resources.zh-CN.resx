@@ -335,44 +335,80 @@
   <data name="LogoutRequired" xml:space="preserve">
     <value>需要注销</value>
   </data>
-  <data name="day" xml:space="preserve">
+  <data name="DayAgo" xml:space="preserve">
     <value>{0:N0} 天前</value>
   </data>
-  <data name="days" xml:space="preserve">
+  <data name="DaysAgo" xml:space="preserve">
     <value>{0:N0} 天前</value>
   </data>
-  <data name="hour" xml:space="preserve">
+  <data name="HourAgo" xml:space="preserve">
     <value>{0:N0} 小时前</value>
   </data>
-  <data name="hours" xml:space="preserve">
+  <data name="HoursAgo" xml:space="preserve">
     <value>{0:N0} 小时前</value>
   </data>
   <data name="JustNow" xml:space="preserve">
     <value>就现在</value>
   </data>
-  <data name="minute" xml:space="preserve">
+  <data name="MinuteAgo" xml:space="preserve">
     <value>{0:N0} 分钟前</value>
   </data>
-  <data name="minutes" xml:space="preserve">
+  <data name="MinutesAgo" xml:space="preserve">
     <value>{0:N0} 分钟前</value>
   </data>
-  <data name="month" xml:space="preserve">
+  <data name="MonthAgo" xml:space="preserve">
     <value>{0:N0} 月前</value>
   </data>
-  <data name="months" xml:space="preserve">
+  <data name="MonthsAgo" xml:space="preserve">
     <value>{0:N0} 月前</value>
   </data>
-  <data name="second" xml:space="preserve">
+  <data name="SecondAgo" xml:space="preserve">
     <value>{0:N0} 秒前</value>
   </data>
-  <data name="seconds" xml:space="preserve">
+  <data name="SecondsAgo" xml:space="preserve">
     <value>{0:N0} 秒前</value>
   </data>
-  <data name="year" xml:space="preserve">
+  <data name="YearAgo" xml:space="preserve">
     <value>{0:N0} 年前</value>
   </data>
-  <data name="years" xml:space="preserve">
+  <data name="YearsAgo" xml:space="preserve">
     <value>{0:N0} 年前</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>{0:N0} day</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>{0:N0} days</value>
+  </data>
+  <data name="Hour" xml:space="preserve">
+    <value>{0:N0} hour</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>{0:N0} hours</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>{0:N0} minute</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>{0:N0} minutes</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>{0:N0} month</value>
+  </data>
+  <data name="Months" xml:space="preserve">
+    <value>{0:N0} months</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+    <value>{0:N0} second</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>{0:N0} seconds</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>{0:N0} year</value>
+  </data>
+  <data name="Years" xml:space="preserve">
+    <value>{0:N0} years</value>
   </data>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
     <value>无效的验证码</value>

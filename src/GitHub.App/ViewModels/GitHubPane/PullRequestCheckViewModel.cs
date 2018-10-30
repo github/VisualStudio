@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
@@ -11,10 +12,12 @@ using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.UI.Converters;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
+    /// <inheritdoc cref="IPullRequestCheckViewModel"/>
     [Export(typeof(IPullRequestCheckViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
@@ -94,22 +97,13 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
                     pullRequestCheckViewModel.Title = model.Name;
 
-                    var description = new StringBuilder(model.Conclusion.ToString());
-
                     if (model.StartedAt.HasValue && model.CompletedAt.HasValue)
                     {
-                        description.Append(" in ");
-                        var timeSpan = model.CompletedAt.Value - model.StartedAt.Value;
-                        description.Append(timeSpan.ToString());
+                        var timeSpanString = TimeSpanExtensions.Humanize(model.CompletedAt.Value - model.StartedAt.Value, CultureInfo.CurrentCulture, TimeSpanExtensions.OutputTense.Completed);
+                        pullRequestCheckViewModel.DurationStatus = $"{checkStatus} - {timeSpanString}";
                     }
 
-                    if (!string.IsNullOrEmpty(model.Title))
-                    {
-                        description.Append(" - ");
-                        description.Append(model.Title);
-                    }
-
-                    pullRequestCheckViewModel.Description = description.ToString();
+                    pullRequestCheckViewModel.Description = model.Title;
                     pullRequestCheckViewModel.Status = checkStatus;
                     pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
 
@@ -141,16 +135,24 @@ namespace GitHub.ViewModels.GitHubPane
             usageTracker.IncrementCounter(expression).Forget();
         }
 
+        /// <inheritdoc/>
         public string Title { get; private set; }
 
+        /// <inheritdoc/>
+        public string DurationStatus { get; private set; }
+
+        /// <inheritdoc/>
         public string Description { get; private set; }
 
         public PullRequestCheckType CheckType { get; private set; }
 
+        /// <inheritdoc/>
         public PullRequestCheckStatus Status{ get; private set; }
 
+        /// <inheritdoc/>
         public Uri DetailsUrl { get; private set; }
 
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
     }
 }

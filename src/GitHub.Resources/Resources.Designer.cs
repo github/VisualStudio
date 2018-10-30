@@ -451,20 +451,38 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} day.
+        /// </summary>
+        public static string Day {
+            get {
+                return ResourceManager.GetString("Day", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} day ago.
         /// </summary>
-        public static string day {
+        public static string DayAgo {
             get {
-                return ResourceManager.GetString("day", resourceCulture);
+                return ResourceManager.GetString("DayAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} days.
+        /// </summary>
+        public static string Days {
+            get {
+                return ResourceManager.GetString("Days", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} days ago.
         /// </summary>
-        public static string days {
+        public static string DaysAgo {
             get {
-                return ResourceManager.GetString("days", resourceCulture);
+                return ResourceManager.GetString("DaysAgo", resourceCulture);
             }
         }
         
@@ -757,20 +775,38 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} hour.
+        /// </summary>
+        public static string Hour {
+            get {
+                return ResourceManager.GetString("Hour", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} hour ago.
         /// </summary>
-        public static string hour {
+        public static string HourAgo {
             get {
-                return ResourceManager.GetString("hour", resourceCulture);
+                return ResourceManager.GetString("HourAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} hours.
+        /// </summary>
+        public static string Hours {
+            get {
+                return ResourceManager.GetString("Hours", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} hours ago.
         /// </summary>
-        public static string hours {
+        public static string HoursAgo {
             get {
-                return ResourceManager.GetString("hours", resourceCulture);
+                return ResourceManager.GetString("HoursAgo", resourceCulture);
             }
         }
         
@@ -973,38 +1009,74 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} minute.
+        /// </summary>
+        public static string Minute {
+            get {
+                return ResourceManager.GetString("Minute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} minute ago.
         /// </summary>
-        public static string minute {
+        public static string MinuteAgo {
             get {
-                return ResourceManager.GetString("minute", resourceCulture);
+                return ResourceManager.GetString("MinuteAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} minutes.
+        /// </summary>
+        public static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} minutes ago.
         /// </summary>
-        public static string minutes {
+        public static string MinutesAgo {
             get {
-                return ResourceManager.GetString("minutes", resourceCulture);
+                return ResourceManager.GetString("MinutesAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} month.
+        /// </summary>
+        public static string Month {
+            get {
+                return ResourceManager.GetString("Month", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} month ago.
         /// </summary>
-        public static string month {
+        public static string MonthAgo {
             get {
-                return ResourceManager.GetString("month", resourceCulture);
+                return ResourceManager.GetString("MonthAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} months.
+        /// </summary>
+        public static string Months {
+            get {
+                return ResourceManager.GetString("Months", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} months ago.
         /// </summary>
-        public static string months {
+        public static string MonthsAgo {
             get {
-                return ResourceManager.GetString("months", resourceCulture);
+                return ResourceManager.GetString("MonthsAgo", resourceCulture);
             }
         }
         
@@ -1774,20 +1846,38 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} second.
+        /// </summary>
+        public static string Second {
+            get {
+                return ResourceManager.GetString("Second", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} second ago.
         /// </summary>
-        public static string second {
+        public static string SecondAgo {
             get {
-                return ResourceManager.GetString("second", resourceCulture);
+                return ResourceManager.GetString("SecondAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} seconds.
+        /// </summary>
+        public static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} seconds ago.
         /// </summary>
-        public static string seconds {
+        public static string SecondsAgo {
             get {
-                return ResourceManager.GetString("seconds", resourceCulture);
+                return ResourceManager.GetString("SecondsAgo", resourceCulture);
             }
         }
         
@@ -2163,20 +2253,38 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} year.
+        /// </summary>
+        public static string Year {
+            get {
+                return ResourceManager.GetString("Year", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0:N0} year ago.
         /// </summary>
-        public static string year {
+        public static string YearAgo {
             get {
-                return ResourceManager.GetString("year", resourceCulture);
+                return ResourceManager.GetString("YearAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} years.
+        /// </summary>
+        public static string Years {
+            get {
+                return ResourceManager.GetString("Years", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to {0:N0} years ago.
         /// </summary>
-        public static string years {
+        public static string YearsAgo {
             get {
-                return ResourceManager.GetString("years", resourceCulture);
+                return ResourceManager.GetString("YearsAgo", resourceCulture);
             }
         }
         

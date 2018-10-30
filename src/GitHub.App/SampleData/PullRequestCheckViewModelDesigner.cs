@@ -13,6 +13,8 @@ namespace GitHub.SampleData
 
         public string Description { get; set; } = "AppVeyor build failed";
 
+        public string DurationStatus { get; set; }
+
         public PullRequestCheckStatus Status { get; set; } = PullRequestCheckStatus.Failure;
 
         public Uri DetailsUrl { get; set; } = new Uri("http://github.com");

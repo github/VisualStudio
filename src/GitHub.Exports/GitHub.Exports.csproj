@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj" />
+    <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj" />
   </ItemGroup>
 
   <ItemGroup>
