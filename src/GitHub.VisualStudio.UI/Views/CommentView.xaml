@@ -89,7 +89,8 @@
               </StackPanel>
             </DockPanel>
 
-            <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+            <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1"
+                                    Name="bodyMarkdown"
                                     Margin="0 2 0 0"
                                     Foreground="{DynamicResource VsBrush.WindowText}"
                                     Markdown="{Binding Body}"/>

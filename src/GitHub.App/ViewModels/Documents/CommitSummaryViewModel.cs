@@ -9,10 +9,12 @@ namespace GitHub.ViewModels.Documents
         public CommitSummaryViewModel(CommitModel model)
         {
             AbbreviatedOid = model.AbbreviatedOid;
+            Author = new ActorViewModel(model.Author);
             Header = model.MessageHeadline;
         }
 
         public string AbbreviatedOid { get; }
+        public IActorViewModel Author { get; }
         public string Header { get; }
     }
 }

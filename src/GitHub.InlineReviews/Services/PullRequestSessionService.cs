@@ -283,8 +283,8 @@ namespace GitHub.InlineReviews.Services
             if (readPullRequest == null)
             {
                 readPullRequest = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
-                    .PullRequest(Var(nameof(number)))
+                    .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
+                    .PullRequest(number: Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
                         Id = pr.Id.Value,
@@ -356,6 +356,30 @@ namespace GitHub.InlineReviews.Services
                                 Url = comment.Url,
                             }).ToList(),
                         }).ToList(),
+                        Timeline = pr.Timeline(null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                            when.Commit(commit => new CommitModel
+                            {
+                                AbbreviatedOid = commit.AbbreviatedOid,
+                                // TODO: commit.Author.User can be null
+                                Author = new ActorModel
+                                {
+                                    Login = commit.Author.User.Login,
+                                    AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                },
+                                MessageHeadline = commit.MessageHeadline,
+                            }).IssueComment(comment => new CommentModel
+                            {
+                                Author = new ActorModel
+                                {
+                                    Login = comment.Author.Login,
+                                    AvatarUrl = comment.Author.AvatarUrl(null),
+                                },
+                                Body = comment.Body,
+                                CreatedAt = comment.CreatedAt,
+                                DatabaseId = comment.DatabaseId.Value,
+                                Id = comment.Id.Value,
+                                Url = comment.Url,
+                            }))).ToList()
                     }).Compile();
             }
 
@@ -778,8 +802,8 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
-                          .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
+                          .PullRequest(number: Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
@@ -816,8 +840,8 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatusesEnterprise == null)
                 {
                     readCommitStatusesEnterprise = new Query()
-                     .Repository(Var(nameof(owner)), Var(nameof(name)))
-                     .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                     .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
+                     .PullRequest(number: Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
                              Statuses = commit.Commit.Status

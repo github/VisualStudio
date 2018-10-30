@@ -16,7 +16,7 @@ namespace GitHub.ViewModels.Documents
     /// </summary>
     [Export(typeof(IPullRequestPageViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestPageViewModel : PullRequestViewModelBase, IPullRequestPageViewModel
+    public class PullRequestPageViewModel : PullRequestViewModelBase, IPullRequestPageViewModel, ICommentThreadViewModel
     {
         readonly IViewViewModelFactory factory;
         readonly IPullRequestSessionManager sessionManager;
@@ -38,7 +38,13 @@ namespace GitHub.ViewModels.Documents
         }
 
         /// <inheritdoc/>
+        public IActorViewModel CurrentUser { get; private set; }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IViewModel> Timeline { get; private set; }
+
+        /// <inheritdoc/>
+        IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
@@ -47,34 +53,53 @@ namespace GitHub.ViewModels.Documents
         {
             await base.InitializeAsync(model).ConfigureAwait(true);
 
-            Timeline = new IViewModel[]
-            {
-                new CommitSummariesViewModel(
-                    new CommitSummaryViewModel(new CommitModel
-                    {
-                        Author = new ActorModel { Login = "grokys" },
-                        AbbreviatedOid = "c7c7d25",
-                        MessageHeadline = "Refactor comment view models."
-                    }),
-                    new CommitSummaryViewModel(new CommitModel
-                    {
-                        Author = new ActorModel { Login = "grokys" },
-                        AbbreviatedOid = "04e6a90",
-                        MessageHeadline = "Refactor comment view models.",
-                    })),
-                new CommentViewModelDesigner
-                {
-                    Author = new ActorViewModelDesigner("meaghanlewis"),
-                    Body = @"This is looking great! Really enjoying using this feature so far.
+            CurrentUser = new ActorViewModel(currentUser);
 
-When leaving an inline comment, the comment posts successfully and then a new comment is drafted with the same text.",
-                },
-                new CommentViewModelDesigner
+            var timeline = new ReactiveList<IViewModel>();
+            var commits = new List<CommitSummaryViewModel>();
+
+            foreach (var i in model.Timeline)
+            {
+                if (!(i is CommitModel) && commits.Count > 0)
                 {
-                    Author = new ActorViewModelDesigner("grokys"),
-                    Body = @"Oops, sorry about that @meaghanlewis - I was sure I tested those things, but must have got messed up again at some point. Should be fixed now.",
-                },
-            };
+                    timeline.Add(new CommitSummariesViewModel(commits));
+                    commits.Clear();
+                }
+
+                switch (i)
+                {
+                    case CommitModel commit:
+                        commits.Add(new CommitSummaryViewModel(commit));
+                        break;
+                    case CommentModel comment:
+                        var vm = factory.CreateViewModel<ICommentViewModel>();
+                        await vm.InitializeAsync(this, currentUser, comment, CommentEditState.None).ConfigureAwait(true);
+                        timeline.Add(vm);
+                        break;
+                }
+            }
+
+            if (commits.Count > 0)
+            {
+                timeline.Add(new CommitSummariesViewModel(commits));
+            }
+
+            Timeline = timeline;
+        }
+
+        Task ICommentThreadViewModel.DeleteComment(int pullRequestId, int commentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task ICommentThreadViewModel.EditComment(string id, string body)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task ICommentThreadViewModel.PostComment(string body)
+        {
+            throw new NotImplementedException();
         }
     }
 }

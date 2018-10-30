@@ -76,5 +76,10 @@ namespace GitHub.Models
         /// into threads, as such each pull request review comment will appear in both collections.
         /// </remarks>
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pull request timeline entries.
+        /// </summary>
+        public IReadOnlyList<object> Timeline { get; set; }
     }
 }

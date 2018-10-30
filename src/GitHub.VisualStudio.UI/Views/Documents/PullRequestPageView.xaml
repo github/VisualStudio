@@ -7,7 +7,7 @@
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
-             mc:Ignorable="d"  d:DesignHeight="2048" d:DesignWidth="800"
+             mc:Ignorable="d"  d:DesignHeight="1200" d:DesignWidth="800"
              MaxWidth="800">
     <d:DesignData.DataContext>
         <ghfvs:PullRequestPageViewModelDesigner/>
@@ -100,15 +100,24 @@
                                            Height="16"
                                            Margin="2"
                                            ViewModel="{Binding Author}"/>
-                        <TextBlock DockPanel.Dock="Right">
+                        <TextBlock DockPanel.Dock="Right"
+                                   FontFamily="Consolas"
+                                   Margin="0,0,0,2"
+                                   VerticalAlignment="Center">
                             <Hyperlink>
                                 <Run Text="{Binding AbbreviatedOid, Mode=OneWay}"/>
                             </Hyperlink>
                         </TextBlock>
-                        <TextBlock Text="{Binding Header}"/>
+                        <TextBlock Margin="0,0,0,2"
+                                   Text="{Binding Header}" 
+                                   VerticalAlignment="Center"/>
                     </DockPanel>
                 </DataTemplate>
-                
+
+                <DataTemplate DataType="{x:Type ghfvs:CommentViewModel}">
+                    <v:CommentView/>
+                </DataTemplate>
+
                 <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
                     <v:CommentView/>
                 </DataTemplate>
