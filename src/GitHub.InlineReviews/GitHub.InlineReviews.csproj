@@ -81,6 +81,7 @@
     <Compile Include="Margins\InlineCommentMargin.cs" />
     <Compile Include="Margins\InlineCommentMarginVisible.cs" />
     <Compile Include="Margins\InlineCommentMarginEnabled.cs" />
+    <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="PullRequestStatusBarPackage.cs" />
     <Compile Include="InlineReviewsPackage.cs" />
     <Compile Include="Models\InlineCommentThreadModel.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Models\PullRequestSessionFile.cs" />
     <Compile Include="Services\PullRequestStatusBarManager.cs" />
     <Compile Include="Tags\MouseEnterAndLeaveEventRouter.cs" />
-    <Compile Include="Peek\InlineCommentPeekableItem.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSource.cs" />
     <Compile Include="Peek\InlineCommentPeekableItemSourceProvider.cs" />
     <Compile Include="Peek\InlineCommentPeekableResultSource.cs" />
@@ -97,9 +97,7 @@
     <Compile Include="Peek\InlineCommentPeekResultPresentation.cs" />
     <Compile Include="Peek\InlineCommentPeekResultPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IInlineCommentPeekService.cs" />
     <Compile Include="Services\IPullRequestSessionService.cs" />
-    <Compile Include="Services\InlineCommentPeekService.cs" />
     <Compile Include="Services\PullRequestSession.cs" />
     <Compile Include="Services\PullRequestSessionManager.cs" />
     <Compile Include="Margins\InlineCommentMarginProvider.cs" />
