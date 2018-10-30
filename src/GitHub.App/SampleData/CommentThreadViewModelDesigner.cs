@@ -80,8 +80,8 @@ namespace GitHub.SampleData
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };
 
-        public Task DeleteComment(int pullRequestId, int commentId) => Task.CompletedTask;
-        public Task EditComment(string id, string body) => Task.CompletedTask;
-        public Task PostComment(string body) => Task.CompletedTask;
+        public Task DeleteComment(ICommentViewModel comment) => Task.CompletedTask;
+        public Task EditComment(ICommentViewModel comment) => Task.CompletedTask;
+        public Task PostComment(ICommentViewModel comment) => Task.CompletedTask;
     }
 }

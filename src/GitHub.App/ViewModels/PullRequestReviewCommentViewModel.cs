@@ -67,6 +67,7 @@ namespace GitHub.ViewModels
         public async Task InitializeAsPlaceholderAsync(
             IPullRequestSession session,
             ICommentThreadViewModel thread,
+            bool isPending,
             bool isEditing)
         {
             Guard.ArgumentNotNull(session, nameof(session));
@@ -77,6 +78,7 @@ namespace GitHub.ViewModels
                 null,
                 isEditing ? CommentEditState.Editing : CommentEditState.Placeholder).ConfigureAwait(true);
             this.session = session;
+            IsPending = isPending;
         }
 
         /// <inheritdoc/>
@@ -101,7 +103,7 @@ namespace GitHub.ViewModels
 
             try
             {
-                await session.StartReview().ConfigureAwait(false);
+                await session.StartReview().ConfigureAwait(true);
                 await CommitEdit.Execute();
             }
             finally

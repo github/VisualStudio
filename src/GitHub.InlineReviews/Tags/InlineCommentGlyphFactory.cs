@@ -7,6 +7,8 @@ using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using GitHub.InlineReviews.Services;
+using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -88,12 +90,14 @@ namespace GitHub.InlineReviews.Tags
 
             if (addTag != null)
             {
-                peekService.Show(textView, addTag);
+                var side = addTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, addTag.LineNumber);
                 return true;
             }
             else if (showTag != null)
             {
-                peekService.Show(textView, showTag);
+                var side = showTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, showTag.LineNumber);
                 return true;
             }
 

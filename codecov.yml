@@ -32,3 +32,4 @@ ignore:
   - "*.xaml"
   - "*.xaml.cs"
   - "**/SampleData/*"
+  - "src/GitHub.App/sqlite-net/*"

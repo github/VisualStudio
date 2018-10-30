@@ -2,15 +2,9 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Factories;
-using GitHub.InlineReviews.Peek;
-using GitHub.InlineReviews.Tags;
 using GitHub.Models;
-using GitHub.Primitives;
-using GitHub.Services;
+using GitHub.ViewModels;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
@@ -18,7 +12,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Outlining;
 using Microsoft.VisualStudio.Text.Projection;
 
-namespace GitHub.InlineReviews.Services
+namespace GitHub.Services
 {
     /// <summary>
     /// Shows inline comments in a peek view.
@@ -26,6 +20,7 @@ namespace GitHub.InlineReviews.Services
     [Export(typeof(IInlineCommentPeekService))]
     class InlineCommentPeekService : IInlineCommentPeekService
     {
+        const string relationship = "GitHubCodeReview";
         readonly IOutliningManagerService outliningService;
         readonly IPeekBroker peekBroker;
         readonly IUsageTracker usageTracker;
@@ -90,69 +85,46 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public ITrackingPoint Show(ITextView textView, AddInlineCommentTag tag)
+        public ITrackingPoint Show(ITextView textView, DiffSide side, int lineNumber)
         {
-            Guard.ArgumentNotNull(tag, nameof(tag));
-
-            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
+            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, side, lineNumber);
             var line = lineAndtrackingPoint.Item1;
             var trackingPoint = lineAndtrackingPoint.Item2;
             var options = new PeekSessionCreationOptions(
                 textView,
-                InlineCommentPeekRelationship.Instance.Name,
+                relationship,
                 trackingPoint,
                 defaultHeight: 0);
 
             ExpandCollapsedRegions(textView, line.Extent);
 
             var session = peekBroker.TriggerPeekSession(options);
-            var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
-            item?.ViewModel.Close.Take(1).Subscribe(_ => session.Dismiss());
-
+            var item = session.PeekableItems.OfType<IClosable>().FirstOrDefault();
+            item?.Closed.Take(1).Subscribe(_ => session.Dismiss());
+            
             return trackingPoint;
         }
 
-        /// <inheritdoc/>
-        public ITrackingPoint Show(ITextView textView, ShowInlineCommentTag tag)
-        {
-            Guard.ArgumentNotNull(textView, nameof(textView));
-            Guard.ArgumentNotNull(tag, nameof(tag));
-
-            var lineAndtrackingPoint = GetLineAndTrackingPoint(textView, tag);
-            var line = lineAndtrackingPoint.Item1;
-            var trackingPoint = lineAndtrackingPoint.Item2;
-            var options = new PeekSessionCreationOptions(
-                textView,
-                InlineCommentPeekRelationship.Instance.Name,
-                trackingPoint,
-                defaultHeight: 0);
-
-            ExpandCollapsedRegions(textView, line.Extent);
-
-            var session = peekBroker.TriggerPeekSession(options);
-            var item = session.PeekableItems.OfType<InlineCommentPeekableItem>().FirstOrDefault();
-            item?.ViewModel.Close.Take(1).Subscribe(_ => session.Dismiss());
-
-            return trackingPoint;
-        }
-
-        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(ITextView textView, InlineCommentTag tag)
+        Tuple<ITextSnapshotLine, ITrackingPoint> GetLineAndTrackingPoint(
+            ITextView textView,
+            DiffSide side,
+            int lineNumber)
         {
             var diffModel = (textView as IWpfTextView)?.TextViewModel as IDifferenceTextViewModel;
             var snapshot = textView.TextSnapshot;
 
             if (diffModel?.ViewType == DifferenceViewType.InlineView)
             {
-                snapshot = tag.DiffChangeType == DiffChangeType.Delete ?
+                snapshot = side == DiffSide.Left ?
                     diffModel.Viewer.DifferenceBuffer.LeftBuffer.CurrentSnapshot :
                     diffModel.Viewer.DifferenceBuffer.RightBuffer.CurrentSnapshot;
             }
 
-            var line = snapshot.GetLineFromLineNumber(tag.LineNumber);
+            var line = snapshot.GetLineFromLineNumber(lineNumber);
             var trackingPoint = snapshot.CreateTrackingPoint(line.Start.Position, PointTrackingMode.Positive);
 
             ExpandCollapsedRegions(textView, line.Extent);
-            peekBroker.TriggerPeekSession(textView, trackingPoint, InlineCommentPeekRelationship.Instance.Name);
+            peekBroker.TriggerPeekSession(textView, trackingPoint, relationship);
 
             usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentOpen).Forget();
 

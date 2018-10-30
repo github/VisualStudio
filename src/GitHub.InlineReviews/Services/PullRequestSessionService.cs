@@ -809,7 +809,7 @@ namespace GitHub.InlineReviews.Services
                                                           EndLine = annotation.Location.End.Line,
                                                       }).ToList()
                                               }).ToList(),
-                                          ApplicationName = suite.App.Name,
+                                          ApplicationName = suite.App != null ? suite.App.Name : "Private App"
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>

@@ -165,8 +165,6 @@ namespace GitHub.InlineReviews.ViewModels
 
         async Task UpdateThread()
         {
-            var placeholderBody = GetPlaceholderBodyToPreserve();
-
             Thread = null;
             threadSubscription?.Dispose();
 
@@ -184,27 +182,18 @@ namespace GitHub.InlineReviews.ViewModels
                 .Select(model => new InlineAnnotationViewModel(model))
                 .ToArray();
 
-            Thread = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
+            var vm = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
 
             if (thread?.Comments.Count > 0)
             {
-                await Thread.InitializeAsync(session, annotationModels, file, thread.Comments[0].Review, thread, true);
+                await vm.InitializeAsync(session, annotationModels, file, thread.Comments[0].Review, thread, true);
             }
             else
             {
-                await Thread.InitializeNewAsync(session, annotationModels, file, lineNumber, side, true);
+                await vm.InitializeNewAsync(session, annotationModels, file, lineNumber, side, true);
             }
 
-            if (!string.IsNullOrWhiteSpace(placeholderBody))
-            {
-                var placeholder = Thread.Comments.LastOrDefault();
-
-                if (placeholder?.EditState == CommentEditState.Placeholder)
-                {
-                    await placeholder.BeginEdit.Execute();
-                    placeholder.Body = placeholderBody;
-                }
-            }
+            Thread = vm;
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)
@@ -222,18 +211,6 @@ namespace GitHub.InlineReviews.ViewModels
             {
                 await UpdateThread();
             }
-        }
-
-        string GetPlaceholderBodyToPreserve()
-        {
-            var lastComment = Thread?.Comments.LastOrDefault();
-
-            if (lastComment?.EditState == CommentEditState.Editing)
-            {
-                if (!lastComment.IsSubmitting) return lastComment.Body;
-            }
-
-            return null;
         }
     }
 }

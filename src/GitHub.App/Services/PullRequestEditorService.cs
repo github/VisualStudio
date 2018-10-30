@@ -5,9 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using EnvDTE;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.ViewModels;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
@@ -18,7 +21,6 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
-using EnvDTE;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -39,6 +41,8 @@ namespace GitHub.Services
         readonly IStatusBarNotificationService statusBar;
         readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IEditorOptionsFactoryService editorOptionsFactoryService;
+        readonly IMessageDraftStore draftStore;
+        readonly IInlineCommentPeekService peekService;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -49,6 +53,8 @@ namespace GitHub.Services
             IStatusBarNotificationService statusBar,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IEditorOptionsFactoryService editorOptionsFactoryService,
+            IMessageDraftStore draftStore,
+            IInlineCommentPeekService peekService,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
@@ -58,6 +64,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(goToSolutionOrPullRequestFileCommand));
             Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(editorOptionsFactoryService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
+            Guard.ArgumentNotNull(draftStore, nameof(draftStore));
 
             this.serviceProvider = serviceProvider;
             this.pullRequestService = pullRequestService;
@@ -65,6 +73,8 @@ namespace GitHub.Services
             this.statusBar = statusBar;
             this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
             this.editorOptionsFactoryService = editorOptionsFactoryService;
+            this.draftStore = draftStore;
+            this.peekService = peekService;
             this.usageTracker = usageTracker;
         }
 
@@ -129,7 +139,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDiff)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDraftOrDiff)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
@@ -168,10 +178,35 @@ namespace GitHub.Services
                 var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
+                var openThread = (line: -1, side: DiffSide.Left);
+                var scrollToFirstDiff = false;
 
                 if (!workingDirectory)
                 {
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
+
+                if (scrollToFirstDraftOrDiff)
+                {
+                    var (key, _) = PullRequestReviewCommentThreadViewModel.GetDraftKeys(
+                        session.LocalRepository.CloneUrl.WithOwner(session.RepositoryOwner),
+                        session.PullRequest.Number,
+                        relativePath,
+                        0);
+                    var drafts = (await draftStore.GetDrafts<PullRequestReviewCommentDraft>(key)
+                        .ConfigureAwait(true))
+                        .OrderByDescending(x => x.data.UpdatedAt)
+                        .ToList();
+
+                    if (drafts.Count > 0 && int.TryParse(drafts[0].secondaryKey, out var line))
+                    {
+                        openThread = (line, drafts[0].data.Side);
+                        scrollToFirstDiff = false;
+                    }
+                    else
+                    {
+                        scrollToFirstDiff = true;
+                    }
                 }
 
                 IVsWindowFrame frame;
@@ -227,6 +262,18 @@ namespace GitHub.Services
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
+
+                if (openThread.line != -1)
+                {
+                    var view = diffViewer.ViewMode == DifferenceViewMode.Inline ?
+                        diffViewer.InlineView :
+                        openThread.side == DiffSide.Left ? diffViewer.LeftView : diffViewer.RightView;
+                    
+                    // HACK: We need to wait here for the view to initialize or the peek session won't appear.
+                    // There must be a better way of doing this.
+                    await Task.Delay(1500).ConfigureAwait(true);
+                    peekService.Show(view, openThread.side, openThread.line);
+                }
 
                 return diffViewer;
             }

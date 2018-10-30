@@ -176,12 +176,12 @@ namespace GitHub.Services
         IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
-        /// Gets the encoding for the specified file.
+        /// Gets the encoding for the specified local file.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="relativePath">The relative path to the file in the repository.</param>
         /// <returns>
-        /// The file's encoding or <see cref="Encoding.Default"/> if the file doesn't exist.
+        /// The file's encoding or null if the file doesn't exist locally.
         /// </returns>
         Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath);
 
@@ -192,7 +192,9 @@ namespace GitHub.Services
         /// <param name="pullRequest">The pull request details.</param>
         /// <param name="relativePath">The path to the file, relative to the repository root.</param>
         /// <param name="commitSha">The SHA of the commit.</param>
-        /// <param name="encoding">The encoding to use.</param>
+        /// <param name="encoding">
+        /// The encoding to save the file with. If null, will use the file's original encoding.
+        /// </param>
         /// <returns>The path to the temporary file.</returns>
         Task<string> ExtractToTempFile(
             ILocalRepositoryModel repository,
