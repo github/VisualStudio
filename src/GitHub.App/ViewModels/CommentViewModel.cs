@@ -219,7 +219,7 @@ namespace GitHub.ViewModels
                     ErrorMessage = null;
                     IsSubmitting = true;
 
-                    await Thread.DeleteComment(PullRequestId, DatabaseId).ConfigureAwait(true);
+                    await Thread.DeleteComment(this).ConfigureAwait(true);
                 }
                 catch (Exception e)
                 {
@@ -264,12 +264,14 @@ namespace GitHub.ViewModels
 
                 if (Id == null)
                 {
-                    await Thread.PostComment(Body).ConfigureAwait(true);
+                    await Thread.PostComment(this).ConfigureAwait(true);
                 }
                 else
                 {
-                    await Thread.EditComment(Id, Body).ConfigureAwait(true);
+                    await Thread.EditComment(this).ConfigureAwait(true);
                 }
+
+                EditState = CommentEditState.None;
             }
             catch (Exception e)
             {

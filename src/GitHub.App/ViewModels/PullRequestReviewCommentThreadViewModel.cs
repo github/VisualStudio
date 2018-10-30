@@ -1,12 +1,17 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
+using static System.FormattableString;
 
 namespace GitHub.ViewModels
 {
@@ -25,9 +30,13 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewCommentThreadViewModel"/> class.
         /// </summary>
+        /// <param name="draftStore">The message draft store.</param>
         /// <param name="factory">The view model factory.</param>
         [ImportingConstructor]
-        public PullRequestReviewCommentThreadViewModel(IViewViewModelFactory factory)
+        public PullRequestReviewCommentThreadViewModel(
+            IMessageDraftStore draftStore,
+            IViewViewModelFactory factory)
+            : base(draftStore)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
 
@@ -76,7 +85,7 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User, annotations).ConfigureAwait(false);
+            await base.InitializeAsync(session.User, annotations).ConfigureAwait(true);
 
             Session = session;
             File = file;
@@ -98,8 +107,23 @@ namespace GitHub.ViewModels
             if (addPlaceholder)
             {
                 var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
-                await vm.InitializeAsPlaceholderAsync(session, this, false).ConfigureAwait(false);
-                Comments.Add(vm);
+
+                await vm.InitializeAsPlaceholderAsync(
+                    session,
+                    this,
+                    review.State == PullRequestReviewState.Pending,
+                    false).ConfigureAwait(true);
+
+                var (key, secondaryKey) = GetDraftKeys(vm);
+                var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
+
+                if (draft?.Side == Side)
+                {
+                    await vm.BeginEdit.Execute();
+                    vm.Body = draft.Body;
+                }
+
+                AddPlaceholder(vm);
             }
         }
 
@@ -123,13 +147,22 @@ namespace GitHub.ViewModels
             IsNewThread = true;
 
             var vm = factory.CreateViewModel<IPullRequestReviewCommentViewModel>();
-            await vm.InitializeAsPlaceholderAsync(session, this, isEditing).ConfigureAwait(false);
-            Comments.Add(vm);
+            await vm.InitializeAsPlaceholderAsync(session, this, session.HasPendingReview, isEditing).ConfigureAwait(false);
+
+            var (key, secondaryKey) = GetDraftKeys(vm);
+            var draft = await DraftStore.GetDraft<PullRequestReviewCommentDraft>(key, secondaryKey).ConfigureAwait(true);
+
+            if (draft?.Side == side)
+            {
+                vm.Body = draft.Body;
+            }
+
+            AddPlaceholder(vm);
         }
 
-        public override async Task PostComment(string body)
+        public override async Task PostComment(ICommentViewModel comment)
         {
-            Guard.ArgumentNotNull(body, nameof(body));
+            Guard.ArgumentNotNull(comment, nameof(comment));
 
             if (IsNewThread)
             {
@@ -147,7 +180,7 @@ namespace GitHub.ViewModels
                 }
 
                 await Session.PostReviewComment(
-                    body,
+                    comment.Body,
                     File.CommitSha,
                     File.RelativePath.Replace("\\", "/"),
                     File.Diff,
@@ -156,21 +189,54 @@ namespace GitHub.ViewModels
             else
             {
                 var replyId = Comments[0].Id;
-                await Session.PostReviewComment(body, replyId).ConfigureAwait(false);
+                await Session.PostReviewComment(comment.Body, replyId).ConfigureAwait(false);
             }
+
+            await DeleteDraft(comment).ConfigureAwait(false);
         }
 
-        public override async Task EditComment(string id, string body)
+        public override async Task EditComment(ICommentViewModel comment)
         {
-            Guard.ArgumentNotNull(id, nameof(id));
-            Guard.ArgumentNotNull(body, nameof(body));
+            Guard.ArgumentNotNull(comment, nameof(comment));
 
-            await Session.EditComment(id, body).ConfigureAwait(false);
+            await Session.EditComment(comment.Id, comment.Body).ConfigureAwait(false);
         }
 
-        public override async Task DeleteComment(int pullRequestId, int commentId)
+        public override async Task DeleteComment(ICommentViewModel comment)
         {
-            await Session.DeleteComment(pullRequestId, commentId).ConfigureAwait(false);
+            Guard.ArgumentNotNull(comment, nameof(comment));
+
+            await Session.DeleteComment(comment.PullRequestId, comment.DatabaseId).ConfigureAwait(false);
+        }
+
+        public static (string key, string secondaryKey) GetDraftKeys(
+            UriString cloneUri,
+            int pullRequestNumber,
+            string relativePath,
+            int lineNumber)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+            var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{relativePath}");
+            return (key, lineNumber.ToString(CultureInfo.InvariantCulture));
+        }
+
+        protected override CommentDraft BuildDraft(ICommentViewModel comment)
+        {
+            return new PullRequestReviewCommentDraft
+            {
+                Body = comment.Body,
+                Side = Side,
+                UpdatedAt = DateTimeOffset.UtcNow,
+            };
+        }
+
+        protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment)
+        {
+            return GetDraftKeys(
+                Session.LocalRepository.CloneUrl.WithOwner(Session.RepositoryOwner),
+                Session.PullRequest.Number,
+                File.RelativePath,
+                LineNumber);
         }
     }
 }

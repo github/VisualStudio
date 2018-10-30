@@ -23,17 +23,20 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Called by a comment in the thread to post itself as a new comment to the API.
         /// </summary>
-        Task PostComment(string body);
+        /// <param name="comment">The comment to post.</param>
+        Task PostComment(ICommentViewModel comment);
 
         /// <summary>
         /// Called by a comment in the thread to post itself as an edit to a comment to the API.
         /// </summary>
-        Task EditComment(string id, string body);
+        /// <param name="comment">The comment to edit.</param>
+        Task EditComment(ICommentViewModel comment);
 
         /// <summary>
         /// Called by a comment in the thread to delete the comment on the API.
         /// </summary>
-        Task DeleteComment(int pullRequestId, int commentId);
+        /// <param name="comment">The comment to delete.</param>
+        Task DeleteComment(ICommentViewModel comment);
 
         /// <summary>
         /// Gets the annotations displayed.
