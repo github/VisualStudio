@@ -39,6 +39,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
+        readonly IGitService gitService;
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -77,7 +78,8 @@ namespace GitHub.ViewModels.GitHubPane
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
             ISyncSubmodulesCommand syncSubmodulesCommand,
-            IViewViewModelFactory viewViewModelFactory)
+            IViewViewModelFactory viewViewModelFactory,
+            IGitService gitService)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -86,6 +88,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
             Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -94,6 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
+            this.gitService = gitService;
             Files = files;
 
             Checkout = ReactiveCommand.CreateFromObservable(
@@ -401,6 +405,8 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
+                // HACK: This is only necessary because the CurrentBranch is being read too early
+                gitService.Refresh(LocalRepository);
                 IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
 
                 if (IsCheckedOut)
