@@ -30,6 +30,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.3-beta" />
   </ItemGroup>
 </Project>
