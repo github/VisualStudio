@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -128,7 +129,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             if (newThread)
             {
-                await result.InitializeNewAsync(session, file, 10, DiffSide.Right, true);
+                await result.InitializeNewAsync(session, annotations, file, 10, DiffSide.Right, true);
             }
             else
             {
