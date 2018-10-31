@@ -27,15 +27,14 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
-                    <TextBlock FontSize="16" VerticalAlignment="Center">
-                        <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
-                    </TextBlock>
-                <TextBlock FontSize="16" VerticalAlignment="Center">
-                        <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
-                        <Run>for</Run>
-                        <Hyperlink Command="{Binding NavigateToPullRequest}">
-                            <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
-                        </Hyperlink>
+                <TextBlock FontSize="16" VerticalAlignment="Center" TextWrapping="Wrap">
+                    <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
+                    <Run>/</Run>
+                    <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
+                    <Run>for</Run>
+                    <Hyperlink Command="{Binding NavigateToPullRequest}">
+                        <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                    </Hyperlink>
                 </TextBlock>
 
                 <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
