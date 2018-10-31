@@ -40,7 +40,7 @@ namespace GitHub.Services
         string solutionPath;
         string repositoryPath;
         UriString cloneUrl;
-        Tuple<string, int> pullRequest;
+        (string owner, int number) pullRequest;
 
         ILocalRepositoryModel repositoryModel;
         JoinableTask refreshJoinableTask;
@@ -110,7 +110,7 @@ namespace GitHub.Services
                 {
                     var newRepositoryPath = repo?.LocalPath;
                     var newCloneUrl = repo?.CloneUrl;
-                    var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : null;
+                    var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : default;
 
                     if (newRepositoryPath != repositoryPath)
                     {

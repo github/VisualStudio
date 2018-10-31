@@ -203,7 +203,7 @@ namespace GitHub.InlineReviews.Services
             var session = CurrentSession;
 
             var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
-            if (pr != null)
+            if (pr != default)
             {
                 var changePR =
                     pr.Item1 != (session?.PullRequest.BaseRepositoryOwner) ||

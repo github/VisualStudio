@@ -231,8 +231,8 @@ namespace GitHub.Services
                     if (hasCheckRuns)
                     {
                         checksHasFailure = checkRuns
-                            .Any(model => model.Conclusion.HasValue 
-                                          && (model.Conclusion.Value == CheckConclusionState.Failure 
+                            .Any(model => model.Conclusion.HasValue
+                                          && (model.Conclusion.Value == CheckConclusionState.Failure
                                               || model.Conclusion.Value == CheckConclusionState.ActionRequired));
 
                         if (!checksHasFailure)
@@ -718,7 +718,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        public IObservable<(string owner, int number)> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -912,7 +912,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null &&
+            return value != default &&
                 value.Item1 == pullRequest.BaseRepositoryOwner &&
                 value.Item2 == pullRequest.Number;
         }
@@ -983,7 +983,7 @@ namespace GitHub.Services
             return owner + '#' + number.ToString(CultureInfo.InvariantCulture);
         }
 
-        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        static (string owner, int number) ParseGHfVSConfigKeyValue(string value)
         {
             if (value != null)
             {
@@ -996,12 +996,12 @@ namespace GitHub.Services
 
                     if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
                     {
-                        return Tuple.Create(owner, number);
+                        return (owner, number);
                     }
                 }
             }
 
-            return null;
+            return default;
         }
 
         class ListItemAdapter : PullRequestListItemModel

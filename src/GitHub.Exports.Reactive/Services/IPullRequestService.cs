@@ -173,7 +173,7 @@ namespace GitHub.Services
         /// This method does not do an API request - it simply checks the mark left in the git
         /// config by <see cref="Checkout(ILocalRepositoryModel, PullRequestDetailModel, string)"/>.
         /// </remarks>
-        IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
+        IObservable<(string owner, int number)> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository);
 
         /// <summary>
         /// Gets the encoding for the specified local file.

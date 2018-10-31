@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var sessionService = CreateSessionService();
 
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
-                    Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
+                    Observable.Return(("fork", CurrentBranchPullRequestNumber)));
 
                 var connectionManager = CreateConnectionManager();
                 var target = CreateTarget(
@@ -80,7 +80,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public void CurrentSessionIsNullIfNoPullRequestForCurrentBranch()
             {
                 var service = CreatePullRequestService();
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<(string, int)>());
 
                 var target = CreateTarget(service: service);
 
@@ -98,7 +98,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var session = target.CurrentSession;
 
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(("foo", 22)));
                 teamExplorerContext.StatusChanged += Raise.Event();
 
                 Assert.That(session, Is.Not.SameAs(target.CurrentSession));
@@ -124,7 +124,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     teamExplorerContext: teamExplorerContext);
                 Assert.That(target.CurrentSession, Is.Not.Null);
 
-                Tuple<string, int> newPullRequest = null;
+                (string owner, int number) newPullRequest = default;
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(newPullRequest));
                 teamExplorerContext.StatusChanged += Raise.Event();
 
@@ -813,14 +813,14 @@ Line 4";
                 var model = CreatePullRequestModel();
                 var sessionService = CreateSessionService(model);
 
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<(string, int)>());
 
                 var target = CreateTarget(service: service, sessionService: sessionService);
 
                 Assert.That(target.CurrentSession, Is.Null);
 
                 service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("owner", CurrentBranchPullRequestNumber)));
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(("owner", CurrentBranchPullRequestNumber)));
 
                 var session = await target.GetSession("owner", "name", CurrentBranchPullRequestNumber);
 
@@ -881,7 +881,7 @@ Line 4";
         IPullRequestService CreatePullRequestService(string owner = "owner")
         {
             var result = Substitute.For<IPullRequestService>();
-            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create(owner, CurrentBranchPullRequestNumber)));
+            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return((owner, CurrentBranchPullRequestNumber)));
             return result;
         }
 
