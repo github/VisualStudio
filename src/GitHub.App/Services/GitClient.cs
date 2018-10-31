@@ -181,6 +181,11 @@ namespace GitHub.Services
             });
         }
 
+        public async Task<bool> CommitExists(IRepository repository, string sha)
+        {
+            return await Task.Run(() => repository.Lookup<Commit>(sha) != null).ConfigureAwait(false);
+        }
+
         public Task CreateBranch(IRepository repository, string branchName)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));

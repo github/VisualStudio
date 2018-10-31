@@ -26,6 +26,9 @@ namespace GitHub.ViewModels
         {
         }
 
+        /// <inheritdoc/>
+        public ILocalRepositoryModel LocalRepository { get; private set; }
+
         public PullRequestState State
         {
             get => state;
@@ -44,11 +47,15 @@ namespace GitHub.ViewModels
             private set => this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value);
         }
 
-        protected virtual async Task InitializeAsync(PullRequestDetailModel model)
+        protected virtual async Task InitializeAsync(
+            IRemoteRepositoryModel repository,
+            ILocalRepositoryModel localRepository,
+            PullRequestDetailModel model)
         {
-            await base.InitializeAsync(model).ConfigureAwait(true);
+            await base.InitializeAsync(repository, model).ConfigureAwait(true);
 
             var fork = model.BaseRepositoryOwner != model.HeadRepositoryOwner;
+            LocalRepository = localRepository;
             SourceBranchDisplayName = GetBranchDisplayName(fork, model.HeadRepositoryOwner, model.HeadRefName);
             TargetBranchDisplayName = GetBranchDisplayName(fork, model.BaseRepositoryOwner, model.BaseRefName);
         }

@@ -84,7 +84,7 @@
 
         <markdig:MarkdownViewer Name="bodyMarkdown" Markdown="{Binding Body}"/>
 
-        <ItemsControl ItemsSource="{Binding Timeline}">
+        <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummariesViewModel}">
                     <ItemsControl ItemsSource="{Binding Commits}"/>
@@ -104,7 +104,8 @@
                                    FontFamily="Consolas"
                                    Margin="0,0,0,2"
                                    VerticalAlignment="Center">
-                            <Hyperlink>
+                            <Hyperlink Command="{Binding DataContext.ShowCommit, ElementName=timeline}"
+                                       CommandParameter="{Binding Oid}">
                                 <Run Text="{Binding AbbreviatedOid, Mode=OneWay}"/>
                             </Hyperlink>
                         </TextBlock>

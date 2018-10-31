@@ -91,11 +91,17 @@ When leaving an inline comment, the comment posts successfully and then a new co
         public IActorViewModel Author { get; set; } = new ActorViewModelDesigner("grokys");
         public string Body { get; set; }
         public int Number { get; set; } = 1994;
-        public IRepositoryModel Repository { get; set; }
+        public ILocalRepositoryModel LocalRepository { get; }
+        public IRemoteRepositoryModel Repository { get; set; }
         public string Title { get; set; } = "Save drafts of comments";
         public Uri WebUrl { get; set; }
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<string, Unit> ShowCommit { get; }
 
-        public Task InitializeAsync(ActorModel currentUser, PullRequestDetailModel model) => Task.CompletedTask;
+
+        public Task InitializeAsync(IRemoteRepositoryModel repository, ILocalRepositoryModel localRepository, ActorModel currentUser, PullRequestDetailModel model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -70,6 +70,15 @@ namespace GitHub.Services
         IObservable<Unit> Checkout(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName);
 
         /// <summary>
+        /// Checks if a commit is available and if not tries to fetch the commit.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepository">The remote repository.</param>
+        /// <param name="sha">The SHA of the commit.</param>
+        /// <returns>True if the commit was found, otherwise false.</returns>
+        Task<bool> FetchCommit(ILocalRepositoryModel localRepository, IRepositoryModel remoteRepository, string sha);
+
+        /// <summary>
         /// Carries out a pull on the current branch.
         /// </summary>
         /// <param name="repository">The repository.</param>

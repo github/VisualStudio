@@ -567,6 +567,21 @@ namespace GitHub.Services
             });
         }
 
+        public async Task<bool> FetchCommit(ILocalRepositoryModel localRepository, IRepositoryModel remoteRepository, string sha)
+        {
+            using (var repo = gitService.GetRepository(localRepository.LocalPath))
+            {
+                if (!await gitClient.CommitExists(repo, sha).ConfigureAwait(false))
+                {
+                    var remote = await CreateRemote(repo, remoteRepository.CloneUrl).ConfigureAwait(false);
+                    await gitClient.Fetch(repo, remote).ConfigureAwait(false);
+                    return await gitClient.CommitExists(repo, sha).ConfigureAwait(false);
+                }
+
+                return true;
+            }
+        }
+
         public IObservable<string> GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
             return Observable.Defer(() =>

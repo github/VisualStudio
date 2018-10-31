@@ -8,6 +8,11 @@ namespace GitHub.ViewModels
     public interface IPullRequestViewModelBase : IIssueishViewModel
     {
         /// <summary>
+        /// Gets the local repository.
+        /// </summary>
+        ILocalRepositoryModel LocalRepository { get; }
+
+        /// <summary>
         /// Gets the pull request state.
         /// </summary>
         PullRequestState State { get; }

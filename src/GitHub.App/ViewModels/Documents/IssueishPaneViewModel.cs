@@ -49,7 +49,21 @@ namespace GitHub.ViewModels.Documents
             {
                 var session = await sessionManager.GetSession(owner, name, number).ConfigureAwait(true);
                 var vm = factory.CreateViewModel<IPullRequestPageViewModel>();
-                await vm.InitializeAsync(session.User, session.PullRequest).ConfigureAwait(true);
+
+                var repository = new RemoteRepositoryModel(
+                    0,
+                    name,
+                    session.LocalRepository.CloneUrl.WithOwner(session.PullRequest.HeadRepositoryOwner),
+                    false,
+                    false,
+                    null,
+                    null);
+
+                await vm.InitializeAsync(
+                    repository,
+                    session.LocalRepository,
+                    session.User,
+                    session.PullRequest).ConfigureAwait(true);
                 Content = vm;
             }
             catch (Exception ex)

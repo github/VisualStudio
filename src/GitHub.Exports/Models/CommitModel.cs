@@ -13,13 +13,18 @@ namespace GitHub.Models
         public ActorModel Author { get; set; }
 
         /// <summary>
-        /// Gets the abbreviated git object ID for the commit.
+        /// Gets or sets the abbreviated git object ID for the commit.
         /// </summary>
         public string AbbreviatedOid { get; set; }
 
         /// <summary>
-        /// Gets the commit headline.
+        /// Gets or sets the commit headline.
         /// </summary>
         public string MessageHeadline { get; set; }
+
+        /// <summary>
+        /// Gets or sets the git object ID for the commit.
+        /// </summary>
+        public string Oid { get; set; }
     }
 }

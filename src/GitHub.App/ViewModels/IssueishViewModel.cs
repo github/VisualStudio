@@ -30,7 +30,7 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
-        public IRepositoryModel Repository { get; private set; }
+        public IRemoteRepositoryModel Repository { get; private set; }
 
         /// <inheritdoc/>
         public int Number { get; private set; }
@@ -66,8 +66,11 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
-        protected Task InitializeAsync(IssueishDetailModel model)
+        protected Task InitializeAsync(
+            IRemoteRepositoryModel repository,
+            IssueishDetailModel model)
         {
+            Repository = repository;
             Author = new ActorViewModel(model.Author);
             Body = model.Body;
             Number = model.Number;

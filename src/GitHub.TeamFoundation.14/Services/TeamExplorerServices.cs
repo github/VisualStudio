@@ -44,6 +44,12 @@ namespace GitHub.Services
             te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
         }
 
+        public void ShowCommitDetails(string oid)
+        {
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommitDetails), oid);
+        }
+
         public void ShowHomePage()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();

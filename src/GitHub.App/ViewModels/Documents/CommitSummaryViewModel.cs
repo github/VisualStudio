@@ -1,20 +1,31 @@
-﻿using System;
-using GitHub.Models;
-using GitHub.ViewModels;
+﻿using GitHub.Models;
 
 namespace GitHub.ViewModels.Documents
 {
     public class CommitSummaryViewModel : ViewModelBase
     {
-        public CommitSummaryViewModel(CommitModel model)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommitSummaryViewModel"/> class.
+        /// </summary>
+        /// <param name="commit">The commit model.</param>
+        public CommitSummaryViewModel(CommitModel commit)
         {
-            AbbreviatedOid = model.AbbreviatedOid;
-            Author = new ActorViewModel(model.Author);
-            Header = model.MessageHeadline;
+            AbbreviatedOid = commit.AbbreviatedOid;
+            Author = new ActorViewModel(commit.Author);
+            Header = commit.MessageHeadline;
+            Oid = commit.Oid;
         }
 
-        public string AbbreviatedOid { get; }
-        public IActorViewModel Author { get; }
-        public string Header { get; }
+        /// <inheritdoc/>
+        public string AbbreviatedOid { get; private set; }
+
+        /// <inheritdoc/>
+        public IActorViewModel Author { get; private set; }
+
+        /// <inheritdoc/>
+        public string Header { get; private set; }
+
+        /// <inheritdoc/>
+        public string Oid { get; private set; }
     }
 }

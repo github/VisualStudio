@@ -65,6 +65,14 @@ namespace GitHub.Services
         Task Checkout(IRepository repository, string branchName);
 
         /// <summary>
+        /// Checks if a commit exists a the repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="sha">The SHA of the commit.</param>
+        /// <returns></returns>
+        Task<bool> CommitExists(IRepository repository, string sha);
+
+        /// <summary>
         /// Creates a new branch.
         /// </summary>
         /// <param name="repository">The repository to carry out the checkout on</param>
