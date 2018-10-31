@@ -25,7 +25,7 @@ namespace GitHub.Services
         /// Updates the CloneUrl information based on the "origin" remote.
         /// </summary>
         /// <param name="localRepositoryModel">The repository model to refresh.</param>
-        void Refresh(ILocalRepositoryModel localRepositoryModel);
+        void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel);
 
         /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository

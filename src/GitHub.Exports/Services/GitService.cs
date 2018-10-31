@@ -71,7 +71,7 @@ namespace GitHub.Services
         /// <summary>
         /// Updates the CloneUrl from the "origin" remote.
         /// </summary>
-        public void Refresh(ILocalRepositoryModel localRepositoryModel)
+        public void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel)
         {
             var localPath = localRepositoryModel.LocalPath;
             if (localPath == null)

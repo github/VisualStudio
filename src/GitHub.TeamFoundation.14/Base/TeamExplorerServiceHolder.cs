@@ -113,7 +113,7 @@ namespace GitHub.VisualStudio.Base
             // for that, so this is a good place to refresh it in case that happened
             if (repo != null)
             {
-                gitService.Refresh(repo);
+                gitService.RefreshCloneUrl(repo);
             }
 
             // if the active repo hasn't changed and there's notifications queued up,
