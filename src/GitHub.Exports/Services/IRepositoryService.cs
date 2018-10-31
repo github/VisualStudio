@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitHub.Models;
 using GitHub.Primitives;
 
 namespace GitHub.Services
@@ -17,5 +19,7 @@ namespace GitHub.Services
         /// otherwise null.
         /// </returns>
         Task<(string owner, string name)?> FindParent(HostAddress address, string owner, string name);
+
+        Task<IEnumerable<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name);
     }
 }

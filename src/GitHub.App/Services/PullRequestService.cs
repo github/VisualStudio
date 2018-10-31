@@ -55,6 +55,7 @@ namespace GitHub.Services
         readonly IGitService gitService;
         readonly IVSGitExt gitExt;
         readonly IGraphQLClientFactory graphqlFactory;
+        readonly IRepositoryService repositoryService;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
@@ -64,6 +65,7 @@ namespace GitHub.Services
             IGitService gitService,
             IVSGitExt gitExt,
             IGraphQLClientFactory graphqlFactory,
+            IRepositoryService repositoryService,
             IOperatingSystem os,
             IUsageTracker usageTracker)
         {
@@ -71,6 +73,7 @@ namespace GitHub.Services
             this.gitService = gitService;
             this.gitExt = gitExt;
             this.graphqlFactory = graphqlFactory;
+            this.repositoryService = repositoryService;
             this.os = os;
             this.usageTracker = usageTracker;
         }
@@ -197,6 +200,11 @@ namespace GitHub.Services
 
                 query = readPullRequestsEnterprise;
             }
+
+            var protectedBranches = await repositoryService.GetProtectedBranches(address, owner, name)
+                .ConfigureAwait(false);
+
+            var protectedBranchDictionary = protectedBranches.ToDictionary(branch => branch.Name);
 
             var graphql = await graphqlFactory.CreateConnection(address);
             var vars = new Dictionary<string, object>
