@@ -27,18 +27,18 @@ namespace GitHub.VisualStudio.Base
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
         readonly IServiceProvider serviceProvider;
-        readonly ILocalRepositoryModelFactory repositoryFactory;
+        readonly IGitService gitService;
         readonly object refreshLock = new object();
 
-        IGitExt gitService;
+        IGitExt gitExt;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
-        public VSGitExt(IServiceProvider serviceProvider)
-            : this(serviceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory(), ThreadHelper.JoinableTaskContext)
+        public VSGitExt(IServiceProvider serviceProvider, IGitService gitService)
+            : this(serviceProvider, new VSUIContextFactory(), gitService, ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public VSGitExt(IServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory,
+        public VSGitExt(IServiceProvider serviceProvider, IVSUIContextFactory factory, IGitService gitService,
             JoinableTaskContext joinableTaskContext)
         {
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
@@ -46,7 +46,7 @@ namespace GitHub.VisualStudio.Base
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
 
             this.serviceProvider = serviceProvider;
-            this.repositoryFactory = repositoryFactory;
+            this.gitService = gitService;
 
             // Start with empty array until we have a chance to initialize.
             ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
@@ -64,7 +64,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task InitializeAsync()
         {
-            gitService = await GetServiceAsync<IGitExt>();
+            gitExt = await GetServiceAsync<IGitExt>();
             if (gitService == null)
             {
                 log.Error("Couldn't find IGitExt service");
@@ -74,9 +74,9 @@ namespace GitHub.VisualStudio.Base
             // Refresh on background thread
             await Task.Run(() => RefreshActiveRepositories());
 
-            gitService.PropertyChanged += (s, e) =>
+            gitExt.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(gitService.ActiveRepositories))
+                if (e.PropertyName == nameof(gitExt.ActiveRepositories))
                 {
                     RefreshActiveRepositories();
                 }
@@ -91,10 +91,10 @@ namespace GitHub.VisualStudio.Base
                 {
                     log.Debug(
                         "IGitExt.ActiveRepositories (#{Id}) returned {Repositories}",
-                        gitService.GetHashCode(),
-                        gitService.ActiveRepositories.Select(x => x.RepositoryPath));
+                        gitExt.GetHashCode(),
+                        gitExt.ActiveRepositories.Select(x => x.RepositoryPath));
 
-                    ActiveRepositories = gitService?.ActiveRepositories.Select(x => repositoryFactory.Create(x.RepositoryPath)).ToList();
+                    ActiveRepositories = gitExt?.ActiveRepositories.Select(x => gitService.CreateLocalRepositoryModel(x.RepositoryPath)).ToList();
                 }
             }
             catch (Exception e)
