@@ -19,14 +19,6 @@ namespace GitHub.Models
         }
 
         /// <summary>
-        /// Gets the current branch of the repository.
-        /// </summary>
-        public IBranch CurrentBranch
-        {
-            get; set;
-        }
-
-        /// <summary>
         /// Note: We don't consider CloneUrl a part of the hash code because it can change during the lifetime
         /// of a repository. Equals takes care of any hash collisions because of this
         /// </summary>

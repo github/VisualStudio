@@ -40,9 +40,6 @@ namespace GitHub.Services
         string solutionPath;
         string repositoryPath;
         UriString cloneUrl;
-        string branchName;
-        string headSha;
-        string trackedSha;
         Tuple<string, int> pullRequest;
 
         ILocalRepositoryModel repositoryModel;
@@ -113,9 +110,6 @@ namespace GitHub.Services
                 {
                     var newRepositoryPath = repo?.LocalPath;
                     var newCloneUrl = repo?.CloneUrl;
-                    var newBranchName = repo?.CurrentBranch?.Name;
-                    var newHeadSha = repo?.CurrentBranch?.Sha;
-                    var newTrackedSha = repo?.CurrentBranch?.TrackedSha;
                     var newPullRequest = repo != null ? await pullRequestService.GetPullRequestForCurrentBranch(repo) : null;
 
                     if (newRepositoryPath != repositoryPath)
@@ -128,33 +122,20 @@ namespace GitHub.Services
                         log.Debug("ActiveRepository changed to {CloneUrl} @ {Path}", repo?.CloneUrl, newRepositoryPath);
                         ActiveRepository = repo;
                     }
-                    else if (newBranchName != branchName)
-                    {
-                        log.Debug("Fire StatusChanged event when BranchName changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
-                    }
-                    else if (newHeadSha != headSha)
-                    {
-                        log.Debug("Fire StatusChanged event when HeadSha changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
-                    }
-                    else if (newTrackedSha != trackedSha)
-                    {
-                        log.Debug("Fire StatusChanged event when TrackedSha changes for ActiveRepository");
-                        StatusChanged?.Invoke(this, EventArgs.Empty);
-                    }
                     else if (newPullRequest != pullRequest)
                     {
                         log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
+                    else
+                    {
+                        log.Debug("Fire StatusChanged event when ***anything*** changes");
+                        StatusChanged?.Invoke(this, EventArgs.Empty);
+                    }
 
                     repositoryPath = newRepositoryPath;
                     cloneUrl = newCloneUrl;
-                    branchName = newBranchName;
-                    headSha = newHeadSha;
                     solutionPath = newSolutionPath;
-                    trackedSha = newTrackedSha;
                     pullRequest = newPullRequest;
                 }
             }

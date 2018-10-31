@@ -405,9 +405,8 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
-                // HACK: This is only necessary because the CurrentBranch is being read too early
-                gitService.Refresh(LocalRepository);
-                IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
+                var currentBranch = gitService.CreateCurrentBranchModel(LocalRepository);
+                IsCheckedOut = localBranches.Contains(currentBranch);
 
                 if (IsCheckedOut)
                 {

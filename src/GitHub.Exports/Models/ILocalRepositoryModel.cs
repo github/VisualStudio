@@ -11,10 +11,5 @@ namespace GitHub.Models
         /// Gets the path to the repository on the filesystem.
         /// </summary>
         string LocalPath { get; }
-
-        /// <summary>
-        /// Gets the current branch.
-        /// </summary>
-        IBranch CurrentBranch { get; set; }
     }
 }

@@ -49,13 +49,27 @@ namespace GitHub.Services
                 Icon = Octicon.repo
             };
 
-            RefreshCurrentBranch(model);
-
             return model;
         }
 
+        public IBranch CreateCurrentBranchModel(ILocalRepositoryModel model)
+        {
+            var localPath = model.LocalPath;
+            using (var repo = GetRepository(localPath))
+            {
+                var headBranch = repo?.Head;
+                if (headBranch == null)
+                {
+                    return null;
+                }
+
+                // BranchModel doesn't keep a reference to Repository
+                return new BranchModel(headBranch, model, this);
+            }
+        }
+
         /// <summary>
-        /// Updates the CloneUrl and CurrentBranch from the local repository.
+        /// Updates the CloneUrl from the "origin" remote.
         /// </summary>
         public void Refresh(ILocalRepositoryModel localRepositoryModel)
         {
@@ -64,8 +78,6 @@ namespace GitHub.Services
                 return;
 
             localRepositoryModel.CloneUrl = GetUri(localPath);
-
-            RefreshCurrentBranch(localRepositoryModel);
         }
 
         /// <summary>
@@ -199,20 +211,6 @@ namespace GitHub.Services
                     return null;
                 }
             });
-        }
-
-        void RefreshCurrentBranch(ILocalRepositoryModel model)
-        {
-            var localPath = model.LocalPath;
-            using (var repo = GetRepository(localPath))
-            {
-                var headBranch = repo?.Head;
-                if (headBranch != null)
-                {
-                    // BranchModel doesn't keep a reference to Repository
-                    model.CurrentBranch = new BranchModel(headBranch, model, this);
-                }
-            }
         }
     }
 }

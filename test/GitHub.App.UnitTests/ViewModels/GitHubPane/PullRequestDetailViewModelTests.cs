@@ -552,7 +552,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var repository = Substitute.For<ILocalRepositoryModel>();
             var currentBranchModel = new BranchModel(currentBranch, repository);
-            repository.CurrentBranch.Returns(currentBranchModel);
+            var gitService = Substitute.For<IGitService>();
+            gitService.CreateCurrentBranchModel(repository).Returns(currentBranchModel);
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
             repository.LocalPath.Returns(@"C:\projects\ThisRepo");
             repository.Name.Returns("repo");
@@ -608,7 +609,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IPullRequestFilesViewModel>(),
                 Substitute.For<ISyncSubmodulesCommand>(),
                 Substitute.For<IViewViewModelFactory>(),
-                Substitute.For<IGitService>());
+                gitService);
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);

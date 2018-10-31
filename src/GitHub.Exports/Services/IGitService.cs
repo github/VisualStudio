@@ -15,7 +15,14 @@ namespace GitHub.Services
         ILocalRepositoryModel CreateLocalRepositoryModel(string localPath);
 
         /// <summary>
-        /// Updates the CloneUrl information based on the local path.
+        /// Creates a new branch model for the current branch.
+        /// </summary>
+        /// <param name="model">The <see cref="ILocalRepositoryModel" /> to create a current branch model for.</param>
+        /// <returns>A new branch model.</returns>
+        IBranch CreateCurrentBranchModel(ILocalRepositoryModel model);
+
+        /// <summary>
+        /// Updates the CloneUrl information based on the "origin" remote.
         /// </summary>
         /// <param name="localRepositoryModel">The repository model to refresh.</param>
         void Refresh(ILocalRepositoryModel localRepositoryModel);

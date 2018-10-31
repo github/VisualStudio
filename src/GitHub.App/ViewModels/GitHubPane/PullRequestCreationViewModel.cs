@@ -38,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService service;
         readonly IModelServiceFactory modelServiceFactory;
         readonly IMessageDraftStore draftStore;
+        readonly IGitService gitService;
         readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         ILocalRepositoryModel activeLocalRepo;
@@ -49,8 +50,9 @@ namespace GitHub.ViewModels.GitHubPane
             IModelServiceFactory modelServiceFactory,
             IPullRequestService service,
             INotificationService notifications,
-            IMessageDraftStore draftStore)
-            : this(modelServiceFactory, service, notifications, draftStore, DefaultScheduler.Instance)
+            IMessageDraftStore draftStore,
+            IGitService gitService)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
         {
         }
 
@@ -59,17 +61,20 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
+            IGitService gitService,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(notifications, nameof(notifications));
             Guard.ArgumentNotNull(draftStore, nameof(draftStore));
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.service = service;
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
+            this.gitService = gitService;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -137,7 +142,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             modelService = await modelServiceFactory.CreateAsync(connection);
             activeLocalRepo = repository;
-            SourceBranch = repository.CurrentBranch;
+            SourceBranch = gitService.CreateCurrentBranchModel(repository);
 
             var obs = modelService.ApiClient.GetRepository(repository.Owner, repository.Name)
                 .Select(r => new RemoteRepositoryModel(r))
@@ -207,7 +212,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         void LoadDescriptionFromCommits()
         {
-            SourceBranch = activeLocalRepo.CurrentBranch;
+            SourceBranch = gitService.CreateCurrentBranchModel(activeLocalRepo);
 
             var uniqueCommits = this.WhenAnyValue(
                 x => x.SourceBranch,
