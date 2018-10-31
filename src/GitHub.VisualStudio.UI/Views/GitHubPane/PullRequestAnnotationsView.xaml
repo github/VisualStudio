@@ -6,6 +6,8 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"  
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
 
@@ -55,9 +57,9 @@
                                       IsExpanded="{Binding IsExpanded, Mode=OneTime}">
                                     <Expander.Header>
                                         <StackPanel Orientation="Horizontal">
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                                            <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                                            <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                                            <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
                                             <TextBlock FontWeight="SemiBold" Margin="2 0">
                                                 <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
                                             </TextBlock>
