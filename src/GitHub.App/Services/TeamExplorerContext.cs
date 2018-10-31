@@ -127,9 +127,9 @@ namespace GitHub.Services
                         log.Debug("Fire StatusChanged event when PullRequest changes for ActiveRepository");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
-                    else
+                    else if (newRepositoryPath != null)
                     {
-                        log.Debug("Fire StatusChanged event when ***anything*** changes");
+                        log.Debug("Fire StatusChanged event when on a repository and anything changes");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
 

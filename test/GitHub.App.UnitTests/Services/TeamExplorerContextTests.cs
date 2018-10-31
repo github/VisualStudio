@@ -151,14 +151,13 @@ namespace GitHub.App.UnitTests.Services
 
         public class TheStatusChangedEvent
         {
-            [TestCase(true, false)]
-            [TestCase(false, true)]
-            public void AlwaysFireWhenNoLocalPathChange(bool changePath, bool expectWasRaised)
+            [TestCase("path", "path", true)]
+            [TestCase("path1", "path2", false)]
+            [TestCase(null, null, false)]
+            public void AlwaysFireWhenNoLocalPathChange(string path1, string path2, bool expectWasRaised)
             {
                 var gitExt = CreateGitExt();
                 var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
-                var path1 = Directory.GetCurrentDirectory();
-                var path2 = changePath ? Path.GetTempPath() : path1;
                 var repoInfo1 = CreateRepositoryModel(path1);
                 var repoInfo2 = CreateRepositoryModel(path2);
 
