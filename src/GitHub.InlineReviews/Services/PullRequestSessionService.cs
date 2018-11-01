@@ -283,7 +283,7 @@ namespace GitHub.InlineReviews.Services
             if (readPullRequest == null)
             {
                 readPullRequest = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(Var(nameof(name)), Var(nameof(owner)))
                     .PullRequest(Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
@@ -395,7 +395,7 @@ namespace GitHub.InlineReviews.Services
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var query = new Query()
-                .Repository(repositoryOwner, localRepository.Name)
+                .Repository(localRepository.Name, repositoryOwner)
                 .PullRequest(number)
                 .Select(x => x.Id);
 
@@ -760,7 +760,7 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(Var(nameof(name)), Var(nameof(owner)))
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
@@ -798,7 +798,7 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatusesEnterprise == null)
                 {
                     readCommitStatusesEnterprise = new Query()
-                     .Repository(Var(nameof(owner)), Var(nameof(name)))
+                     .Repository(Var(nameof(name)), Var(nameof(owner)))
                      .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {

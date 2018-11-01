@@ -93,7 +93,7 @@ namespace GitHub.Services
                 if (readPullRequests == null)
                 {
                     readPullRequests = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(Var(nameof(name)), Var(nameof(owner)))
                           .PullRequests(
                               first: 100,
                               after: Var(nameof(after)),
@@ -154,7 +154,7 @@ namespace GitHub.Services
                 if (readPullRequestsEnterprise == null)
                 {
                     readPullRequestsEnterprise = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(Var(nameof(name)), Var(nameof(owner)))
                           .PullRequests(
                               first: 100,
                               after: Var(nameof(after)),
@@ -298,7 +298,7 @@ namespace GitHub.Services
             if (readAssignableUsers == null)
             {
                 readAssignableUsers = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(Var(nameof(name)), Var(nameof(owner)))
                     .AssignableUsers(first: 100, after: Var(nameof(after)))
                     .Select(connection => new Page<ActorModel>
                     {
