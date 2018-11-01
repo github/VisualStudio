@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using GitHub.Extensions;
-using GitHub.Logging;
 using GitHub.Services;
-using Serilog;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -14,8 +12,6 @@ namespace GitHub.VisualStudio.Base
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TeamExplorerServiceHolder : ITeamExplorerServiceHolder
     {
-        static readonly ILogger log = LogManager.ForContext<TeamExplorerServiceHolder>();
-
         IServiceProvider serviceProvider;
 
         /// <summary>
