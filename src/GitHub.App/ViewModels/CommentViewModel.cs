@@ -22,7 +22,9 @@ namespace GitHub.ViewModels
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
         readonly ICommentService commentService;
+        readonly ObservableAsPropertyHelper<bool> canCancel;
         readonly ObservableAsPropertyHelper<bool> canDelete;
+        ObservableAsPropertyHelper<string> commitCaption;
         string id;
         IActorViewModel author;
         IActorViewModel currentUser;
@@ -74,6 +76,9 @@ namespace GitHub.ViewModels
                     (ro, body) => !ro && !string.IsNullOrWhiteSpace(body)));
             AddErrorHandler(CommitEdit);
 
+            canCancel = this.WhenAnyValue(x => x.Id)
+                .Select(id => id != null)
+                .ToProperty(this, x => x.CanCancel);
             CancelEdit = ReactiveCommand.Create(DoCancelEdit, CommitEdit.IsExecuting.Select(x => !x));
             AddErrorHandler(CancelEdit);
 
@@ -145,6 +150,9 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
+        public bool CanCancel => canCancel.Value;
+
+        /// <inheritdoc/>
         public bool CanDelete => canDelete.Value;
 
         /// <inheritdoc/>
@@ -153,6 +161,9 @@ namespace GitHub.ViewModels
             get => createdAt;
             private set => this.RaiseAndSetIfChanged(ref createdAt, value);
         }
+
+        /// <inheritdoc/>
+        public string CommitCaption => commitCaption.Value;
 
         /// <inheritdoc/>
         public ICommentThreadViewModel Thread
@@ -200,12 +211,20 @@ namespace GitHub.ViewModels
             CreatedAt = comment?.CreatedAt ?? DateTimeOffset.MinValue;
             WebUrl = comment?.Url != null ? new Uri(comment.Url) : null;
 
+            commitCaption = GetCommitCaptionObservable().ToProperty(this, x => x.CommitCaption);
+
             return Task.CompletedTask;
         }
 
         protected void AddErrorHandler(ReactiveCommand command)
         {
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
+        }
+
+        protected virtual IObservable<string> GetCommitCaptionObservable()
+        {
+            return this.WhenAnyValue(x => x.Id)
+                .Select(x => x == null ? Resources.Comment : Resources.UpdateComment);
         }
 
         async Task DoDelete()

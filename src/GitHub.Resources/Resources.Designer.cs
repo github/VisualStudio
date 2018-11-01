@@ -304,6 +304,33 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close issue.
+        /// </summary>
+        public static string CloseIssue {
+            get {
+                return ResourceManager.GetString("CloseIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close pull request.
+        /// </summary>
+        public static string ClosePullRequest {
+            get {
+                return ResourceManager.GetString("ClosePullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comment.
+        /// </summary>
+        public static string Comment {
+            get {
+                return ResourceManager.GetString("Comment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Commented.
         /// </summary>
         public static string Commented {

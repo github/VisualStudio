@@ -839,4 +839,13 @@ https://git-scm.com/download/win</value>
   <data name="OpenConversation" xml:space="preserve">
     <value>Open Conversation</value>
   </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Close pull request</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Close issue</value>
+  </data>
 </root>

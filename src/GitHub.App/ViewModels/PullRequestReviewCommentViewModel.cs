@@ -19,7 +19,6 @@ namespace GitHub.ViewModels
     public class PullRequestReviewCommentViewModel : CommentViewModel, IPullRequestReviewCommentViewModel
     {
         readonly ObservableAsPropertyHelper<bool> canStartReview;
-        readonly ObservableAsPropertyHelper<string> commitCaption;
         IPullRequestSession session;
         bool isPending;
 
@@ -31,18 +30,11 @@ namespace GitHub.ViewModels
         public PullRequestReviewCommentViewModel(ICommentService commentService)
             : base(commentService)
         {
-            var pendingAndIsNew = this.WhenAnyValue(
+            canStartReview = this.WhenAnyValue(
                 x => x.IsPending,
                 x => x.Id,
-                (isPending, id) => (isPending, isNewComment: id == null));
-
-            canStartReview = pendingAndIsNew
-                .Select(arg => !arg.isPending && arg.isNewComment)
+                (isPending, id) => !isPending && id == null)
                 .ToProperty(this, x => x.CanStartReview);
-
-            commitCaption = pendingAndIsNew
-                .Select(arg => !arg.isNewComment ? Resources.UpdateComment : arg.isPending ? Resources.AddReviewComment : Resources.AddSingleComment)
-                .ToProperty(this, x => x.CommitCaption);
 
             StartReview = ReactiveCommand.CreateFromTask(DoStartReview, CommitEdit.CanExecute);
             AddErrorHandler(StartReview);
@@ -83,9 +75,6 @@ namespace GitHub.ViewModels
         public bool CanStartReview => canStartReview.Value;
 
         /// <inheritdoc/>
-        public string CommitCaption => commitCaption.Value;
-
-        /// <inheritdoc/>
         public bool IsPending
         {
             get => isPending;
@@ -94,6 +83,16 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> StartReview { get; }
+
+        protected override IObservable<string> GetCommitCaptionObservable()
+        {
+            return this.WhenAnyValue(
+                x => x.IsPending,
+                x => x.Id,
+                (pending, id) => id != null ?
+                    Resources.UpdateComment :
+                    pending ? Resources.AddReviewComment : Resources.AddSingleComment);
+        }
 
         async Task DoStartReview()
         {

@@ -24,7 +24,9 @@ namespace GitHub.SampleData
         public CommentEditState EditState { get; set; }
         public bool IsReadOnly { get; set; }
         public bool IsSubmitting { get; set; }
+        public bool CanCancel { get; } = true;
         public bool CanDelete { get; } = true;
+        public string CommitCaption { get; set; } = "Comment";
         public ICommentThreadViewModel Thread { get; }
         public DateTimeOffset CreatedAt => DateTime.Now.Subtract(TimeSpan.FromDays(3));
         public IActorViewModel Author { get; set; }

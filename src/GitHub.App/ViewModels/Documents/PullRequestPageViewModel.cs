@@ -89,8 +89,8 @@ namespace GitHub.ViewModels.Documents
                         break;
                     case CommentModel comment:
                         {
-                            var vm = factory.CreateViewModel<ICommentViewModel>();
-                            await vm.InitializeAsync(this, currentUser, comment, CommentEditState.None).ConfigureAwait(true);
+                            var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
+                            await vm.InitializeAsync(this, currentUser, comment, null).ConfigureAwait(true);
                             timeline.Add(vm);
                         }
                         break;
@@ -101,6 +101,14 @@ namespace GitHub.ViewModels.Documents
             {
                 timeline.Add(new CommitSummariesViewModel(commits));
             }
+
+            var placeholder = factory.CreateViewModel<IIssueishCommentViewModel>();
+            await placeholder.InitializeAsync(
+                this,
+                currentUser,
+                null,
+                Resources.ClosePullRequest).ConfigureAwait(true);
+            timeline.Add(placeholder);
 
             Timeline = timeline;
         }

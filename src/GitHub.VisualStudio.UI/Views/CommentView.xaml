@@ -11,7 +11,7 @@
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <ghfvs:CommentViewModelDesigner EditState="None">
+        <ghfvs:CommentViewModelDesigner EditState="Editing">
             <ghfvs:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </ghfvs:CommentViewModelDesigner.Body>
@@ -213,12 +213,20 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
+                <Button Command="{Binding CommitEdit}"
+                        Content="{Binding CommitCaption}"/>
                 <Button Margin="4 0 0 0"
                         Command="{Binding StartReview}"
                         Content="{x:Static ghfvs:Resources.StartAReview}"
-                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}"/>
-                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}" Content="{x:Static ghfvs:Resources.Cancel}"/>
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                <Button Margin="4 0 0 0"
+                        Command="{Binding CloseIssueish}"
+                        Content="{Binding CloseIssueishCaption}"
+                        Visibility="{Binding CanCloseIssueish, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                <Button Margin="4 0 0 0"
+                        Command="{Binding CancelEdit}"
+                        Content="{x:Static ghfvs:Resources.Cancel}"
+                        Visibility="{Binding CanCancel, Converter={ui:BooleanToVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
     </Grid>

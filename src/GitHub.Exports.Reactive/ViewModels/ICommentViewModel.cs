@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Threading.Tasks;
-using GitHub.Models;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -65,7 +63,12 @@ namespace GitHub.ViewModels
         bool IsSubmitting { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the comment can be edited or deleted by the current user
+        /// Gets a value indicating whether the comment edit state can be canceled.
+        /// </summary>
+        bool CanCancel { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the comment can be edited or deleted by the current user.
         /// </summary>
         bool CanDelete { get; }
 
@@ -73,6 +76,14 @@ namespace GitHub.ViewModels
         /// Gets the creation date of the comment.
         /// </summary>
         DateTimeOffset CreatedAt { get; }
+
+        /// <summary>
+        /// Gets the caption for the "Commit" button.
+        /// </summary>
+        /// <remarks>
+        /// This will be "Comment" when editing a new comment and "Update" when editing an existing comment.
+        /// </remarks>
+        string CommitCaption { get; }
 
         /// <summary>
         /// Gets the thread that the comment is a part of.
@@ -108,18 +119,5 @@ namespace GitHub.ViewModels
         /// Deletes a comment.
         /// </summary>
         ReactiveCommand<Unit, Unit> Delete { get; }
-
-        /// <summary>
-        /// Initializes the view model with data.
-        /// </summary>
-        /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <param name="comment">The comment model. May be null.</param>
-        /// <param name="state">The comment edit state.</param>
-        Task InitializeAsync(
-            ICommentThreadViewModel thread,
-            ActorModel currentUser,
-            CommentModel comment,
-            CommentEditState state);
     }
 }
