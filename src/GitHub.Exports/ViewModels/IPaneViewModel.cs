@@ -9,6 +9,11 @@ namespace GitHub.ViewModels
     public interface IPaneViewModel : IViewModel
     {
         /// <summary>
+        /// Gets the caption for the tool window.
+        /// </summary>
+        string PaneCaption { get; }
+
+        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="paneServiceProvider">

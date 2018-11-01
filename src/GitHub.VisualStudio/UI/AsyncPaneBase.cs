@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.ViewModels;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
+using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -15,6 +16,7 @@ namespace GitHub.VisualStudio.UI
         where TViewModel : IPaneViewModel
     {
         readonly ContentPresenter contentPresenter;
+        IDisposable subscription;
         JoinableTask<TViewModel> viewModelTask;
 
         public AsyncPaneBase()
@@ -38,6 +40,17 @@ namespace GitHub.VisualStudio.UI
 
         public Task<TViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                subscription?.Dispose();
+                subscription = null;
+            }
+        }
+
         async Task<TViewModel> InitializeAsync(AsyncPackage asyncPackage)
         {
             try
@@ -55,6 +68,7 @@ namespace GitHub.VisualStudio.UI
                     throw new CompositionException("Could not find view for " + typeof(TViewModel).FullName);
                 }
                 View.DataContext = viewModel;
+                subscription = viewModel.WhenAnyValue(x => x.PaneCaption).Subscribe(x => Caption = x);
                 return viewModel;
             }
             catch (Exception e)

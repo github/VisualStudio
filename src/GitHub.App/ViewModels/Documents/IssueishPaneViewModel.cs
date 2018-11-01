@@ -16,6 +16,7 @@ namespace GitHub.ViewModels.Documents
         readonly IViewViewModelFactory factory;
         readonly IPullRequestSessionManager sessionManager;
         IViewModel content;
+        string paneCaption;
 
         [ImportingConstructor]
         public IssueishPaneViewModel(
@@ -35,6 +36,12 @@ namespace GitHub.ViewModels.Documents
             private set => this.RaiseAndSetIfChanged(ref content, value);
         }
 
+        public string PaneCaption
+        {
+            get => paneCaption;
+            private set => this.RaiseAndSetIfChanged(ref paneCaption, value);
+        }
+
         public Task InitializeAsync(IServiceProvider paneServiceProvider)
         {
             return Task.CompletedTask;
@@ -43,6 +50,7 @@ namespace GitHub.ViewModels.Documents
         public async Task Load(IConnection connection, string owner, string name, int number)
         {
             Content = new SpinnerViewModel();
+            PaneCaption = "#" + number;
 
             // TODO: We will eventually support loading issues here as well.
             try
@@ -65,6 +73,7 @@ namespace GitHub.ViewModels.Documents
                     session.User,
                     session.PullRequest).ConfigureAwait(true);
                 Content = vm;
+                PaneCaption += " " + vm.Title;
             }
             catch (Exception ex)
             {
