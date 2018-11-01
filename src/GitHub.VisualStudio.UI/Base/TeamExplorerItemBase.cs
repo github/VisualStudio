@@ -103,7 +103,6 @@ namespace GitHub.VisualStudio.Base
 
         void Unsubscribe()
         {
-            //holder.Unsubscribe(this);
             holder.TeamExplorerContext.PropertyChanged -= TeamExplorerContext_PropertyChanged;
             holder.TeamExplorerContext.StatusChanged -= TeamExplorerContext_StatusChanged;
 
