@@ -386,7 +386,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll">
+    <Content Include="$(OutputPath)\Newtonsoft.Json.dll">
       <Link>Newtonsoft.Json.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
