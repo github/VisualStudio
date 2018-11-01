@@ -11,6 +11,7 @@ using GitHub.Exports;
 using GitHub.Logging;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.Services.Vssdk.Services;
@@ -171,8 +172,10 @@ namespace GitHub.VisualStudio
         public const string ServiceProviderPackageId = "D5CE1488-DEDE-426D-9E5B-BFCCFBE33E53";
         static readonly ILogger log = LogManager.ForContext<ServiceProviderPackage>();
 
-        protected override Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            await CheckBindingPathsAsync();
+
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
             AddService(typeof(IUsageTracker), CreateService, true);
@@ -181,8 +184,27 @@ namespace GitHub.VisualStudio
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
             AddService(typeof(IVsTippingService), CreateService, true);
-            return Task.CompletedTask;
         }
+
+#if DEBUG
+        async Task CheckBindingPathsAsync()
+        {
+            try
+            {
+                // When running in the Exp instance, ensure there is only one active binding path.
+                // This is necessary when the regular (AllUsers) extension is also installed.
+                // See: https://github.com/github/VisualStudio/issues/2006
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                BindingPathHelper.CheckBindingPaths(GetType().Assembly, this);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(CheckBindingPathsAsync));
+            }
+        }
+#else
+        Task CheckBindingPathsAsync() => Task.CompletedTask;
+#endif
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()
         {

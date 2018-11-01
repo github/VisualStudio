@@ -56,7 +56,7 @@
                                         Account="{Binding Author}"/>
 
                 <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
-                <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
+                <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
                                      Command="{Binding OpenOnGitHub}"
                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
                                      Opacity="0.75" />
@@ -154,6 +154,7 @@
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
                               GotFocus="ReplyPlaceholder_GotFocus"
+                              Loaded="body_Loaded"
                               SpellCheck.IsEnabled="True">
                 <ui:PromptTextBox.Style>
                     <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">

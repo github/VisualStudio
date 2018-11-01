@@ -120,7 +120,7 @@ namespace UnitTests.GitHub.App.Models
 
         public static byte[] BitmapSourceToBytes(BitmapSource image)
         {
-            byte[] data = new byte[] { };
+            byte[] data = Array.Empty<byte>();
             if (image != null)
             {
                 try

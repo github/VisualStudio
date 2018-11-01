@@ -39,8 +39,6 @@ namespace GitHub.InlineReviews.Services
         readonly Lazy<IConnectionManager> connectionManager;
         readonly Lazy<IVsTippingService> tippingService;
 
-        IDisposable currentSessionSubscription;
-
         [ImportingConstructor]
         public PullRequestStatusBarManager(
             Lazy<IUsageTracker> usageTracker,
@@ -72,21 +70,18 @@ namespace GitHub.InlineReviews.Services
         {
             try
             {
-                teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository)
+                var activeReposities = teamExplorerContext.Value.WhenAnyValue(x => x.ActiveRepository);
+                var sessions = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession);
+                activeReposities
+                    .CombineLatest(sessions, (r, s) => (r, s))
+                    .Throttle(TimeSpan.FromSeconds(1))
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => RefreshActiveRepository(x));
+                    .Subscribe(x => RefreshCurrentSession(x.r, x.s).Forget(log));
             }
             catch (Exception e)
             {
                 log.Error(e, "Error initializing");
             }
-        }
-
-        void RefreshActiveRepository(ILocalRepositoryModel repository)
-        {
-            currentSessionSubscription?.Dispose();
-            currentSessionSubscription = pullRequestSessionManager.Value.WhenAnyValue(x => x.CurrentSession)
-                .Subscribe(x => RefreshCurrentSession(repository, x).Forget());
         }
 
         async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)

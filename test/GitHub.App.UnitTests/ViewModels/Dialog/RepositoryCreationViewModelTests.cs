@@ -21,8 +21,6 @@ using System.Windows.Input;
 
 public class RepositoryCreationViewModelTests
 {
-    static object DefaultInstance = new object();
-
     static IRepositoryCreationViewModel GetMeAViewModel(
         IServiceProvider provider = null,
         IRepositoryCreationService creationService = null,

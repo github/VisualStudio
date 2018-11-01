@@ -7,74 +7,46 @@ using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels;
 using ReactiveUI;
 using Serilog;
 
-namespace GitHub.InlineReviews.ViewModels
+namespace GitHub.ViewModels
 {
     /// <summary>
-    /// View model for an issue or pull request comment.
+    /// Base view model for an issue or pull request comment.
     /// </summary>
-    public class CommentViewModel : ReactiveObject, ICommentViewModel
+    public abstract class CommentViewModel : ReactiveObject, ICommentViewModel
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
-        ICommentService commentService;
+        readonly ICommentService commentService;
+        readonly ObservableAsPropertyHelper<bool> canDelete;
+        string id;
+        IActorViewModel author;
+        IActorViewModel currentUser;
         string body;
         string errorMessage;
         bool isReadOnly;
         bool isSubmitting;
         CommentEditState state;
-        DateTimeOffset updatedAt;
+        DateTimeOffset createdAt;
+        ICommentThreadViewModel thread;
         string undoBody;
-        ObservableAsPropertyHelper<bool> canDelete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
-        /// <param name="commentService">The comment service</param>
-        /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <param name="pullRequestId">The pull request id of the comment.</param>
-        /// <param name="commentId">The GraphQL ID of the comment.</param>
-        /// <param name="databaseId">The database id of the comment.</param>
-        /// <param name="body">The comment body.</param>
-        /// <param name="state">The comment edit state.</param>
-        /// <param name="author">The author of the comment.</param>
-        /// <param name="updatedAt">The modified date of the comment.</param>
-        /// <param name="webUrl"></param>
-        protected CommentViewModel(
-            ICommentService commentService,
-            ICommentThreadViewModel thread,
-            IActorViewModel currentUser,
-            int pullRequestId,
-            string commentId,
-            int databaseId,
-            string body,
-            CommentEditState state,
-            IActorViewModel author,
-            DateTimeOffset updatedAt,
-            Uri webUrl)
+        /// <param name="commentService">The comment service.</param>
+        public CommentViewModel(ICommentService commentService)
         {
-            this.commentService = commentService;
-            Guard.ArgumentNotNull(thread, nameof(thread));
-            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
-            Guard.ArgumentNotNull(author, nameof(author));
+            Guard.ArgumentNotNull(commentService, nameof(commentService));
 
-            Thread = thread;
-            CurrentUser = currentUser;
-            Id = commentId;
-            DatabaseId = databaseId;
-            PullRequestId = pullRequestId;
-            Body = body;
-            EditState = state;
-            Author = author;
-            UpdatedAt = updatedAt;
-            WebUrl = webUrl;
+            this.commentService = commentService;
 
             var canDeleteObservable = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.None && author.Login == currentUser.Login);
+                x => x.Author,
+                x => x.CurrentUser,
+                (editState, author, currentUser) => editState == CommentEditState.None && author?.Login == currentUser?.Login);
 
             canDelete = canDeleteObservable.ToProperty(this, x => x.CanDelete);
 
@@ -82,18 +54,20 @@ namespace GitHub.InlineReviews.ViewModels
 
             var canEdit = this.WhenAnyValue(
                 x => x.EditState,
-                x => x == CommentEditState.Placeholder || (x == CommentEditState.None && author.Login == currentUser.Login));
+                x => x.Author,
+                x => x.CurrentUser,
+                (editState, author, currentUser) => editState == CommentEditState.Placeholder || 
+                    (editState == CommentEditState.None && author?.Login == currentUser?.Login));
 
             BeginEdit = ReactiveCommand.Create(DoBeginEdit, canEdit);
             AddErrorHandler(BeginEdit);
 
             CommitEdit = ReactiveCommand.CreateFromTask(
                 DoCommitEdit,
-                Observable.CombineLatest(
-                    this.WhenAnyValue(x => x.IsReadOnly),
-                    this.WhenAnyValue(x => x.Body, x => !string.IsNullOrWhiteSpace(x)),
-                    this.WhenAnyObservable(x => x.Thread.PostComment.CanExecute),
-                    (readOnly, hasBody, canPost) => !readOnly && hasBody && canPost));
+                this.WhenAnyValue(
+                    x => x.IsReadOnly,
+                    x => x.Body,
+                    (ro, body) => !ro && !string.IsNullOrWhiteSpace(body)));
             AddErrorHandler(CommitEdit);
 
             CancelEdit = ReactiveCommand.Create(DoCancelEdit, CommitEdit.IsExecuting.Select(x => !x));
@@ -104,31 +78,131 @@ namespace GitHub.InlineReviews.ViewModels
                 this.WhenAnyValue(x => x.Id).Select(x => x != null));
         }
 
+        /// <inheritdoc/>
+        public string Id
+        {
+            get => id;
+            private set => this.RaiseAndSetIfChanged(ref id, value);
+        }
+
+        /// <inheritdoc/>
+        public int DatabaseId { get; private set; }
+
+        /// <inheritdoc/>
+        public int PullRequestId { get; private set; }
+        
+        /// <inheritdoc/>
+        public IActorViewModel Author
+        {
+            get => author;
+            private set => this.RaiseAndSetIfChanged(ref author, value);
+        }
+
+        /// <inheritdoc/>
+        public IActorViewModel CurrentUser
+        {
+            get => currentUser;
+            private set => this.RaiseAndSetIfChanged(ref currentUser, value);
+        }
+
+        /// <inheritdoc/>
+        public string Body
+        {
+            get => body;
+            set => this.RaiseAndSetIfChanged(ref body, value);
+        }
+
+        /// <inheritdoc/>
+        public string ErrorMessage
+        {
+            get => errorMessage; 
+            private set => this.RaiseAndSetIfChanged(ref errorMessage, value); 
+        }
+
+        /// <inheritdoc/>
+        public CommentEditState EditState
+        {
+            get => state;
+            private set => this.RaiseAndSetIfChanged(ref state, value);
+        }
+
+        /// <inheritdoc/>
+        public bool IsReadOnly
+        {
+            get => isReadOnly;
+            set => this.RaiseAndSetIfChanged(ref isReadOnly, value);
+        }
+
+        /// <inheritdoc/>
+        public bool IsSubmitting
+        {
+            get => isSubmitting;
+            protected set => this.RaiseAndSetIfChanged(ref isSubmitting, value);
+        }
+
+        /// <inheritdoc/>
+        public bool CanDelete => canDelete.Value;
+
+        /// <inheritdoc/>
+        public DateTimeOffset CreatedAt
+        {
+            get => createdAt;
+            private set => this.RaiseAndSetIfChanged(ref createdAt, value);
+        }
+
+        /// <inheritdoc/>
+        public ICommentThreadViewModel Thread
+        {
+            get => thread;
+            private set => this.RaiseAndSetIfChanged(ref thread, value);
+        }
+
+        /// <inheritdoc/>
+        public Uri WebUrl { get; private set; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> BeginEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> CancelEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> CommitEdit { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> Delete { get; }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
+        /// Initializes the view model with data.
         /// </summary>
-        /// <param name="commentService">Comment Service</param>
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="model">The comment model.</param>
-        protected CommentViewModel(
-            ICommentService commentService,
+        /// <param name="comment">The comment model. May be null.</param>
+        /// <param name="state">The comment edit state.</param>
+        protected Task InitializeAsync(
             ICommentThreadViewModel thread,
             ActorModel currentUser,
-            CommentModel model)
-            : this(
-                  commentService,
-                  thread, 
-                  new ActorViewModel(currentUser),
-                  model.PullRequestId, 
-                  model.Id, 
-                  model.DatabaseId, 
-                  model.Body, 
-                  CommentEditState.None, 
-                  new ActorViewModel(model.Author), 
-                  model.CreatedAt,
-                  new Uri(model.Url))
+            CommentModel comment,
+            CommentEditState state)
         {
+            Guard.ArgumentNotNull(thread, nameof(thread));
+            Guard.ArgumentNotNull(currentUser, nameof(currentUser));
+
+            Thread = thread;
+            CurrentUser = new ActorViewModel(currentUser);
+            Id = comment?.Id;
+            DatabaseId = comment?.DatabaseId ?? 0;
+            PullRequestId = comment?.PullRequestId ?? 0;
+            Body = comment?.Body;
+            EditState = state;
+            Author = comment != null ? new ActorViewModel(comment.Author) : CurrentUser;
+            CreatedAt = comment?.CreatedAt ?? DateTimeOffset.MinValue;
+            WebUrl = comment?.Url != null ? new Uri(comment.Url) : null;
+
+            return Task.CompletedTask;
         }
 
         protected void AddErrorHandler(ReactiveCommand command)
@@ -145,7 +219,7 @@ namespace GitHub.InlineReviews.ViewModels
                     ErrorMessage = null;
                     IsSubmitting = true;
 
-                    await Thread.DeleteComment.Execute(new Tuple<int, int>(PullRequestId, DatabaseId));
+                    await Thread.DeleteComment(this).ConfigureAwait(true);
                 }
                 catch (Exception e)
                 {
@@ -190,12 +264,14 @@ namespace GitHub.InlineReviews.ViewModels
 
                 if (Id == null)
                 {
-                    await Thread.PostComment.Execute(Body);
+                    await Thread.PostComment(this).ConfigureAwait(true);
                 }
                 else
                 {
-                    await Thread.EditComment.Execute(new Tuple<string, string>(Id, Body));
+                    await Thread.EditComment(this).ConfigureAwait(true);
                 }
+
+                EditState = CommentEditState.None;
             }
             catch (Exception e)
             {
@@ -208,88 +284,5 @@ namespace GitHub.InlineReviews.ViewModels
                 IsSubmitting = false;
             }
         }
-
-        /// <inheritdoc/>
-        public string Id { get; private set; }
-
-        /// <inheritdoc/>
-        public int DatabaseId { get; private set; }
-    
-        /// <inheritdoc/>
-        public int PullRequestId { get; private set; }
-
-        /// <inheritdoc/>
-        public string Body
-        {
-            get { return body; }
-            set { this.RaiseAndSetIfChanged(ref body, value); }
-        }
-
-        /// <inheritdoc/>
-        public string ErrorMessage
-        {
-            get { return this.errorMessage; }
-            private set { this.RaiseAndSetIfChanged(ref errorMessage, value); }
-        }
-
-        /// <inheritdoc/>
-        public CommentEditState EditState
-        {
-            get { return state; }
-            private set { this.RaiseAndSetIfChanged(ref state, value); }
-        }
-
-        /// <inheritdoc/>
-        public bool IsReadOnly
-        {
-            get { return isReadOnly; }
-            set { this.RaiseAndSetIfChanged(ref isReadOnly, value); }
-        }
-
-        /// <inheritdoc/>
-        public bool IsSubmitting
-        {
-            get { return isSubmitting; }
-            protected set { this.RaiseAndSetIfChanged(ref isSubmitting, value); }
-        }
-
-        public bool CanDelete
-        {
-            get { return canDelete.Value; }
-        }
-
-        /// <inheritdoc/>
-        public DateTimeOffset UpdatedAt
-        {
-            get { return updatedAt; }
-            private set { this.RaiseAndSetIfChanged(ref updatedAt, value); }
-        }
-
-        /// <inheritdoc/>
-        public IActorViewModel CurrentUser { get; }
-
-        /// <inheritdoc/>
-        public ICommentThreadViewModel Thread { get; }
-
-        /// <inheritdoc/>
-        public IActorViewModel Author { get; }
-
-        /// <inheritdoc/>
-        public Uri WebUrl { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> BeginEdit { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> CancelEdit { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> CommitEdit { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
-
-        /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }
