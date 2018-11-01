@@ -43,29 +43,28 @@
                            Margin="0"
                            Text="{Binding PullRequestTitle}"
                            TextWrapping="Wrap"/>
-                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="-8 8 -8 4"/>
 
                 <ItemsControl ItemsSource="{Binding Annotations}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="0 4">
+                            <StackPanel Margin="0 2">
                                 <Expander Margin="0"
                                       Foreground="{DynamicResource GitHubVsToolWindowText}"
                                       IsExpanded="{Binding IsExpanded, Mode=OneTime}">
                                     <Expander.Header>
                                         <StackPanel Orientation="Horizontal">
-                                            <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
                                             <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
                                             <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-                                            <TextBlock FontWeight="SemiBold" Margin="4 2 0 2">
+                                            <TextBlock FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="4 2 0 2">
                                                 <Run Text="{Binding Annotation.Path, Mode=OneWay}"/>
                                             </TextBlock>
                                         </StackPanel>
                                     </Expander.Header>
 
                                     <StackPanel Margin="40 0 0 0">
-                                        <TextBlock Margin="0 0 0 4" Text="{Binding Annotation.Title, Mode=OneWay}" />
-                                        <TextBlock FontFamily="Consolas" Text="{Binding Annotation.Message, Mode=OneWay}"/>
+                                        <TextBlock Margin="0 0 0 4" TextWrapping="Wrap" Text="{Binding Annotation.Title, Mode=OneWay}" />
+                                        <TextBlock FontFamily="Consolas" TextWrapping="Wrap" Text="{Binding Annotation.Message, Mode=OneWay}"/>
                                     </StackPanel>
                                 </Expander>
                             </StackPanel>
