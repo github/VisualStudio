@@ -34,7 +34,7 @@ namespace GitHub.Services
             if (readParentOwnerLogin == null)
             {
                 readParentOwnerLogin = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(Var(nameof(name)), Var(nameof(owner)))
                     .Select(r => r.Parent != null ? Tuple.Create(r.Parent.Owner.Login, r.Parent.Name) : null)
                     .Compile();
             }
