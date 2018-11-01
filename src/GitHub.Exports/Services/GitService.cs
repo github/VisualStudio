@@ -69,18 +69,6 @@ namespace GitHub.Services
         }
 
         /// <summary>
-        /// Updates the CloneUrl from the "origin" remote.
-        /// </summary>
-        public void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel)
-        {
-            var localPath = localRepositoryModel.LocalPath;
-            if (localPath == null)
-                return;
-
-            localRepositoryModel.CloneUrl = GetUri(localPath);
-        }
-
-        /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote named origin exists, this method returns null
         /// </summary>

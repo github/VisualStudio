@@ -317,6 +317,5 @@ public class VSGitExtTests
         public IRepository GetRepository(string path) => throw new NotImplementedException();
         public UriString GetUri(IRepository repository, string remote = "origin") => throw new NotImplementedException();
         public UriString GetUri(string path, string remote = "origin") => throw new NotImplementedException();
-        public void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel) => throw new NotImplementedException();
     }
 }

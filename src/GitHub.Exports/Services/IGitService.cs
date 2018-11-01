@@ -22,12 +22,6 @@ namespace GitHub.Services
         IBranch CreateCurrentBranchModel(ILocalRepositoryModel model);
 
         /// <summary>
-        /// Updates the CloneUrl information based on the "origin" remote.
-        /// </summary>
-        /// <param name="localRepositoryModel">The repository model to refresh.</param>
-        void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel);
-
-        /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository
         /// is null or no remote exists, this method returns null
         /// </summary>

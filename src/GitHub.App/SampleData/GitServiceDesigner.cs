@@ -10,7 +10,6 @@ namespace GitHub.SampleData
     {
         public ILocalRepositoryModel CreateLocalRepositoryModel(string localPath) => null;
         public IBranch CreateCurrentBranchModel(ILocalRepositoryModel model) => null;
-        public void RefreshCloneUrl(ILocalRepositoryModel localRepositoryModel) { }
         public Task<string> GetLatestPushedSha(string path, string remote = "origin") => Task.FromResult<string>(null);
         public UriString GetRemoteUri(IRepository repo, string remote = "origin") => null;
         public IRepository GetRepository(string path) => null;
