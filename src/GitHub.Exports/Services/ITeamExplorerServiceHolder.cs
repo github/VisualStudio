@@ -28,8 +28,14 @@ namespace GitHub.Services
         /// <param name="provider">If the current ServiceProvider matches this, clear it</param>
         void ClearServiceProvider(IServiceProvider provider);
 
+        /// <summary>
+        /// A service that can be used for repository changed events.
+        /// </summary>
         ITeamExplorerContext TeamExplorerContext { get; }
 
+        /// <summary>
+        /// A service for avoiding deadlocks and marshaling tasks onto the UI thread.
+        /// </summary>
         JoinableTaskFactory JoinableTaskFactory { get; }
 
         IGitAwareItem HomeSection { get; }
