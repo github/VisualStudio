@@ -304,6 +304,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close and comment.
+        /// </summary>
+        public static string CloseAndComment {
+            get {
+                return ResourceManager.GetString("CloseAndComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close issue.
         /// </summary>
         public static string CloseIssue {

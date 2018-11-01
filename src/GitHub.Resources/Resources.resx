@@ -848,4 +848,7 @@ https://git-scm.com/download/win</value>
   <data name="CloseIssue" xml:space="preserve">
     <value>Close issue</value>
   </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Close and comment</value>
+  </data>
 </root>

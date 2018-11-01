@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
@@ -15,6 +16,8 @@ namespace GitHub.ViewModels.Documents
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssueishCommentViewModel : CommentViewModel, IIssueishCommentViewModel
     {
+        ObservableAsPropertyHelper<string> closeIssueishCaption;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
@@ -29,7 +32,7 @@ namespace GitHub.ViewModels.Documents
         public bool CanCloseIssueish { get; private set; }
 
         /// <inheritdoc/>
-        public string CloseIssueishCaption { get; private set; }
+        public string CloseIssueishCaption => closeIssueishCaption?.Value;
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> CloseIssueish { get; }
@@ -49,7 +52,13 @@ namespace GitHub.ViewModels.Documents
                     .ConfigureAwait(true);
 
             CanCloseIssueish = closeCaption != null;
-            CloseIssueishCaption = closeCaption;
+
+            if (closeCaption != null)
+            {
+                closeIssueishCaption = this.WhenAnyValue(x => x.Body)
+                    .Select(x => string.IsNullOrWhiteSpace(x) ? closeCaption : Resources.CloseAndComment)
+                    .ToProperty(this, x => x.CloseIssueishCaption);
+            }
         }
     }
 }
