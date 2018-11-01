@@ -39,9 +39,9 @@ namespace GitHub.VisualStudio.Base
                 Invalidate();
             };
 
-            UpdateRepo(holder.TeamExplorerContext.ActiveRepository);
+            ActiveRepo = holder.TeamExplorerContext.ActiveRepository;
             holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
-            holder.TeamExplorerContext.StatusChanged += TeamExplorerContext_StatusChanged; ;
+            holder.TeamExplorerContext.StatusChanged += TeamExplorerContext_StatusChanged;
         }
 
         void TeamExplorerContext_StatusChanged(object sender, EventArgs e)
