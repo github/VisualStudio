@@ -78,7 +78,6 @@ namespace GitHub.ViewModels
         public async Task InitializeAsync(
             IPullRequestSession session,
             IPullRequestSessionFile file,
-            PullRequestReviewModel review,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
         {
@@ -97,7 +96,7 @@ namespace GitHub.ViewModels
                 await vm.InitializeAsync(
                     session,
                     this,
-                    review,
+                    comment.Review,
                     comment.Comment,
                     CommentEditState.None).ConfigureAwait(false);
                 Comments.Add(vm);
@@ -110,7 +109,7 @@ namespace GitHub.ViewModels
                 await vm.InitializeAsPlaceholderAsync(
                     session,
                     this,
-                    review.State == PullRequestReviewState.Pending,
+                    session.HasPendingReview,
                     false).ConfigureAwait(true);
 
                 var (key, secondaryKey) = GetDraftKeys(vm);
