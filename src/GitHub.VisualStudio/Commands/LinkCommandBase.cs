@@ -63,7 +63,7 @@ namespace GitHub.VisualStudio.Commands
 
         protected ILocalRepositoryModel GetActiveRepo()
         {
-            var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.ActiveRepo;
+            var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.TeamExplorerContext.ActiveRepository;
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
             if (activeRepo == null)
             {
@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio.Commands
 
         void RefreshRepo()
         {
-            ActiveRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>().ActiveRepo;
+            ActiveRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.TeamExplorerContext.ActiveRepository;
 
             if (ActiveRepo == null)
             {

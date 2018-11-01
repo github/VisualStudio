@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
+        readonly ISimpleApiClientFactory apiFactory;
+        readonly ITeamExplorerServiceHolder holder;
         readonly IPackageSettings packageSettings;
         readonly ITeamExplorerServices teamExplorerServices;
         readonly int sectionIndex;
@@ -101,8 +103,6 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public ICommand Clone { get; }
 
-        internal ITeamExplorerServiceHolder Holder => holder;
-
         public GitHubConnectSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
@@ -127,6 +127,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IsVisible = false;
             sectionIndex = index;
 
+            this.apiFactory = apiFactory;
+            this.holder = holder;
             this.packageSettings = packageSettings;
             this.teamExplorerServices = teamExplorerServices;
             this.localRepositories = localRepositories;
@@ -325,7 +327,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var api = await apiFactory.Create(newrepo.CloneUrl);
                         var repo = await api.GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
@@ -344,13 +346,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         .Cast<ILocalRepositoryModel>()
                         .ForEach(async r =>
                     {
-                        if (Equals(Holder.ActiveRepo, r))
+                        if (Equals(holder.TeamExplorerContext.ActiveRepository, r))
                             SelectedRepository = r;
 
                         try
                         {
                             // TODO: Cache the icon state.
-                            var api = await ApiFactory.Create(r.CloneUrl);
+                            var api = await apiFactory.Create(r.CloneUrl);
                             var repo = await api.GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
@@ -457,7 +459,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public bool OpenRepository()
         {
-            var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
+            var old = Repositories.FirstOrDefault(x => x.Equals(holder.TeamExplorerContext.ActiveRepository));
             if (!Equals(SelectedRepository, old))
             {
                 try

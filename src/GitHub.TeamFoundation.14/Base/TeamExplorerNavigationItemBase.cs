@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.ComponentModel;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Services;
@@ -14,6 +15,7 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2
     {
+        readonly ITeamExplorerServiceHolder holder;
         readonly Octicon octicon;
 
         public TeamExplorerNavigationItemBase(IGitHubServiceProvider serviceProvider,
@@ -24,6 +26,7 @@ namespace GitHub.VisualStudio.Base
             Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
             Guard.ArgumentNotNull(holder, nameof(holder));
 
+            this.holder = holder;
             this.octicon = octicon;
 
             IsVisible = false;
@@ -36,7 +39,31 @@ namespace GitHub.VisualStudio.Base
                 Invalidate();
             };
 
-            holder.Subscribe(this, UpdateRepo);
+            UpdateRepo(holder.TeamExplorerContext.ActiveRepository);
+            holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
+            holder.TeamExplorerContext.StatusChanged += TeamExplorerContext_StatusChanged; ;
+        }
+
+        void TeamExplorerContext_StatusChanged(object sender, EventArgs e)
+        {
+            UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
+        }
+
+        void TeamExplorerContext_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(holder.TeamExplorerContext.ActiveRepository))
+            {
+                UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
+            }
+        }
+
+        void UpdateRepoOnMainThread(ILocalRepositoryModel repo)
+        {
+            holder.JoinableTaskFactory.RunAsync(async () =>
+            {
+                await holder.JoinableTaskFactory.SwitchToMainThreadAsync();
+                UpdateRepo(repo);
+            }).Task.Forget();
         }
 
         public override async void Invalidate()
@@ -75,7 +102,8 @@ namespace GitHub.VisualStudio.Base
 
         void Unsubscribe()
         {
-            holder.Unsubscribe(this);
+            holder.TeamExplorerContext.PropertyChanged -= TeamExplorerContext_PropertyChanged;
+            holder.TeamExplorerContext.StatusChanged -= TeamExplorerContext_StatusChanged; ;
         }
 
         bool disposed;
@@ -109,7 +137,7 @@ namespace GitHub.VisualStudio.Base
         Image image;
         public Image Image
         {
-            get{ return image; }
+            get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }
     }

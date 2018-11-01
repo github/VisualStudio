@@ -9,13 +9,14 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.UI;
 using GitHub.Extensions;
+using System.ComponentModel;
 
 namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerItemBase : TeamExplorerGitRepoInfo, IServiceProviderAware
     {
+        readonly ITeamExplorerServiceHolder holder;
         readonly ISimpleApiClientFactory apiFactory;
-        protected ITeamExplorerServiceHolder holder;
 
         ISimpleApiClient simpleApiClient;
         public ISimpleApiClient SimpleApiClient
@@ -28,8 +29,6 @@ namespace GitHub.VisualStudio.Base
                 simpleApiClient = value;
             }
         }
-
-        protected ISimpleApiClientFactory ApiFactory => apiFactory;
 
         public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
             : base(serviceProvider)
@@ -75,19 +74,49 @@ namespace GitHub.VisualStudio.Base
 
         void SubscribeToRepoChanges()
         {
-            holder.Subscribe(this, (ILocalRepositoryModel repo) =>
+            UpdateRepo(holder.TeamExplorerContext.ActiveRepository);
+            holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
+            holder.TeamExplorerContext.StatusChanged += TeamExplorerContext_StatusChanged;
+        }
+
+        void TeamExplorerContext_StatusChanged(object sender, EventArgs e)
+        {
+            UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
+        }
+
+        void TeamExplorerContext_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(holder.TeamExplorerContext.ActiveRepository))
             {
-                var changed = !Equals(ActiveRepo, repo);
-                ActiveRepo = repo;
-                RepoChanged(changed);
-            });
+                UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
+            }
+        }
+
+        void UpdateRepoOnMainThread(ILocalRepositoryModel repo)
+        {
+            holder.JoinableTaskFactory.RunAsync(async () =>
+            {
+                await holder.JoinableTaskFactory.SwitchToMainThreadAsync();
+                UpdateRepo(repo);
+            }).Task.Forget();
         }
 
         void Unsubscribe()
         {
-            holder.Unsubscribe(this);
+            //holder.Unsubscribe(this);
+            holder.TeamExplorerContext.PropertyChanged -= TeamExplorerContext_PropertyChanged;
+            holder.TeamExplorerContext.StatusChanged -= TeamExplorerContext_StatusChanged;
+
             if (TEServiceProvider != null)
                 holder.ClearServiceProvider(TEServiceProvider);
+        }
+
+        void UpdateRepo(ILocalRepositoryModel repo)
+        {
+            var changed = ActiveRepo != repo;
+            ActiveRepo = repo;
+            RepoChanged(changed);
+            Invalidate();
         }
 
         protected virtual void RepoChanged(bool changed)
@@ -198,6 +227,5 @@ namespace GitHub.VisualStudio.Base
             get { return text; }
             set { text = value; this.RaisePropertyChange(); }
         }
-
     }
 }
