@@ -83,5 +83,12 @@ namespace GitHub.Services
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             return await graphql.Run(queryProtectedBranches, vars).ConfigureAwait(false);
         }
+
+        public async Task<ProtectedBranch> GetProtectedBranch(HostAddress address, string owner, string name, string branchName)
+        {
+            Guard.ArgumentNotNull(branchName, nameof(branchName));
+            var protectedBranches = await GetProtectedBranches(address, owner, name).ConfigureAwait(false);
+            return protectedBranches.FirstOrDefault(branch => branch.Name.Equals(branchName, StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 }

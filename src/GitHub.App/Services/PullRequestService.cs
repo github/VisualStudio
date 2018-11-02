@@ -115,10 +115,10 @@ namespace GitHub.Services
                                           CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                               .Select(suite => new CheckSuiteSummaryModel
                                               {
-                                                  ApplicationName = suite.App != null ? suite.App.Name : "Private Application",
                                                   CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                                       .Select(run => new CheckRunSummaryModel
                                                       {
+                                                          Name = run.Name,
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
                                                       }).ToList()
@@ -233,8 +233,8 @@ namespace GitHub.Services
                 if (protectedBranchContexts != null)
                 {
                     var requiredCheckRuns = item.LastCommit?.CheckSuites?
-                        .Where(model => protectedBranchContexts.Contains(model.ApplicationName))
                         .SelectMany(checkSuite => checkSuite.CheckRuns)
+                        .Where(model => protectedBranchContexts.Contains(model.Name))
                         .ToArray();
 
                     var requiredStatues = item.LastCommit?.Statuses
@@ -249,8 +249,8 @@ namespace GitHub.Services
                 }
 
                 var checkRuns = item.LastCommit?.CheckSuites?
-                    .Where(model => protectedBranchContexts == null || !protectedBranchContexts.Contains(model.ApplicationName))
                     .SelectMany(checkSuite => checkSuite.CheckRuns)
+                    .Where(model => protectedBranchContexts == null || !protectedBranchContexts.Contains(model.Name))
                     .ToArray();
 
                 var statuses = item.LastCommit?.Statuses
@@ -1141,11 +1141,11 @@ namespace GitHub.Services
         class CheckSuiteSummaryModel
         {
             public List<CheckRunSummaryModel> CheckRuns { get; set; }
-            public string ApplicationName { get; set; }
         }
 
         class CheckRunSummaryModel
         {
+            public string Name { get; set; }
             public CheckConclusionState? Conclusion { get; set; }
             public CheckStatusState Status { get; set; }
         }

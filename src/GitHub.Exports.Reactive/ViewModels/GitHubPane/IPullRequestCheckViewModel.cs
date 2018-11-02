@@ -11,6 +11,8 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public interface IPullRequestCheckViewModel: IViewModel
     {
+        bool IsRequired { get; }
+        
         /// <summary>
         /// The title of the Status/Check
         /// </summary>

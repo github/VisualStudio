@@ -45,10 +45,14 @@
         <!--
             <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
         -->
-        <Label Grid.Column="3" HorizontalAlignment="Right"
-               Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
-            <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
-        </Label>
+        <StackPanel Grid.Column="3" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Label Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                Required
+            </Label>
+            <Label Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+                <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
+            </Label>
+        </StackPanel>
     </Grid>
 </local:GenericPullRequestCheckView>
 

@@ -45,6 +45,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                 pullRequestCheckViewModel.CheckType = PullRequestCheckType.StatusApi;
+                pullRequestCheckViewModel.IsRequired = model.IsRequired;
                 pullRequestCheckViewModel.Title = model.Context;
                 pullRequestCheckViewModel.Description = model.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
@@ -91,6 +92,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
+                    pullRequestCheckViewModel.IsRequired = model.IsRequired;
                     pullRequestCheckViewModel.Title = model.Name;
                     pullRequestCheckViewModel.Description = model.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
@@ -123,6 +125,8 @@ namespace GitHub.ViewModels.GitHubPane
 
             usageTracker.IncrementCounter(expression).Forget();
         }
+
+        public bool IsRequired { get; private set; }
 
         public string Title { get; private set; }
 

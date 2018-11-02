@@ -24,5 +24,7 @@
         /// The descritption for the Status
         /// </summary>
         public string Description { get; set; }
+
+        public bool IsRequired { get; set; }
     }
 }
