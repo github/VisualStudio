@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Globalization;
-using GitHub.Services;
 
 namespace GitHub.Models
 {
     public class BranchModel : IBranch
     {
+        public BranchModel(string name, IRepositoryModel repo, string sha, bool isTracking, string trackedSha) :
+            this(name, repo)
+        {
+            IsTracking = isTracking;
+            Sha = sha;
+            TrackedSha = trackedSha;
+        }
+
         public BranchModel(string name, IRepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -23,21 +30,6 @@ namespace GitHub.Models
 
             Name = DisplayName = branch.Name;
             Repository = repo;
-            Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
-        }
-
-        public BranchModel(LibGit2Sharp.Branch branch, IRepositoryModel repo, IGitService gitService)
-        {
-            Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
-            Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
-            Name = DisplayName = branch.FriendlyName;
-#pragma warning disable 0618 // TODO: Replace `Branch.Remote` with `Repository.Network.Remotes[branch.RemoteName]`.
-            // NOTE: This method expects a localPath not a URL!
-            Repository = branch.IsRemote ? gitService.CreateLocalRepositoryModel(branch.Remote.Url) : repo;
-#pragma warning restore 0618
-            IsTracking = branch.IsTracking;
-            Sha = branch.Tip?.Sha;
-            TrackedSha = branch.TrackedBranch?.Tip?.Sha;
             Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 

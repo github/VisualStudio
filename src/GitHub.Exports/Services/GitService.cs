@@ -57,14 +57,18 @@ namespace GitHub.Services
             var localPath = model.LocalPath;
             using (var repo = GetRepository(localPath))
             {
-                var headBranch = repo?.Head;
-                if (headBranch == null)
+                var branch = repo?.Head;
+                if (branch == null)
                 {
                     return null;
                 }
 
-                // BranchModel doesn't keep a reference to Repository
-                return new BranchModel(headBranch, model, this);
+                return new BranchModel(
+                    name: branch.FriendlyName,
+                    repo: model,
+                    sha: branch.Tip?.Sha,
+                    isTracking: branch.IsTracking,
+                    trackedSha: branch.TrackedBranch?.Tip?.Sha);
             }
         }
 
