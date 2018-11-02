@@ -227,12 +227,13 @@ namespace GitHub.ViewModels
 
         protected override CommentDraft BuildDraft(ICommentViewModel comment)
         {
-            return new PullRequestReviewCommentDraft
-            {
-                Body = comment.Body,
-                Side = Side,
-                UpdatedAt = DateTimeOffset.UtcNow,
-            };
+            return !string.IsNullOrEmpty(comment.Body) ?
+                new PullRequestReviewCommentDraft
+                {
+                    Body = comment.Body,
+                    Side = Side,
+                    UpdatedAt = DateTimeOffset.UtcNow,
+                } : null;
         }
 
         protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment)
