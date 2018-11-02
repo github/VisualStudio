@@ -20,6 +20,6 @@ namespace GitHub.Services
         /// </returns>
         Task<(string owner, string name)?> FindParent(HostAddress address, string owner, string name);
 
-        Task<IEnumerable<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name);
+        Task<IList<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name);
     }
 }

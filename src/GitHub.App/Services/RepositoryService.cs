@@ -17,7 +17,7 @@ namespace GitHub.Services
     public class RepositoryService: IRepositoryService
     {
         static ICompiledQuery<Tuple<string, string>> readParentOwnerLogin;
-        static ICompiledQuery<IEnumerable<ProtectedBranch>> queryProtectedBranches;
+        static ICompiledQuery<List<ProtectedBranch>> queryProtectedBranches;
         readonly IGraphQLClientFactory graphqlFactory;
 
         [ImportingConstructor]
@@ -53,7 +53,7 @@ namespace GitHub.Services
             return result != null ? (result.Item1, result.Item2) : ((string, string)?)null;
         }
 
-        public async Task<IEnumerable<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name)
+        public async Task<IList<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name)
         {
             Guard.ArgumentNotNull(address, nameof(address));
             Guard.ArgumentNotEmptyString(owner, nameof(owner));
@@ -62,7 +62,7 @@ namespace GitHub.Services
             if (queryProtectedBranches == null)
             {
                 queryProtectedBranches = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(Var(nameof(name)), Var(nameof(owner)))
                     .Select(r =>
                         r.ProtectedBranches(null, null, null, null)
                             .AllPages()
@@ -70,7 +70,7 @@ namespace GitHub.Services
                             {
                                 Name = branch.Name,
                                 RequiredStatusCheckContexts = branch.RequiredStatusCheckContexts.ToArray()
-                            })
+                            }).ToList()
                         ).Compile();
             }
 
