@@ -197,7 +197,7 @@ public class OpenFromClipboardCommandTests
             var gitService = Substitute.For<IGitService>();
             var currentBranch = Substitute.For<IBranch>();
             currentBranch.Name.Returns(currentBranchName);
-            gitService.CreateCurrentBranchModel(activeRepository).Returns(currentBranch);
+            gitService.GetBranch(activeRepository).Returns(currentBranch);
             if (resolveBlobResult != null)
             {
                 gitHubContextService.ResolveBlob(repositoryDir, contextFromClipboard).Returns(resolveBlobResult.Value);

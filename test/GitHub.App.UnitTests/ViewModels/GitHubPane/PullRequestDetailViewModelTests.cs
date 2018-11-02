@@ -553,7 +553,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var repository = Substitute.For<ILocalRepositoryModel>();
             var currentBranchModel = new BranchModel(currentBranch, repository);
             var gitService = Substitute.For<IGitService>();
-            gitService.CreateCurrentBranchModel(repository).Returns(currentBranchModel);
+            gitService.GetBranch(repository).Returns(currentBranchModel);
             repository.CloneUrl.Returns(new UriString(Uri.ToString()));
             repository.LocalPath.Returns(@"C:\projects\ThisRepo");
             repository.Name.Returns("repo");

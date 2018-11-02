@@ -99,7 +99,7 @@ namespace GitHub.VisualStudio.Commands
             if (hasChanges)
             {
                 // TODO: What if this returns null because we're not on a branch?
-                var currentBranch = gitService.Value.CreateCurrentBranchModel(activeRepository);
+                var currentBranch = gitService.Value.GetBranch(activeRepository);
                 var branchName = currentBranch.Name;
 
                 // AnnotateFile expects a branch name so we use the current branch

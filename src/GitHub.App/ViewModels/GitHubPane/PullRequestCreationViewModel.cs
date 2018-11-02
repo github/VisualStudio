@@ -142,7 +142,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             modelService = await modelServiceFactory.CreateAsync(connection);
             activeLocalRepo = repository;
-            SourceBranch = gitService.CreateCurrentBranchModel(repository);
+            SourceBranch = gitService.GetBranch(repository);
 
             var obs = modelService.ApiClient.GetRepository(repository.Owner, repository.Name)
                 .Select(r => new RemoteRepositoryModel(r))
@@ -212,7 +212,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         void LoadDescriptionFromCommits()
         {
-            SourceBranch = gitService.CreateCurrentBranchModel(activeLocalRepo);
+            SourceBranch = gitService.GetBranch(activeLocalRepo);
 
             var uniqueCommits = this.WhenAnyValue(
                 x => x.SourceBranch,

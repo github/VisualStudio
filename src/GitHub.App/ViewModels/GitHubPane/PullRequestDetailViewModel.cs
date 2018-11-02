@@ -405,7 +405,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
-                var currentBranch = gitService.CreateCurrentBranchModel(LocalRepository);
+                var currentBranch = gitService.GetBranch(LocalRepository);
                 IsCheckedOut = localBranches.Contains(currentBranch);
 
                 if (IsCheckedOut)

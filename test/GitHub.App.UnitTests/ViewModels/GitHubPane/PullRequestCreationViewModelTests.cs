@@ -97,7 +97,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetRepo = targetRepoOwner == sourceRepoOwner ? sourceRepo : sourceRepo.Parent;
         var targetBranch = targetBranchName != targetRepo.DefaultBranch.Name ? new BranchModel(targetBranchName, targetRepo) : targetRepo.DefaultBranch;
 
-        gitService.CreateCurrentBranchModel(activeRepo).Returns(sourceBranch);
+        gitService.GetBranch(activeRepo).Returns(sourceBranch);
         api.GetRepository(Args.String, Args.String).Returns(Observable.Return(githubRepo));
         ms.ApiClient.Returns(api);
 
