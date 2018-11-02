@@ -129,7 +129,8 @@ namespace GitHub.Services
                     }
                     else if (newRepositoryPath != null)
                     {
-                        log.Debug("Fire StatusChanged event when on a repository and anything changes");
+                        // For example, this will fire when the HEAD commit changes
+                        log.Debug("Fire StatusChanged event if anything about an active repository has changed");
                         StatusChanged?.Invoke(this, EventArgs.Empty);
                     }
 
