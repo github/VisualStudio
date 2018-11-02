@@ -24,13 +24,13 @@ namespace GitHub.TeamFoundation
             return Registry.CurrentUser.OpenSubKey(keyName, true);
         }
 
-        internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
+        internal static IEnumerable<LocalRepositoryModel> PokeTheRegistryForRepositoryList()
         {
             using (var key = OpenGitKey("Repositories"))
             {
                 if (key == null)
                 {
-                    return Enumerable.Empty<ILocalRepositoryModel>();
+                    return Enumerable.Empty<LocalRepositoryModel>();
                 }
 
                 return key.GetSubKeyNames().Select(x =>

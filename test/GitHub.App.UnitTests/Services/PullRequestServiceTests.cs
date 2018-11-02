@@ -581,10 +581,10 @@ public class PullRequestServiceTests : TestBaseClass
         return service;
     }
 
-    static ILocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
+    static LocalRepositoryModel CreateLocalRepositoryModel(Repository repo)
     {
         var repoDir = repo.Info.WorkingDirectory;
-        var repositoryModel = Substitute.For<ILocalRepositoryModel>();
+        var repositoryModel = Substitute.For<LocalRepositoryModel>();
         repositoryModel.LocalPath.Returns(repoDir);
         return repositoryModel;
     }
@@ -598,7 +598,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var gitClient = MockGitClient();
             var target = CreateTarget(gitClient);
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
             var fileContent = "file content";
             var pr = CreatePullRequest();
 
@@ -620,7 +620,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var gitClient = MockGitClient();
             var target = CreateTarget(gitClient);
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
             var pr = CreatePullRequest();
 
             gitClient.ExtractFile(Arg.Any<IRepository>(), "123", "filename").Returns(GetFileTaskAsync(null));
@@ -647,7 +647,7 @@ public class PullRequestServiceTests : TestBaseClass
             var fileContent = "file content";
             var gitClient = MockGitClient();
             var target = CreateTarget(gitClient);
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
             var pr = CreatePullRequest();
 
             var expectedPath = Path.Combine(repoDir, fileName);
@@ -689,8 +689,8 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IUsageTracker>());
 
         IModelService ms = null;
-        ILocalRepositoryModel sourceRepo = null;
-        ILocalRepositoryModel targetRepo = null;
+        LocalRepositoryModel sourceRepo = null;
+        LocalRepositoryModel targetRepo = null;
         string title = null;
         string body = null;
         BranchModel source = null;
@@ -730,7 +730,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
 
             var pr = new PullRequestDetailModel
             {
@@ -754,7 +754,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
 
             var pr = new PullRequestDetailModel
@@ -783,7 +783,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/Owner/repo"));
 
             var pr = new PullRequestDetailModel
@@ -812,7 +812,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitClient = MockGitClient();
             var service = CreateTarget(gitClient, MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
 
             var pr = new PullRequestDetailModel
@@ -845,7 +845,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitService = MockGitService();
             var service = CreateTarget(gitClient, gitService);
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://foo.bar/owner/repo"));
 
             using (var repo = gitService.GetRepository(localRepo.CloneUrl))
@@ -881,7 +881,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "Pull requests can be \"named\" all sorts of thing's (sic)");
             Assert.That("pr/123-pull-requests-can-be-named-all-sorts-of-thing-s-sic", Is.EqualTo(result));
         }
@@ -897,7 +897,7 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "コードをレビューする準備ができたこと");
             Assert.That("pr/123", Is.EqualTo(result));
         }
@@ -907,7 +907,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "foo1");
             Assert.That("pr/123-foo1-3", Is.EqualTo(result));
         }
@@ -920,7 +920,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
@@ -933,7 +933,7 @@ public class PullRequestServiceTests : TestBaseClass
         {
             var service = CreateTarget(MockGitClient(), MockGitService());
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/Foo/bar"));
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(fromFork: false));
@@ -964,7 +964,7 @@ public class PullRequestServiceTests : TestBaseClass
 
             var service = CreateTarget(MockGitClient(), MockGitService(repo));
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar.git"));
 
             var result = await service.GetLocalBranches(localRepo, CreatePullRequest(true));
@@ -1004,7 +1004,7 @@ public class PullRequestServiceTests : TestBaseClass
             var gitService = MockGitService();
             var service = CreateTarget(gitClient, gitService);
 
-            var localRepo = Substitute.For<ILocalRepositoryModel>();
+            var localRepo = Substitute.For<LocalRepositoryModel>();
             localRepo.CloneUrl.Returns(new UriString("https://github.com/foo/bar"));
 
             using (var repo = gitService.GetRepository(localRepo.CloneUrl))

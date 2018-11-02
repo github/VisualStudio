@@ -65,7 +65,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<Unit> Back => BackCommand;
 
-        public async Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             var modelService = await modelServiceFactory.CreateAsync(connection);
             apiClient = modelService.ApiClient;

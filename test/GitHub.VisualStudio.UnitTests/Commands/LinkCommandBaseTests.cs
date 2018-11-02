@@ -46,7 +46,7 @@ public class LinkCommandBaseTests : TestBaseClass
             var basePath = temp.Directory.CreateSubdirectory("generate-url-test1-" + testid);
             if (createRootedPath && path != null)
                 path = System.IO.Path.Combine(basePath.FullName, path);
-            ILocalRepositoryModel model = null;
+            LocalRepositoryModel model = null;
             model = new LocalRepositoryModel { Name = "bar", CloneUrl = baseUrl, LocalPath = basePath.FullName };
 
             var result = await LinkCommandBase.GenerateUrl(gitService, model, linkType, path, startLine, endLine);

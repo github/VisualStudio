@@ -42,7 +42,7 @@ namespace GitHub.Services
         UriString cloneUrl;
         (string owner, int number) pullRequest;
 
-        ILocalRepositoryModel repositoryModel;
+        LocalRepositoryModel repositoryModel;
         JoinableTask refreshJoinableTask;
 
         [ImportingConstructor]
@@ -156,7 +156,7 @@ namespace GitHub.Services
         /// <summary>
         /// The active repository or null if not in a repository.
         /// </summary>
-        public ILocalRepositoryModel ActiveRepository
+        public LocalRepositoryModel ActiveRepository
         {
             get
             {

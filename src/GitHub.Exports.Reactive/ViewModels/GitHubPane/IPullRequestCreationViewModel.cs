@@ -17,6 +17,6 @@ namespace GitHub.ViewModels.GitHubPane
         string PRTitle { get; set; }
         ReactivePropertyValidator TitleValidator { get; }
 
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

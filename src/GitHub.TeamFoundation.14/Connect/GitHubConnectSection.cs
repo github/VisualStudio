@@ -87,15 +87,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             private set { showRetry = value; this.RaisePropertyChange(); }
         }
 
-        IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        public IReactiveDerivedList<ILocalRepositoryModel> Repositories
+        IReactiveDerivedList<LocalRepositoryModel> repositories;
+        public IReactiveDerivedList<LocalRepositoryModel> Repositories
         {
             get { return repositories; }
             private set { repositories = value; this.RaisePropertyChange(); }
         }
 
-        ILocalRepositoryModel selectedRepository;
-        public ILocalRepositoryModel SelectedRepository
+        LocalRepositoryModel selectedRepository;
+        public LocalRepositoryModel SelectedRepository
         {
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
@@ -314,7 +314,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 // so we can handle just one new entry separately
                 if (isCloning || isCreating)
                 {
-                    var newrepo = e.NewItems.Cast<ILocalRepositoryModel>().First();
+                    var newrepo = e.NewItems.Cast<LocalRepositoryModel>().First();
 
                     SelectedRepository = newrepo;
                     if (isCreating)
@@ -343,7 +343,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 else
                 {
                     e.NewItems
-                        .Cast<ILocalRepositoryModel>()
+                        .Cast<LocalRepositoryModel>()
                         .ForEach(async r =>
                     {
                         if (Equals(holder.TeamExplorerContext.ActiveRepository, r))
@@ -368,7 +368,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        void HandleCreatedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -377,7 +377,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void HandleClonedRepo(ILocalRepositoryModel newrepo)
+        void HandleClonedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -389,7 +389,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        void ShowNotification(LocalRepositoryModel newrepo, string msg)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 

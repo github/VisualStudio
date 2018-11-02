@@ -28,7 +28,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="localPath">The repository's local path.</param>
         /// <returns>A repository model.</returns>
-        public ILocalRepositoryModel CreateLocalRepositoryModel(string localPath)
+        public LocalRepositoryModel CreateLocalRepositoryModel(string localPath)
         {
             Guard.ArgumentNotNull(localPath, nameof(localPath));
 
@@ -52,7 +52,7 @@ namespace GitHub.Services
             return model;
         }
 
-        public BranchModel GetBranch(ILocalRepositoryModel model)
+        public BranchModel GetBranch(LocalRepositoryModel model)
         {
             var localPath = model.LocalPath;
             using (var repo = GetRepository(localPath))

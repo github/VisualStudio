@@ -100,7 +100,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var author = Substitute.For<IAccount>();
 
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
             repository.LocalPath.Returns(@"C:\Foo");
 
             var result = Substitute.For<IPullRequestSession>();

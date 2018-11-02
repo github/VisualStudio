@@ -23,7 +23,7 @@ internal static class Args
     public static LibGit2Sharp.IRepository LibGit2Repo { get { return Arg.Any<LibGit2Sharp.IRepository>(); } }
     public static LibGit2Sharp.Branch LibGit2Branch { get { return Arg.Any<LibGit2Sharp.Branch>(); } }
     public static Remote LibgGit2Remote { get { return Arg.Any<Remote>(); } }
-    public static ILocalRepositoryModel LocalRepositoryModel { get { return Arg.Any<ILocalRepositoryModel>(); } }
+    public static LocalRepositoryModel LocalRepositoryModel { get { return Arg.Any<LocalRepositoryModel>(); } }
     public static IRemoteRepositoryModel RemoteRepositoryModel { get { return Arg.Any<IRemoteRepositoryModel>(); } }
     public static BranchModel Branch { get { return Arg.Any<BranchModel>(); } }
     public static IGitService GitService { get { return Arg.Any<IGitService>(); } }

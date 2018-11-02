@@ -92,7 +92,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void UpdateRepoOnMainThread(ILocalRepositoryModel repo)
+        void UpdateRepoOnMainThread(LocalRepositoryModel repo)
         {
             holder.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -110,7 +110,7 @@ namespace GitHub.VisualStudio.Base
                 holder.ClearServiceProvider(TEServiceProvider);
         }
 
-        void UpdateRepo(ILocalRepositoryModel repo)
+        void UpdateRepo(LocalRepositoryModel repo)
         {
             var changed = ActiveRepo != repo;
             ActiveRepo = repo;

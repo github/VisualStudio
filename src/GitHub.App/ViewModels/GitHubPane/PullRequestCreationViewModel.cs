@@ -41,7 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IGitService gitService;
         readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
-        ILocalRepositoryModel activeLocalRepo;
+        LocalRepositoryModel activeLocalRepo;
         ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
         IModelService modelService;
 
@@ -138,7 +138,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => IsBusy = x);
         }
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             modelService = await modelServiceFactory.CreateAsync(connection);
             activeLocalRepo = repository;

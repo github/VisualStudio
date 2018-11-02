@@ -392,7 +392,7 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
-            var repo = Substitute.For<ILocalRepositoryModel>();
+            var repo = Substitute.For<LocalRepositoryModel>();
             repo.Name.Returns(reponame);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
 
@@ -444,7 +444,7 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
-            var repo = Substitute.For<ILocalRepositoryModel>();
+            var repo = Substitute.For<LocalRepositoryModel>();
             repo.Name.Returns(reponame);
             repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));
@@ -513,7 +513,7 @@ public class ModelServiceTests
             apiClient.GetOrganizations().Returns(Observable.Empty<Organization>());
             var act = modelService.GetAccounts().ToEnumerable().First().First();
 
-            var repo = Substitute.For<ILocalRepositoryModel>();
+            var repo = Substitute.For<LocalRepositoryModel>();
             repo.Name.Returns(reponame);
             repo.Owner.Returns(user.Login);
             repo.CloneUrl.Returns(new UriString("https://github.com/" + username + "/" + reponame));

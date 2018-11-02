@@ -35,7 +35,7 @@ namespace GitHub.InlineReviews.Services
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         TaskCompletionSource<object> initialized;
         IPullRequestSession currentSession;
-        ILocalRepositoryModel repository;
+        LocalRepositoryModel repository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionManager"/> class.
@@ -182,7 +182,7 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
+        async Task RepoChanged(LocalRepositoryModel localRepositoryModel)
         {
             repository = localRepositoryModel;
             CurrentSession = null;

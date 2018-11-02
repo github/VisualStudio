@@ -161,7 +161,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         async Task InitializeAsync(
             PullRequestUserReviewsViewModel target,
-            ILocalRepositoryModel localRepository = null,
+            LocalRepositoryModel localRepository = null,
             IConnection connection = null,
             int pullRequestNumber = 5,
             string login = AuthorLogin)
@@ -214,9 +214,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return result;
         }
 
-        ILocalRepositoryModel CreateRepository(string owner = "owner", string name = "repo")
+        LocalRepositoryModel CreateRepository(string owner = "owner", string name = "repo")
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
+            var result = Substitute.For<LocalRepositoryModel>();
             result.Owner.Returns(owner);
             result.Name.Returns(name);
             return result;

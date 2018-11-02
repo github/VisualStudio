@@ -43,7 +43,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     struct TestData
     {
         public IServiceProvider ServiceProvider;
-        public ILocalRepositoryModel ActiveRepo;
+        public LocalRepositoryModel ActiveRepo;
         public LibGit2Sharp.IRepository L2Repo;
         public IRepositoryModel SourceRepo;
         public IRepositoryModel TargetRepo;
@@ -82,7 +82,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         connection.HostAddress.Returns(HostAddress.Create("https://github.com"));
 
         // this is the local repo instance that is available via TeamExplorerServiceHolder and friends
-        var activeRepo = Substitute.For<ILocalRepositoryModel>();
+        var activeRepo = Substitute.For<LocalRepositoryModel>();
         activeRepo.LocalPath.Returns("");
         activeRepo.Name.Returns(repoName);
         activeRepo.CloneUrl.Returns(new UriString("http://github.com/" + sourceRepoOwner + "/" + repoName));

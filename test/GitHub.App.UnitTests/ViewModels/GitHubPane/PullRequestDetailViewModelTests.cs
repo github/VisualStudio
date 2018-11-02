@@ -550,7 +550,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
             var currentBranchModel = new BranchModel(currentBranch, repository);
             var gitService = Substitute.For<IGitService>();
             gitService.GetBranch(repository).Returns(currentBranchModel);

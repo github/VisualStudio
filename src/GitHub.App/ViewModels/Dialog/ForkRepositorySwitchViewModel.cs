@@ -41,7 +41,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<object> Done => SwitchFork.Where(value => value != null).SelectNull();
 
-        public void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
+        public void Initialize(LocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
         {
             SourceRepository = sourceRepository;
             DestinationRepository = remoteRepository;

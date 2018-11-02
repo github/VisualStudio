@@ -8,7 +8,7 @@ using GitHub.Exports;
 
 namespace GitHub.App.SampleData
 {
-    public class LocalRepositoryModelDesigner : ILocalRepositoryModel
+    public class LocalRepositoryModelDesigner : LocalRepositoryModel
     {
         public UriString CloneUrl { get; set; }
         public BranchModel CurrentBranch { get; set; }

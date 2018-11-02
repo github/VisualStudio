@@ -43,7 +43,7 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin => null;
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             return Task.CompletedTask;
         }

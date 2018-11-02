@@ -24,7 +24,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NotAGitRepositoryShownWhenNoRepositoryAsync()
         {
             var te = Substitute.For<ITeamExplorerContext>();
-            te.ActiveRepository.Returns(null as ILocalRepositoryModel);
+            te.ActiveRepository.Returns(null as LocalRepositoryModel);
             var target = CreateTarget(teamExplorerContext: te);
 
             await InitializeAsync(target);
@@ -282,7 +282,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
     {
-        var repository = Substitute.For<ILocalRepositoryModel>();
+        var repository = Substitute.For<LocalRepositoryModel>();
         repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
         var result = Substitute.For<ITeamExplorerContext>();
         result.ActiveRepository.Returns(repository);

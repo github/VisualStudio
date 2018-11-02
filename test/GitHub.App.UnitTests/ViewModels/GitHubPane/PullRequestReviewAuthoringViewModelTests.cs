@@ -605,9 +605,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return result;
         }
 
-        static ILocalRepositoryModel CreateLocalRepositoryModel()
+        static LocalRepositoryModel CreateLocalRepositoryModel()
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
+            var result = Substitute.For<LocalRepositoryModel>();
             result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
             result.Owner.Returns("owner");
             result.Name.Returns("repo");
@@ -616,7 +616,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static async Task InitializeAsync(
             IPullRequestReviewAuthoringViewModel target,
-            ILocalRepositoryModel localRepository = null)
+            LocalRepositoryModel localRepository = null)
         {
             localRepository = localRepository ?? CreateLocalRepositoryModel();
 

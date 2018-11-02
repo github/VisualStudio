@@ -31,7 +31,7 @@ namespace GitHub.VisualStudio.Base
         readonly object refreshLock = new object();
 
         IGitExt gitExt;
-        IReadOnlyList<ILocalRepositoryModel> activeRepositories;
+        IReadOnlyList<LocalRepositoryModel> activeRepositories;
 
         public VSGitExt(IServiceProvider serviceProvider, IGitService gitService)
             : this(serviceProvider, new VSUIContextFactory(), gitService, ThreadHelper.JoinableTaskContext)
@@ -49,7 +49,7 @@ namespace GitHub.VisualStudio.Base
             this.gitService = gitService;
 
             // Start with empty array until we have a chance to initialize.
-            ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
+            ActiveRepositories = Array.Empty<LocalRepositoryModel>();
 
             // The IGitExt service isn't available when a TFS based solution is opened directly.
             // It will become available when moving to a Git based solution (and cause a UIContext event to fire).
@@ -100,11 +100,11 @@ namespace GitHub.VisualStudio.Base
             catch (Exception e)
             {
                 log.Error(e, "Error refreshing repositories");
-                ActiveRepositories = Array.Empty<ILocalRepositoryModel>();
+                ActiveRepositories = Array.Empty<LocalRepositoryModel>();
             }
         }
 
-        public IReadOnlyList<ILocalRepositoryModel> ActiveRepositories
+        public IReadOnlyList<LocalRepositoryModel> ActiveRepositories
         {
             get
             {

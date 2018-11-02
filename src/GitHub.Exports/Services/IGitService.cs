@@ -12,14 +12,14 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="localPath">The repository's local path.</param>
         /// <returns>A repository model.</returns>
-        ILocalRepositoryModel CreateLocalRepositoryModel(string localPath);
+        LocalRepositoryModel CreateLocalRepositoryModel(string localPath);
 
         /// <summary>
         /// Creates a new branch model for the current branch.
         /// </summary>
-        /// <param name="model">The <see cref="ILocalRepositoryModel" /> to create a current branch model for.</param>
+        /// <param name="model">The <see cref="LocalRepositoryModel" /> to create a current branch model for.</param>
         /// <returns>A new branch model.</returns>
-        BranchModel GetBranch(ILocalRepositoryModel model);
+        BranchModel GetBranch(LocalRepositoryModel model);
 
         /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository

@@ -43,7 +43,7 @@ namespace GitHub.Services
 
     public interface IGitAwareItem
     {
-        ILocalRepositoryModel ActiveRepo { get; }
+        LocalRepositoryModel ActiveRepo { get; }
 
         /// <summary>
         /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.

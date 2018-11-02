@@ -132,14 +132,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 });
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        void HandleCreatedRepo(LocalRepositoryModel newrepo)
         {
             var msg = String.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + String.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
-        private void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        private void ShowNotification(LocalRepositoryModel newrepo, string msg)
         {
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
 

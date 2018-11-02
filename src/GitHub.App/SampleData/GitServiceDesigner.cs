@@ -8,8 +8,8 @@ namespace GitHub.SampleData
 {
     class GitServiceDesigner : IGitService
     {
-        public ILocalRepositoryModel CreateLocalRepositoryModel(string localPath) => null;
-        public BranchModel GetBranch(ILocalRepositoryModel model) => null;
+        public LocalRepositoryModel CreateLocalRepositoryModel(string localPath) => null;
+        public BranchModel GetBranch(LocalRepositoryModel model) => null;
         public Task<string> GetLatestPushedSha(string path, string remote = "origin") => Task.FromResult<string>(null);
         public UriString GetRemoteUri(IRepository repo, string remote = "origin") => null;
         public IRepository GetRepository(string path) => null;

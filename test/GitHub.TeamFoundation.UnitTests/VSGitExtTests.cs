@@ -295,9 +295,9 @@ public class VSGitExtTests
 
     class MockGitService : IGitService
     {
-        public ILocalRepositoryModel CreateLocalRepositoryModel(string localPath)
+        public LocalRepositoryModel CreateLocalRepositoryModel(string localPath)
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
+            var result = Substitute.For<LocalRepositoryModel>();
             result.LocalPath.Returns(localPath);
 
             if (localPath == "repo1")
@@ -311,7 +311,7 @@ public class VSGitExtTests
             return result;
         }
 
-        public BranchModel GetBranch(ILocalRepositoryModel model) => throw new NotImplementedException();
+        public BranchModel GetBranch(LocalRepositoryModel model) => throw new NotImplementedException();
         public Task<string> GetLatestPushedSha(string path, string remote = "origin") => throw new NotImplementedException();
         public UriString GetRemoteUri(IRepository repo, string remote = "origin") => throw new NotImplementedException();
         public IRepository GetRepository(string path) => throw new NotImplementedException();

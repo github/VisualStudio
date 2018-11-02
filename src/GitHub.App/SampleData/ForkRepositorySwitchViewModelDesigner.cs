@@ -41,7 +41,7 @@ namespace GitHub.SampleData
 
         public bool UpdateOrigin { get; set; } = true;
 
-        public void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
+        public void Initialize(LocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
         {
         }
     }

@@ -57,7 +57,7 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
-        void UpdateRepoOnMainThread(ILocalRepositoryModel repo)
+        void UpdateRepoOnMainThread(LocalRepositoryModel repo)
         {
             holder.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -79,7 +79,7 @@ namespace GitHub.VisualStudio.Base
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
         }
 
-        void UpdateRepo(ILocalRepositoryModel repo)
+        void UpdateRepo(LocalRepositoryModel repo)
         {
             var changed = ActiveRepo != repo;
             ActiveRepo = repo;

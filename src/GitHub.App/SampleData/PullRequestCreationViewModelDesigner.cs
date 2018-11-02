@@ -56,6 +56,6 @@ namespace GitHub.SampleData
 
         public ReactivePropertyValidator BranchValidator { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
+        public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
 }

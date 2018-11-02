@@ -256,7 +256,7 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+        public IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
             BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {

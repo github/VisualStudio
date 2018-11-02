@@ -36,14 +36,14 @@ namespace GitHub.VisualStudio.Commands
             lazyGitService = gitService;
         }
 
-        protected ILocalRepositoryModel ActiveRepo { get; private set; }
+        protected LocalRepositoryModel ActiveRepo { get; private set; }
         protected ISimpleApiClientFactory ApiFactory => apiFactory.Value;
         protected IGitHubServiceProvider ServiceProvider { get; }
         protected IUsageTracker UsageTracker => usageTracker.Value;
 
         public abstract override Task Execute();
 
-        protected ILocalRepositoryModel GetRepositoryByPath(string path)
+        protected LocalRepositoryModel GetRepositoryByPath(string path)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace GitHub.VisualStudio.Commands
             return null;
         }
 
-        protected ILocalRepositoryModel GetActiveRepo()
+        protected LocalRepositoryModel GetActiveRepo()
         {
             var activeRepo = ServiceProvider.TryGetService<ITeamExplorerServiceHolder>()?.TeamExplorerContext.ActiveRepository;
             // activeRepo can be null at this point because it is set elsewhere as the result of async operation that may not have completed yet.
@@ -175,7 +175,7 @@ namespace GitHub.VisualStudio.Commands
         /// <param name="endLine">The end of a line range on the specified file.</param>
         /// <returns>An UriString with the generated url, or null if the repository has no remote server configured or if it can't be found locally</returns>
         public static async Task<UriString> GenerateUrl(IGitService gitService,
-            ILocalRepositoryModel repo, LinkType linkType, string path = null, int startLine = -1, int endLine = -1)
+            LocalRepositoryModel repo, LinkType linkType, string path = null, int startLine = -1, int endLine = -1)
         {
             if (repo.CloneUrl == null)
                 return null;

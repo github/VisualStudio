@@ -46,7 +46,7 @@ namespace GitHub.ViewModels.Dialog
         /// <param name="destinationAccount">The account to fork to.</param>
         /// <param name="connection">The connection to use.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel sourceRepository, 
+            LocalRepositoryModel sourceRepository, 
             IAccount destinationAccount, 
             IConnection connection);
     }

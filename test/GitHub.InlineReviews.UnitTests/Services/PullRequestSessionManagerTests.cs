@@ -237,7 +237,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.GetContents(textView.TextBuffer).Returns(contents);
                 sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
                 sessionService.Diff(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "MERGE_BASE",
                     "HEADSHA",
                     FilePath,
@@ -690,7 +690,7 @@ Line 4";
                     Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     Arg.Any<PullRequestDetailModel>()).Returns("MERGE_BASE");
                 result.ReadPullRequestDetail(
                     Arg.Any<HostAddress>(),
@@ -819,7 +819,7 @@ Line 4";
 
                 Assert.That(target.CurrentSession, Is.Null);
 
-                service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
+                service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<LocalRepositoryModel>(), model).Returns(Observable.Return(true));
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(("owner", CurrentBranchPullRequestNumber)));
 
                 var session = await target.GetSession("owner", "name", CurrentBranchPullRequestNumber);
@@ -912,9 +912,9 @@ Line 4";
             return sessionService;
         }
 
-        ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
+        LocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
+            var result = Substitute.For<LocalRepositoryModel>();
             var uriString = new UriString(cloneUrl);
             result.CloneUrl.Returns(uriString);
             result.Name.Returns(uriString.RepositoryName);
@@ -922,14 +922,14 @@ Line 4";
             return result;
         }
 
-        static ITeamExplorerContext CreateTeamExplorerContext(ILocalRepositoryModel repo)
+        static ITeamExplorerContext CreateTeamExplorerContext(LocalRepositoryModel repo)
         {
             var teamExplorerContext = Substitute.For<ITeamExplorerContext>();
             teamExplorerContext.ActiveRepository.Returns(repo);
             return teamExplorerContext;
         }
 
-        static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
+        static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, LocalRepositoryModel localRepositoryModel)
         {
             teamExplorerContext.ActiveRepository.Returns(localRepositoryModel);
             var eventArgs = new PropertyChangedEventArgs(nameof(teamExplorerContext.ActiveRepository));

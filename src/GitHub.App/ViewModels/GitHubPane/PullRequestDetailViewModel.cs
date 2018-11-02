@@ -162,7 +162,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -333,7 +333,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="number">The pull request number.</param>
         public async Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

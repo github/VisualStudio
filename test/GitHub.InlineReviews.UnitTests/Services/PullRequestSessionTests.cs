@@ -29,7 +29,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -48,7 +48,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -66,7 +66,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -84,7 +84,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -148,7 +148,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     service,
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -170,7 +170,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -185,7 +185,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -201,7 +201,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath, "123");
@@ -217,7 +217,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var sessionService = CreateRealSessionService();
 
                 sessionService.Diff(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "MERGE_BASE",
                     "HEAD_SHA",
                     FilePath).Returns(diff);
@@ -226,7 +226,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -264,7 +264,7 @@ Line 4";
                         service,
                         CreateActor(),
                         pullRequest,
-                        Substitute.For<ILocalRepositoryModel>(),
+                        Substitute.For<LocalRepositoryModel>(),
                         "owner",
                         true);
 
@@ -281,7 +281,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file1 = await target.GetFile(FilePath, "123");
@@ -297,7 +297,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file1 = await target.GetFile(FilePath, "123");
@@ -316,7 +316,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -334,7 +334,7 @@ Line 4";
                 await target.CancelReview();
 
                 await service.Received(1).CancelPendingReview(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "review1");
             }
 
@@ -365,7 +365,7 @@ Line 4";
                     service,
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
             }
@@ -747,9 +747,9 @@ Line 4";
             };
         }
 
-        static ILocalRepositoryModel CreateLocalRepository()
+        static LocalRepositoryModel CreateLocalRepository()
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
+            var result = Substitute.For<LocalRepositoryModel>();
             result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
             return result;
         }
@@ -770,8 +770,8 @@ Line 4";
                 Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
 
-            result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
-            result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<PullRequestDetailModel>())
+            result.GetTipSha(Arg.Any<LocalRepositoryModel>()).Returns("BRANCH_TIP");
+            result.GetPullRequestMergeBase(Arg.Any<LocalRepositoryModel>(), Arg.Any<PullRequestDetailModel>())
                 .Returns("MERGE_BASE");
             return result;
         }
@@ -782,7 +782,7 @@ Line 4";
             string remoteRepositoryOwner,
             bool hasPendingReview)
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = Substitute.For<LocalRepositoryModel>();
 
             repository.CloneUrl.Returns(new UriString($"https://github.com/{localRepositoryOwner}/reop"));
             repository.Owner.Returns(localRepositoryOwner);

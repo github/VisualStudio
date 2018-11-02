@@ -29,6 +29,6 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         /// <param name="sourceRepository">The repository to fork.</param>
         /// <param name="remoteRepository"></param>
-        void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository);
+        void Initialize(LocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository);
     }
 }

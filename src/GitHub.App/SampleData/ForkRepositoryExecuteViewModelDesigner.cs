@@ -57,7 +57,7 @@ namespace GitHub.SampleData
 
         public string Error { get; } = "I AM ERROR";
 
-        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             return Task.CompletedTask;
         }

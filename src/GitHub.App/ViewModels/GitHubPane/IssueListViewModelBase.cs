@@ -86,7 +86,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public IssueListMessage Message
@@ -126,7 +126,7 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             try
             {

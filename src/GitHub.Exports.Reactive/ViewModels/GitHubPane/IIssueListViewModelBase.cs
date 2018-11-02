@@ -63,7 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets an enum indicating a message that should be displayed in place of a list of items.
@@ -105,6 +105,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repository">The local repository.</param>
         /// <param name="connection">The connection/</param>
         /// <returns>A task tracking the operation.</returns>
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

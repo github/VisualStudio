@@ -60,7 +60,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<object> Done => SelectedAccount.SelectNull();
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             IsLoading = true;
 
@@ -97,7 +97,7 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        void BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
+        void BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, LocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
         {
             log.Verbose("BuildAccounts: {AccessibleAccounts} accessibleAccounts, {Forks} forks, {Parents} parents", accessibleAccounts.Count, forks.Count, parents.Count);
 

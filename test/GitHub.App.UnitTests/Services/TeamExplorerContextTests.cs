@@ -202,9 +202,9 @@ namespace GitHub.App.UnitTests.Services
             return new TeamExplorerContext(gitExt, new AsyncLazy<DTE>(() => Task.FromResult(dte)), pullRequestService, joinableTaskContext);
         }
 
-        static ILocalRepositoryModel CreateRepositoryModel(string path)
+        static LocalRepositoryModel CreateRepositoryModel(string path)
         {
-            var repo = Substitute.For<ILocalRepositoryModel>();
+            var repo = Substitute.For<LocalRepositoryModel>();
             repo.LocalPath.Returns(path);
             return repo;
         }
@@ -214,9 +214,9 @@ namespace GitHub.App.UnitTests.Services
             return Substitute.For<IVSGitExt>();
         }
 
-        static void SetActiveRepository(IVSGitExt gitExt, ILocalRepositoryModel repo)
+        static void SetActiveRepository(IVSGitExt gitExt, LocalRepositoryModel repo)
         {
-            var repos = repo != null ? new[] { repo } : Array.Empty<ILocalRepositoryModel>();
+            var repos = repo != null ? new[] { repo } : Array.Empty<LocalRepositoryModel>();
             gitExt.ActiveRepositories.Returns(repos);
             gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
         }
