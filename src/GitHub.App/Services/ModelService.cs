@@ -270,7 +270,7 @@ namespace GitHub.Services
                                 new NewPullRequest(title,
                                                    string.Format(CultureInfo.InvariantCulture, "{0}:{1}", sourceRepository.Owner, sourceBranch.Name),
                                                    targetBranch.Name)
-                                                   { Body = body },
+                                { Body = body },
                                 targetRepository.Owner,
                                 targetRepository.Name)
                             .Select(PullRequestCacheItem.Create)
@@ -366,7 +366,7 @@ namespace GitHub.Services
 
             return Observable.Defer(() => keyobs
                     .SelectMany(key => ApiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
-                .Select(x => new BranchModel(x, repo));
+                .Select(x => new BranchModel(x.Name, repo));
         }
 
         static GitIgnoreItem Create(GitIgnoreCacheItem item)
@@ -452,7 +452,7 @@ namespace GitHub.Services
         }
 
         protected virtual void Dispose(bool disposing)
-        {}
+        { }
 
         public void Dispose()
         {
@@ -493,7 +493,7 @@ namespace GitHub.Services
                 return new RepositoryCacheItem(apiRepository);
             }
 
-            public RepositoryCacheItem() {}
+            public RepositoryCacheItem() { }
 
             public RepositoryCacheItem(Repository apiRepository)
             {
@@ -529,7 +529,7 @@ namespace GitHub.Services
                 return new PullRequestCacheItem(pr);
             }
 
-            public PullRequestCacheItem() {}
+            public PullRequestCacheItem() { }
 
             public PullRequestCacheItem(PullRequest pr)
             {
@@ -563,7 +563,7 @@ namespace GitHub.Services
                 Timestamp = UpdatedAt;
             }
 
-            public string Title {get; set; }
+            public string Title { get; set; }
             public int Number { get; set; }
             public GitReferenceCacheItem Base { get; set; }
             public GitReferenceCacheItem Head { get; set; }
@@ -574,7 +574,7 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public string Body { get; set; }
-            
+
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
 

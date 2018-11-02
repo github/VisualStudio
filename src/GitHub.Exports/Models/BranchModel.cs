@@ -20,17 +20,7 @@ namespace GitHub.Models
 
             Name = DisplayName = name;
             Repository = repo;
-            Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
-        }
-
-        public BranchModel(Octokit.Branch branch, IRepositoryModel repo)
-        {
-            Extensions.Guard.ArgumentNotNull(branch, nameof(branch));
-            Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
-
-            Name = DisplayName = branch.Name;
-            Repository = repo;
-            Id = String.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
+            Id = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Repository.Owner, Name);
         }
 
         public string Id { get; private set; }
