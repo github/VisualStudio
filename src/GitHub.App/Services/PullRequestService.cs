@@ -318,7 +318,7 @@ namespace GitHub.Services
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body
         )
         {
@@ -635,7 +635,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<BranchModel> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -926,7 +926,7 @@ namespace GitHub.Services
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {
             // PullRequestModel doesn't keep a reference to repo

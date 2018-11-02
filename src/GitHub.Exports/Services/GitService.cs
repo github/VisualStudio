@@ -52,7 +52,7 @@ namespace GitHub.Services
             return model;
         }
 
-        public IBranch GetBranch(ILocalRepositoryModel model)
+        public BranchModel GetBranch(ILocalRepositoryModel model)
         {
             var localPath = model.LocalPath;
             using (var repo = GetRepository(localPath))

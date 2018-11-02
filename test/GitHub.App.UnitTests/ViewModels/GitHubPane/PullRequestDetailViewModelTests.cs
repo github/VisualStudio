@@ -569,7 +569,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             else
             {
                 pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequestDetailModel>())
-                    .Returns(Observable.Empty<IBranch>());
+                    .Returns(Observable.Empty<BranchModel>());
             }
 
             pullRequestService.Checkout(repository, Arg.Any<PullRequestDetailModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));

@@ -257,7 +257,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {
             var keyobs = GetUserFromCache()
@@ -359,7 +359,7 @@ namespace GitHub.Services
                     });
         }
 
-        public IObservable<IBranch> GetBranches(IRepositoryModel repo)
+        public IObservable<BranchModel> GetBranches(IRepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));

@@ -21,7 +21,7 @@ namespace GitHub.Models
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
         /// <param name="parent">The parent repository if this repository is a fork.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount, IRemoteRepositoryModel parent)
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount, IRemoteRepositoryModel parent)
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -56,7 +56,7 @@ namespace GitHub.Models
                 Parent.DefaultBranch.DisplayName = Parent.DefaultBranch.Id;
         }
 
-#region Equality Things
+        #region Equality Things
         public void CopyFrom(IRemoteRepositoryModel other)
         {
             if (!Equals(other))
@@ -124,7 +124,7 @@ namespace GitHub.Models
         {
             return !(lhs == rhs);
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Gets the account that is the ower of the repository.
@@ -159,7 +159,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the default branch for the repository.
         /// </summary>
-        public IBranch DefaultBranch { get; }
+        public BranchModel DefaultBranch { get; }
 
         internal string DebuggerDisplay
         {

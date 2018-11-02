@@ -195,7 +195,7 @@ public class OpenFromClipboardCommandTests
             activeRepository.Name.Returns(repositoryName);
             activeRepository.Owner.Returns(repositoryOwner);
             var gitService = Substitute.For<IGitService>();
-            var currentBranch = Substitute.For<IBranch>();
+            var currentBranch = Substitute.For<BranchModel>();
             currentBranch.Name.Returns(currentBranchName);
             gitService.GetBranch(activeRepository).Returns(currentBranch);
             if (resolveBlobResult != null)

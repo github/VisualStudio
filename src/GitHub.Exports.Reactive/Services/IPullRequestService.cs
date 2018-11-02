@@ -43,7 +43,7 @@ namespace GitHub.Services
 
         IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
             ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body);
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace GitHub.Services
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>
         /// <returns></returns>
-        IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
+        IObservable<BranchModel> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest);
 
         /// <summary>
         /// Ensures that all local branches for the specified pull request are marked as PR branches.

@@ -21,7 +21,7 @@ namespace GitHub.SampleData
                 CloneUrl = "http://github.com/user/repo"
             };
 
-            Branches = new List<IBranch>
+            Branches = new List<BranchModel>
             {
                 new BranchModel("master", repositoryModel),
                 new BranchModel("don/stub-ui", repositoryModel),
@@ -40,9 +40,9 @@ namespace GitHub.SampleData
             };
         }
 
-        public IBranch SourceBranch { get; set; }
-        public IBranch TargetBranch { get; set; }
-        public IReadOnlyList<IBranch> Branches { get; set; }
+        public BranchModel SourceBranch { get; set; }
+        public BranchModel TargetBranch { get; set; }
+        public IReadOnlyList<BranchModel> Branches { get; set; }
 
         public string SelectedAssignee { get; set; }
         public List<string> Users { get; set; }

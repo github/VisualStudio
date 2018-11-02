@@ -19,7 +19,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="model">The <see cref="ILocalRepositoryModel" /> to create a current branch model for.</param>
         /// <returns>A new branch model.</returns>
-        IBranch GetBranch(ILocalRepositoryModel model);
+        BranchModel GetBranch(ILocalRepositoryModel model);
 
         /// <summary>
         /// Returns the URL of the remote for the specified <see cref="repository"/>. If the repository

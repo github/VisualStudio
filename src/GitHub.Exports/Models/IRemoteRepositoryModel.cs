@@ -42,6 +42,6 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the default branch for the repository.
         /// </summary>
-        IBranch DefaultBranch { get; }
+        BranchModel DefaultBranch { get; }
     }
 }

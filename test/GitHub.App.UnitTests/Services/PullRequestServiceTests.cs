@@ -693,8 +693,8 @@ public class PullRequestServiceTests : TestBaseClass
         ILocalRepositoryModel targetRepo = null;
         string title = null;
         string body = null;
-        IBranch source = null;
-        IBranch target = null;
+        BranchModel source = null;
+        BranchModel target = null;
 
         Assert.Throws<ArgumentNullException>(() => service.CreatePullRequest(ms, sourceRepo, targetRepo, source, target, title, body));
 

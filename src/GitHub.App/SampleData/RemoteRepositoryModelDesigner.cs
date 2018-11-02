@@ -10,7 +10,7 @@ namespace GitHub.SampleData
     {
         public UriString CloneUrl { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
-        public IBranch DefaultBranch { get; set; }
+        public BranchModel DefaultBranch { get; set; }
         public Octicon Icon { get; set; }
         public long Id { get; set; }
         public bool IsFork { get; set; }

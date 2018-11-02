@@ -311,7 +311,7 @@ public class VSGitExtTests
             return result;
         }
 
-        public IBranch GetBranch(ILocalRepositoryModel model) => throw new NotImplementedException();
+        public BranchModel GetBranch(ILocalRepositoryModel model) => throw new NotImplementedException();
         public Task<string> GetLatestPushedSha(string path, string remote = "origin") => throw new NotImplementedException();
         public UriString GetRemoteUri(IRepository repo, string remote = "origin") => throw new NotImplementedException();
         public IRepository GetRepository(string path) => throw new NotImplementedException();

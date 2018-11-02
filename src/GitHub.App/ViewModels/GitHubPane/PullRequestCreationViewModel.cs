@@ -161,7 +161,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             githubObs.SelectMany(r =>
             {
-                var b = Observable.Empty<IBranch>();
+                var b = Observable.Empty<BranchModel>();
                 if (r.IsFork)
                 {
                     b = modelService.GetBranches(r.Parent).Select(x =>
@@ -327,22 +327,22 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref initialized, value); }
         }
 
-        IBranch sourceBranch;
-        public IBranch SourceBranch
+        BranchModel sourceBranch;
+        public BranchModel SourceBranch
         {
             get { return sourceBranch; }
             set { this.RaiseAndSetIfChanged(ref sourceBranch, value); }
         }
 
-        IBranch targetBranch;
-        public IBranch TargetBranch
+        BranchModel targetBranch;
+        public BranchModel TargetBranch
         {
             get { return targetBranch; }
             set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
         }
 
-        IReadOnlyList<IBranch> branches;
-        public IReadOnlyList<IBranch> Branches
+        IReadOnlyList<BranchModel> branches;
+        public IReadOnlyList<BranchModel> Branches
         {
             get { return branches; }
             set { this.RaiseAndSetIfChanged(ref branches, value); }

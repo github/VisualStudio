@@ -28,9 +28,9 @@ namespace GitHub.Services
         IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);
         ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
         IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body);
-        IObservable<IBranch> GetBranches(IRepositoryModel repo);
+        IObservable<BranchModel> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
         IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
     }

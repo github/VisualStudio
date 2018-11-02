@@ -11,7 +11,7 @@ namespace GitHub.App.SampleData
     public class LocalRepositoryModelDesigner : ILocalRepositoryModel
     {
         public UriString CloneUrl { get; set; }
-        public IBranch CurrentBranch { get; set; }
+        public BranchModel CurrentBranch { get; set; }
         public Octicon Icon { get; set; }
         public string LocalPath { get; set; }
         public string Name { get; set; }

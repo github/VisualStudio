@@ -15,7 +15,7 @@ namespace GitHub.UI.Converters
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var branch = values.OfType<IBranch>().FirstOrDefault();
+            var branch = values.OfType<BranchModel>().FirstOrDefault();
             var activeRepo = values.OfType<IRepositoryModel>().FirstOrDefault();
 
             if (branch != null && activeRepo != null)
