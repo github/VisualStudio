@@ -867,7 +867,7 @@ namespace GitHub.InlineReviews.Services
             }
 
             // Get the comments that are replies and place them into the relevant list.
-            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
+            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments).OrderBy(x => x.CreatedAt))
             {
                 if (comment.ReplyTo != null)
                 {
