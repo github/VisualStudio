@@ -700,7 +700,7 @@ namespace GitHub.Collections
         }
 
         /// <summary>
-        /// Checks if the object being moved affects the filtered list in any way and update
+        /// OtherChecks if the object being moved affects the filtered list in any way and update
         /// the list accordingly
         /// </summary>
         /// <param name="data"></param>
@@ -756,7 +756,7 @@ namespace GitHub.Collections
         }
 
         /// <summary>
-        /// Checks if the object being moved affects the filtered list in any way and update
+        /// OtherChecks if the object being moved affects the filtered list in any way and update
         /// the list accordingly
         /// </summary>
         /// <param name="data"></param>

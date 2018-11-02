@@ -40,7 +40,17 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the pull request checks and statuses summary
         /// </summary>
-        public PullRequestChecksState Checks { get; set; }
+        public PullRequestChecksState RequiredChecks { get; set; }
+
+        /// <summary>
+        /// Gets the pull request checks and statuses summary
+        /// </summary>
+        public PullRequestChecksState OtherChecks { get; set; }
+
+        /// <summary>
+        /// Gets the pull request checks and statuses summary
+        /// </summary>
+        public PullRequestChecksSummaryState Checks { get; set; }
 
         /// <summary>
         /// Gets or sets the date/time at which the pull request was last updated.

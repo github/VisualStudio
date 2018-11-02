@@ -57,7 +57,7 @@ namespace GitHub.Services
         Task Fetch(IRepository repository, UriString remoteUri, params string[] refspecs);
 
         /// <summary>
-        /// Checks out a branch.
+        /// OtherChecks out a branch.
         /// </summary>
         /// <param name="repository">The repository to carry out the checkout on</param>
         /// <param name="branchName">The name of the branch</param>
@@ -178,7 +178,7 @@ namespace GitHub.Services
         Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName);
 
         /// <summary>
-        /// Checks whether the latest commit of a file in the repository has the specified file
+        /// OtherChecks whether the latest commit of a file in the repository has the specified file
         /// contents.
         /// </summary>
         /// <param name="repository">The repository.</param>
@@ -203,7 +203,7 @@ namespace GitHub.Services
         Task<string> GetPullRequestMergeBase(IRepository repo, UriString targetCloneUrl, string baseSha, string headSha, string baseRef, int pullNumber);
 
         /// <summary>
-        /// Checks whether the current head is pushed to its remote tracking branch.
+        /// OtherChecks whether the current head is pushed to its remote tracking branch.
         /// </summary>
         /// <param name="repo">The repository.</param>
         /// <returns></returns>

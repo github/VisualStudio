@@ -33,7 +33,7 @@ namespace GitHub.Services
         Task<EnterpriseProbeResult> Probe(Uri enterpriseBaseUrl);
 
         /// <summary>
-        /// Checks the login methods supported by an enterprise instance.
+        /// OtherChecks the login methods supported by an enterprise instance.
         /// </summary>
         /// <param name="enterpriseBaseUrl">The URL to test.</param>
         /// <returns>The supported login methods.</returns>

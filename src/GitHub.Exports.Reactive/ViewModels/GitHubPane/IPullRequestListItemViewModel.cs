@@ -32,6 +32,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the pull request checks and statuses summary
         /// </summary>
-        PullRequestChecksState Checks { get; }
+        PullRequestChecksSummaryState Checks { get; }
     }
 }

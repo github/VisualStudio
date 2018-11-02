@@ -17,6 +17,6 @@ namespace GitHub.SampleData
         public int Number { get; set; }
         public string Title { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
-        public PullRequestChecksState Checks { get; set; }
+        public PullRequestChecksSummaryState Checks { get; set; }
     }
 }

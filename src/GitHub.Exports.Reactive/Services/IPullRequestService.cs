@@ -47,7 +47,7 @@ namespace GitHub.Services
             string title, string body);
 
         /// <summary>
-        /// Checks whether the working directory for the specified repository is in a clean state.
+        /// OtherChecks whether the working directory for the specified repository is in a clean state.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <returns></returns>
@@ -61,7 +61,7 @@ namespace GitHub.Services
         IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository);
 
         /// <summary>
-        /// Checks out a pull request to a local branch.
+        /// OtherChecks out a pull request to a local branch.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="pullRequest">The pull request details.</param>

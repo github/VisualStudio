@@ -176,7 +176,7 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <summary>
-        /// Gets the latest pull request Checks & Statuses
+        /// Gets the latest pull request OtherChecks & Statuses
         /// </summary>
         IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 

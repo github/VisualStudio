@@ -33,7 +33,7 @@ namespace GitHub.ViewModels.GitHubPane
         public IActorViewModel Author { get; }
 
         /// <inheritdoc/>
-        public PullRequestChecksState Checks { get; }
+        public PullRequestChecksSummaryState Checks { get; }
 
         /// <inheritdoc/>
         public int CommentCount { get; }

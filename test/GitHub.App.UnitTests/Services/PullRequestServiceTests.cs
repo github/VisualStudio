@@ -576,6 +576,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitService,
             Substitute.For<IVSGitExt>(),
             Substitute.For<IGraphQLClientFactory>(),
+            Substitute.For<IRepositoryService>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
         return service;
@@ -685,6 +686,7 @@ public class PullRequestServiceTests : TestBaseClass
             serviceProvider.GetGitService(),
             Substitute.For<IVSGitExt>(),
             Substitute.For<IGraphQLClientFactory>(),
+            Substitute.For<IRepositoryService>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
 
@@ -894,6 +896,7 @@ public class PullRequestServiceTests : TestBaseClass
                 MockGitService(),
                 Substitute.For<IVSGitExt>(),
                 Substitute.For<IGraphQLClientFactory>(),
+                Substitute.For<IRepositoryService>(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
 
@@ -1046,6 +1049,7 @@ public class PullRequestServiceTests : TestBaseClass
         IGitService gitService = null,
         IVSGitExt gitExt = null,
         IGraphQLClientFactory graphqlFactory = null,
+        IRepositoryService repositoryService = null,
         IOperatingSystem os = null,
         IUsageTracker usageTracker = null)
     {
@@ -1055,12 +1059,14 @@ public class PullRequestServiceTests : TestBaseClass
         graphqlFactory = graphqlFactory ?? Substitute.For<IGraphQLClientFactory>();
         os = os ?? Substitute.For<IOperatingSystem>();
         usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
+        repositoryService = repositoryService ?? Substitute.For<IRepositoryService>();
 
         return new PullRequestService(
             gitClient,
             gitService,
             gitExt,
             graphqlFactory,
+            repositoryService,
             os,
             usageTracker);
     }

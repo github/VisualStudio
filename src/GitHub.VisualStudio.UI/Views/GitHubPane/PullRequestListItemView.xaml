@@ -101,6 +101,10 @@
                 <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
                 <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
                 <ghfvs:OcticonImage Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter SuccessWithPending}}"/>
+                <ghfvs:OcticonImage Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter SuccessWithPending}}"/>
+                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter SuccessWithFailure}}"/>
+                <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter SuccessWithFailure}}"/>
             </StackPanel>
         </Grid>
     </Grid>

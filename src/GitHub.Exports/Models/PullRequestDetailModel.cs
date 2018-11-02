@@ -93,7 +93,7 @@ namespace GitHub.Models
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
 
         /// <summary>
-        /// Gets or sets a collection of pull request Checks Suites
+        /// Gets or sets a collection of pull request OtherChecks Suites
         /// </summary>
         public IReadOnlyList<CheckSuiteModel> CheckSuites { get; set; }
 
