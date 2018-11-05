@@ -749,9 +749,10 @@ Line 4";
 
         static LocalRepositoryModel CreateLocalRepository()
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString("https://github.com/owner/repo")
+            };
         }
 
         static IPullRequestSessionService CreateMockSessionService()
@@ -782,11 +783,11 @@ Line 4";
             string remoteRepositoryOwner,
             bool hasPendingReview)
         {
-            var repository = Substitute.For<LocalRepositoryModel>();
-
-            repository.CloneUrl.Returns(new UriString($"https://github.com/{localRepositoryOwner}/reop"));
-            repository.Owner.Returns(localRepositoryOwner);
-            repository.Name.Returns("repo");
+            var repository = new LocalRepositoryModel
+            {
+                CloneUrl = $"https://github.com/{localRepositoryOwner}/repo",
+                Name = "repo"
+            };
 
             var pr = CreatePullRequest();
             var user = CreateActor();

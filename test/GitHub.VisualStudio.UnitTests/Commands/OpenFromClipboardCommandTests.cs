@@ -190,13 +190,15 @@ public class OpenFromClipboardCommandTests
             vsServices = vsServices ?? Substitute.For<IVSServices>();
 
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
-            var activeRepository = teamExplorerContext.ActiveRepository;
-            activeRepository.LocalPath.Returns(repositoryDir);
-            activeRepository.Name.Returns(repositoryName);
-            activeRepository.Owner.Returns(repositoryOwner);
+            var activeRepository = new LocalRepositoryModel
+            {
+                LocalPath = repositoryDir,
+                Name = repositoryName,
+                CloneUrl = new UriString($"https://github.com/{repositoryOwner}/{repositoryName}")
+            };
+            teamExplorerContext.ActiveRepository.Returns(activeRepository);
             var gitService = Substitute.For<IGitService>();
-            var currentBranch = Substitute.For<BranchModel>();
-            currentBranch.Name.Returns(currentBranchName);
+            var currentBranch = currentBranchName != null ? new BranchModel(currentBranchName, activeRepository) : null;
             gitService.GetBranch(activeRepository).Returns(currentBranch);
             if (resolveBlobResult != null)
             {

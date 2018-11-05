@@ -460,11 +460,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
         static RepositoryModel CreateRepositoryModel(string owner, string name)
         {
-            var repository = Substitute.For<RepositoryModel>();
-            repository.Owner.Returns(owner);
-            repository.Name.Returns(name);
-            repository.CloneUrl.Returns(CreateGitHubUrl(owner, name));
-            return repository;
+            var cloneUrl = CreateGitHubUrl(owner, name);
+            return new RepositoryModel(name, cloneUrl);
         }
 
         static UriString CreateGitHubUrl(string owner, string repo)

@@ -607,10 +607,11 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static LocalRepositoryModel CreateLocalRepositoryModel()
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
-            result.Owner.Returns("owner");
-            result.Name.Returns("repo");
+            var result = new LocalRepositoryModel
+            {
+                CloneUrl = new UriString("https://github.com/owner/repo"),
+                Name = "repo"
+            };
             return result;
         }
 

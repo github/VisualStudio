@@ -914,12 +914,12 @@ Line 4";
 
         LocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            var uriString = new UriString(cloneUrl);
-            result.CloneUrl.Returns(uriString);
-            result.Name.Returns(uriString.RepositoryName);
-            result.Owner.Returns(uriString.Owner);
-            return result;
+            var cloneUrlString = new UriString(cloneUrl);
+            return new LocalRepositoryModel
+            {
+                CloneUrl = cloneUrlString,
+                Name = cloneUrlString.RepositoryName
+            };
         }
 
         static ITeamExplorerContext CreateTeamExplorerContext(LocalRepositoryModel repo)

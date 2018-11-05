@@ -550,13 +550,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
         {
-            var repository = Substitute.For<LocalRepositoryModel>();
+            var repository = new LocalRepositoryModel
+            {
+                CloneUrl = new UriString(Uri.ToString()),
+                LocalPath = @"C:\projects\ThisRepo",
+                Name = "repo"
+            };
+
             var currentBranchModel = new BranchModel(currentBranch, repository);
             var gitService = Substitute.For<IGitService>();
             gitService.GetBranch(repository).Returns(currentBranchModel);
-            repository.CloneUrl.Returns(new UriString(Uri.ToString()));
-            repository.LocalPath.Returns(@"C:\projects\ThisRepo");
-            repository.Name.Returns("repo");
 
             var pullRequestService = Substitute.For<IPullRequestService>();
 

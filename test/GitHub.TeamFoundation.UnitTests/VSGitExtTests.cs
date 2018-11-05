@@ -297,8 +297,10 @@ public class VSGitExtTests
     {
         public LocalRepositoryModel CreateLocalRepositoryModel(string localPath)
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            result.LocalPath.Returns(localPath);
+            var result = new LocalRepositoryModel
+            {
+                LocalPath = localPath
+            };
 
             if (localPath == "repo1")
             {

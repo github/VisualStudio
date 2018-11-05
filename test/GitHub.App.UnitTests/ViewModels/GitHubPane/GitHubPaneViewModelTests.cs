@@ -282,8 +282,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
     {
-        var repository = Substitute.For<LocalRepositoryModel>();
-        repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
+        var repository = new LocalRepositoryModel
+        {
+            CloneUrl = new UriString(repositoryCloneUrl)
+        };
         var result = Substitute.For<ITeamExplorerContext>();
         result.ActiveRepository.Returns(repository);
         return result;

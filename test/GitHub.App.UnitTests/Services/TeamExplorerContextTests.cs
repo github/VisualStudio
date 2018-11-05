@@ -204,9 +204,10 @@ namespace GitHub.App.UnitTests.Services
 
         static LocalRepositoryModel CreateRepositoryModel(string path)
         {
-            var repo = Substitute.For<LocalRepositoryModel>();
-            repo.LocalPath.Returns(path);
-            return repo;
+            return new LocalRepositoryModel
+            {
+                LocalPath = path
+            };
         }
 
         static IVSGitExt CreateGitExt()

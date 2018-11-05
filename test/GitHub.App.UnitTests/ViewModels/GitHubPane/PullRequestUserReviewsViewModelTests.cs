@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
@@ -207,19 +208,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 sessionManager);
         }
 
-        IModelServiceFactory CreateFactory(IModelService modelService)
-        {
-            var result = Substitute.For<IModelServiceFactory>();
-            result.CreateAsync(null).ReturnsForAnyArgs(modelService);
-            return result;
-        }
-
         LocalRepositoryModel CreateRepository(string owner = "owner", string name = "repo")
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            result.Owner.Returns(owner);
-            result.Name.Returns(name);
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString($"https://github.com/{owner}/{name}"),
+                Name = name
+            };
         }
     }
 }

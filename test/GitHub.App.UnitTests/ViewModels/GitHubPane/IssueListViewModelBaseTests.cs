@@ -96,11 +96,11 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             string owner = "owner",
             string name = "name")
         {
-            var result = Substitute.For<LocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString($"https://giuthub.com/{owner}/{name}"));
-            result.Owner.Returns(owner);
-            result.Name.Returns(name);
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString($"https://giuthub.com/{owner}/{name}"),
+                Name = name
+            };
         }
 
         protected static IPullRequestSessionManager CreateSessionManager(PullRequestDetailModel pullRequest = null)

@@ -32,7 +32,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo1", "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo1", "repo2", "new" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "a", "b", "c" },
-			Is.EqualTo(result.Select(x => x.Name).ToList()));
+            Is.EqualTo(result.Select(x => x.Name).ToList()));
     }
 
     static IVSGitServices CreateVSGitServices(params string[] names)
@@ -128,9 +128,10 @@ public class LocalRepositoriesTests : TestBaseClass
 
     static LocalRepositoryModel CreateRepository(Tuple<string, string> nameAndAddress)
     {
-        var result = Substitute.For<LocalRepositoryModel>();
-        result.Name.Returns(nameAndAddress.Item1);
-        result.CloneUrl.Returns(new UriString(nameAndAddress.Item2));
-        return result;
+        return new LocalRepositoryModel
+        {
+            Name = nameAndAddress.Item1,
+            CloneUrl = new UriString(nameAndAddress.Item2)
+        };
     }
 }

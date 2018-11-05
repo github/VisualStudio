@@ -83,7 +83,9 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x =>
                 {
                     if (!x.Any(t => t.Equals(TargetBranch)))
+                    {
                         TargetBranch = GitHubRepository.IsFork ? GitHubRepository.Parent.DefaultBranch : GitHubRepository.DefaultBranch;
+                    }
                 });
 
             SetupValidators();
