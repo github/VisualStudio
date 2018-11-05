@@ -90,6 +90,7 @@ When leaving an inline comment, the comment posts successfully and then a new co
         public string SourceBranchDisplayName { get; set; } = "feature/save-drafts";
         public string TargetBranchDisplayName { get; set; } = "master";
         public IActorViewModel Author { get; set; } = new ActorViewModelDesigner("grokys");
+        public int CommitCount { get; set; } = 2;
         public string Body { get; set; }
         public int Number { get; set; } = 1994;
         public ILocalRepositoryModel LocalRepository { get; }

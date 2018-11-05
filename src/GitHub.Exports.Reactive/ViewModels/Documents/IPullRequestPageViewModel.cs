@@ -12,6 +12,11 @@ namespace GitHub.ViewModels.Documents
     public interface IPullRequestPageViewModel : IPullRequestViewModelBase
     {
         /// <summary>
+        /// Gets the number of commits in the pull request.
+        /// </summary>
+        int CommitCount { get; }
+
+        /// <summary>
         /// Gets the pull request's timeline.
         /// </summary>
         IReadOnlyList<IViewModel> Timeline { get; }

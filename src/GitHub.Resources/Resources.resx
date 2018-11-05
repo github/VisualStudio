@@ -860,4 +860,7 @@ https://git-scm.com/download/win</value>
   <data name="ReopenPullRequest" xml:space="preserve">
     <value>Reopen pull request</value>
   </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} commits</value>
+  </data>
 </root>

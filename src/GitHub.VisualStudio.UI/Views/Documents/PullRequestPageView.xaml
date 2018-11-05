@@ -56,7 +56,7 @@
                     </InlineUIContainer>
                     <TextBlock FontWeight="Bold" Text="{Binding Author.Login, Mode=OneWay}"/>
                     wants to merge
-                    <TextBlock FontWeight="Black" Text="{Binding Commits.Count, Mode=OneWay, StringFormat={}{0} commits}"/>
+                    <TextBlock FontWeight="Bold" Text="{Binding CommitCount, Mode=OneWay, StringFormat={x:Static ghfvs:Resources.CommitCountFormat}}"/>
                     into
                     <InlineUIContainer BaselineAlignment="Bottom">
                         <Border CornerRadius="2" Padding="5 0" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">

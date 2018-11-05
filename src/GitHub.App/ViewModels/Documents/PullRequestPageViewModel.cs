@@ -54,6 +54,9 @@ namespace GitHub.ViewModels.Documents
         public IActorViewModel CurrentUser { get; private set; }
 
         /// <inheritdoc/>
+        public int CommitCount { get; private set; }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IViewModel> Timeline => timeline;
 
         /// <inheritdoc/>
@@ -68,6 +71,7 @@ namespace GitHub.ViewModels.Documents
         {
             await base.InitializeAsync(repository, localRepository, model).ConfigureAwait(true);
 
+            CommitCount = 0;
             currentUserModel = currentUser;
             CurrentUser = new ActorViewModel(currentUser);
             timeline = new ReactiveList<IViewModel>();
@@ -86,6 +90,7 @@ namespace GitHub.ViewModels.Documents
                 {
                     case CommitModel commit:
                         commits.Add(new CommitSummaryViewModel(commit));
+                        ++CommitCount;
                         break;
                     case CommentModel comment:
                         await AddComment(comment).ConfigureAwait(true);

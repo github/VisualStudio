@@ -367,6 +367,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} commits.
+        /// </summary>
+        public static string CommitCountFormat {
+            get {
+                return ResourceManager.GetString("CommitCountFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compare File as Default Action.
         /// </summary>
         public static string CompareFileAsDefaultAction {
