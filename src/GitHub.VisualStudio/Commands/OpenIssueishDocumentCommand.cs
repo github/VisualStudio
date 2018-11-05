@@ -47,9 +47,13 @@ namespace GitHub.VisualStudio.Commands
             try
             {
                 var m = serviceProvider.GetService<IGitHubToolWindowManager>();
-                var vm = await m.OpenIssueishDocumentPane();
-                var connection = await connectionManager.GetConnection(p.Address);
-                await vm.Load(connection, p.Owner, p.Repository, p.Number);
+                var vm = await m.ShowIssueishDocumentPane(p.Address, p.Owner, p.Repository, p.Number);
+
+                if (!vm.IsInitialized)
+                {
+                    var connection = await connectionManager.GetConnection(p.Address);
+                    await vm.Load(connection, p.Owner, p.Repository, p.Number);
+                }
             }
             catch (Exception ex)
             {

@@ -12,7 +12,15 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.UI
 {
-    public class AsyncPaneBase<TViewModel> : ToolWindowPane
+    public class AsyncPaneBase : ToolWindowPane
+    {
+        /// <summary>
+        /// Gets or sets an ID string that identifies the content of the pane.
+        /// </summary>
+        public string Id { get; set; }
+    }
+
+    public class AsyncPaneBase<TViewModel> : AsyncPaneBase
         where TViewModel : IPaneViewModel
     {
         readonly ContentPresenter contentPresenter;

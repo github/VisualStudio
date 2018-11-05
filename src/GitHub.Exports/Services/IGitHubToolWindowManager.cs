@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using GitHub.ViewModels.GitHubPane;
 using GitHub.ViewModels.Documents;
+using GitHub.Primitives;
 
 namespace GitHub.Services
 {
@@ -20,9 +21,19 @@ namespace GitHub.Services
         Task<IGitHubPaneViewModel> ShowGitHubPane();
 
         /// <summary>
-        /// Opens a new issue or pull request document pane.
+        /// Shows a document-like tool window pane for an issue or pull request.
         /// </summary>
-        /// <returns>>The view model for the document pane.</returns>
-        Task<IIssueishPaneViewModel> OpenIssueishDocumentPane();
+        /// <param name="address">
+        /// The host address of the server that hosts the issue or pull request.
+        /// </param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repository">The repository name.</param>
+        /// <param name="number">The issue or pull request number.</param>
+        /// <returns>The view model for the document pane.</returns>
+        Task<IIssueishPaneViewModel> ShowIssueishDocumentPane(
+            HostAddress address,
+            string owner,
+            string repository,
+            int number);
     }
 }

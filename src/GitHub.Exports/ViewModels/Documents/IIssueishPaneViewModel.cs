@@ -15,6 +15,12 @@ namespace GitHub.ViewModels.Documents
         IViewModel Content { get; }
 
         /// <summary>
+        /// Gets a value indicating whether <see cref="Load(IConnection, string, string, int)"/>
+        /// has been called on the view model.
+        /// </summary>
+        bool IsInitialized { get; }
+        
+        /// <summary>
         /// Loads an issue or pull request into the view model.
         /// </summary>
         /// <param name="connection">The connection to use.</param>

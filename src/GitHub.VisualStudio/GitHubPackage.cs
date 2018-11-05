@@ -1,20 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel.Design;
-using System.ComponentModel.Composition;
-using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Info;
 using GitHub.Exports;
+using GitHub.Info;
 using GitHub.Logging;
+using GitHub.Primitives;
 using GitHub.Services;
-using GitHub.Settings;
-using GitHub.VisualStudio.Helpers;
-using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
+using GitHub.Settings;
+using GitHub.ViewModels.Documents;
 using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio.Commands;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
@@ -23,7 +26,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
-using GitHub.ViewModels.Documents;
+using static System.FormattableString;
 
 namespace GitHub.VisualStudio
 {
@@ -162,7 +165,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
-    [ProvideToolWindow(typeof(IssueishDocumentPane), DocumentLikeTool = true)]
+    [ProvideToolWindow(typeof(IssueishDocumentPane), DocumentLikeTool = true, MultiInstances = true)]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
@@ -217,10 +220,43 @@ namespace GitHub.VisualStudio
             return await gitHubPane.GetViewModelAsync();
         }
 
-        public async Task<IIssueishPaneViewModel> OpenIssueishDocumentPane()
+        public async Task<IIssueishPaneViewModel> ShowIssueishDocumentPane(
+            HostAddress address,
+            string owner,
+            string repository,
+            int number)
         {
-            var pane = (IssueishDocumentPane)ShowToolWindow(new Guid(IssueishDocumentPane.IssueishDocumentPaneGuid));
-            return await pane.GetViewModelAsync();
+            var id = Invariant($"{address.WebUri}|{owner}/{repository}#{number}");
+            var pane = GetOrCreateToolWindow<IssueishDocumentPane>(id);
+
+            if (pane != null && pane.Frame is IVsWindowFrame frame)
+            {
+                ErrorHandler.ThrowOnFailure(frame.Show());
+                return await pane.GetViewModelAsync();
+            }
+
+            return null;
+        }
+
+        T GetOrCreateToolWindow<T>(string id) where T : AsyncPaneBase
+        {
+            for (var i = 0; i < int.MaxValue; ++i)
+            {
+                var result = (T)FindToolWindow(typeof(T), i, false);
+
+                if (result != null && result.Id == id)
+                {
+                    return result;
+                }
+                else if (result == null)
+                {
+                    result = (T)FindToolWindow(typeof(T), i, true);
+                    result.Id = id;
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)

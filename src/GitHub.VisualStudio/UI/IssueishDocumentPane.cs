@@ -11,6 +11,9 @@ namespace GitHub.VisualStudio.UI
     [Guid(IssueishDocumentPaneGuid)]
     public class IssueishDocumentPane : AsyncPaneBase<IIssueishPaneViewModel>
     {
+        /// <summary>
+        /// The guid of the document pane.
+        /// </summary>
         public const string IssueishDocumentPaneGuid = "9506846C-4CEC-4DDA-87E7-A99CDCD4E35B";
     }
 }

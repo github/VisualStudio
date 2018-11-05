@@ -36,6 +36,8 @@ namespace GitHub.ViewModels.Documents
             private set => this.RaiseAndSetIfChanged(ref content, value);
         }
 
+        public bool IsInitialized => content != null;
+
         public string PaneCaption
         {
             get => paneCaption;
