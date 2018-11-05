@@ -81,12 +81,12 @@ public class PullRequestCreationViewModelTests : TestBaseClass
 
         connection.HostAddress.Returns(HostAddress.Create("https://github.com"));
 
-        // this is the local repo instance that is available via TeamExplorerServiceHolder and friends
-        var activeRepo = Substitute.For<LocalRepositoryModel>();
-        activeRepo.LocalPath.Returns("");
-        activeRepo.Name.Returns(repoName);
-        activeRepo.CloneUrl.Returns(new UriString("http://github.com/" + sourceRepoOwner + "/" + repoName));
-        activeRepo.Owner.Returns(sourceRepoOwner);
+        var activeRepo = new LocalRepositoryModel
+        {
+            LocalPath = "",
+            Name = repoName,
+            CloneUrl = new UriString("http://github.com/" + sourceRepoOwner + "/" + repoName)
+        };
 
         Repository githubRepoParent = null;
         if (repoIsFork)

@@ -82,7 +82,8 @@ namespace GitHub.ViewModels.GitHubPane
                 .Where(_ => TargetBranch != null)
                 .Subscribe(x =>
                 {
-                    if (!x.Any(t => t.Equals(TargetBranch)))
+                    // HACK: Why is `t` null?
+                    if (!x.Any(t => t != null && t.Equals(TargetBranch)))
                     {
                         TargetBranch = GitHubRepository.IsFork ? GitHubRepository.Parent.DefaultBranch : GitHubRepository.DefaultBranch;
                     }
