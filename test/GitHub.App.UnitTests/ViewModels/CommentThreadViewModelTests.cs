@@ -8,6 +8,7 @@ using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
 using NUnit.Framework;
+using ReactiveUI;
 using ReactiveUI.Testing;
 
 namespace GitHub.App.UnitTests.ViewModels
@@ -90,13 +91,17 @@ namespace GitHub.App.UnitTests.ViewModels
             public Target(IMessageDraftStore drafts, IScheduler scheduler)
                 : base(drafts, scheduler)
             {
+                Comments = new ReactiveList<ICommentViewModel>();
             }
+
+            public ReactiveList<ICommentViewModel> Comments { get; }
 
             public async Task AddPlaceholder(bool isEditing)
             {
                 var c = new TestComment();
                 await c.InitializeAsPlaceholderAsync(this, isEditing);
-                AddPlaceholder(c);
+                InitializePlaceholder(c);
+                Comments.Add(c);
             }
 
             public override Task DeleteComment(ICommentViewModel comment) => Task.CompletedTask;

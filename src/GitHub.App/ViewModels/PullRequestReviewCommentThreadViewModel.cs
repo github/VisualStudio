@@ -128,7 +128,8 @@ namespace GitHub.ViewModels
                     vm.Body = draft.Body;
                 }
 
-                AddPlaceholder(vm);
+                InitializePlaceholder(vm);
+                comments.Add(vm);
             }
         }
 
@@ -161,7 +162,8 @@ namespace GitHub.ViewModels
                 vm.Body = draft.Body;
             }
 
-            AddPlaceholder(vm);
+            InitializePlaceholder(vm);
+            comments.Add(vm);
         }
 
         public override async Task PostComment(ICommentViewModel comment)

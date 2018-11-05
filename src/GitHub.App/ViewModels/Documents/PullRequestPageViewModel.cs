@@ -108,25 +108,25 @@ namespace GitHub.ViewModels.Documents
         }
 
         /// <inheritdoc/>
-        public async Task PostComment(string body)
+        public async Task PostComment(ICommentViewModel comment)
         {
             var address = HostAddress.Create(Repository.CloneUrl);
-            var comment = await service.PostComment(address, Id, body).ConfigureAwait(true);
-            await AddComment(comment).ConfigureAwait(true);
+            var result = await service.PostComment(address, Id, comment.Body).ConfigureAwait(true);
+            await AddComment(result).ConfigureAwait(true);
             ClearPlaceholder();
         }
 
-        Task ICommentThreadViewModel.DeleteComment(int pullRequestId, int commentId)
+        Task ICommentThreadViewModel.DeleteComment(ICommentViewModel comment)
         {
             throw new NotImplementedException();
         }
 
-        Task ICommentThreadViewModel.EditComment(string id, string body)
+        Task ICommentThreadViewModel.EditComment(ICommentViewModel comment)
         {
             throw new NotImplementedException();
         }
 
-        Task IIssueishCommentThreadViewModel.CloseIssueish(string body)
+        Task IIssueishCommentThreadViewModel.CloseIssueish(ICommentViewModel comment)
         {
             throw new NotImplementedException();
         }
