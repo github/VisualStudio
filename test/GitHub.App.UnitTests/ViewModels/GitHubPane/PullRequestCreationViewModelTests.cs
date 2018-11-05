@@ -101,6 +101,9 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         api.GetRepository(Args.String, Args.String).Returns(Observable.Return(githubRepo));
         ms.ApiClient.Returns(api);
 
+        // Default to returning no branches
+        ms.GetBranches(null).ReturnsForAnyArgs(Observable.Empty<BranchModel>());
+
         // sets up the libgit2sharp repo and branch objects
         var l2repo = SetupLocalRepoMock(gitClient, gitService, remote, sourceBranchName, sourceBranchIsTracking);
 
