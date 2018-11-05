@@ -98,13 +98,7 @@ namespace GitHub.ViewModels.Documents
                 timeline.Add(new CommitSummariesViewModel(commits));
             }
 
-            var placeholder = factory.CreateViewModel<IIssueishCommentViewModel>();
-            await placeholder.InitializeAsync(
-                this,
-                currentUser,
-                null,
-                Resources.ClosePullRequest).ConfigureAwait(true);
-            timeline.Add(placeholder);
+            await AddPlaceholder().ConfigureAwait(true);
         }
 
         /// <inheritdoc/>
@@ -112,8 +106,9 @@ namespace GitHub.ViewModels.Documents
         {
             var address = HostAddress.Create(Repository.CloneUrl);
             var result = await service.PostComment(address, Id, comment.Body).ConfigureAwait(true);
+            timeline.Remove(comment);
             await AddComment(result).ConfigureAwait(true);
-            ClearPlaceholder();
+            await AddPlaceholder().ConfigureAwait(true);
         }
 
         Task ICommentThreadViewModel.DeleteComment(ICommentViewModel comment)
@@ -135,37 +130,18 @@ namespace GitHub.ViewModels.Documents
         {
             var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
             await vm.InitializeAsync(this, currentUserModel, comment, null).ConfigureAwait(true);
-
-            if (GetPlaceholder() == null)
-            {
-                timeline.Add(vm);
-            }
-            else
-            {
-                timeline.Insert(timeline.Count - 1, vm);
-            }
+            timeline.Add(vm);
         }
 
-        void ClearPlaceholder()
+        async Task AddPlaceholder()
         {
-            var placeholder = GetPlaceholder();
-
-            if (placeholder != null)
-            {
-                placeholder.Body = null;
-            }
-        }
-
-        ICommentViewModel GetPlaceholder()
-        {
-            if (timeline.Count > 0 &&
-                timeline[timeline.Count - 1] is ICommentViewModel comment &&
-                comment.Id == null)
-            {
-                return comment;
-            }
-
-            return null;
+            var placeholder = factory.CreateViewModel<IIssueishCommentViewModel>();
+            await placeholder.InitializeAsync(
+                this,
+                currentUserModel,
+                null,
+                Resources.ClosePullRequest).ConfigureAwait(true);
+            timeline.Add(placeholder);
         }
 
         async Task DoShowCommit(string oid)
