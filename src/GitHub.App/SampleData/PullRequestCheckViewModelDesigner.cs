@@ -26,7 +26,7 @@ namespace GitHub.SampleData
 
         public PullRequestCheckType CheckType { get; set; } = PullRequestCheckType.ChecksApi;
 
-        public int CheckRunId { get; set; }
+        public string CheckRunId { get; set; }
 
         public bool HasAnnotations { get; } = true;
     }

@@ -44,7 +44,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the id of the check run.
         /// </summary>
-        int CheckRunId { get; }
+        string CheckRunId { get; }
 
         /// <summary>
         /// Gets a flag to show this check run has annotations.

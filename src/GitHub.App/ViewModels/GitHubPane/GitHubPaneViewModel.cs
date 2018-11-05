@@ -272,7 +272,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
                 var number = int.Parse(match.Groups["number"].Value);
-                var id = int.Parse(match.Groups["id"].Value);
+                var id = match.Groups["id"].Value;
 
                 await ShowPullRequestCheckRun(owner, repo, number, id);
             }
@@ -330,7 +330,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public Task ShowPullRequestCheckRun(string owner, string repo, int number, int checkRunId)
+        public Task ShowPullRequestCheckRun(string owner, string repo, int number, string checkRunId)
         {
             Guard.ArgumentNotNull(owner, nameof(owner));
             Guard.ArgumentNotNull(repo, nameof(repo));
@@ -513,8 +513,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         static Regex CreateRoute(string route)
         {
-            // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
-            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)") + "$";
+            // Build RegEx from route (:foo to named group (?<foo>[\w_.-=]+)).
+            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.\-=]+)") + "$";
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }
