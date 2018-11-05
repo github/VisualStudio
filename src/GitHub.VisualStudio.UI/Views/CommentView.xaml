@@ -35,7 +35,7 @@
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
 
-    <Grid>
+    <Grid IsEnabled="{Binding IsSubmitting, Converter={ui:InverseBooleanConverter}}">
         <!-- Displays an existing comment-->
         <StackPanel Orientation="Vertical" Margin="4">
             <StackPanel.Style>
