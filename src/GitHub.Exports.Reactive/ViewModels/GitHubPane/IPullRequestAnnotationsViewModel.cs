@@ -39,7 +39,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the id of the check run.
         /// </summary>
-        int CheckRunId { get; }
+        string CheckRunId { get; }
 
         /// <summary>
         /// Gets the name of the check run.
@@ -76,6 +76,6 @@ namespace GitHub.ViewModels.GitHubPane
             string owner,
             string repo,
             int pullRequestNumber,
-            int checkRunId);
+            string checkRunId);
     }
 }

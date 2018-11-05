@@ -41,7 +41,7 @@ namespace GitHub.App.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public async Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner,
-            string repo, int pullRequestNumber, int checkRunId)
+            string repo, int pullRequestNumber, string checkRunId)
         {
             if (repo != localRepository.Name)
             {
@@ -75,7 +75,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         public int PullRequestNumber { get; private set; }
 
         /// <inheritdoc/>
-        public int CheckRunId { get; private set; }
+        public string CheckRunId { get; private set; }
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; private set; }
@@ -119,7 +119,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 var checkSuiteRun = pullRequest
                     .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns
                             .Select(checkRun => new{checkSuite, checkRun}))
-                    .First(arg => arg.checkRun.DatabaseId == CheckRunId);
+                    .First(arg => arg.checkRun.CheckRunId == CheckRunId);
 
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
