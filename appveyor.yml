@@ -18,6 +18,8 @@ install:
 
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
+- choco install --no-progress BCC-MSBuildLog --version 0.1.5 --pre 
+- choco install --no-progress BCC-Submission --version 0.1.3 --pre 
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test:
@@ -31,5 +33,5 @@ on_success:
     }
 on_finish:
 - ps: scripts\Run-CodeCoverage.ps1 -AppVeyor -Configuration:Release
-- IF NOT "%BCC_TOKEN%x"=="x" %USERPROFILE%\.nuget\packages\bcc-msbuildlog\0.1.2\tools\net471\BCC.MSBuildLog.exe -i output.binlog -o checkrun.json -c "%APPVEYOR_BUILD_FOLDER%"
-- IF NOT "%BCC_TOKEN%x"=="x" %USERPROFILE%\.nuget\packages\bcc-submission\0.1.0\tools\net471\BCC.Submission.exe -i checkrun.json -t "%BCC_TOKEN%" -h "%APPVEYOR_REPO_COMMIT%"
+- IF NOT "%BCC_TOKEN%x"=="x" BCCMSBuildLog --cloneRoot "%APPVEYOR_BUILD_FOLDER%" --input output.binlog --output checkrun.json --ownerRepo %APPVEYOR_REPO_NAME% --hash %APPVEYOR_REPO_COMMIT%
+- IF NOT "%BCC_TOKEN%x"=="x" BCCSubmission -h %APPVEYOR_REPO_COMMIT% -i checkrun.json -t %BCC_TOKEN%
