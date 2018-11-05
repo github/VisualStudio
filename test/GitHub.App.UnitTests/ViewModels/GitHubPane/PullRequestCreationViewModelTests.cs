@@ -45,8 +45,8 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         public IServiceProvider ServiceProvider;
         public LocalRepositoryModel ActiveRepo;
         public LibGit2Sharp.IRepository L2Repo;
-        public IRepositoryModel SourceRepo;
-        public IRepositoryModel TargetRepo;
+        public RepositoryModel SourceRepo;
+        public RepositoryModel TargetRepo;
         public BranchModel SourceBranch;
         public BranchModel TargetBranch;
         public IGitClient GitClient;

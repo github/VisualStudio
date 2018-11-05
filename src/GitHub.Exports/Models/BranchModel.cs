@@ -7,7 +7,7 @@ namespace GitHub.Models
     public class BranchModel : ICopyable<BranchModel>,
         IEquatable<BranchModel>, IComparable<BranchModel>
     {
-        public BranchModel(string name, IRepositoryModel repo, string sha, bool isTracking, string trackedSha) :
+        public BranchModel(string name, RepositoryModel repo, string sha, bool isTracking, string trackedSha) :
             this(name, repo)
         {
             IsTracking = isTracking;
@@ -15,7 +15,7 @@ namespace GitHub.Models
             TrackedSha = trackedSha;
         }
 
-        public BranchModel(string name, IRepositoryModel repo)
+        public BranchModel(string name, RepositoryModel repo)
         {
             Extensions.Guard.ArgumentNotEmptyString(name, nameof(name));
             Extensions.Guard.ArgumentNotNull(repo, nameof(repo));
@@ -27,7 +27,7 @@ namespace GitHub.Models
 
         public string Id { get; private set; }
         public string Name { get; private set; }
-        public IRepositoryModel Repository { get; private set; }
+        public RepositoryModel Repository { get; private set; }
         public bool IsTracking { get; private set; }
         public string DisplayName { get; set; }
         public string Sha { get; private set; }

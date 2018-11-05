@@ -49,11 +49,11 @@ namespace GitHub.ViewModels.Dialog
             BackCommand = ReactiveCommand.Create(() => { });
         }
 
-        public IRepositoryModel SourceRepository { get; private set; }
+        public RepositoryModel SourceRepository { get; private set; }
 
         public IAccount DestinationAccount { get; private set; }
 
-        public IRepositoryModel DestinationRepository { get; private set; }
+        public RepositoryModel DestinationRepository { get; private set; }
 
         public ReactiveCommand<Unit, Repository> CreateFork { get; }
 

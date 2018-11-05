@@ -31,8 +31,8 @@ namespace GitHub.ViewModels.GitHubPane
         ICollectionView itemsView;
         IDisposable subscription;
         IssueListMessage message;
-        IRepositoryModel remoteRepository;
-        IReadOnlyList<IRepositoryModel> forks;
+        RepositoryModel remoteRepository;
+        IReadOnlyList<RepositoryModel> forks;
         string searchQuery;
         string selectedState;
         ObservableAsPropertyHelper<string> stateCaption;
@@ -65,7 +65,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IRepositoryModel> Forks
+        public IReadOnlyList<RepositoryModel> Forks
         {
             get { return forks; }
             set { this.RaiseAndSetIfChanged(ref forks, value); }
@@ -96,7 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public IRepositoryModel RemoteRepository
+        public RepositoryModel RemoteRepository
         {
             get { return remoteRepository; }
             set { this.RaiseAndSetIfChanged(ref remoteRepository, value); }
@@ -151,7 +151,7 @@ namespace GitHub.ViewModels.GitHubPane
                         repository.Name,
                         UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
 
-                    Forks = new IRepositoryModel[]
+                    Forks = new RepositoryModel[]
                     {
                     RemoteRepository,
                     repository,

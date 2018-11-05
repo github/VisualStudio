@@ -37,7 +37,7 @@ namespace GitHub.Services
         /// The re-clone dialog is shown from the VS2017+ start page when the user wants to check
         /// out a repository that was previously checked out on another machine.
         /// </remarks>
-        Task<string> ShowReCloneDialog(IRepositoryModel repository);
+        Task<string> ShowReCloneDialog(RepositoryModel repository);
 
         /// <summary>
         /// Shows the Create Gist dialog.

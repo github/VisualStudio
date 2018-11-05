@@ -42,7 +42,7 @@ namespace GitHub.Services
             string after);
 
         IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
-            LocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
             BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body);
 

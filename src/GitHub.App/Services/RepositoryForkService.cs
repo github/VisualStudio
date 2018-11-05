@@ -37,7 +37,7 @@ namespace GitHub.Services
             this.usageTracker = usageTracker;
         }
 
-        public IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
+        public IObservable<Repository> ForkRepository(IApiClient apiClient, RepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
         {
             log.Verbose("ForkRepository Source:{SourceOwner}/{SourceName} To:{DestinationOwner}", sourceRepository.Owner, sourceRepository.Name, repositoryFork.Organization ?? "[Current User]");
             log.Verbose("ForkRepository updateOrigin:{UpdateOrigin} addUpstream:{AddUpstream} trackMasterUpstream:{TrackMasterUpstream}", updateOrigin, addUpstream, trackMasterUpstream);
@@ -64,7 +64,7 @@ namespace GitHub.Services
                 });
         }
 
-        public IObservable<Unit> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
+        public IObservable<Unit> SwitchRemotes(RepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream)
         {
             return Observable.Defer(() => Observable.Return(new object())
                 .ObserveOn(RxApp.MainThreadScheduler)

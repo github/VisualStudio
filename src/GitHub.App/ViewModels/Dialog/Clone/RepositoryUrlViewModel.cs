@@ -14,7 +14,7 @@ namespace GitHub.App.ViewModels.Dialog.Clone
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryUrlViewModel : ViewModelBase, IRepositoryUrlViewModel
     {
-        ObservableAsPropertyHelper<IRepositoryModel> repository;
+        ObservableAsPropertyHelper<RepositoryModel> repository;
         string url;
 
         public RepositoryUrlViewModel()
@@ -30,11 +30,11 @@ namespace GitHub.App.ViewModels.Dialog.Clone
 
         public bool IsEnabled => true;
 
-        public IRepositoryModel Repository => repository.Value;
+        public RepositoryModel Repository => repository.Value;
 
         public Task Activate() => Task.CompletedTask;
 
-        IRepositoryModel ParseUrl(string s)
+        RepositoryModel ParseUrl(string s)
         {
             if (s != null)
             {

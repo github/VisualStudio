@@ -317,7 +317,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
-            LocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
             BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body
         )
@@ -925,7 +925,7 @@ namespace GitHub.Services
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
-            LocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
             BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {

@@ -33,7 +33,7 @@ namespace GitHub.SampleData
 
         public IObservable<object> Done => null;
 
-        public IReadOnlyList<IRemoteRepositoryModel> ExistingForks { get; set; }
+        public IReadOnlyList<RemoteRepositoryModel> ExistingForks { get; set; }
 
         public bool IsLoading { get; set; }
 
@@ -41,7 +41,7 @@ namespace GitHub.SampleData
 
         public ReactiveCommand<IAccount, Unit> SelectedAccount => null;
 
-        public ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin => null;
+        public ReactiveCommand<RemoteRepositoryModel, Unit> SwitchOrigin => null;
 
         public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {

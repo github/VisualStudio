@@ -64,7 +64,7 @@ namespace GitHub.ViewModels.Dialog
             Content = executePage;
         }
 
-        void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
+        void ShowSwitchRepositoryPath(RemoteRepositoryModel remoteRepository)
         {
             switchPage.Initialize(Repository, remoteRepository);
             Content = switchPage;

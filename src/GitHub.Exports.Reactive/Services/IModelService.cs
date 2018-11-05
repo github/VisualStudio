@@ -20,18 +20,18 @@ namespace GitHub.Services
         IObservable<IAccount> GetUser(string login);
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo);
-        ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
-        IObservable<IRemoteRepositoryModel> GetForks(IRepositoryModel repository);
+        IObservable<RemoteRepositoryModel> GetRepository(string owner, string repo);
+        ITrackingCollection<RemoteRepositoryModel> GetRepositories(ITrackingCollection<RemoteRepositoryModel> collection);
+        IObservable<RemoteRepositoryModel> GetForks(RepositoryModel repository);
         IObservable<LicenseItem> GetLicenses();
         IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
         IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);
-        ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
-        IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+        ITrackingCollection<IPullRequestModel> GetPullRequests(RepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
+        IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
             BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body);
-        IObservable<BranchModel> GetBranches(IRepositoryModel repo);
+        IObservable<BranchModel> GetBranches(RepositoryModel repo);
         IObservable<Unit> InvalidateAll();
-        IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
+        IObservable<string> GetFileContents(RepositoryModel repo, string commitSha, string path, string fileSha);
     }
 }

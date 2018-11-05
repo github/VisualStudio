@@ -50,7 +50,7 @@ namespace GitHub.StartPage
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
-        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
+        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, RepositoryModel repository)
         {
             CloneDialogResult request = null;
 
@@ -84,7 +84,7 @@ namespace GitHub.StartPage
         async Task<CloneDialogResult> ShowCloneDialog(
             IGitHubServiceProvider gitHubServiceProvider,
             IProgress<ServiceProgressData> progress,
-            IRepositoryModel repository = null)
+            RepositoryModel repository = null)
         {
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
             var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();

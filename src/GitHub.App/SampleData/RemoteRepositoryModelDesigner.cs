@@ -6,7 +6,7 @@ using GitHub.UI;
 namespace GitHub.SampleData
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes")]
-    public class RemoteRepositoryModelDesigner : IRemoteRepositoryModel
+    public class RemoteRepositoryModelDesigner : RemoteRepositoryModel
     {
         public UriString CloneUrl { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
@@ -17,20 +17,20 @@ namespace GitHub.SampleData
         public string Name { get; set; }
         public string Owner { get; set; }
         public IAccount OwnerAccount { get; set; }
-        public IRemoteRepositoryModel Parent { get; set; }
+        public RemoteRepositoryModel Parent { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
 
-        public int CompareTo(IRemoteRepositoryModel other)
+        public int CompareTo(RemoteRepositoryModel other)
         {
             return 0;
         }
 
-        public void CopyFrom(IRemoteRepositoryModel other)
+        public void CopyFrom(RemoteRepositoryModel other)
         {
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
-        public bool Equals(IRemoteRepositoryModel other)
+        public bool Equals(RemoteRepositoryModel other)
         {
             return false;
         }

@@ -42,7 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         LocalRepositoryModel activeLocalRepo;
-        ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
+        ObservableAsPropertyHelper<RemoteRepositoryModel> githubRepository;
         IModelService modelService;
 
         [ImportingConstructor]
@@ -317,7 +317,7 @@ namespace GitHub.ViewModels.GitHubPane
                 SourceBranch.Name);
         }
 
-        public IRemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
+        public RemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
         bool IsExecuting { get { return isExecuting.Value; } }
 
         bool initialized;

@@ -10,7 +10,7 @@ namespace GitHub.Models
     /// The base class for local and remote repository models.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class RepositoryModel : NotificationAwareObject, IRepositoryModel
+    public class RepositoryModel : NotificationAwareObject
     {
         UriString cloneUrl;
         Octicon icon;

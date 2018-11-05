@@ -55,8 +55,8 @@ namespace GitHub.SampleData
         public ICollectionView ItemsView { get; }
         public LocalRepositoryModel LocalRepository { get; set; }
         public IssueListMessage Message { get; set; }
-        public IRepositoryModel RemoteRepository { get; set; }
-        public IReadOnlyList<IRepositoryModel> Forks { get; }
+        public RepositoryModel RemoteRepository { get; set; }
+        public IReadOnlyList<RepositoryModel> Forks { get; }
         public string SearchQuery { get; set; }
         public string SelectedState { get; set; }
         public string StateCaption { get; set; }

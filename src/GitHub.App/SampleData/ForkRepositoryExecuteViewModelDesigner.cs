@@ -35,9 +35,9 @@ namespace GitHub.SampleData
 
         public string Title => null;
 
-        public IRepositoryModel SourceRepository { get; set; }
+        public RepositoryModel SourceRepository { get; set; }
 
-        public IRepositoryModel DestinationRepository { get; set; }
+        public RepositoryModel DestinationRepository { get; set; }
 
         public IAccount DestinationAccount { get; }
 

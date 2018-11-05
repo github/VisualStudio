@@ -343,7 +343,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.Open.CanExecute(null), Is.True);
         }
 
-        static void SetRepository(IRepositoryCloneTabViewModel vm, IRepositoryModel repository)
+        static void SetRepository(IRepositoryCloneTabViewModel vm, RepositoryModel repository)
         {
             vm.Repository.Returns(repository);
             vm.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(
@@ -376,7 +376,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositorySelectViewModel CreateSelectViewModel()
         {
             var result = Substitute.For<IRepositorySelectViewModel>();
-            result.Repository.Returns((IRepositoryModel)null);
+            result.Repository.Returns((RepositoryModel)null);
             result.WhenForAnyArgs(x => x.Initialize(null)).Do(_ => result.IsEnabled.Returns(true));
             return result;
         }
@@ -451,16 +451,16 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             return usageService;
         }
 
-        static IRepositoryModel CreateRepositoryModel(string repo = "owner/repo")
+        static RepositoryModel CreateRepositoryModel(string repo = "owner/repo")
         {
             var split = repo.Split('/');
             var (owner, name) = (split[0], split[1]);
             return CreateRepositoryModel(owner, name);
         }
 
-        static IRepositoryModel CreateRepositoryModel(string owner, string name)
+        static RepositoryModel CreateRepositoryModel(string owner, string name)
         {
-            var repository = Substitute.For<IRepositoryModel>();
+            var repository = Substitute.For<RepositoryModel>();
             repository.Owner.Returns(owner);
             repository.Name.Returns(name);
             repository.CloneUrl.Returns(CreateGitHubUrl(owner, name));
@@ -475,7 +475,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
         {
             var repositoryUrlViewModel = Substitute.For<IRepositoryUrlViewModel>();
-            repositoryUrlViewModel.Repository.Returns(null as IRepositoryModel);
+            repositoryUrlViewModel.Repository.Returns(null as RepositoryModel);
             repositoryUrlViewModel.Url.Returns(string.Empty);
             return repositoryUrlViewModel;
         }

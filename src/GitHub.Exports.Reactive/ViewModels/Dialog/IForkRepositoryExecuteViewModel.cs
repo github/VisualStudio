@@ -13,9 +13,9 @@ namespace GitHub.ViewModels.Dialog
     /// </summary>
     public interface IForkRepositoryExecuteViewModel : IDialogContentViewModel
     {
-        IRepositoryModel SourceRepository { get; }
+        RepositoryModel SourceRepository { get; }
 
-        IRepositoryModel DestinationRepository { get; }
+        RepositoryModel DestinationRepository { get; }
 
         IAccount DestinationAccount { get; }
       

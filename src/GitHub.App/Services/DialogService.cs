@@ -52,7 +52,7 @@ namespace GitHub.Services
             }
         }
 
-        public async Task<string> ShowReCloneDialog(IRepositoryModel repository)
+        public async Task<string> ShowReCloneDialog(RepositoryModel repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
 

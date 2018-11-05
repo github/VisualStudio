@@ -2,15 +2,21 @@
 using System;
 using System.Globalization;
 using GitHub.Extensions;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {
     /// <summary>
     /// A repository read from the GitHub API.
     /// </summary>
-    public class RemoteRepositoryModel : RepositoryModel, IRemoteRepositoryModel,
+    public class RemoteRepositoryModel : RepositoryModel, ICopyable<RemoteRepositoryModel>,
         IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
+        protected RemoteRepositoryModel()
+        {
+            // Used by designer
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
         /// </summary>
@@ -21,7 +27,7 @@ namespace GitHub.Models
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
         /// <param name="parent">The parent repository if this repository is a fork.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount, IRemoteRepositoryModel parent)
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount, RemoteRepositoryModel parent)
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -57,7 +63,7 @@ namespace GitHub.Models
         }
 
         #region Equality Things
-        public void CopyFrom(IRemoteRepositoryModel other)
+        public void CopyFrom(RemoteRepositoryModel other)
         {
             if (!Equals(other))
                 throw new ArgumentException("Instance to copy from doesn't match this instance. this:(" + this + ") other:(" + other + ")", nameof(other));
@@ -77,23 +83,11 @@ namespace GitHub.Models
             return Equals(other);
         }
 
-        public bool Equals(IRemoteRepositoryModel other)
-        {
-            if (ReferenceEquals(this, other))
-                return true;
-            return other != null && Id == other.Id;
-        }
-
         public bool Equals(RemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
-        }
-
-        public int CompareTo(IRemoteRepositoryModel other)
-        {
-            return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
         public int CompareTo(RemoteRepositoryModel other)
@@ -154,7 +148,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the repository from which this repository was forked, if any.
         /// </summary>
-        public IRemoteRepositoryModel Parent { get; }
+        public RemoteRepositoryModel Parent { get; }
 
         /// <summary>
         /// Gets the default branch for the repository.
