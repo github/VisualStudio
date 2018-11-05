@@ -49,9 +49,7 @@
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <TextBlock >
                     <InlineUIContainer BaselineAlignment="Bottom">
-                        <Border Background="#6CC644" CornerRadius="2" Padding="6,0,6,2" Margin="0,0,2,-2">
-                            <TextBlock FontWeight="Bold" Foreground="White" Text="{Binding State}"/>
-                        </Border>
+                        <v:IssueishStateBadge DataContext="{Binding State}" Margin="0,0,0,-2"/>
                     </InlineUIContainer>
                     <InlineUIContainer BaselineAlignment="TextBottom">
                         <v:ActorAvatarView ViewModel="{Binding Author}" Width="14" Height="14"/>

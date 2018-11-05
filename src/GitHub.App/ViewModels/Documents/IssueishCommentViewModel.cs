@@ -16,7 +16,7 @@ namespace GitHub.ViewModels.Documents
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class IssueishCommentViewModel : CommentViewModel, IIssueishCommentViewModel
     {
-        ObservableAsPropertyHelper<string> closeIssueishCaption;
+        ObservableAsPropertyHelper<string> closeOrReopenCaption;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
@@ -26,26 +26,28 @@ namespace GitHub.ViewModels.Documents
         public IssueishCommentViewModel(ICommentService commentService)
             : base(commentService)
         {
-            CloseIssueish = ReactiveCommand.CreateFromTask(
-                DoCloseIssueish,
-                this.WhenAnyValue(x => x.CanCloseIssueish));
+            CloseOrReopen = ReactiveCommand.CreateFromTask(
+                DoCloseOrReopen,
+                this.WhenAnyValue(x => x.CanCloseOrReopen));
         }
 
         /// <inheritdoc/>
-        public bool CanCloseIssueish { get; private set; }
+        public bool CanCloseOrReopen { get; private set; }
 
         /// <inheritdoc/>
-        public string CloseIssueishCaption => closeIssueishCaption?.Value;
+        public string CloseOrReopenCaption => closeOrReopenCaption?.Value;
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> CloseIssueish { get; }
+        public ReactiveCommand<Unit, Unit> CloseOrReopen { get; }
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
             IIssueishCommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
-            string closeCaption)
+            bool isPullRequest,
+            bool isOpen,
+            bool canCloseOrReopen)
         {
             await base.InitializeAsync(
                 thread,
@@ -54,17 +56,26 @@ namespace GitHub.ViewModels.Documents
                 comment == null ? CommentEditState.Editing : CommentEditState.None)
                     .ConfigureAwait(true);
 
-            CanCloseIssueish = closeCaption != null;
+            CanCloseOrReopen = canCloseOrReopen;
+            closeOrReopenCaption?.Dispose();
 
-            if (closeCaption != null)
+            if (canCloseOrReopen)
             {
-                closeIssueishCaption = this.WhenAnyValue(x => x.Body)
-                    .Select(x => string.IsNullOrWhiteSpace(x) ? closeCaption : Resources.CloseAndComment)
-                    .ToProperty(this, x => x.CloseIssueishCaption);
+                var caption = isPullRequest ?
+                    isOpen ?
+                        (Resources.ClosePullRequest, Resources.CloseAndComment) :
+                        (Resources.ReopenPullRequest, Resources.ReopenAndComment) :
+                    isOpen ?
+                        (Resources.CloseIssue, Resources.CloseAndComment) :
+                        (Resources.ReopenIssue, Resources.ReopenAndComment);
+
+                closeOrReopenCaption = this.WhenAnyValue(x => x.Body)
+                    .Select(x => string.IsNullOrWhiteSpace(x) ? caption.Item1 : caption.Item2)
+                    .ToProperty(this, x => x.CloseOrReopenCaption);
             }
         }
 
-        Task DoCloseIssueish()
+        Task DoCloseOrReopen()
         {
             return Task.CompletedTask;
         }

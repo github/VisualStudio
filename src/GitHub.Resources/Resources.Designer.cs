@@ -1639,6 +1639,33 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reopen and comment.
+        /// </summary>
+        public static string ReopenAndComment {
+            get {
+                return ResourceManager.GetString("ReopenAndComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reopen issue.
+        /// </summary>
+        public static string ReopenIssue {
+            get {
+                return ResourceManager.GetString("ReopenIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reopen pull request.
+        /// </summary>
+        public static string ReopenPullRequest {
+            get {
+                return ResourceManager.GetString("ReopenPullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This repository does not have a remote. Fill out the form to publish it to GitHub..
         /// </summary>
         public static string RepoDoesNotHaveRemoteText {

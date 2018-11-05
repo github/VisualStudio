@@ -46,22 +46,6 @@
                 <Setter Property="Fill" Value="{DynamicResource GitHubHeaderSeparatorBrush}"/>
             </Style>
 
-            <!-- TODO Fix this: here we change the color of TextBlock depending on the label.
-                 It's a hack, it will break with localization -->
-            <Style x:Key="StateIndicator" TargetType="TextBlock">
-                <Style.Triggers>
-                    <Trigger Property="Text" Value="OPEN">
-                        <Setter Property="Foreground" Value="#6CC644"/>
-                    </Trigger>
-                    <Trigger Property="Text" Value="CLOSED">
-                        <Setter Property="Foreground" Value="#BD2C00"/>
-                    </Trigger>
-                    <Trigger Property="Text" Value="MERGED">
-                        <Setter Property="Foreground" Value="#6E5494"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-
             <Style x:Key="CheckoutMessage" TargetType="TextBlock">
                 <Setter Property="Margin" Value="0 4"/>
             </Style>
@@ -91,10 +75,7 @@
 
             <!-- State and branches -->
             <StackPanel Orientation="Horizontal">
-                <TextBlock FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           Text="{Binding Model.State, Converter={StaticResource AllCaps}}"
-                           Style="{StaticResource StateIndicator}"/>
+                <v:IssueishStateBadge DataContext="{Binding Model.State}" VerticalAlignment="Center"/>
 
                 <Rectangle Margin="9 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
 

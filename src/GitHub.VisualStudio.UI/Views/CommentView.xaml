@@ -221,9 +221,9 @@
                         Content="{x:Static ghfvs:Resources.StartAReview}"
                         Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <Button Margin="4 0 0 0"
-                        Command="{Binding CloseIssueish}"
-                        Content="{Binding CloseIssueishCaption}"
-                        Visibility="{Binding CanCloseIssueish, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                        Command="{Binding CloseOrReopen}"
+                        Content="{Binding CloseOrReopenCaption}"
+                        Visibility="{Binding CanCloseOrReopen, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <Button Margin="4 0 0 0"
                         Command="{Binding CancelEdit}"
                         Content="{x:Static ghfvs:Resources.Cancel}"

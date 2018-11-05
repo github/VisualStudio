@@ -10,30 +10,30 @@ namespace GitHub.App.UnitTests.ViewModels.Documents
     public class IssueishCommentViewModelTests
     {
         [Test]
-        public async Task CloseIssueishCaption_Is_Set_When_Body_Empty()
+        public async Task CloseOrReopenCaption_Is_Set_When_Body_Empty()
         {
             var target = await CreateAndInitializeTarget(
                 new CommentModel(),
-                "Close issue");
+                canCloseOrReopen: true);
 
-            Assert.That(target.CloseIssueishCaption, Is.EqualTo("Close issue"));
+            Assert.That(target.CloseOrReopenCaption, Is.EqualTo("Close issue"));
         }
 
         [Test]
-        public async Task CommitCaption_Is_Update_When_Body_Not_Empty()
+        public async Task CloseOrReopenCaption_Is_Updated_When_Body_Not_Empty()
         {
             var target = await CreateAndInitializeTarget(
                 new CommentModel(),
-                "Close issue");
+                canCloseOrReopen: true);
 
             target.Body = "Body";
 
-            Assert.That(target.CloseIssueishCaption, Is.EqualTo("Close and comment"));
+            Assert.That(target.CloseOrReopenCaption, Is.EqualTo("Close and comment"));
         }
 
         async Task<IssueishCommentViewModel> CreateAndInitializeTarget(
             CommentModel comment,
-            string closeCaption,
+            bool canCloseOrReopen = false,
             ICommentService commentService = null,
             IIssueishCommentThreadViewModel thread = null,
             ActorModel currentUser = null)
@@ -46,7 +46,9 @@ namespace GitHub.App.UnitTests.ViewModels.Documents
                 thread,
                 currentUser,
                 comment,
-                closeCaption);
+                false,
+                true,
+                canCloseOrReopen);
             return target;
         }
 

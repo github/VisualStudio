@@ -129,7 +129,13 @@ namespace GitHub.ViewModels.Documents
         async Task AddComment(CommentModel comment)
         {
             var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
-            await vm.InitializeAsync(this, currentUserModel, comment, null).ConfigureAwait(true);
+            await vm.InitializeAsync(
+                this,
+                currentUserModel,
+                comment,
+                true,
+                State == PullRequestState.Open,
+                false).ConfigureAwait(true);
             timeline.Add(vm);
         }
 
@@ -140,7 +146,9 @@ namespace GitHub.ViewModels.Documents
                 this,
                 currentUserModel,
                 null,
-                Resources.ClosePullRequest).ConfigureAwait(true);
+                true,
+                State == PullRequestState.Open,
+                true).ConfigureAwait(true);
             timeline.Add(placeholder);
         }
 

@@ -851,4 +851,13 @@ https://git-scm.com/download/win</value>
   <data name="CloseAndComment" xml:space="preserve">
     <value>Close and comment</value>
   </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Reopen and comment</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Reopen issue</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Reopen pull request</value>
+  </data>
 </root>

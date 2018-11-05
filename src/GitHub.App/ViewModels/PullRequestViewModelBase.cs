@@ -56,6 +56,7 @@ namespace GitHub.ViewModels
 
             var fork = model.BaseRepositoryOwner != model.HeadRepositoryOwner;
             LocalRepository = localRepository;
+            State = model.State;
             SourceBranchDisplayName = GetBranchDisplayName(fork, model.HeadRepositoryOwner, model.HeadRefName);
             TargetBranchDisplayName = GetBranchDisplayName(fork, model.BaseRepositoryOwner, model.BaseRefName);
         }

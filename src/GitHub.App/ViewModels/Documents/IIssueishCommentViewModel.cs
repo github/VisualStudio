@@ -11,20 +11,21 @@ namespace GitHub.ViewModels.Documents
     public interface IIssueishCommentViewModel : ICommentViewModel
     {
         /// <summary>
-        /// Gets a value indicating whether the comment will show a 
-        /// a button for <see cref="CloseIssueish"/>.
+        /// Gets a value indicating whether the comment will show a button for
+        /// <see cref="CloseOrReopen"/>.
         /// </summary>
-        bool CanCloseIssueish { get; }
+        bool CanCloseOrReopen { get; }
 
         /// <summary>
-        /// Gets a a caption for the <see cref="CloseIssueish"/> command.
+        /// Gets a a caption for the <see cref="CloseOrReopen"/> command.
         /// </summary>
-        string CloseIssueishCaption { get; }
+        string CloseOrReopenCaption { get; }
 
         /// <summary>
-        /// Gets a command which when executed will close the issue or pull request.
+        /// Gets a command which when executed will close the issue or pull request if it is open,
+        /// or reopen it if it is closed.
         /// </summary>
-        ReactiveCommand<Unit, Unit> CloseIssueish { get; }
+        ReactiveCommand<Unit, Unit> CloseOrReopen { get; }
 
         /// <summary>
         /// Initializes the view model with data.
@@ -32,14 +33,19 @@ namespace GitHub.ViewModels.Documents
         /// <param name="thread">The thread that the comment is a part of.</param>
         /// <param name="currentUser">The current user.</param>
         /// <param name="comment">The comment model. May be null.</param>
-        /// <param name="closeCaption">
-        /// The caption for the <see cref="CloseIssueish"/> command, or null if the user cannot
-        /// close the issue/pr from this comment.
+        /// <param name="isPullRequest">
+        /// true if the comment is on a pull request, false if the comment is on an issue.
+        /// </param>
+        /// <param name="isOpen">Whether the issue or pull request is open.</param>
+        /// <param name="canCloseOrReopen">
+        /// Whether the user can close or reopen the pull request from this comment.
         /// </param>
         Task InitializeAsync(
             IIssueishCommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
-            string closeCaption);
+            bool isPullRequest,
+            bool isOpen,
+            bool canCloseOrReopen);
     }
 }
