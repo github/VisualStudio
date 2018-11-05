@@ -32,7 +32,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestService : IPullRequestService
+    public class PullRequestService : IssueishService, IPullRequestService
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
@@ -66,6 +66,7 @@ namespace GitHub.Services
             IGraphQLClientFactory graphqlFactory,
             IOperatingSystem os,
             IUsageTracker usageTracker)
+            : base(graphqlFactory)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;

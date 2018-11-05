@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
-using GitHub.SampleData;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 
@@ -23,6 +23,8 @@ namespace GitHub.ViewModels.Documents
         readonly IPullRequestService service;
         readonly IPullRequestSessionManager sessionManager;
         readonly ITeamExplorerServices teServices;
+        ActorModel currentUserModel;
+        ReactiveList<IViewModel> timeline;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestPageViewModel"/> class.
@@ -52,7 +54,7 @@ namespace GitHub.ViewModels.Documents
         public IActorViewModel CurrentUser { get; private set; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IViewModel> Timeline { get; private set; }
+        public IReadOnlyList<IViewModel> Timeline => timeline;
 
         /// <inheritdoc/>
         public ReactiveCommand<string, Unit> ShowCommit { get; }
@@ -69,9 +71,10 @@ namespace GitHub.ViewModels.Documents
         {
             await base.InitializeAsync(repository, localRepository, model).ConfigureAwait(true);
 
+            currentUserModel = currentUser;
             CurrentUser = new ActorViewModel(currentUser);
+            timeline = new ReactiveList<IViewModel>();
 
-            var timeline = new ReactiveList<IViewModel>();
             var commits = new List<CommitSummaryViewModel>();
 
             foreach (var i in model.Timeline)
@@ -88,11 +91,7 @@ namespace GitHub.ViewModels.Documents
                         commits.Add(new CommitSummaryViewModel(commit));
                         break;
                     case CommentModel comment:
-                        {
-                            var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
-                            await vm.InitializeAsync(this, currentUser, comment, null).ConfigureAwait(true);
-                            timeline.Add(vm);
-                        }
+                        await AddComment(comment).ConfigureAwait(true);
                         break;
                 }
             }
@@ -109,8 +108,15 @@ namespace GitHub.ViewModels.Documents
                 null,
                 Resources.ClosePullRequest).ConfigureAwait(true);
             timeline.Add(placeholder);
+        }
 
-            Timeline = timeline;
+        /// <inheritdoc/>
+        public async Task PostComment(string body)
+        {
+            var address = HostAddress.Create(Repository.CloneUrl);
+            var comment = await service.PostComment(address, Id, body).ConfigureAwait(true);
+            await AddComment(comment).ConfigureAwait(true);
+            ClearPlaceholder();
         }
 
         Task ICommentThreadViewModel.DeleteComment(int pullRequestId, int commentId)
@@ -123,9 +129,41 @@ namespace GitHub.ViewModels.Documents
             throw new NotImplementedException();
         }
 
-        Task ICommentThreadViewModel.PostComment(string body)
+        async Task AddComment(CommentModel comment)
         {
-            throw new NotImplementedException();
+            var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
+            await vm.InitializeAsync(this, currentUserModel, comment, null).ConfigureAwait(true);
+
+            if (GetPlaceholder() == null)
+            {
+                timeline.Add(vm);
+            }
+            else
+            {
+                timeline.Insert(timeline.Count - 1, vm);
+            }
+        }
+
+        void ClearPlaceholder()
+        {
+            var placeholder = GetPlaceholder();
+
+            if (placeholder != null)
+            {
+                placeholder.Body = null;
+            }
+        }
+
+        ICommentViewModel GetPlaceholder()
+        {
+            if (timeline.Count > 0 &&
+                timeline[timeline.Count - 1] is ICommentViewModel comment &&
+                comment.Id == null)
+            {
+                return comment;
+            }
+
+            return null;
         }
 
         async Task DoShowCommit(string oid)

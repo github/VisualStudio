@@ -9,7 +9,7 @@ using LibGit2Sharp;
 
 namespace GitHub.Services
 {
-    public interface IPullRequestService
+    public interface IPullRequestService : IIssueishService
     {
         /// <summary>
         /// Reads a page of pull request items.

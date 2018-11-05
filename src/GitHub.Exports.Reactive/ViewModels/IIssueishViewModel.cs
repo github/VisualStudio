@@ -11,6 +11,11 @@ namespace GitHub.ViewModels
     public interface IIssueishViewModel : IViewModel
     {
         /// <summary>
+        /// Gets the GraphQL ID for the issue or pull request.
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
         /// Gets the issue or pull request author.
         /// </summary>
         IActorViewModel Author { get; }

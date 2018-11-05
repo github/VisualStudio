@@ -33,6 +33,9 @@ namespace GitHub.ViewModels
         public IRemoteRepositoryModel Repository { get; private set; }
 
         /// <inheritdoc/>
+        public string Id { get; private set; }
+
+        /// <inheritdoc/>
         public int Number { get; private set; }
 
         /// <inheritdoc/>
@@ -71,6 +74,7 @@ namespace GitHub.ViewModels
             IssueishDetailModel model)
         {
             Repository = repository;
+            Id = model.Id;
             Author = new ActorViewModel(model.Author);
             Body = model.Body;
             Number = model.Number;

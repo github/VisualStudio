@@ -84,6 +84,7 @@ When leaving an inline comment, the comment posts successfully and then a new co
             };
         }
 
+        public string Id { get; set; }
         public PullRequestState State { get; set; } = PullRequestState.Open;
         public IReadOnlyList<IViewModel> Timeline { get; }
         public string SourceBranchDisplayName { get; set; } = "feature/save-drafts";
