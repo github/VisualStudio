@@ -785,7 +785,7 @@ namespace GitHub.Services
                 }
             }
 
-            return Encoding.Default;
+            return null;
         }
 
         static bool HasPreamble(string file, Encoding encoding)
@@ -893,7 +893,15 @@ namespace GitHub.Services
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));
-            File.WriteAllText(tempFilePath, contents, encoding);
+
+            if (encoding != null)
+            {
+                File.WriteAllText(tempFilePath, contents, encoding);
+            }
+            else
+            {
+                File.WriteAllText(tempFilePath, contents);
+            }
         }
 
         IEnumerable<string> GetLocalBranchesInternal(
@@ -979,7 +987,7 @@ namespace GitHub.Services
         {
             // The combination of relative path, commit SHA and encoding should be sufficient to uniquely identify a file.
             var relativeDir = Path.GetDirectoryName(relativePath) ?? string.Empty;
-            var key = relativeDir + '|' + encoding.WebName;
+            var key = relativeDir + '|' + (encoding?.WebName ?? "unknown");
             var relativePathHash = key.GetSha256Hash();
             var tempDir = Path.Combine(Path.GetTempPath(), "GitHubVisualStudio", "FileContents", relativePathHash);
             var tempFileName = Invariant($"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}");

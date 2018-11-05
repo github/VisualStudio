@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels;
 using NSubstitute;
@@ -57,38 +59,82 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         [Test]
         public async Task PostsCommentInReplyToCorrectComment()
         {
-            using (TestUtils.WithScheduler(Scheduler.CurrentThread))
-            {
-                var session = CreateSession();
-                var target = await CreateTarget(
-                    session: session,
-                    comments: CreateComments("Comment 1", "Comment 2"));
+            var session = CreateSession();
+            var target = await CreateTarget(
+                session: session,
+                comments: CreateComments("Comment 1", "Comment 2"));
 
-                target.Comments[2].Body = "New Comment";
-                await target.Comments[2].CommitEdit.Execute();
+            target.Comments[2].Body = "New Comment";
+            await target.Comments[2].CommitEdit.Execute();
 
-                session.Received(1).PostReviewComment("New Comment", "1");
-            }
+            await session.Received(1).PostReviewComment("New Comment", "1");
+        }
+
+        [Test]
+        public async Task LoadsDraftForNewThread()
+        {
+            var draftStore = Substitute.For<IMessageDraftStore>();
+
+            draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                .Returns(new PullRequestReviewCommentDraft
+                {
+                    Body = "Draft comment.",
+                    Side = DiffSide.Right,
+                });
+
+            var target = await CreateTarget(draftStore: draftStore, newThread: true);
+
+            Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
+        }
+
+        [Test]
+        public async Task LoadsDraftForExistingThread()
+        {
+            var draftStore = Substitute.For<IMessageDraftStore>();
+
+            draftStore.GetDraft<PullRequestReviewCommentDraft>(
+                "pr-review-comment|https://github.com/owner/repo|47|file.cs", "10")
+                .Returns(new PullRequestReviewCommentDraft
+                {
+                    Body = "Draft comment.",
+                    Side = DiffSide.Right,
+                });
+
+            var target = await CreateTarget(draftStore: draftStore);
+
+            Assert.That(target.Comments[0].Body, Is.EqualTo("Draft comment."));
         }
 
         async Task<PullRequestReviewCommentThreadViewModel> CreateTarget(
+            IMessageDraftStore draftStore = null,
             IViewViewModelFactory factory = null,
             IPullRequestSession session = null,
             IPullRequestSessionFile file = null,
-            PullRequestReviewModel review = null,
-            IEnumerable<InlineCommentModel> comments = null)
+            IEnumerable<InlineCommentModel> comments = null,
+            bool newThread = false)
         {
+            draftStore = draftStore ?? Substitute.For<IMessageDraftStore>();
             factory = factory ?? CreateFactory();
             session = session ?? CreateSession();
-            file = file ?? Substitute.For<IPullRequestSessionFile>();
-            review = review ?? new PullRequestReviewModel();
+            file = file ?? CreateFile();
             comments = comments ?? CreateComments();
 
-            var thread = Substitute.For<IInlineCommentThreadModel>();
-            thread.Comments.Returns(comments.ToList());
+            var result = new PullRequestReviewCommentThreadViewModel(draftStore, factory);
 
-            var result = new PullRequestReviewCommentThreadViewModel(factory);
-            await result.InitializeAsync(session, file, review, thread, true);
+            if (newThread)
+            {
+                await result.InitializeNewAsync(session, file, 10, DiffSide.Right, true);
+            }
+            else
+            {
+                var thread = Substitute.For<IInlineCommentThreadModel>();
+                thread.Comments.Returns(comments.ToList());
+                thread.LineNumber.Returns(10);
+
+                await result.InitializeAsync(session, file, thread, true);
+            }
+
             return result;
         }
 
@@ -111,11 +157,18 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             foreach (var body in bodies)
             {
-                yield return CreateComment((id++).ToString(), body);
+                yield return CreateComment((id++).ToString(CultureInfo.InvariantCulture), body);
             }
         }
 
-        IViewViewModelFactory CreateFactory()
+        static IPullRequestSessionFile CreateFile(string relativePath = "file.cs")
+        {
+            var result = Substitute.For<IPullRequestSessionFile>();
+            result.RelativePath.Returns(relativePath);
+            return result;
+        }
+
+        static IViewViewModelFactory CreateFactory()
         {
             var result = Substitute.For<IViewViewModelFactory>();
             var commentService = Substitute.For<ICommentService>();
@@ -124,11 +177,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             return result;
         }
 
-        IPullRequestSession CreateSession()
+        static IPullRequestSession CreateSession()
         {
             var result = Substitute.For<IPullRequestSession>();
             result.User.Returns(new ActorModel { Login = "Viewer" });
             result.RepositoryOwner.Returns("owner");
+            result.LocalRepository.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
             result.LocalRepository.Name.Returns("repo");
             result.LocalRepository.Owner.Returns("shouldnt-be-used");
             result.PullRequest.Returns(new PullRequestDetailModel

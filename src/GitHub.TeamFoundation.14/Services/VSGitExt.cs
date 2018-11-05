@@ -26,26 +26,26 @@ namespace GitHub.VisualStudio.Base
     {
         static readonly ILogger log = LogManager.ForContext<VSGitExt>();
 
-        readonly IAsyncServiceProvider asyncServiceProvider;
+        readonly IServiceProvider serviceProvider;
         readonly ILocalRepositoryModelFactory repositoryFactory;
         readonly object refreshLock = new object();
 
         IGitExt gitService;
         IReadOnlyList<ILocalRepositoryModel> activeRepositories;
 
-        public VSGitExt(IAsyncServiceProvider asyncServiceProvider)
-            : this(asyncServiceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory(), ThreadHelper.JoinableTaskContext)
+        public VSGitExt(IServiceProvider serviceProvider)
+            : this(serviceProvider, new VSUIContextFactory(), new LocalRepositoryModelFactory(), ThreadHelper.JoinableTaskContext)
         {
         }
 
-        public VSGitExt(IAsyncServiceProvider asyncServiceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory,
+        public VSGitExt(IServiceProvider serviceProvider, IVSUIContextFactory factory, ILocalRepositoryModelFactory repositoryFactory,
             JoinableTaskContext joinableTaskContext)
         {
             JoinableTaskCollection = joinableTaskContext.CreateCollection();
             JoinableTaskCollection.DisplayName = nameof(VSGitExt);
             JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
 
-            this.asyncServiceProvider = asyncServiceProvider;
+            this.serviceProvider = serviceProvider;
             this.repositoryFactory = repositoryFactory;
 
             // Start with empty array until we have a chance to initialize.
@@ -133,9 +133,8 @@ namespace GitHub.VisualStudio.Base
         async Task<T> GetServiceAsync<T>()
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            return (T)await asyncServiceProvider.GetServiceAsync(typeof(T));
+            return (T)serviceProvider.GetService(typeof(T));
         }
-
 
         public event Action ActiveRepositoriesChanged;
 

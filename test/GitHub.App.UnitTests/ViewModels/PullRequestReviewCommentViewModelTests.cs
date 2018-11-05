@@ -56,7 +56,7 @@ namespace GitHub.App.UnitTests.ViewModels
                 var commentService = Substitute.For<ICommentService>();
                 var target = new PullRequestReviewCommentViewModel(commentService);
 
-                await target.InitializeAsPlaceholderAsync(session, thread, false);
+                await target.InitializeAsPlaceholderAsync(session, thread, false, false);
 
                 Assert.That(target.BeginEdit.CanExecute(new object()), Is.True);
             }
@@ -100,7 +100,7 @@ namespace GitHub.App.UnitTests.ViewModels
                 var commentService = Substitute.For<ICommentService>();
                 var target = new PullRequestReviewCommentViewModel(commentService);
 
-                await target.InitializeAsPlaceholderAsync(session, thread, false);
+                await target.InitializeAsPlaceholderAsync(session, thread, false, false);
 
                 Assert.That(target.Delete.CanExecute(new object()), Is.False);
             }

@@ -76,5 +76,11 @@ namespace GitHub.VisualStudio.Views
                 GetBrowser().OpenUrl(uri);
             }
         }
+
+        private void body_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var textBox = (PromptTextBox)sender;
+            textBox.SelectAll();
+        }
     }
 }
