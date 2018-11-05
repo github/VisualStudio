@@ -17,7 +17,7 @@ namespace GitHub.ViewModels.Documents
     /// </summary>
     [Export(typeof(IPullRequestPageViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class PullRequestPageViewModel : PullRequestViewModelBase, IPullRequestPageViewModel, ICommentThreadViewModel
+    public class PullRequestPageViewModel : PullRequestViewModelBase, IPullRequestPageViewModel, IIssueishCommentThreadViewModel
     {
         readonly IViewViewModelFactory factory;
         readonly IPullRequestService service;
@@ -58,9 +58,6 @@ namespace GitHub.ViewModels.Documents
 
         /// <inheritdoc/>
         public ReactiveCommand<string, Unit> ShowCommit { get; }
-
-        /// <inheritdoc/>
-        IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
@@ -125,6 +122,11 @@ namespace GitHub.ViewModels.Documents
         }
 
         Task ICommentThreadViewModel.EditComment(string id, string body)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IIssueishCommentThreadViewModel.CloseIssueish(string body)
         {
             throw new NotImplementedException();
         }

@@ -10,12 +10,7 @@ namespace GitHub.ViewModels
     public interface ICommentThreadViewModel : IViewModel
     {
         /// <summary>
-        /// Gets the comments in the thread.
-        /// </summary>
-        IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
-
-        /// <summary>
-        /// Gets the current user under whos account new comments will be created.
+        /// Gets the current user under whose account new comments will be created.
         /// </summary>
         IActorViewModel CurrentUser { get; }
 

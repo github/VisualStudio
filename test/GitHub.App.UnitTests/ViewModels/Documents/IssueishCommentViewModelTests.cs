@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels;
 using GitHub.ViewModels.Documents;
 using NSubstitute;
 using NUnit.Framework;
@@ -40,10 +35,10 @@ namespace GitHub.App.UnitTests.ViewModels.Documents
             CommentModel comment,
             string closeCaption,
             ICommentService commentService = null,
-            ICommentThreadViewModel thread = null,
+            IIssueishCommentThreadViewModel thread = null,
             ActorModel currentUser = null)
         {
-            thread = thread ?? Substitute.For<ICommentThreadViewModel>();
+            thread = thread ?? Substitute.For<IIssueishCommentThreadViewModel>();
             currentUser = currentUser ?? new ActorModel { Login = "grokys" };
 
             var target = CreateTarget(commentService);

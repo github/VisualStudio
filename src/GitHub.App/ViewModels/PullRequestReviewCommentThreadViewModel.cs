@@ -17,6 +17,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestReviewCommentThreadViewModel : CommentThreadViewModel, IPullRequestReviewCommentThreadViewModel
     {
+        readonly ReactiveList<ICommentViewModel> comments = new ReactiveList<ICommentViewModel>();
         readonly IViewViewModelFactory factory;
         readonly ObservableAsPropertyHelper<bool> needsPush;
         IPullRequestSessionFile file;
@@ -39,6 +40,9 @@ namespace GitHub.ViewModels
                 (sha, isNew) => isNew && sha == null)
                 .ToProperty(this, x => x.NeedsPush);
         }
+
+        /// <inheritdoc/>
+        public IReactiveList<ICommentViewModel> Comments => comments;
 
         /// <inheritdoc/>
         public IPullRequestSession Session { get; private set; }
@@ -64,6 +68,9 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         public bool NeedsPush => needsPush.Value;
+
+        /// <inheritdoc/>
+        IReadOnlyReactiveList<ICommentViewModel> IPullRequestReviewCommentThreadViewModel.Comments => comments;
 
         /// <inheritdoc/>
         public async Task InitializeAsync(

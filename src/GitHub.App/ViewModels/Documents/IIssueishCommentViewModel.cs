@@ -37,7 +37,7 @@ namespace GitHub.ViewModels.Documents
         /// close the issue/pr from this comment.
         /// </param>
         Task InitializeAsync(
-            ICommentThreadViewModel thread,
+            IIssueishCommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
             string closeCaption);

@@ -26,6 +26,9 @@ namespace GitHub.ViewModels.Documents
         public IssueishCommentViewModel(ICommentService commentService)
             : base(commentService)
         {
+            CloseIssueish = ReactiveCommand.CreateFromTask(
+                DoCloseIssueish,
+                this.WhenAnyValue(x => x.CanCloseIssueish));
         }
 
         /// <inheritdoc/>
@@ -39,7 +42,7 @@ namespace GitHub.ViewModels.Documents
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
-            ICommentThreadViewModel thread,
+            IIssueishCommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
             string closeCaption)
@@ -59,6 +62,11 @@ namespace GitHub.ViewModels.Documents
                     .Select(x => string.IsNullOrWhiteSpace(x) ? closeCaption : Resources.CloseAndComment)
                     .ToProperty(this, x => x.CloseIssueishCaption);
             }
+        }
+
+        Task DoCloseIssueish()
+        {
+            return Task.CompletedTask;
         }
     }
 }

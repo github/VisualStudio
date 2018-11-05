@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GitHub.Models;
 
 namespace GitHub.ViewModels.Documents
 {
@@ -10,16 +9,9 @@ namespace GitHub.ViewModels.Documents
     public interface IIssueishCommentThreadViewModel : ICommentThreadViewModel
     {
         /// <summary>
-        /// Initializes the view model with data.
+        /// Called by a comment in the thread to close the issue or pull request.
         /// </summary>
-        /// <param name="currentUser">The currently logged in user.</param>
-        /// <param name="model">The issue or pull request model.</param>
-        /// <param name="addPlaceholder">
-        /// Whether to add a placeholder comment at the end of the thread.
-        /// </param>
-        Task InitializeAsync(
-            ActorModel currentUser,
-            IssueishDetailModel model,
-            bool addPlaceholder);
+        /// <param name="body">The body of a comment to submit before closing.</param>
+        Task CloseIssueish(string body);
     }
 }

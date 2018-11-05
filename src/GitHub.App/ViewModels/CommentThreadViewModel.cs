@@ -11,8 +11,6 @@ namespace GitHub.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        readonly ReactiveList<ICommentViewModel> comments = new ReactiveList<ICommentViewModel>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
@@ -33,13 +31,7 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
-        public IReactiveList<ICommentViewModel> Comments => comments;
-
-        /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; private set; }
-
-        /// <inheritdoc/>
-        IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => comments;
 
         /// <inheritdoc/>
         public abstract Task PostComment(string body);
