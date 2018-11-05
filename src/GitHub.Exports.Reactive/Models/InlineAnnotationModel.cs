@@ -2,8 +2,10 @@
 
 namespace GitHub.Models
 {
-    /// <inheritdoc />
-    public class InlineAnnotationModel: IInlineAnnotationModel
+    /// <summary>
+    /// Represents an inline annotation on an <see cref="IPullRequestSessionFile"/>.
+    /// </summary>
+    public class InlineAnnotationModel
     {
         private CheckRunModel checkRun;
         private CheckRunAnnotationModel annotation;
@@ -20,14 +22,18 @@ namespace GitHub.Models
             this.checkRun = checkRun;
             this.annotation = annotation;
         }
-
-        /// <inheritdoc />
+        /// Gets the start line of the annotation.
+        /// </summary>
         public int StartLine => annotation.StartLine;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the end line of the annotation.
+        /// </summary>
         public int EndLine => annotation.EndLine;
-
-        /// <inheritdoc />
+        
+        /// <summary>
+        /// Gets the annotation level.
+        /// </summary>
         public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel;
     }
 }
