@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -810,6 +810,8 @@ namespace GitHub.InlineReviews.Services
                                                       }).ToList()
                                               }).ToList(),
                                           ApplicationName = suite.App != null ? suite.App.Name : "Private App"
+                                          ApplicationSlug = suite.App != null ? suite.App.Slug : "private-app",
+                                          ApplicationLogoUrl = suite.App != null ? suite.App.LogoUrl(null) : null,
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -819,6 +821,7 @@ namespace GitHub.InlineReviews.Services
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
                                               Description = statusContext.Description,
+                                              AvatarUrl = statusContext.Creator.AvatarUrl(null)
                                           }).ToList()
                                       ).SingleOrDefault()
                               }

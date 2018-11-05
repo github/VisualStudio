@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
@@ -17,6 +18,8 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
     {
+        const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+
         private readonly IUsageTracker usageTracker;
 
         /// <summary>
@@ -52,15 +55,22 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
                 pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(statusModel.TargetUrl) ? new Uri(statusModel.TargetUrl) : null;
+                pullRequestCheckViewModel.AvatarUrl = statusModel.AvatarUrl ?? DefaultAvatar;
+                pullRequestCheckViewModel.Avatar = statusModel.AvatarUrl != null
+                    ? new BitmapImage(new Uri(statusModel.AvatarUrl))
+                    : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                 return pullRequestCheckViewModel;
             }) ?? Array.Empty<PullRequestCheckViewModel>();
 
-            var checks = pullRequest.CheckSuites?.SelectMany(checkSuiteModel => checkSuiteModel.CheckRuns)
-                .Select(checkRunModel =>
+            var checks = 
+                pullRequest.CheckSuites?
+                    .SelectMany(checkSuite => checkSuite.CheckRuns
+                        .Select(checkRun => new { checkSuiteModel = checkSuite, checkRun}))
+                .Select(arg =>
                 {
                     PullRequestCheckStatus checkStatus;
-                    switch (checkRunModel.Status)
+                    switch (arg.checkRun.Status)
                     {
                         case CheckStatusState.Requested:
                         case CheckStatusState.Queued:
@@ -69,7 +79,7 @@ namespace GitHub.ViewModels.GitHubPane
                             break;
 
                         case CheckStatusState.Completed:
-                            switch (checkRunModel.Conclusion)
+                            switch (arg.checkRun.Conclusion)
                             {
                                 case CheckConclusionState.Success:
                                     checkStatus = PullRequestCheckStatus.Success;
@@ -94,12 +104,16 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
-                    pullRequestCheckViewModel.CheckRunId = checkRunModel.DatabaseId;
-                    pullRequestCheckViewModel.HasAnnotations = checkRunModel.Annotations?.Any() ?? false;
-                    pullRequestCheckViewModel.Title = checkRunModel.Name;
-                    pullRequestCheckViewModel.Description = checkRunModel.Summary;
+                    pullRequestCheckViewModel.CheckRunId = arg.checkRun.DatabaseId;
+                    pullRequestCheckViewModel.HasAnnotations = arg.checkRun.Annotations?.Any() ?? false;
+                    pullRequestCheckViewModel.Title = arg.checkRun.Name;
+                    pullRequestCheckViewModel.Description = arg.checkRun.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
-                    pullRequestCheckViewModel.DetailsUrl = new Uri(checkRunModel.DetailsUrl);
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
+                    pullRequestCheckViewModel.AvatarUrl = arg.checkSuiteModel.ApplicationLogoUrl ?? DefaultAvatar;
+                    pullRequestCheckViewModel.Avatar = arg.checkSuiteModel.ApplicationLogoUrl != null
+                        ? new BitmapImage(new Uri(arg.checkSuiteModel.ApplicationLogoUrl))
+                        : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                     return pullRequestCheckViewModel;
                 }) ?? Array.Empty<PullRequestCheckViewModel>();
@@ -156,5 +170,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
+
+        public string AvatarUrl { get; private set; }
+
+        public BitmapImage Avatar { get; private set; }
     }
 }
