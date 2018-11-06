@@ -110,10 +110,8 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.Description = arg.checkRun.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
                     pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
-                    pullRequestCheckViewModel.AvatarUrl = arg.checkSuiteModel.ApplicationLogoUrl ?? DefaultAvatar;
-                    pullRequestCheckViewModel.Avatar = arg.checkSuiteModel.ApplicationLogoUrl != null
-                        ? new BitmapImage(new Uri(arg.checkSuiteModel.ApplicationLogoUrl))
-                        : AvatarProvider.CreateBitmapImage(DefaultAvatar);
+                    pullRequestCheckViewModel.AvatarUrl = DefaultAvatar;
+                    pullRequestCheckViewModel.Avatar = AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                     return pullRequestCheckViewModel;
                 }) ?? Array.Empty<PullRequestCheckViewModel>();
