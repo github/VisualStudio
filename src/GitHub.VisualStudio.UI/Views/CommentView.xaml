@@ -37,7 +37,7 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <Border BorderBrush="{DynamicResource VsBrush.ButtonBorder}" BorderThickness="1" HorizontalAlignment="Stretch" Margin="0 0 0 4">
+        <Border BorderBrush="{DynamicResource VsBrush.ButtonBorder}" BorderThickness="0 1 0 0" HorizontalAlignment="Stretch">
             <Grid Background="{DynamicResource VsBrush.ToolWindowBackground}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="4" />
@@ -69,7 +69,7 @@
                                                     Height="16" 
                                                     Account="{Binding Author}"/>
 
-                            <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
+                            <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="SemiBold" Text="{Binding Author.Login}" Margin="4 0"/>
                             <ui:GitHubActionLink Content="{Binding UpdatedAt, Converter={ui:DurationToStringConverter}}"
                                                  Command="{Binding OpenOnGitHub}"
                                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
@@ -104,7 +104,7 @@
                         </DockPanel>
 
                         <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
-                                                Margin="0 2 0 0"
+                                                Margin="20 2 0 0"
                                                 Foreground="{DynamicResource VsBrush.WindowText}"
                                                 Markdown="{Binding Body}"/>
 
