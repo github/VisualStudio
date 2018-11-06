@@ -92,7 +92,7 @@ namespace GitHub.InlineReviews.Tags
 
                     var spanThreadsByLine = spanThreads.ToDictionary(model => model.LineNumber);
 
-                    Dictionary<int, IInlineAnnotationModel[]> spanAnnotationsByLine = null;
+                    Dictionary<int, InlineAnnotationModel[]> spanAnnotationsByLine = null;
                     if (side == DiffSide.Right)
                     {
                         var spanAnnotations = file.InlineAnnotations.Where(x =>
@@ -121,7 +121,7 @@ namespace GitHub.InlineReviews.Tags
                             }
                         }
 
-                        IInlineAnnotationModel[] annotations = null;
+                        InlineAnnotationModel[] annotations = null;
                         spanAnnotationsByLine?.TryGetValue(line, out annotations);
 
                         if (thread != null || annotations != null)

@@ -30,6 +30,6 @@ namespace GitHub.InlineReviews.Tags
         /// <summary>
         /// Gets a list of models holding details of the annotations at the tagged line.
         /// </summary>
-        public IReadOnlyList<IInlineAnnotationModel> Annotations { get; set; }
+        public IReadOnlyList<InlineAnnotationModel> Annotations { get; set; }
     }
 }
