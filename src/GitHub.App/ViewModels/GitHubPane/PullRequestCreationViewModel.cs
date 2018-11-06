@@ -149,7 +149,7 @@ namespace GitHub.ViewModels.GitHubPane
             SourceBranch = gitService.GetBranch(repository);
 
             var obs = modelService.ApiClient.GetRepository(repository.Owner, repository.Name)
-                .Select(r => new RemoteRepositoryModel(r))
+                .Select(r => CreateRemoteRepositoryModel(r))
                 .PublishLast();
             disposables.Add(obs.Connect());
             var githubObs = obs;
@@ -194,6 +194,21 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => draftStore.UpdateDraft(draftKey, string.Empty, x));
 
             Initialized = true;
+        }
+
+        static RemoteRepositoryModel CreateRemoteRepositoryModel(Repository repository)
+        {
+            var ownerAccount = new Models.Account(repository.Owner);
+            var parent = repository.Parent != null ? CreateRemoteRepositoryModel(repository.Parent) : null;
+            var model = new RemoteRepositoryModel(repository.Id, repository.Name, repository.CloneUrl,
+                repository.Private, repository.Fork, ownerAccount, parent, repository.DefaultBranch);
+
+            if (parent != null)
+            {
+                parent.DefaultBranch.DisplayName = parent.DefaultBranch.Id;
+            }
+
+            return model;
         }
 
         async Task LoadInitialState(string draftKey)

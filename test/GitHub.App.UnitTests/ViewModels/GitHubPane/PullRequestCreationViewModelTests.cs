@@ -93,7 +93,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
             githubRepoParent = CreateRepository(targetRepoOwner, repoName, id: 1);
         var githubRepo = CreateRepository(sourceRepoOwner, repoName, id: 2, parent: githubRepoParent);
         var sourceBranch = new BranchModel(sourceBranchName, activeRepo);
-        var sourceRepo = new RemoteRepositoryModel(githubRepo);
+        var sourceRepo = CreateRemoteRepositoryModel(githubRepo);
         var targetRepo = targetRepoOwner == sourceRepoOwner ? sourceRepo : sourceRepo.Parent;
         var targetBranch = targetBranchName != targetRepo.DefaultBranch.Name ? new BranchModel(targetBranchName, targetRepo) : targetRepo.DefaultBranch;
 
@@ -123,6 +123,21 @@ public class PullRequestCreationViewModelTests : TestBaseClass
             ApiClient = api,
             ModelService = ms
         };
+    }
+
+    static RemoteRepositoryModel CreateRemoteRepositoryModel(Repository repository)
+    {
+        var ownerAccount = new GitHub.Models.Account(repository.Owner);
+        var parent = repository.Parent != null ? CreateRemoteRepositoryModel(repository.Parent) : null;
+        var model = new RemoteRepositoryModel(repository.Id, repository.Name, repository.CloneUrl,
+            repository.Private, repository.Fork, ownerAccount, parent, repository.DefaultBranch);
+
+        if (parent != null)
+        {
+            parent.DefaultBranch.DisplayName = parent.DefaultBranch.Id;
+        }
+
+        return model;
     }
 
     [Test]

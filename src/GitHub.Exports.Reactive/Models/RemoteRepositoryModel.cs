@@ -1,6 +1,6 @@
-﻿using GitHub.Primitives;
-using System;
+﻿using System;
 using System.Globalization;
+using GitHub.Primitives;
 using GitHub.Extensions;
 using GitHub.Collections;
 
@@ -27,7 +27,9 @@ namespace GitHub.Models
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
         /// <param name="parent">The parent repository if this repository is a fork.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount, RemoteRepositoryModel parent)
+        /// <param name="defaultBranchName">The default branch name (or "master" if undefined).</param>
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount,
+            RemoteRepositoryModel parent, string defaultBranchName = "master")
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -37,29 +39,8 @@ namespace GitHub.Models
             OwnerAccount = ownerAccount;
             IsFork = isFork;
             SetIcon(isPrivate, isFork);
-            // this is an assumption, we'd have to load the repo information from octokit to know for sure
-            // probably not worth it for this ctor
-            DefaultBranch = new BranchModel("master", this);
+            DefaultBranch = new BranchModel(defaultBranchName, this);
             Parent = parent;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
-        /// </summary>
-        /// <param name="repository">The source octokit repository.</param>
-        public RemoteRepositoryModel(Octokit.Repository repository)
-            : base(repository.Name, repository.CloneUrl)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-
-            Id = repository.Id;
-            IsFork = repository.Fork;
-            SetIcon(repository.Private, IsFork);
-            OwnerAccount = new Account(repository.Owner);
-            DefaultBranch = new BranchModel(repository.DefaultBranch, this);
-            Parent = repository.Parent != null ? new RemoteRepositoryModel(repository.Parent) : null;
-            if (Parent != null)
-                Parent.DefaultBranch.DisplayName = Parent.DefaultBranch.Id;
         }
 
         #region Equality Things

@@ -107,7 +107,22 @@ namespace GitHub.Services
         public IObservable<RemoteRepositoryModel> GetForks(RepositoryModel repository)
         {
             return ApiClient.GetForks(repository.Owner, repository.Name)
-                .Select(x => new RemoteRepositoryModel(x));
+                .Select(x => CreateRemoteRepositoryModel(x));
+        }
+
+        static RemoteRepositoryModel CreateRemoteRepositoryModel(Repository repository)
+        {
+            var ownerAccount = new Models.Account(repository.Owner);
+            var parent = repository.Parent != null ? CreateRemoteRepositoryModel(repository.Parent) : null;
+            var model = new RemoteRepositoryModel(repository.Id, repository.Name, repository.CloneUrl,
+                repository.Private, repository.Fork, ownerAccount, parent, repository.DefaultBranch);
+
+            if (parent != null)
+            {
+                parent.DefaultBranch.DisplayName = parent.DefaultBranch.Id;
+            }
+
+            return model;
         }
 
         IObservable<LicenseCacheItem> GetLicensesFromApi()
