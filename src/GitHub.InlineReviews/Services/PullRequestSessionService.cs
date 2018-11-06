@@ -98,7 +98,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+        public IReadOnlyList<InlineAnnotationModel> BuildAnnotations(
             PullRequestDetailModel pullRequest,
             string relativePath)
         {

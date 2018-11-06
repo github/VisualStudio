@@ -25,7 +25,7 @@ namespace GitHub.InlineReviews.Models
         IReadOnlyList<DiffChunk> diff;
         string commitSha;
         IReadOnlyList<IInlineCommentThreadModel> inlineCommentThreads;
-        IReadOnlyList<IInlineAnnotationModel> inlineAnnotations;
+        IReadOnlyList<InlineAnnotationModel> inlineAnnotations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionFile"/> class.
@@ -101,7 +101,7 @@ namespace GitHub.InlineReviews.Models
         public IObservable<IReadOnlyList<Tuple<int, DiffSide>>> LinesChanged => linesChanged;
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineAnnotationModel> InlineAnnotations
+        public IReadOnlyList<InlineAnnotationModel> InlineAnnotations
         {
             get
             {
@@ -109,8 +109,8 @@ namespace GitHub.InlineReviews.Models
             }
             set
             {
-                var lines = (inlineAnnotations ?? Enumerable.Empty<IInlineAnnotationModel>())?
-                    .Concat(value ?? Enumerable.Empty<IInlineAnnotationModel>())
+                var lines = (inlineAnnotations ?? Enumerable.Empty<InlineAnnotationModel>())?
+                    .Concat(value ?? Enumerable.Empty<InlineAnnotationModel>())
                     .Select(x => Tuple.Create(x.StartLine, DiffSide.Right))
                     .Where(x => x.Item1 >= 0)
                     .Distinct()

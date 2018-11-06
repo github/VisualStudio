@@ -57,7 +57,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the inline annotations for the file.
         /// </summary>
-        IReadOnlyList<IInlineAnnotationModel> InlineAnnotations { get; }
+        IReadOnlyList<InlineAnnotationModel> InlineAnnotations { get; }
 
         /// <summary>
         /// Gets an observable that is raised with a collection of 0-based line numbers when the

@@ -52,9 +52,9 @@ namespace GitHub.InlineReviews.Services
         /// <param name="pullRequest">The pull request session.</param>
         /// <param name="relativePath">The relative path to the file.</param>
         /// <returns>
-        /// A collection of <see cref="IInlineAnnotationModel"/> objects.
+        /// A collection of <see cref="InlineAnnotationModel"/> objects.
         /// </returns>
-        IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+        IReadOnlyList<InlineAnnotationModel> BuildAnnotations(
             PullRequestDetailModel pullRequest,
             string relativePath);
 
