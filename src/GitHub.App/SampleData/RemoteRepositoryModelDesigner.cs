@@ -8,35 +8,16 @@ namespace GitHub.SampleData
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes")]
     public class RemoteRepositoryModelDesigner : RemoteRepositoryModel
     {
-        public UriString CloneUrl { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public BranchModel DefaultBranch { get; set; }
-        public Octicon Icon { get; set; }
-        public long Id { get; set; }
-        public bool IsFork { get; set; }
-        public string Name { get; set; }
-        public string Owner { get; set; }
-        public IAccount OwnerAccount { get; set; }
-        public RemoteRepositoryModel Parent { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
-
-        public int CompareTo(RemoteRepositoryModel other)
-        {
-            return 0;
-        }
-
-        public void CopyFrom(RemoteRepositoryModel other)
-        {
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
-        public bool Equals(RemoteRepositoryModel other)
-        {
-            return false;
-        }
-
-        public void SetIcon(bool isPrivate, bool isFork)
-        {
-        }
+        public new UriString CloneUrl { get; set; }
+        public new DateTimeOffset CreatedAt { get; set; }
+        public new BranchModel DefaultBranch { get; set; }
+        public new Octicon Icon { get; set; }
+        public new long Id { get; set; }
+        public new bool IsFork { get; set; }
+        public new string Name { get; set; }
+        public new string Owner { get; set; }
+        public new IAccount OwnerAccount { get; set; }
+        public new RemoteRepositoryModel Parent { get; set; }
+        public new DateTimeOffset UpdatedAt { get; set; }
     }
 }

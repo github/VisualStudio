@@ -59,6 +59,5 @@ namespace GitHub.Models
             CloneUrl,
             LocalPath,
             GetHashCode());
-
     }
 }

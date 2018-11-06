@@ -12,11 +12,6 @@ namespace GitHub.Models
     public class RemoteRepositoryModel : RepositoryModel, ICopyable<RemoteRepositoryModel>,
         IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
-        protected RemoteRepositoryModel()
-        {
-            // Used by designer
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
         /// </summary>
@@ -41,6 +36,13 @@ namespace GitHub.Models
             SetIcon(isPrivate, isFork);
             DefaultBranch = new BranchModel(defaultBranchName, this);
             Parent = parent;
+        }
+
+        /// <summary>
+        /// This is used by <see cref="RemoteRepositoryModelDesigner"/>.
+        /// </summary>
+        protected RemoteRepositoryModel()
+        {
         }
 
         #region Equality Things
