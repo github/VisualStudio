@@ -18,7 +18,7 @@ install:
 
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
-- choco install --no-progress BCC-MSBuildLog --version 0.1.5 --pre 
+- choco install --no-progress BCC-MSBuildLog --version 0.1.6-report-writing0002 --pre 
 - choco install --no-progress BCC-Submission --version 0.1.3 --pre 
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
