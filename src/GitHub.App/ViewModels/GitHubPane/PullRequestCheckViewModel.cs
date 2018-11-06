@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 
@@ -55,10 +55,6 @@ namespace GitHub.ViewModels.GitHubPane
                 pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
                 pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(statusModel.TargetUrl) ? new Uri(statusModel.TargetUrl) : null;
-                pullRequestCheckViewModel.AvatarUrl = statusModel.AvatarUrl ?? DefaultAvatar;
-                pullRequestCheckViewModel.Avatar = statusModel.AvatarUrl != null
-                    ? new BitmapImage(new Uri(statusModel.AvatarUrl))
-                    : AvatarProvider.CreateBitmapImage(DefaultAvatar);
 
                 return pullRequestCheckViewModel;
             }) ?? Array.Empty<PullRequestCheckViewModel>();
@@ -110,9 +106,6 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.Description = arg.checkRun.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
                     pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
-                    pullRequestCheckViewModel.AvatarUrl = DefaultAvatar;
-                    pullRequestCheckViewModel.Avatar = AvatarProvider.CreateBitmapImage(DefaultAvatar);
-
                     return pullRequestCheckViewModel;
                 }) ?? Array.Empty<PullRequestCheckViewModel>();
 
@@ -168,9 +161,5 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
-
-        public string AvatarUrl { get; private set; }
-
-        public BitmapImage Avatar { get; private set; }
     }
 }

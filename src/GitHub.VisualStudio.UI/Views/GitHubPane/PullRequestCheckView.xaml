@@ -39,7 +39,11 @@
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
-        <Image Grid.Column="1" Source="{Binding Avatar}" Height="16" Width="16" />
+
+	<!--
+        <Image Grid.Column="1" Source="{Binding AvatarUrl}" Height="16" Width="16" />
+        -->
+
         <Label Grid.Column="2" Foreground="{DynamicResource VsBrush.WindowText}" Content="{Binding Title}"/>
         <!--
             <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />

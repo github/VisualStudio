@@ -20,6 +20,5 @@ namespace GitHub.Models
 
         public string ApplicationName { get; set; }
         public string ApplicationSlug { get; set; }
-        public string ApplicationLogoUrl { get; set; }
     }
 }

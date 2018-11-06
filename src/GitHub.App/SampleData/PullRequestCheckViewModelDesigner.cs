@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
@@ -17,10 +16,6 @@ namespace GitHub.SampleData
         public PullRequestCheckStatus Status { get; set; } = PullRequestCheckStatus.Failure;
 
         public Uri DetailsUrl { get; set; } = new Uri("http://github.com");
-
-        public string AvatarUrl { get; set; } = "https://avatars1.githubusercontent.com/u/417571?s=88&v=4";
-
-        public BitmapImage Avatar { get; set; } = null;
 
         public ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; set; } = null;
 

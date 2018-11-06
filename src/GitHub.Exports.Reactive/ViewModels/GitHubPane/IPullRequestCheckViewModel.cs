@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -50,10 +49,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a flag to show this check run has annotations.
         /// </summary>
         bool HasAnnotations { get; }
-
-        string AvatarUrl { get; }
-
-        BitmapImage Avatar { get; }
     }
 
     public enum PullRequestCheckStatus

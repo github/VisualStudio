@@ -810,8 +810,7 @@ namespace GitHub.InlineReviews.Services
                                                       }).ToList()
                                               }).ToList(),
                                           ApplicationName = suite.App != null ? suite.App.Name : "Private App",
-                                          ApplicationSlug = suite.App != null ? suite.App.Slug : "private-app",
-                                          ApplicationLogoUrl = suite.App != null ? suite.App.LogoUrl(null) : null,
+                                          ApplicationSlug = suite.App != null ? suite.App.Slug : "private-app"
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -820,8 +819,7 @@ namespace GitHub.InlineReviews.Services
                                               State = statusContext.State.FromGraphQl(),
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
-                                              Description = statusContext.Description,
-                                              AvatarUrl = statusContext.Creator.AvatarUrl(null)
+                                              Description = statusContext.Description
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
