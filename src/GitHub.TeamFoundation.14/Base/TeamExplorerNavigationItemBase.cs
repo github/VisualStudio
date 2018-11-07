@@ -41,12 +41,6 @@ namespace GitHub.VisualStudio.Base
 
             ActiveRepo = holder.TeamExplorerContext.ActiveRepository;
             holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
-            holder.TeamExplorerContext.StatusChanged += TeamExplorerContext_StatusChanged;
-        }
-
-        void TeamExplorerContext_StatusChanged(object sender, EventArgs e)
-        {
-            UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
         }
 
         void TeamExplorerContext_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -103,7 +97,6 @@ namespace GitHub.VisualStudio.Base
         void Unsubscribe()
         {
             holder.TeamExplorerContext.PropertyChanged -= TeamExplorerContext_PropertyChanged;
-            holder.TeamExplorerContext.StatusChanged -= TeamExplorerContext_StatusChanged; ;
         }
 
         bool disposed;
