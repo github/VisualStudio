@@ -25,7 +25,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         string title;
         string checkSuiteName;
         string checkRunName;
-        IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> annotationsDictionary;
+        IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> annotationsDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
@@ -105,7 +105,7 @@ namespace GitHub.App.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref checkRunName, value); }
         }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> AnnotationsDictionary
+        public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary
         {
             get { return annotationsDictionary; }
             private set { this.RaiseAndSetIfChanged(ref annotationsDictionary, value); }
@@ -131,8 +131,11 @@ namespace GitHub.App.ViewModels.GitHubPane
                     .GroupBy(annotation => annotation.Path)
                     .ToDictionary(
                         grouping => grouping.Key,
-                        grouping => (IReadOnlyList<IPullRequestAnnotationItemViewModel>) grouping
-                            .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService)));
+                        grouping => grouping
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService))
+                            .Cast<IPullRequestAnnotationItemViewModel>()
+                            .ToArray()
+                        );
             }
             finally
             {

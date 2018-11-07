@@ -20,8 +20,8 @@ namespace GitHub.SampleData
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public string PullRequestTitle { get; } = "Fixing stuff in this PR";
         public string CheckSuiteName { get; } = "Awesome Check Suite";
-        public IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> AnnotationsDictionary { get; }
-            = new Dictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>>
+        public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary { get; }
+            = new Dictionary<string, IPullRequestAnnotationItemViewModel[]>
             {
                 {
                     "asdf/asdf.cs",
