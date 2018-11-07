@@ -110,7 +110,7 @@
                             </Style>
                         </TextBlock.Style>
                         <imaging:CrispImage Width="10" Height="10" 
-                                            Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Margin="-2 0" />
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Margin="-2 0" />
                         <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationNotice, ElementName=root}"
                                    CommandParameter="{Binding}">
                             <Run Text="{Binding AnnotationNoticeCount, Mode=OneWay}"/>
