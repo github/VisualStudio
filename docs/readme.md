@@ -8,6 +8,6 @@ Get GitHub for Visual Studio set up to bring the GitHub flow to Visual Studio. A
 
 Use GitHub for Visual Studio to manage your projects and work with pull requests.
 
-### [Developing GitHub for Visual Studio]
+### [Developing GitHub for Visual Studio](developer/readme.md)
 
 Documentation for hacking on GitHub for Visual Studio.
