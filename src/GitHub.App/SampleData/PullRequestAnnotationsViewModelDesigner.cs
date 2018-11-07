@@ -45,7 +45,7 @@ namespace GitHub.SampleData
                         {
                             Annotation = new CheckRunAnnotationModel
                             {
-                                AnnotationLevel = CheckAnnotationLevel.Error,
+                                AnnotationLevel = CheckAnnotationLevel.Failure,
                                 StartLine = 3,
                                 EndLine = 4,
                                 Path = "asdf/asdf.cs",

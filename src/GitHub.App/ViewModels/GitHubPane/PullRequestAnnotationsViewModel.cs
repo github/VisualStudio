@@ -128,7 +128,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 CheckRunName = checkSuiteRun.checkRun.Name;
 
                 AnnotationsDictionary = checkSuiteRun.checkRun.Annotations
-                    .GroupBy(model => model.Path)
+                    .GroupBy(annotation => annotation.Path)
                     .ToDictionary(
                         group => group.Key,
                         group => (IReadOnlyList<IPullRequestAnnotationItemViewModel>) group
