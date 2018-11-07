@@ -105,13 +105,12 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateRepo(LocalRepositoryModel repo)
         {
-            var changed = ActiveRepo != repo;
             ActiveRepo = repo;
-            RepoChanged(changed);
+            RepoChanged();
             Invalidate();
         }
 
-        protected virtual void RepoChanged(bool changed)
+        protected virtual void RepoChanged()
         {
             var repo = ActiveRepo;
             if (repo != null)
