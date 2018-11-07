@@ -111,7 +111,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             IViewViewModelFactory factory = null,
             IPullRequestSession session = null,
             IPullRequestSessionFile file = null,
-            PullRequestReviewModel review = null,
             IEnumerable<InlineCommentModel> comments = null,
             bool newThread = false)
         {
@@ -119,7 +118,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             factory = factory ?? CreateFactory();
             session = session ?? CreateSession();
             file = file ?? CreateFile();
-            review = review ?? new PullRequestReviewModel();
             comments = comments ?? CreateComments();
 
             var result = new PullRequestReviewCommentThreadViewModel(draftStore, factory);
@@ -134,7 +132,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 thread.Comments.Returns(comments.ToList());
                 thread.LineNumber.Returns(10);
 
-                await result.InitializeAsync(session, file, review, thread, true);
+                await result.InitializeAsync(session, file, thread, true);
             }
 
             return result;
