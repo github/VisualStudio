@@ -20,46 +20,65 @@ namespace GitHub.SampleData
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public string PullRequestTitle { get; } = "Fixing stuff in this PR";
         public string CheckSuiteName { get; } = "Awesome Check Suite";
+        public IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> AnnotationsDictionary { get; }
+            = new Dictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>>
+            {
+                {
+                    "asdf/asdf.cs",
+                    new IPullRequestAnnotationItemViewModel[] 
+                    {
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Warning,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "asdf/asdf.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                            IsFileInPullRequest = true
+                        },
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Error,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "asdf/asdf.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                            IsFileInPullRequest = true
+                        },
+                    }
+                },
+                {
+                    "blah.cs",
+                    new IPullRequestAnnotationItemViewModel[] 
+                    {
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Notice,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "blah.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                        }
+                    }
+                },
+            };
+
         public string CheckRunName { get; } = "Psuedo Check Run";
-        public IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; } = new[]
-        {
-            new PullRequestAnnotationItemViewModelDesigner{
-                Annotation = new CheckRunAnnotationModel
-                {
-                    AnnotationLevel = CheckAnnotationLevel.Notice,
-                    StartLine = 3,
-                    EndLine = 4,
-                    Path = "asdf/asdf.cs",
-                    Message = "; is expected",
-                    Title = "CS 12345"
-                },
-                IsExpanded = true,
-                IsFileInPullRequest = true
-            },
-            new PullRequestAnnotationItemViewModelDesigner{
-                Annotation = new CheckRunAnnotationModel
-                {
-                    AnnotationLevel = CheckAnnotationLevel.Warning,
-                    StartLine = 3,
-                    EndLine = 4,
-                    Path = "asdf/asdf.cs",
-                    Message = "; is expected",
-                    Title = "CS 12345"
-                },
-                IsExpanded = true
-            },
-            new PullRequestAnnotationItemViewModelDesigner{
-                Annotation = new CheckRunAnnotationModel
-                {
-                    AnnotationLevel = CheckAnnotationLevel.Failure,
-                    StartLine = 3,
-                    EndLine = 4,
-                    Path = "blah.cs",
-                    Message = "; is expected",
-                    Title = "CS 12345"
-                }
-            }
-        };
 
         public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo,
             int pullRequestNumber, string checkRunId)
