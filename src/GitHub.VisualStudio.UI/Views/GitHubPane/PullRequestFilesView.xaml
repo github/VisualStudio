@@ -110,7 +110,7 @@
                             </Style>
                         </TextBlock.Style>
                         <ghfvs:OcticonImage Icon="alert" Height="10" Margin="-2 0"/>
-                                            Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Margin="-2 0" />
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Margin="-2 0" />
                         <Label Content="{Binding AnnotationNoticeCount}"></Label>
                     </TextBlock>
 
