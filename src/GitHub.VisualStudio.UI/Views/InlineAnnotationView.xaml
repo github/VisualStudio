@@ -13,7 +13,7 @@
         <ghfvs:InlineAnnotationViewModelDesigner />
     </d:DesignProperties.DataContext>
 
-    <Border BorderBrush="{DynamicResource VsBrush.ButtonBorder}" BorderThickness="1" HorizontalAlignment="Stretch" Margin="0 0 0 4">
+    <Border BorderBrush="{DynamicResource VsBrush.ScrollBarThumbBackground}" BorderThickness="0 0 0 1" HorizontalAlignment="Stretch" Margin="0 0 0 4">
         <Grid Background="{DynamicResource VsBrush.ToolWindowBackground}" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4" />

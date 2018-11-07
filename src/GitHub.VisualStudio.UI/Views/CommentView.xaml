@@ -37,7 +37,7 @@
 
     <Grid>
         <!-- Displays an existing comment-->
-        <Border BorderBrush="{DynamicResource VsBrush.ButtonBorder}" BorderThickness="0 1 0 0" HorizontalAlignment="Stretch">
+        <Border BorderBrush="{DynamicResource VsBrush.ScrollBarThumbBackground}" BorderThickness="0 1 0 0" HorizontalAlignment="Stretch">
             <Grid Background="{DynamicResource VsBrush.ToolWindowBackground}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="4" />
