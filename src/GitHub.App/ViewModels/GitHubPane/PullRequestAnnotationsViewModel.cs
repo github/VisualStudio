@@ -23,7 +23,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         string title;
         string checkSuiteName;
         string checkRunName;
-        IReadOnlyList<IPullRequestAnnotationItemViewModel> annotations;
+        IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> annotationsDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
@@ -101,11 +101,10 @@ namespace GitHub.App.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref checkRunName, value); }
         }
 
-        /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations
+        public IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> AnnotationsDictionary
         {
-            get { return annotations; }
-            private set { this.RaiseAndSetIfChanged(ref annotations, value); }
+            get { return annotationsDictionary; }
+            private set { this.RaiseAndSetIfChanged(ref annotationsDictionary, value); }
         }
 
         void Load(PullRequestDetailModel pullRequest)
@@ -123,14 +122,19 @@ namespace GitHub.App.ViewModels.GitHubPane
 
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
-                Annotations = checkSuiteRun.checkRun.Annotations
-                    .Select(annotation => new PullRequestAnnotationItemViewModel(annotation))
-                    .ToArray();
+
+                AnnotationsDictionary = checkSuiteRun.checkRun.Annotations
+                    .GroupBy(model => model.Path)
+                    .ToDictionary(
+                        annotation => annotation.Key,
+                        annotation => (IReadOnlyList<IPullRequestAnnotationItemViewModel>) annotation
+                            .Select(model => new PullRequestAnnotationItemViewModel(model)));
             }
             finally
             {
                 IsBusy = false;
             }
         }
+
     }
 }

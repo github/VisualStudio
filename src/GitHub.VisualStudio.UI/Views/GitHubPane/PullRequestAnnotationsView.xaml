@@ -27,9 +27,9 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
-                    <TextBlock FontSize="16" VerticalAlignment="Center">
+                <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
-                    </TextBlock>
+                </TextBlock>
                 <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
                         <Run>for</Run>
@@ -45,34 +45,43 @@
                 <StackPanel Orientation="Horizontal" Margin="0 4">
                 </StackPanel>
 
-                <ItemsControl ItemsSource="{Binding Annotations}">
+                <ItemsControl ItemsSource="{Binding AnnotationsDictionary}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+                                <Label Content="{Binding Key}"></Label>
 
-                                <Expander Margin="0 0 4 0"
-                                      Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                      IsExpanded="{Binding IsExpanded, Mode=OneTime}">
-                                    <Expander.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
-                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-                                            <TextBlock FontWeight="SemiBold" Margin="2 0">
-                                                <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Expander.Header>
-                                    <StackPanel Margin="21 4 0 4">
-                                        <TextBlock Margin="5 4 0 0">
-                                            <Run Text="{Binding Annotation.Path, Mode=OneWay}"/>
-                                            <Run FontWeight="SemiBold" Text="{Binding LineDescription, Mode=OneWay}"/>
-                                        </TextBlock>
-                                        <markdig:MarkdownViewer Margin="5 0 0 0" Markdown="{Binding Annotation.Message}"/>
-                                    </StackPanel>
-                                </Expander>
+                                <ItemsControl ItemsSource="{Binding Value}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+
+                                                <Expander Margin="0 0 4 0" Foreground="{DynamicResource GitHubVsToolWindowText}" IsExpanded="{Binding IsExpanded, Mode=OneTime}">
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                                                            <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                                                            <TextBlock FontWeight="SemiBold" Margin="2 0">
+                                                                <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Expander.Header>
+                                                    <StackPanel Margin="21 4 0 4">
+                                                        <TextBlock Margin="5 4 0 0">
+                                                            <Run Text="{Binding Annotation.Path, Mode=OneWay}"/>
+                                                            <Run FontWeight="SemiBold" Text="{Binding LineDescription, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                        <markdig:MarkdownViewer Margin="5 0 0 0" Markdown="{Binding Annotation.Message}"/>
+                                                    </StackPanel>
+                                                </Expander>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
+
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

@@ -52,14 +52,14 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
-        /// Gets the list of annotations.
-        /// </summary>
-        IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; }
-
-        /// <summary>
         /// Name of the Check Suite.
         /// </summary>
         string CheckSuiteName { get; }
+
+        /// <summary>
+        /// Gets a dictionary of annotations by file path.
+        /// </summary>
+        IReadOnlyDictionary<string, IReadOnlyList<IPullRequestAnnotationItemViewModel>> AnnotationsDictionary { get; }
 
         /// <summary>
         /// Initializes the view model.
