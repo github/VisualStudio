@@ -49,11 +49,11 @@ namespace GitHub.ViewModels.Dialog
             BackCommand = ReactiveCommand.Create(() => { });
         }
 
-        public IRepositoryModel SourceRepository { get; private set; }
+        public RepositoryModel SourceRepository { get; private set; }
 
         public IAccount DestinationAccount { get; private set; }
 
-        public IRepositoryModel DestinationRepository { get; private set; }
+        public RepositoryModel DestinationRepository { get; private set; }
 
         public ReactiveCommand<Unit, Repository> CreateFork { get; }
 
@@ -65,7 +65,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<Unit> Back => BackCommand;
 
-        public async Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             var modelService = await modelServiceFactory.CreateAsync(connection);
             apiClient = modelService.ApiClient;

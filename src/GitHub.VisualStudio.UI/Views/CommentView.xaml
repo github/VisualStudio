@@ -70,7 +70,6 @@
                                                     Account="{Binding Author}"/>
 
                             <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="SemiBold" Text="{Binding Author.Login}" Margin="4 0"/>
-
                             <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
                                                  Command="{Binding OpenOnGitHub}"
                                                  Foreground="{DynamicResource GitHubVsToolWindowText}"

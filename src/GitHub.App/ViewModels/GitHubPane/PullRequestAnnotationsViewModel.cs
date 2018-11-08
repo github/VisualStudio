@@ -44,7 +44,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner,
+        public async Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner,
             string repo, int pullRequestNumber, string checkRunId)
         {
             if (repo != localRepository.Name)
@@ -70,7 +70,7 @@ namespace GitHub.App.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public string RemoteRepositoryOwner { get; private set; }

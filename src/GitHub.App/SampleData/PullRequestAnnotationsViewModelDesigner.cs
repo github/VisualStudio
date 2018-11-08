@@ -13,7 +13,7 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public sealed class PullRequestAnnotationsViewModelDesigner : PanePageViewModelBase, IPullRequestAnnotationsViewModel
     {
-        public ILocalRepositoryModel LocalRepository { get; set; }
+        public LocalRepositoryModel LocalRepository { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public int PullRequestNumber { get; set; } = 123;
         public string CheckRunId { get; set; }
@@ -80,7 +80,8 @@ namespace GitHub.SampleData
 
         public string CheckRunName { get; } = "Psuedo Check Run";
 
-        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo,
+        public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner,
+            string repo,
             int pullRequestNumber, string checkRunId)
         {
             return Task.CompletedTask;

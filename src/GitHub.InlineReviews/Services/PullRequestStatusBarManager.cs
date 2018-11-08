@@ -80,7 +80,7 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
+        async Task RefreshCurrentSession(LocalRepositoryModel repository, IPullRequestSession session)
         {
             var showStatus = await IsDotComOrEnterpriseRepository(repository);
             if (!showStatus)
@@ -93,7 +93,7 @@ namespace GitHub.InlineReviews.Services
             ShowStatus(viewModel);
         }
 
-        async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
+        async Task<bool> IsDotComOrEnterpriseRepository(LocalRepositoryModel repository)
         {
             var cloneUrl = repository?.CloneUrl;
             if (cloneUrl == null)
