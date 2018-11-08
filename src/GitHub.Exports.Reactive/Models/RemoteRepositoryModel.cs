@@ -1,14 +1,15 @@
-﻿using GitHub.Primitives;
-using System;
+﻿using System;
 using System.Globalization;
+using GitHub.Primitives;
 using GitHub.Extensions;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {
     /// <summary>
     /// A repository read from the GitHub API.
     /// </summary>
-    public class RemoteRepositoryModel : RepositoryModel, IRemoteRepositoryModel,
+    public class RemoteRepositoryModel : RepositoryModel, ICopyable<RemoteRepositoryModel>,
         IEquatable<RemoteRepositoryModel>, IComparable<RemoteRepositoryModel>
     {
         /// <summary>
@@ -21,7 +22,9 @@ namespace GitHub.Models
         /// <param name="isFork">Whether the repository is a fork.</param>
         /// <param name="ownerAccount">The repository owner account.</param>
         /// <param name="parent">The parent repository if this repository is a fork.</param>
-        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork,  IAccount ownerAccount, IRemoteRepositoryModel parent)
+        /// <param name="defaultBranchName">The default branch name (or "master" if undefined).</param>
+        public RemoteRepositoryModel(long id, string name, UriString cloneUrl, bool isPrivate, bool isFork, IAccount ownerAccount,
+            RemoteRepositoryModel parent, string defaultBranchName = "master")
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
@@ -31,33 +34,19 @@ namespace GitHub.Models
             OwnerAccount = ownerAccount;
             IsFork = isFork;
             SetIcon(isPrivate, isFork);
-            // this is an assumption, we'd have to load the repo information from octokit to know for sure
-            // probably not worth it for this ctor
-            DefaultBranch = new BranchModel("master", this);
+            DefaultBranch = new BranchModel(defaultBranchName, this);
             Parent = parent;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RemoteRepositoryModel"/> class.
+        /// This is used by <see cref="RemoteRepositoryModelDesigner"/>.
         /// </summary>
-        /// <param name="repository">The source octokit repository.</param>
-        public RemoteRepositoryModel(Octokit.Repository repository)
-            : base(repository.Name, repository.CloneUrl)
+        protected RemoteRepositoryModel()
         {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-
-            Id = repository.Id;
-            IsFork = repository.Fork;
-            SetIcon(repository.Private, IsFork);
-            OwnerAccount = new Account(repository.Owner);
-            DefaultBranch = new BranchModel(repository.DefaultBranch, this);
-            Parent = repository.Parent != null ? new RemoteRepositoryModel(repository.Parent) : null;
-            if (Parent != null)
-                Parent.DefaultBranch.DisplayName = Parent.DefaultBranch.Id;
         }
 
-#region Equality Things
-        public void CopyFrom(IRemoteRepositoryModel other)
+        #region Equality Things
+        public void CopyFrom(RemoteRepositoryModel other)
         {
             if (!Equals(other))
                 throw new ArgumentException("Instance to copy from doesn't match this instance. this:(" + this + ") other:(" + other + ")", nameof(other));
@@ -77,23 +66,11 @@ namespace GitHub.Models
             return Equals(other);
         }
 
-        public bool Equals(IRemoteRepositoryModel other)
-        {
-            if (ReferenceEquals(this, other))
-                return true;
-            return other != null && Id == other.Id;
-        }
-
         public bool Equals(RemoteRepositoryModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Id == other.Id;
-        }
-
-        public int CompareTo(IRemoteRepositoryModel other)
-        {
-            return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
         public int CompareTo(RemoteRepositoryModel other)
@@ -124,7 +101,7 @@ namespace GitHub.Models
         {
             return !(lhs == rhs);
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Gets the account that is the ower of the repository.
@@ -154,12 +131,12 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the repository from which this repository was forked, if any.
         /// </summary>
-        public IRemoteRepositoryModel Parent { get; }
+        public RemoteRepositoryModel Parent { get; }
 
         /// <summary>
         /// Gets the default branch for the repository.
         /// </summary>
-        public IBranch DefaultBranch { get; }
+        public BranchModel DefaultBranch { get; }
 
         internal string DebuggerDisplay
         {

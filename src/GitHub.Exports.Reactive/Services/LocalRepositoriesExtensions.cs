@@ -16,14 +16,14 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repos">The local repositories object.</param>
         /// <param name="address">The address.</param>
-        public static IReactiveDerivedList<ILocalRepositoryModel> GetRepositoriesForAddress(
+        public static IReactiveDerivedList<LocalRepositoryModel> GetRepositoriesForAddress(
             this ILocalRepositories repos,
             HostAddress address)
         {
             return repos.Repositories.CreateDerivedCollection(
                 x => x,
                 x => x.CloneUrl != null && address.Equals(HostAddress.Create(x.CloneUrl)),
-                OrderedComparer<ILocalRepositoryModel>.OrderBy(x => x.Name).Compare);
+                OrderedComparer<LocalRepositoryModel>.OrderBy(x => x.Name).Compare);
         }
     }
 }

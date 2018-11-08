@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using GitHub.Extensions;
 using GitHub.Primitives;
-using GitHub.Services;
 using GitHub.UI;
 
 namespace GitHub.Models
@@ -12,7 +10,7 @@ namespace GitHub.Models
     /// The base class for local and remote repository models.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class RepositoryModel : NotificationAwareObject, IRepositoryModel
+    public class RepositoryModel : NotificationAwareObject
     {
         UriString cloneUrl;
         Octicon icon;
@@ -33,30 +31,14 @@ namespace GitHub.Models
             CloneUrl = cloneUrl;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RepositoryModel"/> class.
-        /// </summary>
-        /// <param name="path">
-        /// The path to the local repository from which repository name and clone URL will be
-        /// extracted.
-        /// </param>
-        /// <param name="gitService">The service used to find the repository's <see cref="Name"/> and <see cref="CloneUrl"/>.</param>
-        protected RepositoryModel(string path, IGitService gitService)
+        protected RepositoryModel()
         {
-            Guard.ArgumentNotNull(path, nameof(path));
-
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists)
-                throw new ArgumentException("Path does not exist", nameof(path));
-            var uri = gitService.GetUri(path);
-            Name = uri?.RepositoryName ?? dir.Name;
-            CloneUrl = gitService.GetUri(path);
         }
 
         /// <summary>
         /// Gets the name of the repository.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the repository clone URL.
@@ -64,7 +46,7 @@ namespace GitHub.Models
         public UriString CloneUrl
         {
             get { return cloneUrl; }
-            protected set
+            set
             {
                 if (cloneUrl != value)
                 {
@@ -85,7 +67,7 @@ namespace GitHub.Models
         public Octicon Icon
         {
             get { return icon; }
-            protected set
+            set
             {
                 if (icon != value)
                 {

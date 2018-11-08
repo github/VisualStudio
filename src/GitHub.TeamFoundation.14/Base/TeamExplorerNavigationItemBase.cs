@@ -8,7 +8,6 @@ using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
-using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -20,10 +19,6 @@ namespace GitHub.VisualStudio.Base
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
             : base(serviceProvider, apiFactory, holder)
         {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
-            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
-            Guard.ArgumentNotNull(holder, nameof(holder));
-
             this.octicon = octicon;
 
             IsVisible = false;
@@ -36,7 +31,8 @@ namespace GitHub.VisualStudio.Base
                 Invalidate();
             };
 
-            holder.Subscribe(this, UpdateRepo);
+            // Navigation items need to listen for repo change events before they're visible
+            SubscribeToRepoChanges();
         }
 
         public override async void Invalidate()
@@ -52,14 +48,6 @@ namespace GitHub.VisualStudio.Base
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
         }
 
-        void UpdateRepo(ILocalRepositoryModel repo)
-        {
-            var changed = ActiveRepo != repo;
-            ActiveRepo = repo;
-            RepoChanged(changed);
-            Invalidate();
-        }
-
         protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
         {
             var uri = ActiveRepoUri;
@@ -71,25 +59,6 @@ namespace GitHub.VisualStudio.Base
             var browseUrl = uri.ToRepositoryUrl().Append(endpoint);
 
             OpenInBrowser(browser, browseUrl);
-        }
-
-        void Unsubscribe()
-        {
-            holder.Unsubscribe(this);
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    Unsubscribe();
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
         }
 
         int argbColor;
@@ -109,7 +78,7 @@ namespace GitHub.VisualStudio.Base
         Image image;
         public Image Image
         {
-            get{ return image; }
+            get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }
     }
