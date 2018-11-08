@@ -1,5 +1,5 @@
 os: Visual Studio 2017
-version: '2.5.9.{build}'
+version: '2.6.0.{build}'
 skip_tags: true
 install:
 - ps: |
@@ -18,6 +18,8 @@ install:
 
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
+- choco install --no-progress BCC-MSBuildLog
+- choco install --no-progress BCC-Submission
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -BuildNumber:$env:APPVEYOR_BUILD_NUMBER
 test:
@@ -30,6 +32,5 @@ on_success:
       script\Sign-Package -AppVeyor
     }
 on_finish:
-- ps: scripts\Run-CodeCoverage.ps1 -AppVeyor -Configuration:Release
-- IF NOT "%BCC_TOKEN%x"=="x" %USERPROFILE%\.nuget\packages\bcc-msbuildlog\0.0.2-alpha\tools\net471\BCC.MSBuildLog.exe -i output.binlog -o checkrun.json -c "%APPVEYOR_BUILD_FOLDER%"
-- IF NOT "%BCC_TOKEN%x"=="x" %USERPROFILE%\.nuget\packages\bcc-submission\0.0.2-alpha\tools\net471\BCC.Submission.exe -i checkrun.json -t "%BCC_TOKEN%" -h "%APPVEYOR_REPO_COMMIT%"
+- IF NOT "%BCC_TOKEN%x"=="x" BCCMSBuildLog --cloneRoot "%APPVEYOR_BUILD_FOLDER%" --input output.binlog --output checkrun.json --ownerRepo %APPVEYOR_REPO_NAME% --hash %APPVEYOR_REPO_COMMIT%
+- IF NOT "%BCC_TOKEN%x"=="x" BCCSubmission -h %APPVEYOR_REPO_COMMIT% -i checkrun.json -t %BCC_TOKEN%

@@ -14,8 +14,8 @@ namespace GitHub.VisualStudio.Commands
     public class OpenLinkCommand : LinkCommandBase, IOpenLinkCommand
     {
         [ImportingConstructor]
-        protected OpenLinkCommand(IGitHubServiceProvider serviceProvider)
-            : base(CommandSet, CommandId, serviceProvider)
+        protected OpenLinkCommand(IGitHubServiceProvider serviceProvider, Lazy<IGitService> gitService)
+            : base(CommandSet, CommandId, serviceProvider, gitService)
         {
         }
 

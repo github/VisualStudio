@@ -31,9 +31,9 @@ namespace GitHub.ViewModels.Dialog
             SwitchFork = ReactiveCommand.CreateFromObservable(OnSwitchFork);
         }
 
-        public IRepositoryModel SourceRepository { get; private set; }
+        public RepositoryModel SourceRepository { get; private set; }
 
-        public IRepositoryModel DestinationRepository { get; private set; }
+        public RepositoryModel DestinationRepository { get; private set; }
 
         public ReactiveCommand<Unit, Unit> SwitchFork { get; }
 
@@ -41,7 +41,7 @@ namespace GitHub.ViewModels.Dialog
 
         public IObservable<object> Done => SwitchFork.Where(value => value != null).SelectNull();
 
-        public void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
+        public void Initialize(LocalRepositoryModel sourceRepository, RemoteRepositoryModel remoteRepository)
         {
             SourceRepository = sourceRepository;
             DestinationRepository = remoteRepository;

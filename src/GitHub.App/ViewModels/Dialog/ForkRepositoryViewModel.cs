@@ -37,7 +37,7 @@ namespace GitHub.ViewModels.Dialog
             executePage.Back.Subscribe(x => ShowSelectPage().Forget());
         }
 
-        public ILocalRepositoryModel Repository { get; private set; }
+        public LocalRepositoryModel Repository { get; private set; }
 
         public IConnection Connection { get; private set; }
 
@@ -45,7 +45,7 @@ namespace GitHub.ViewModels.Dialog
 
         public override IObservable<object> Done => executePage.Done;
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             Repository = repository;
             Connection = connection;
@@ -64,7 +64,7 @@ namespace GitHub.ViewModels.Dialog
             Content = executePage;
         }
 
-        void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
+        void ShowSwitchRepositoryPath(RemoteRepositoryModel remoteRepository)
         {
             switchPage.Initialize(Repository, remoteRepository);
             Content = switchPage;

@@ -101,7 +101,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public PullRequestDetailModel Model { get; }
         public IPullRequestSession Session { get; }
-        public ILocalRepositoryModel LocalRepository { get; }
+        public LocalRepositoryModel LocalRepository { get; }
         public string RemoteRepositoryOwner { get; }
         public int Number { get; set; }
         public IActorViewModel Author { get; set; }
@@ -127,7 +127,7 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
+        public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
