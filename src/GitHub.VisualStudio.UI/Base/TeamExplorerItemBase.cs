@@ -30,24 +30,19 @@ namespace GitHub.VisualStudio.Base
             }
         }
 
+        public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider, ISimpleApiClientFactory apiFactory,
+            ITeamExplorerServiceHolder holder) : this(serviceProvider, holder)
+        {
+            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
+
+            this.apiFactory = apiFactory;
+        }
+
         public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider, ITeamExplorerServiceHolder holder)
             : base(serviceProvider)
         {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
             Guard.ArgumentNotNull(holder, nameof(holder));
 
-            this.holder = holder;
-        }
-
-        public TeamExplorerItemBase(IGitHubServiceProvider serviceProvider,
-            ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder)
-            : base(serviceProvider)
-        {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
-            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
-            Guard.ArgumentNotNull(holder, nameof(holder));
-
-            this.apiFactory = apiFactory;
             this.holder = holder;
         }
 
@@ -63,7 +58,6 @@ namespace GitHub.VisualStudio.Base
             SubscribeToRepoChanges();
         }
 
-
         public virtual void Execute()
         {
         }
@@ -72,10 +66,15 @@ namespace GitHub.VisualStudio.Base
         {
         }
 
-        void SubscribeToRepoChanges()
+        bool subscribedToRepoChanges = false;
+        protected void SubscribeToRepoChanges()
         {
-            UpdateRepo(holder.TeamExplorerContext.ActiveRepository);
-            holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
+            if (!subscribedToRepoChanges)
+            {
+                subscribedToRepoChanges = true;
+                UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
+                holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
+            }
         }
 
         void TeamExplorerContext_PropertyChanged(object sender, PropertyChangedEventArgs e)

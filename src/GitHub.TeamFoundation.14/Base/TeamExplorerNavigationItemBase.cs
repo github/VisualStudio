@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.ComponentModel;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Services;
@@ -9,7 +8,6 @@ using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
-using GitHub.Models;
 
 namespace GitHub.VisualStudio.Base
 {
@@ -39,25 +37,8 @@ namespace GitHub.VisualStudio.Base
                 Invalidate();
             };
 
-            UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
-            holder.TeamExplorerContext.PropertyChanged += TeamExplorerContext_PropertyChanged;
-        }
-
-        void TeamExplorerContext_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(holder.TeamExplorerContext.ActiveRepository))
-            {
-                UpdateRepoOnMainThread(holder.TeamExplorerContext.ActiveRepository);
-            }
-        }
-
-        void UpdateRepoOnMainThread(LocalRepositoryModel repo)
-        {
-            holder.JoinableTaskFactory.RunAsync(async () =>
-            {
-                await holder.JoinableTaskFactory.SwitchToMainThreadAsync();
-                UpdateRepo(repo);
-            }).Task.Forget();
+            // Navigation items need to listen for repo change events before they're visible
+            SubscribeToRepoChanges();
         }
 
         public override async void Invalidate()
@@ -73,13 +54,6 @@ namespace GitHub.VisualStudio.Base
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
         }
 
-        void UpdateRepo(LocalRepositoryModel repo)
-        {
-            ActiveRepo = repo;
-            RepoChanged();
-            Invalidate();
-        }
-
         protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
         {
             var uri = ActiveRepoUri;
@@ -91,25 +65,6 @@ namespace GitHub.VisualStudio.Base
             var browseUrl = uri.ToRepositoryUrl().Append(endpoint);
 
             OpenInBrowser(browser, browseUrl);
-        }
-
-        void Unsubscribe()
-        {
-            holder.TeamExplorerContext.PropertyChanged -= TeamExplorerContext_PropertyChanged;
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    Unsubscribe();
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
         }
 
         int argbColor;
