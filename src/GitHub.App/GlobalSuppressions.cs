@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", MessageId = "Git", Scope = "resource", Target = "GitHub.App.Resources.resources")]
 [assembly: SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)", Scope = "member", Target = "GitHub.Services.PullRequestService.#CreateTempFile(System.String,System.String,System.String)")]
 [assembly: SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)", Scope = "member", Target = "GitHub.Services.PullRequestService.#CreateTempFile(System.String,System.String,System.String,System.Text.Encoding)")]
-[assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task", Justification = "We always need to think about what thread we're running on")]
 
 // This file is used by Code Analysis to maintain SuppressMessage 
 // attributes that are applied to this project.
