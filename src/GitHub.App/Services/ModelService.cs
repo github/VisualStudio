@@ -104,10 +104,25 @@ namespace GitHub.Services
             .ToReadOnlyList(Create);
         }
 
-        public IObservable<IRemoteRepositoryModel> GetForks(IRepositoryModel repository)
+        public IObservable<RemoteRepositoryModel> GetForks(RepositoryModel repository)
         {
             return ApiClient.GetForks(repository.Owner, repository.Name)
-                .Select(x => new RemoteRepositoryModel(x));
+                .Select(x => CreateRemoteRepositoryModel(x));
+        }
+
+        static RemoteRepositoryModel CreateRemoteRepositoryModel(Repository repository)
+        {
+            var ownerAccount = new Models.Account(repository.Owner);
+            var parent = repository.Parent != null ? CreateRemoteRepositoryModel(repository.Parent) : null;
+            var model = new RemoteRepositoryModel(repository.Id, repository.Name, repository.CloneUrl,
+                repository.Private, repository.Fork, ownerAccount, parent, repository.DefaultBranch);
+
+            if (parent != null)
+            {
+                parent.DefaultBranch.DisplayName = parent.DefaultBranch.Id;
+            }
+
+            return model;
         }
 
         IObservable<LicenseCacheItem> GetLicensesFromApi()
@@ -156,7 +171,7 @@ namespace GitHub.Services
                  });
         }
 
-        public IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetRepositories()
+        public IObservable<IReadOnlyList<RemoteRepositoryModel>> GetRepositories()
         {
             return GetUserRepositories(RepositoryType.Owner)
                 .TakeLast(1)
@@ -175,7 +190,7 @@ namespace GitHub.Services
         /// <param name="repo"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo,
+        public ITrackingCollection<IPullRequestModel> GetPullRequests(RepositoryModel repo,
             ITrackingCollection<IPullRequestModel> collection)
         {
             // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
@@ -215,7 +230,7 @@ namespace GitHub.Services
             throw new NotImplementedException();
         }
 
-        public IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo)
+        public IObservable<RemoteRepositoryModel> GetRepository(string owner, string repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|{2}/{3}", CacheIndex.RepoPrefix, user.Login, owner, repo));
@@ -228,7 +243,7 @@ namespace GitHub.Services
                     .Select(Create)));
         }
 
-        public ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection)
+        public ITrackingCollection<RemoteRepositoryModel> GetRepositories(ITrackingCollection<RemoteRepositoryModel> collection)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
@@ -256,8 +271,8 @@ namespace GitHub.Services
             return collection;
         }
 
-        public IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+        public IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {
             var keyobs = GetUserFromCache()
@@ -270,7 +285,7 @@ namespace GitHub.Services
                                 new NewPullRequest(title,
                                                    string.Format(CultureInfo.InvariantCulture, "{0}:{1}", sourceRepository.Owner, sourceBranch.Name),
                                                    targetBranch.Name)
-                                                   { Body = body },
+                                { Body = body },
                                 targetRepository.Owner,
                                 targetRepository.Name)
                             .Select(PullRequestCacheItem.Create)
@@ -286,7 +301,7 @@ namespace GitHub.Services
             return hostCache.InvalidateAll().ContinueAfter(() => hostCache.Vacuum());
         }
 
-        public IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha)
+        public IObservable<string> GetFileContents(RepositoryModel repo, string commitSha, string path, string fileSha)
         {
             return Observable.Defer(() => Task.Run(async () =>
             {
@@ -305,7 +320,7 @@ namespace GitHub.Services
             }));
         }
 
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
+        IObservable<IReadOnlyList<RemoteRepositoryModel>> GetUserRepositories(RepositoryType repositoryType)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}:repos", user.Login, repositoryType),
@@ -313,14 +328,14 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<RemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
                         log.Error(e,
                             "Retrieving {RepositoryType} user repositories failed because user is not stored in the cache",
                             repositoryType);
-                        return Observable.Return(Array.Empty<IRemoteRepositoryModel>());
+                        return Observable.Return(Array.Empty<RemoteRepositoryModel>());
                     });
         }
 
@@ -333,14 +348,14 @@ namespace GitHub.Services
                 .Catch<IEnumerable<RepositoryCacheItem>, Exception>(_ => Observable.Return(Enumerable.Empty<RepositoryCacheItem>()));
         }
 
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetAllRepositoriesForAllOrganizations()
+        IObservable<IReadOnlyList<RemoteRepositoryModel>> GetAllRepositoriesForAllOrganizations()
         {
             return GetUserOrganizations()
                 .SelectMany(org => org.ToObservable())
                 .SelectMany(org => GetOrganizationRepositories(org.Login).TakeLast(1));
         }
 
-        IObservable<IReadOnlyList<IRemoteRepositoryModel>> GetOrganizationRepositories(string organization)
+        IObservable<IReadOnlyList<RemoteRepositoryModel>> GetOrganizationRepositories(string organization)
         {
             return Observable.Defer(() => GetUserFromCache().SelectMany(user =>
                 hostCache.GetAndRefreshObject(string.Format(CultureInfo.InvariantCulture, "{0}|{1}|repos", user.Login, organization),
@@ -349,24 +364,24 @@ namespace GitHub.Services
                         TimeSpan.FromMinutes(2),
                         TimeSpan.FromDays(7)))
                 .ToReadOnlyList(Create))
-                .Catch<IReadOnlyList<IRemoteRepositoryModel>, KeyNotFoundException>(
+                .Catch<IReadOnlyList<RemoteRepositoryModel>, KeyNotFoundException>(
                     // This could in theory happen if we try to call this before the user is logged in.
                     e =>
                     {
                         log.Error(e, "Retrieveing {Organization} org repositories failed because user is not stored in the cache",
                             organization);
-                        return Observable.Return(Array.Empty<IRemoteRepositoryModel>());
+                        return Observable.Return(Array.Empty<RemoteRepositoryModel>());
                     });
         }
 
-        public IObservable<IBranch> GetBranches(IRepositoryModel repo)
+        public IObservable<BranchModel> GetBranches(RepositoryModel repo)
         {
             var keyobs = GetUserFromCache()
                 .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}|branch", user.Login, repo.Name));
 
             return Observable.Defer(() => keyobs
                     .SelectMany(key => ApiClient.GetBranches(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)))
-                .Select(x => new BranchModel(x, repo));
+                .Select(x => new BranchModel(x.Name, repo));
         }
 
         static GitIgnoreItem Create(GitIgnoreCacheItem item)
@@ -403,7 +418,7 @@ namespace GitHub.Services
                 avatarProvider.GetAvatar(avatarUrl));
         }
 
-        IRemoteRepositoryModel Create(RepositoryCacheItem item)
+        RemoteRepositoryModel Create(RepositoryCacheItem item)
         {
             return new RemoteRepositoryModel(
                 item.Id,
@@ -452,7 +467,7 @@ namespace GitHub.Services
         }
 
         protected virtual void Dispose(bool disposing)
-        {}
+        { }
 
         public void Dispose()
         {
@@ -493,7 +508,7 @@ namespace GitHub.Services
                 return new RepositoryCacheItem(apiRepository);
             }
 
-            public RepositoryCacheItem() {}
+            public RepositoryCacheItem() { }
 
             public RepositoryCacheItem(Repository apiRepository)
             {
@@ -529,7 +544,7 @@ namespace GitHub.Services
                 return new PullRequestCacheItem(pr);
             }
 
-            public PullRequestCacheItem() {}
+            public PullRequestCacheItem() { }
 
             public PullRequestCacheItem(PullRequest pr)
             {
@@ -563,7 +578,7 @@ namespace GitHub.Services
                 Timestamp = UpdatedAt;
             }
 
-            public string Title {get; set; }
+            public string Title { get; set; }
             public int Number { get; set; }
             public GitReferenceCacheItem Base { get; set; }
             public GitReferenceCacheItem Head { get; set; }
@@ -574,7 +589,7 @@ namespace GitHub.Services
             public DateTimeOffset CreatedAt { get; set; }
             public DateTimeOffset UpdatedAt { get; set; }
             public string Body { get; set; }
-            
+
             // Nullable for compatibility with old caches.
             public PullRequestStateEnum? State { get; set; }
 

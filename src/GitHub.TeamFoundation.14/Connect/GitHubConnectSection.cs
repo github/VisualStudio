@@ -28,6 +28,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
+        readonly ISimpleApiClientFactory apiFactory;
+        readonly ITeamExplorerServiceHolder holder;
         readonly IPackageSettings packageSettings;
         readonly ITeamExplorerServices teamExplorerServices;
         readonly int sectionIndex;
@@ -85,23 +87,21 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             private set { showRetry = value; this.RaisePropertyChange(); }
         }
 
-        IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        public IReactiveDerivedList<ILocalRepositoryModel> Repositories
+        IReactiveDerivedList<LocalRepositoryModel> repositories;
+        public IReactiveDerivedList<LocalRepositoryModel> Repositories
         {
             get { return repositories; }
             private set { repositories = value; this.RaisePropertyChange(); }
         }
 
-        ILocalRepositoryModel selectedRepository;
-        public ILocalRepositoryModel SelectedRepository
+        LocalRepositoryModel selectedRepository;
+        public LocalRepositoryModel SelectedRepository
         {
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
         }
 
         public ICommand Clone { get; }
-
-        internal ITeamExplorerServiceHolder Holder => holder;
 
         public GitHubConnectSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
@@ -127,6 +127,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IsVisible = false;
             sectionIndex = index;
 
+            this.apiFactory = apiFactory;
+            this.holder = holder;
             this.packageSettings = packageSettings;
             this.teamExplorerServices = teamExplorerServices;
             this.localRepositories = localRepositories;
@@ -312,7 +314,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 // so we can handle just one new entry separately
                 if (isCloning || isCreating)
                 {
-                    var newrepo = e.NewItems.Cast<ILocalRepositoryModel>().First();
+                    var newrepo = e.NewItems.Cast<LocalRepositoryModel>().First();
 
                     SelectedRepository = newrepo;
                     if (isCreating)
@@ -325,7 +327,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var api = await apiFactory.Create(newrepo.CloneUrl);
                         var repo = await api.GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
@@ -341,16 +343,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 else
                 {
                     e.NewItems
-                        .Cast<ILocalRepositoryModel>()
+                        .Cast<LocalRepositoryModel>()
                         .ForEach(async r =>
                     {
-                        if (Equals(Holder.ActiveRepo, r))
+                        if (Equals(holder.TeamExplorerContext.ActiveRepository, r))
                             SelectedRepository = r;
 
                         try
                         {
                             // TODO: Cache the icon state.
-                            var api = await ApiFactory.Create(r.CloneUrl);
+                            var api = await apiFactory.Create(r.CloneUrl);
                             var repo = await api.GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
@@ -366,7 +368,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        void HandleCreatedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -375,7 +377,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void HandleClonedRepo(ILocalRepositoryModel newrepo)
+        void HandleClonedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -387,7 +389,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        void ShowNotification(LocalRepositoryModel newrepo, string msg)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -457,7 +459,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public bool OpenRepository()
         {
-            var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
+            var old = Repositories.FirstOrDefault(x => x.Equals(holder.TeamExplorerContext.ActiveRepository));
             if (!Equals(SelectedRepository, old))
             {
                 try

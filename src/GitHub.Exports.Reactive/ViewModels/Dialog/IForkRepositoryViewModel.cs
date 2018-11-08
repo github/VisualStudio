@@ -19,6 +19,6 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         /// <param name="repository">The repository to fork.</param>
         /// <param name="connection">The connection to use.</param>
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

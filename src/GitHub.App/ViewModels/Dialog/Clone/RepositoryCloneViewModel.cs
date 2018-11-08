@@ -29,7 +29,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
-        IRepositoryModel previousRepository;
+        RepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
 
@@ -183,7 +183,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        void UpdatePath(IRepositoryModel repository)
+        void UpdatePath(RepositoryModel repository)
         {
             if (repository != null)
             {
@@ -239,7 +239,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        string ValidatePathWarning(IRepositoryModel repositoryModel, string path)
+        string ValidatePathWarning(RepositoryModel repositoryModel, string path)
         {
             if (repositoryModel != null)
             {
