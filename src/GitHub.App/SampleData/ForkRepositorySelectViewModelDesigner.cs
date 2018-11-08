@@ -39,7 +39,7 @@ namespace GitHub.SampleData
 
         public string Title => null;
 
-        public ReactiveCommand<IAccount, Unit> SelectedAccount => null;
+        public ReactiveCommand<IAccount, IAccount> SelectedAccount => null;
 
         public ReactiveCommand<RemoteRepositoryModel, Unit> SwitchOrigin => null;
 
