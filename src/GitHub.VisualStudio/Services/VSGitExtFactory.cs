@@ -17,11 +17,13 @@ namespace GitHub.Services
 
         readonly int vsVersion;
         readonly IServiceProvider serviceProvider;
+        readonly IGitService gitService;
 
-        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider)
+        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService)
         {
             this.vsVersion = vsVersion;
             this.serviceProvider = serviceProvider;
+            this.gitService = gitService;
         }
 
         public IVSGitExt Create()
@@ -29,11 +31,11 @@ namespace GitHub.Services
             switch (vsVersion)
             {
                 case 14:
-                    return Create(() => new VSGitExt14(serviceProvider));
+                    return Create(() => new VSGitExt14(serviceProvider, gitService));
                 case 15:
-                    return Create(() => new VSGitExt15(serviceProvider));
+                    return Create(() => new VSGitExt15(serviceProvider, gitService));
                 case 16:
-                    return Create(() => new VSGitExt16(serviceProvider));
+                    return Create(() => new VSGitExt16(serviceProvider, gitService));
                 default:
                     log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
                     return null;

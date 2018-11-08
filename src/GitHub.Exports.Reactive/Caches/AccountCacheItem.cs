@@ -2,6 +2,7 @@
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
+using Account = Octokit.Account;
 
 namespace GitHub.Caches
 {

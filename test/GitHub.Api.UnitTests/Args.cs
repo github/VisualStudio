@@ -20,16 +20,17 @@ internal static class Args
     public static IApiClient ApiClient { get { return Arg.Any<IApiClient>(); } }
     public static IServiceProvider ServiceProvider { get { return Arg.Any<IServiceProvider>(); } }
     public static IAvatarProvider AvatarProvider { get { return Arg.Any<IAvatarProvider>(); } }
-    public static HostAddress HostAddress { get { return Arg.Any<HostAddress>(); } } 
+    public static HostAddress HostAddress { get { return Arg.Any<HostAddress>(); } }
     public static Uri Uri { get { return Arg.Any<Uri>(); } }
     public static LibGit2Sharp.IRepository LibGit2Repo { get { return Arg.Any<LibGit2Sharp.IRepository>(); } }
     public static LibGit2Sharp.Branch LibGit2Branch { get { return Arg.Any<LibGit2Sharp.Branch>(); } }
     public static Remote LibgGit2Remote { get { return Arg.Any<Remote>(); } }
-    public static ILocalRepositoryModel LocalRepositoryModel { get { return Arg.Any<ILocalRepositoryModel>(); } }
-    public static IRemoteRepositoryModel RemoteRepositoryModel { get { return Arg.Any<IRemoteRepositoryModel>(); } }
-    public static IBranch Branch { get { return Arg.Any<IBranch>(); } }
+    public static LocalRepositoryModel LocalRepositoryModel { get { return Arg.Any<LocalRepositoryModel>(); } }
+    public static RemoteRepositoryModel RemoteRepositoryModel { get { return Arg.Any<RemoteRepositoryModel>(); } }
+    public static BranchModel Branch { get { return Arg.Any<BranchModel>(); } }
     public static IGitService GitService { get { return Arg.Any<IGitService>(); } }
-    public static Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>
-        TwoFactorChallengCallback
-        { get { return Arg.Any<Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>> (); } }
+    public static Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>> TwoFactorChallengCallback
+    {
+        get { return Arg.Any<Func<TwoFactorAuthorizationException, IObservable<TwoFactorChallengeResult>>>(); }
+    }
 }

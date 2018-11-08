@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService service,
             ActorModel user,
             PullRequestDetailModel pullRequest,
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string repositoryOwner,
             bool isCheckedOut)
         {
@@ -402,7 +402,7 @@ namespace GitHub.InlineReviews.Services
         public IObservable<PullRequestDetailModel> PullRequestChanged => pullRequestChanged;
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; }
+        public LocalRepositoryModel LocalRepository { get; }
 
         /// <inheritdoc/>
         public string RepositoryOwner { get; }

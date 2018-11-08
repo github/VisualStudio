@@ -55,7 +55,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets or sets the search query for the current page.

@@ -56,7 +56,7 @@ namespace GitHub.ViewModels.GitHubPane
         IDisposable connectionSubscription;
         Task initializeTask;
         IViewModel content;
-        ILocalRepositoryModel localRepository;
+        LocalRepositoryModel localRepository;
         string searchQuery;
 
         [ImportingConstructor]
@@ -191,7 +191,7 @@ namespace GitHub.ViewModels.GitHubPane
         public bool IsSearchEnabled => isSearchEnabled.Value;
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository
+        public LocalRepositoryModel LocalRepository
         {
             get { return localRepository; }
             private set { this.RaiseAndSetIfChanged(ref localRepository, value); }
@@ -390,7 +390,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        async Task UpdateContent(ILocalRepositoryModel repository)
+        async Task UpdateContent(LocalRepositoryModel repository)
         {
             log.Debug("UpdateContent called with {CloneUrl}", repository?.CloneUrl);
 
