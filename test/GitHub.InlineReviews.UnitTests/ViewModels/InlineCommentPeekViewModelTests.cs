@@ -314,7 +314,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var result = Substitute.For<IPullRequestSession>();
             result.PullRequest.Returns(new PullRequestDetailModel());
             result.User.Returns(new ActorModel { Login = "CurrentUser" });
-            result.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
+            result.LocalRepository.Returns(new LocalRepositoryModel { CloneUrl = new UriString("https://foo.bar") });
             return result;
         }
 

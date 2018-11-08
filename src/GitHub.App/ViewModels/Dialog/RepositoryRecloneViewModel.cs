@@ -131,11 +131,11 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         public ReactiveCommand<Unit, Unit> CloneCommand { get; private set; }
 
-        IRepositoryModel selectedRepository;
+        RepositoryModel selectedRepository;
         /// <summary>
         /// Selected repository to clone
         /// </summary>
-        public IRepositoryModel SelectedRepository
+        public RepositoryModel SelectedRepository
         {
             get { return selectedRepository; }
             set { this.RaiseAndSetIfChanged(ref selectedRepository, value); }

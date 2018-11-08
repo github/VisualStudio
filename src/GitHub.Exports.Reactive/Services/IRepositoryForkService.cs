@@ -9,7 +9,7 @@ namespace GitHub.Services
 {
     public interface IRepositoryForkService
     {
-        IObservable<Repository> ForkRepository(IApiClient apiClient, IRepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
-        IObservable<Unit> SwitchRemotes(IRepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
+        IObservable<Repository> ForkRepository(IApiClient apiClient, RepositoryModel sourceRepository, NewRepositoryFork repositoryFork, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
+        IObservable<Unit> SwitchRemotes(RepositoryModel destinationRepository, bool updateOrigin, bool addUpstream, bool trackMasterUpstream);
     }
 }

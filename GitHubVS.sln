@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
 		scripts\build.ps1 = scripts\build.ps1
 		scripts\Bump-Version.ps1 = scripts\Bump-Version.ps1
 		scripts\common.ps1 = scripts\common.ps1

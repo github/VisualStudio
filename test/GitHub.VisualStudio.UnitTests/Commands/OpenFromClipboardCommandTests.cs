@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Threading.Tasks;
 using GitHub;
 using GitHub.Exports;
+using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.VisualStudio.Commands;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
 using NSubstitute;
 using NUnit.Framework;
@@ -146,7 +146,8 @@ public class OpenFromClipboardCommandTests
             var resolveBlobResult = (targetBranch, "foo.cs", "");
             var vsServices = Substitute.For<IVSServices>();
             var target = CreateOpenFromClipboardCommand(gitHubContextService: gitHubContextService, vsServices: vsServices,
-                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryName: repositoryName, currentBranch: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
+                contextFromClipboard: context, repositoryDir: repositoryDir, repositoryName: repositoryName,
+                currentBranchName: currentBranch, resolveBlobResult: resolveBlobResult, hasChanges: true);
 
             await target.Execute(null);
 
@@ -179,7 +180,7 @@ public class OpenFromClipboardCommandTests
             string repositoryDir = null,
             string repositoryName = null,
             string repositoryOwner = null,
-            string currentBranch = null,
+            string currentBranchName = null,
             (string, string, string)? resolveBlobResult = null,
             bool? hasChanges = null)
         {
@@ -189,10 +190,16 @@ public class OpenFromClipboardCommandTests
             vsServices = vsServices ?? Substitute.For<IVSServices>();
 
             gitHubContextService.FindContextFromClipboard().Returns(contextFromClipboard);
-            teamExplorerContext.ActiveRepository.LocalPath.Returns(repositoryDir);
-            teamExplorerContext.ActiveRepository.Name.Returns(repositoryName);
-            teamExplorerContext.ActiveRepository.Owner.Returns(repositoryOwner);
-            teamExplorerContext.ActiveRepository.CurrentBranch.Name.Returns(currentBranch);
+            var activeRepository = new LocalRepositoryModel
+            {
+                LocalPath = repositoryDir,
+                Name = repositoryName,
+                CloneUrl = new UriString($"https://github.com/{repositoryOwner}/{repositoryName}")
+            };
+            teamExplorerContext.ActiveRepository.Returns(activeRepository);
+            var gitService = Substitute.For<IGitService>();
+            var currentBranch = currentBranchName != null ? new BranchModel(currentBranchName, activeRepository) : null;
+            gitService.GetBranch(activeRepository).Returns(currentBranch);
             if (resolveBlobResult != null)
             {
                 gitHubContextService.ResolveBlob(repositoryDir, contextFromClipboard).Returns(resolveBlobResult.Value);
@@ -206,7 +213,8 @@ public class OpenFromClipboardCommandTests
             return new OpenFromClipboardCommand(
                 new Lazy<IGitHubContextService>(() => gitHubContextService),
                 new Lazy<ITeamExplorerContext>(() => teamExplorerContext),
-                new Lazy<IVSServices>(() => vsServices));
+                new Lazy<IVSServices>(() => vsServices),
+                new Lazy<IGitService>(() => gitService));
         }
 
         static string ResolveResources(string str)
