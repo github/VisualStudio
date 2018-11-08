@@ -46,7 +46,6 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="file">The file that the comment is on.</param>
-        /// <param name="review">The associated review.</param>
         /// <param name="thread">The thread.</param>
         /// <param name="addPlaceholder">
         /// Whether to add a placeholder comment at the end of the thread.
@@ -55,7 +54,6 @@ namespace GitHub.ViewModels
             IPullRequestSession session,
             IInlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
-            PullRequestReviewModel review,
             IInlineCommentThreadModel thread,
             bool addPlaceholder);
 

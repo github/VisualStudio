@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -98,7 +98,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineAnnotationModel> BuildAnnotations(
+        public IReadOnlyList<InlineAnnotationModel> BuildAnnotations(
             PullRequestDetailModel pullRequest,
             string relativePath)
         {
@@ -792,9 +792,9 @@ namespace GitHub.InlineReviews.Services
                                           CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                               .Select(run => new CheckRunModel
                                               {
+                                                  CheckRunId = run.Id.Value,
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
-                                                  DatabaseId = run.DatabaseId.Value,
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
@@ -809,7 +809,8 @@ namespace GitHub.InlineReviews.Services
                                                           EndLine = annotation.Location.End.Line,
                                                       }).ToList()
                                               }).ToList(),
-                                          ApplicationName = suite.App != null ? suite.App.Name : "Private App"
+                                          ApplicationName = suite.App != null ? suite.App.Name : "Private App",
+                                          ApplicationSlug = suite.App != null ? suite.App.Slug : "private-app"
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -818,7 +819,7 @@ namespace GitHub.InlineReviews.Services
                                               State = statusContext.State.FromGraphQl(),
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
-                                              Description = statusContext.Description,
+                                              Description = statusContext.Description
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
@@ -879,7 +880,7 @@ namespace GitHub.InlineReviews.Services
             }
 
             // Get the comments that are replies and place them into the relevant list.
-            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
+            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments).OrderBy(x => x.CreatedAt))
             {
                 if (comment.ReplyTo != null)
                 {

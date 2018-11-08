@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
@@ -22,7 +21,7 @@ namespace GitHub.SampleData
 
         public PullRequestCheckType CheckType { get; set; } = PullRequestCheckType.ChecksApi;
 
-        public int CheckRunId { get; set; }
+        public string CheckRunId { get; set; }
 
         public bool HasAnnotations { get; } = true;
     }

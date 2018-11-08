@@ -501,16 +501,13 @@ namespace GitHub.InlineReviews.UnitTests.Tags
 
             if (withAnnotations)
             {
-                var annotation1 = Substitute.For<IInlineAnnotationModel>();
-                annotation1.EndLine.Returns(11);
+                var annotation1 = new InlineAnnotationModel(new CheckSuiteModel(), new CheckRunModel(), new CheckRunAnnotationModel(){EndLine = 11});
 
-                var annotation2 = Substitute.For<IInlineAnnotationModel>();
-                annotation2.EndLine.Returns(21);
+                var annotation2 = new InlineAnnotationModel(new CheckSuiteModel(), new CheckRunModel(), new CheckRunAnnotationModel() { EndLine = 21 });
 
-                var annotation3 = Substitute.For<IInlineAnnotationModel>();
-                annotation3.EndLine.Returns(21);
+                var annotation3 = new InlineAnnotationModel(new CheckSuiteModel(), new CheckRunModel(), new CheckRunAnnotationModel() { EndLine = 21 });
 
-                var annotations = new List<IInlineAnnotationModel> { annotation1, annotation2, annotation3 };
+                var annotations = new List<InlineAnnotationModel> { annotation1, annotation2, annotation3 };
 
                 file.InlineAnnotations.Returns(annotations);
             }

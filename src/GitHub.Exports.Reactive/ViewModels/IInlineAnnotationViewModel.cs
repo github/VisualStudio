@@ -10,6 +10,6 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the inline annotation model.
         /// </summary>
-        IInlineAnnotationModel Model { get; }
+        InlineAnnotationModel Model { get; }
     }
 }
