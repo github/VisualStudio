@@ -13,18 +13,12 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2
     {
-        readonly ITeamExplorerServiceHolder holder;
         readonly Octicon octicon;
 
         public TeamExplorerNavigationItemBase(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
             : base(serviceProvider, apiFactory, holder)
         {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
-            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
-            Guard.ArgumentNotNull(holder, nameof(holder));
-
-            this.holder = holder;
             this.octicon = octicon;
 
             IsVisible = false;
