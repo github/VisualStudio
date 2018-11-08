@@ -14,6 +14,6 @@ namespace GitHub.SampleData.Documents
         public Task DeleteComment(ICommentViewModel comment) => Task.CompletedTask;
         public Task EditComment(ICommentViewModel comment) => Task.CompletedTask;
         public Task PostComment(ICommentViewModel comment) => Task.CompletedTask;
-        public Task CloseIssueish(ICommentViewModel comment) => Task.CompletedTask;
+        public Task CloseOrReopen(ICommentViewModel comment) => Task.CompletedTask;
     }
 }

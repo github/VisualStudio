@@ -2,24 +2,55 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
+using Octokit;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
+    /// <summary>
+    /// Base class for issue and pull request services.
+    /// </summary>
     public abstract class IssueishService : IIssueishService
     {
         static ICompiledQuery<CommentModel> postComment;
+        readonly IApiClientFactory apiClientFactory;
         readonly IGraphQLClientFactory graphqlFactory;
 
-        public IssueishService(IGraphQLClientFactory graphqlFactory)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IssueishService"/> class.
+        /// </summary>
+        /// <param name="apiClientFactory">The API client factory.</param>
+        /// <param name="graphqlFactory">The GraphQL client factory.</param>
+        public IssueishService(
+            IApiClientFactory apiClientFactory,
+            IGraphQLClientFactory graphqlFactory)
         {
+            this.apiClientFactory = apiClientFactory;
             this.graphqlFactory = graphqlFactory;
         }
 
+        /// <inheritdoc/>
+        public async Task CloseIssueish(HostAddress address, string owner, string repository, int number)
+        {
+            var client = await apiClientFactory.CreateGitHubClient(address).ConfigureAwait(false);
+            var update = new IssueUpdate { State = ItemState.Closed };
+            await client.Issue.Update(owner, repository, number, update).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task ReopenIssueish(HostAddress address, string owner, string repository, int number)
+        {
+            var client = await apiClientFactory.CreateGitHubClient(address).ConfigureAwait(false);
+            var update = new IssueUpdate { State = ItemState.Open };
+            await client.Issue.Update(owner, repository, number, update).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
         public async Task<CommentModel> PostComment(HostAddress address, string issueishId, string body)
         {
             var input = new AddCommentInput

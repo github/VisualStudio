@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using GitHub.Api;
 using GitHub.App.Services;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -63,10 +64,11 @@ namespace GitHub.Services
             IGitClient gitClient,
             IGitService gitService,
             IVSGitExt gitExt,
+            IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
             IOperatingSystem os,
             IUsageTracker usageTracker)
-            : base(graphqlFactory)
+            : base(apiClientFactory, graphqlFactory)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;

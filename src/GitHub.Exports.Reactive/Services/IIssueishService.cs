@@ -11,6 +11,24 @@ namespace GitHub.Services
     public interface IIssueishService
     {
         /// <summary>
+        /// Closes an issue or pull request.
+        /// </summary>
+        /// <param name="address">The address of the server.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repository">The repository name.</param>
+        /// <param name="number">The issue or pull request number.</param>
+        Task CloseIssueish(HostAddress address, string owner, string repository, int number);
+
+        /// <summary>
+        /// Reopens an issue or pull request.
+        /// </summary>
+        /// <param name="address">The address of the server.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repository">The repository name.</param>
+        /// <param name="number">The issue or pull request number.</param>
+        Task ReopenIssueish(HostAddress address, string owner, string repository, int number);
+
+        /// <summary>
         /// Posts an issue or pull request comment.
         /// </summary>
         /// <param name="address">The address of the server.</param>

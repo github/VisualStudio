@@ -14,8 +14,9 @@ namespace GitHub.ViewModels.Documents
     /// </summary>
     [Export(typeof(IIssueishCommentViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class IssueishCommentViewModel : CommentViewModel, IIssueishCommentViewModel
+    public sealed class IssueishCommentViewModel : CommentViewModel, IIssueishCommentViewModel
     {
+        bool canCloseOrReopen;
         ObservableAsPropertyHelper<string> closeOrReopenCaption;
 
         /// <summary>
@@ -29,10 +30,15 @@ namespace GitHub.ViewModels.Documents
             CloseOrReopen = ReactiveCommand.CreateFromTask(
                 DoCloseOrReopen,
                 this.WhenAnyValue(x => x.CanCloseOrReopen));
+            AddErrorHandler(CloseOrReopen);
         }
 
         /// <inheritdoc/>
-        public bool CanCloseOrReopen { get; private set; }
+        public bool CanCloseOrReopen
+        {
+            get => canCloseOrReopen;
+            private set => this.RaiseAndSetIfChanged(ref canCloseOrReopen, value);
+        }
 
         /// <inheritdoc/>
         public string CloseOrReopenCaption => closeOrReopenCaption?.Value;
@@ -46,8 +52,8 @@ namespace GitHub.ViewModels.Documents
             ActorModel currentUser,
             CommentModel comment,
             bool isPullRequest,
-            bool isOpen,
-            bool canCloseOrReopen)
+            bool canCloseOrReopen,
+            IObservable<bool> isOpen = null)
         {
             await base.InitializeAsync(
                 thread,
@@ -59,25 +65,39 @@ namespace GitHub.ViewModels.Documents
             CanCloseOrReopen = canCloseOrReopen;
             closeOrReopenCaption?.Dispose();
 
-            if (canCloseOrReopen)
+            if (canCloseOrReopen && isOpen != null)
             {
-                var caption = isPullRequest ?
-                    isOpen ?
-                        (Resources.ClosePullRequest, Resources.CloseAndComment) :
-                        (Resources.ReopenPullRequest, Resources.ReopenAndComment) :
-                    isOpen ?
-                        (Resources.CloseIssue, Resources.CloseAndComment) :
-                        (Resources.ReopenIssue, Resources.ReopenAndComment);
-
-                closeOrReopenCaption = this.WhenAnyValue(x => x.Body)
-                    .Select(x => string.IsNullOrWhiteSpace(x) ? caption.Item1 : caption.Item2)
+                closeOrReopenCaption =
+                    this.WhenAnyValue(x => x.Body)
+                    .CombineLatest(isOpen, (body, open) => GetCloseOrReopenCaption(isPullRequest, open, body))
                     .ToProperty(this, x => x.CloseOrReopenCaption);
             }
         }
 
-        Task DoCloseOrReopen()
+        public void Dispose() => closeOrReopenCaption.Dispose();
+
+        async Task DoCloseOrReopen()
         {
-            return Task.CompletedTask;
+            await ((IIssueishCommentThreadViewModel)Thread).CloseOrReopen(this).ConfigureAwait(true);
+        }
+
+        static string GetCloseOrReopenCaption(bool isPullRequest, bool isOpen, string body)
+        {
+            if (string.IsNullOrEmpty(body))
+            {
+                if (isPullRequest)
+                {
+                    return isOpen ? Resources.ClosePullRequest : Resources.ReopenPullRequest;
+                }
+                else
+                {
+                    return isOpen ? Resources.CloseIssue: Resources.ReopenIssue;
+                }
+            }
+            else
+            {
+                return isOpen ? Resources.CloseAndComment : Resources.ReopenAndComment;
+            }
         }
     }
 }

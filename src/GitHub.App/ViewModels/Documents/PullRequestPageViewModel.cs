@@ -24,7 +24,7 @@ namespace GitHub.ViewModels.Documents
         readonly IPullRequestSessionManager sessionManager;
         readonly ITeamExplorerServices teServices;
         ActorModel currentUserModel;
-        ReactiveList<IViewModel> timeline;
+        ReactiveList<IViewModel> timeline = new ReactiveList<IViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestPageViewModel"/> class.
@@ -46,6 +46,8 @@ namespace GitHub.ViewModels.Documents
             this.service = service;
             this.sessionManager = sessionManager;
             this.teServices = teServices;
+
+            timeline.ItemsRemoved.Subscribe(TimelineItemRemoved);
 
             ShowCommit = ReactiveCommand.CreateFromTask<string>(DoShowCommit);
         }
@@ -71,10 +73,10 @@ namespace GitHub.ViewModels.Documents
         {
             await base.InitializeAsync(repository, localRepository, model).ConfigureAwait(true);
 
+            timeline.Clear();
             CommitCount = 0;
             currentUserModel = currentUser;
             CurrentUser = new ActorViewModel(currentUser);
-            timeline = new ReactiveList<IViewModel>();
 
             var commits = new List<CommitSummaryViewModel>();
 
@@ -107,6 +109,31 @@ namespace GitHub.ViewModels.Documents
         }
 
         /// <inheritdoc/>
+        public async Task CloseOrReopen(ICommentViewModel comment)
+        {
+            var address = HostAddress.Create(Repository.CloneUrl);
+
+            if (State == PullRequestState.Open)
+            {
+                await service.CloseIssueish(
+                    address,
+                    Repository.Owner,
+                    Repository.Name,
+                    Number).ConfigureAwait(true);
+                State = PullRequestState.Closed;
+            }
+            else
+            {
+                await service.ReopenIssueish(
+                    address,
+                    Repository.Owner,
+                    Repository.Name,
+                    Number).ConfigureAwait(true);
+                State = PullRequestState.Open;
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task PostComment(ICommentViewModel comment)
         {
             var address = HostAddress.Create(Repository.CloneUrl);
@@ -126,11 +153,6 @@ namespace GitHub.ViewModels.Documents
             throw new NotImplementedException();
         }
 
-        Task IIssueishCommentThreadViewModel.CloseIssueish(ICommentViewModel comment)
-        {
-            throw new NotImplementedException();
-        }
-
         async Task AddComment(CommentModel comment)
         {
             var vm = factory.CreateViewModel<IIssueishCommentViewModel>();
@@ -139,7 +161,6 @@ namespace GitHub.ViewModels.Documents
                 currentUserModel,
                 comment,
                 true,
-                State == PullRequestState.Open,
                 false).ConfigureAwait(true);
             timeline.Add(vm);
         }
@@ -152,8 +173,8 @@ namespace GitHub.ViewModels.Documents
                 currentUserModel,
                 null,
                 true,
-                State == PullRequestState.Open,
-                true).ConfigureAwait(true);
+                true,
+                this.WhenAnyValue(x => x.State, x => x == PullRequestState.Open)).ConfigureAwait(true);
             timeline.Add(placeholder);
         }
 
@@ -161,6 +182,11 @@ namespace GitHub.ViewModels.Documents
         {
             await service.FetchCommit(LocalRepository, Repository, oid).ConfigureAwait(true);
             teServices.ShowCommitDetails(oid);
+        }
+
+        void TimelineItemRemoved(IViewModel item)
+        {
+            (item as IDisposable)?.Dispose();
         }
     }
 }

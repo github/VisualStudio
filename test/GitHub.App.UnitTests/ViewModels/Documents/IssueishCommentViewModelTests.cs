@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Reactive.Linq;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.Documents;
@@ -47,8 +48,8 @@ namespace GitHub.App.UnitTests.ViewModels.Documents
                 currentUser,
                 comment,
                 false,
-                true,
-                canCloseOrReopen);
+                canCloseOrReopen,
+                Observable.Return(true));
             return target;
         }
 

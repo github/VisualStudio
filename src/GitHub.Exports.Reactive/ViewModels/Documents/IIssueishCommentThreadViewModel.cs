@@ -12,6 +12,6 @@ namespace GitHub.ViewModels.Documents
         /// Called by a comment in the thread to close the issue or pull request.
         /// </summary>
         /// <param name="body">The comment requesting the close.</param>
-        Task CloseIssueish(ICommentViewModel comment);
+        Task CloseOrReopen(ICommentViewModel comment);
     }
 }

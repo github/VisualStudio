@@ -16,6 +16,7 @@ using Rothko;
 using UnitTests;
 using NUnit.Framework;
 using GitHub.Api;
+using GitHub.Factories;
 
 public class PullRequestServiceTests : TestBaseClass
 {
@@ -575,6 +576,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IGitClient>(),
             gitService,
             Substitute.For<IVSGitExt>(),
+            Substitute.For<IApiClientFactory>(),
             Substitute.For<IGraphQLClientFactory>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
@@ -684,6 +686,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IGitClient>(),
             serviceProvider.GetGitService(),
             Substitute.For<IVSGitExt>(),
+            Substitute.For<IApiClientFactory>(),
             Substitute.For<IGraphQLClientFactory>(),
             serviceProvider.GetOperatingSystem(),
             Substitute.For<IUsageTracker>());
@@ -893,6 +896,7 @@ public class PullRequestServiceTests : TestBaseClass
                 MockGitClient(),
                 MockGitService(),
                 Substitute.For<IVSGitExt>(),
+                Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IOperatingSystem>(),
                 Substitute.For<IUsageTracker>());
@@ -1045,6 +1049,7 @@ public class PullRequestServiceTests : TestBaseClass
         IGitClient gitClient = null,
         IGitService gitService = null,
         IVSGitExt gitExt = null,
+        IApiClientFactory apiClientFactory = null,
         IGraphQLClientFactory graphqlFactory = null,
         IOperatingSystem os = null,
         IUsageTracker usageTracker = null)
@@ -1052,6 +1057,7 @@ public class PullRequestServiceTests : TestBaseClass
         gitClient = gitClient ?? Substitute.For<IGitClient>();
         gitService = gitService ?? Substitute.For<IGitService>();
         gitExt = gitExt ?? Substitute.For<IVSGitExt>();
+        apiClientFactory = apiClientFactory ?? Substitute.For<IApiClientFactory>();
         graphqlFactory = graphqlFactory ?? Substitute.For<IGraphQLClientFactory>();
         os = os ?? Substitute.For<IOperatingSystem>();
         usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
@@ -1060,6 +1066,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitClient,
             gitService,
             gitExt,
+            apiClientFactory,
             graphqlFactory,
             os,
             usageTracker);

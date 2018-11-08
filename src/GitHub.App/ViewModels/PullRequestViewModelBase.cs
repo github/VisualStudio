@@ -32,7 +32,7 @@ namespace GitHub.ViewModels
         public PullRequestState State
         {
             get => state;
-            private set => this.RaiseAndSetIfChanged(ref state, value);
+            protected set => this.RaiseAndSetIfChanged(ref state, value);
         }
 
         public string SourceBranchDisplayName

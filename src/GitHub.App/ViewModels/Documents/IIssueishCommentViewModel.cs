@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -8,7 +9,7 @@ namespace GitHub.ViewModels.Documents
     /// <summary>
     /// View model for comments on an issue or pull request.
     /// </summary>
-    public interface IIssueishCommentViewModel : ICommentViewModel
+    public interface IIssueishCommentViewModel : ICommentViewModel, IDisposable
     {
         /// <summary>
         /// Gets a value indicating whether the comment will show a button for
@@ -36,16 +37,19 @@ namespace GitHub.ViewModels.Documents
         /// <param name="isPullRequest">
         /// true if the comment is on a pull request, false if the comment is on an issue.
         /// </param>
-        /// <param name="isOpen">Whether the issue or pull request is open.</param>
         /// <param name="canCloseOrReopen">
         /// Whether the user can close or reopen the pull request from this comment.
+        /// </param>
+        /// <param name="isOpen">
+        /// An observable tracking whether the issue or pull request is open. Can be null if
+        /// <paramref name="canCloseOrReopen"/> is false.
         /// </param>
         Task InitializeAsync(
             IIssueishCommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
             bool isPullRequest,
-            bool isOpen,
-            bool canCloseOrReopen);
+            bool canCloseOrReopen,
+            IObservable<bool> isOpen = null);
     }
 }
