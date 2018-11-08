@@ -1,4 +1,4 @@
-# Contributing to Projects with GitHub for Visual Studio
+# Using GitHub for Visual Studio
 
 Use GitHub for Visual Studio to manage your projects and work with pull requests.
 
