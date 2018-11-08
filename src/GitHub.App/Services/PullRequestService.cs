@@ -231,8 +231,8 @@ namespace GitHub.Services
                     if (hasCheckRuns)
                     {
                         checksHasFailure = checkRuns
-                            .Any(model => model.Conclusion.HasValue 
-                                          && (model.Conclusion.Value == CheckConclusionState.Failure 
+                            .Any(model => model.Conclusion.HasValue
+                                          && (model.Conclusion.Value == CheckConclusionState.Failure
                                               || model.Conclusion.Value == CheckConclusionState.ActionRequired));
 
                         if (!checksHasFailure)
@@ -317,8 +317,8 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
-            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body
         )
         {
@@ -333,7 +333,7 @@ namespace GitHub.Services
             return PushAndCreatePR(modelService, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
-        public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
+        public IObservable<string> GetPullRequestTemplate(LocalRepositoryModel repository)
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
 
@@ -353,7 +353,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             string baseBranch,
             string compareBranch,
             int maxCommits)
@@ -369,7 +369,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository)
+        public IObservable<int> CountSubmodulesToSync(LocalRepositoryModel repository)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
@@ -399,7 +399,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
+        public IObservable<bool> IsWorkingDirectoryClean(LocalRepositoryModel repository)
         {
             // The `using` appears to resolve this issue:
             // https://github.com/github/VisualStudio/issues/1306
@@ -440,7 +440,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> Pull(ILocalRepositoryModel repository)
+        public IObservable<Unit> Pull(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -452,7 +452,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Unit> Push(ILocalRepositoryModel repository)
+        public IObservable<Unit> Push(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -466,7 +466,7 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress)
+        public async Task<bool> SyncSubmodules(LocalRepositoryModel repository, Action<string> progress)
         {
             var exitCode = await Where("git");
             if (exitCode != 0)
@@ -529,7 +529,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> Checkout(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName)
+        public IObservable<Unit> Checkout(LocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName)
         {
             return Observable.Defer(async () =>
             {
@@ -567,7 +567,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
+        public IObservable<string> GetDefaultLocalBranchName(LocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
             return Observable.Defer(() =>
             {
@@ -587,7 +587,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
+        public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(LocalRepositoryModel repository, int pullRequestNumber)
         {
             return Observable.Defer(async () =>
             {
@@ -606,7 +606,7 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<string> GetMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public async Task<string> GetMergeBase(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
@@ -620,7 +620,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<TreeChanges> GetTreeChanges(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -635,7 +635,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<BranchModel> GetLocalBranches(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -648,7 +648,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -671,12 +671,12 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public bool IsPullRequestFromRepository(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return string.Equals(repository.CloneUrl?.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase);
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<Unit> SwitchToBranch(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -718,7 +718,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        public IObservable<(string owner, int number)> GetPullRequestForCurrentBranch(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -736,7 +736,7 @@ namespace GitHub.Services
         }
 
         public async Task<string> ExtractToTempFile(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             PullRequestDetailModel pullRequest,
             string relativePath,
             string commitSha,
@@ -756,7 +756,7 @@ namespace GitHub.Services
             return tempFilePath;
         }
 
-        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
+        public Encoding GetEncoding(LocalRepositoryModel repository, string relativePath)
         {
             var fullPath = Path.Combine(repository.LocalPath, relativePath);
 
@@ -788,7 +788,7 @@ namespace GitHub.Services
             return true;
         }
 
-        public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
+        public IObservable<Unit> RemoveUnusedRemotes(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -889,7 +889,7 @@ namespace GitHub.Services
         }
 
         IEnumerable<string> GetLocalBranchesInternal(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IRepository repository,
             PullRequestDetailModel pullRequest)
         {
@@ -912,7 +912,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null &&
+            return value != default &&
                 value.Item1 == pullRequest.BaseRepositoryOwner &&
                 value.Item2 == pullRequest.Number;
         }
@@ -925,8 +925,8 @@ namespace GitHub.Services
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
-            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {
             // PullRequestModel doesn't keep a reference to repo
@@ -983,7 +983,7 @@ namespace GitHub.Services
             return owner + '#' + number.ToString(CultureInfo.InvariantCulture);
         }
 
-        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        static (string owner, int number) ParseGHfVSConfigKeyValue(string value)
         {
             if (value != null)
             {
@@ -996,12 +996,12 @@ namespace GitHub.Services
 
                     if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
                     {
-                        return Tuple.Create(owner, number);
+                        return (owner, number);
                     }
                 }
             }
 
-            return null;
+            return default;
         }
 
         class ListItemAdapter : PullRequestListItemModel

@@ -472,7 +472,7 @@ namespace GitHub.Services
             return matchingLine;
         }
 
-        static string GetAbsolutePath(ILocalRepositoryModel localRepository, string relativePath)
+        static string GetAbsolutePath(LocalRepositoryModel localRepository, string relativePath)
         {
             var localPath = localRepository.LocalPath;
             relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);

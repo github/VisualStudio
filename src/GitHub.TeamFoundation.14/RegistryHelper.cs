@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -23,13 +24,13 @@ namespace GitHub.TeamFoundation
             return Registry.CurrentUser.OpenSubKey(keyName, true);
         }
 
-        internal static IEnumerable<ILocalRepositoryModel> PokeTheRegistryForRepositoryList()
+        internal static IEnumerable<LocalRepositoryModel> PokeTheRegistryForRepositoryList()
         {
             using (var key = OpenGitKey("Repositories"))
             {
                 if (key == null)
                 {
-                    return Enumerable.Empty<ILocalRepositoryModel>();
+                    return Enumerable.Empty<LocalRepositoryModel>();
                 }
 
                 return key.GetSubKeyNames().Select(x =>
@@ -40,7 +41,7 @@ namespace GitHub.TeamFoundation
                         {
                             var path = subkey?.GetValue("Path") as string;
                             if (path != null && Directory.Exists(path))
-                                return new LocalRepositoryModel(path, GitService.GitServiceHelper);
+                                return GitService.GitServiceHelper.CreateLocalRepositoryModel(path);
                         }
                         catch (Exception)
                         {

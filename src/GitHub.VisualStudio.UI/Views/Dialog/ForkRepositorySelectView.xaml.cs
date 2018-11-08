@@ -30,7 +30,7 @@ namespace GitHub.VisualStudio.Views.Dialog
 
         private void existingForksListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var repository = e.AddedItems.OfType<IRemoteRepositoryModel>().FirstOrDefault();
+            var repository = e.AddedItems.OfType<RemoteRepositoryModel>().FirstOrDefault();
             if (repository != null)
             {
                 ((IForkRepositorySelectViewModel)DataContext).SwitchOrigin.Execute(repository);

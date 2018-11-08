@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Services;
 using LibGit2Sharp;
@@ -10,6 +8,41 @@ using NUnit.Framework;
 
 public class GitServiceTests
 {
+    public class CreateLocalRepositoryModelTests : TestBaseClass
+    {
+        [Test]
+        public void NoRemoteUrl()
+        {
+            using (var temp = new TempDirectory())
+            {
+                var repositoryFacade = Substitute.For<IRepositoryFacade>();
+                var gitService = new GitService(repositoryFacade);
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+
+                var model = gitService.CreateLocalRepositoryModel(path.FullName);
+
+                Assert.That(model.Name, Is.EqualTo("repo-name"));
+            }
+        }
+
+        [Test]
+        public void WithRemoteUrl()
+        {
+            using (var temp = new TempDirectory())
+            {
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                var repository = CreateRepositoryWithOrigin("https://github.com/user/repo-name");
+                var repositoryFacade = CreateRepositoryFacade(path.FullName, repository);
+                var gitService = new GitService(repositoryFacade);
+
+                var model = gitService.CreateLocalRepositoryModel(path.FullName);
+
+                Assert.That(model.Name, Is.EqualTo("repo-name"));
+                Assert.That(model.Owner, Is.EqualTo("user"));
+            }
+        }
+    }
+
     [TestCase("asdf", null)]
     [TestCase("", null)]
     [TestCase(null, null)]
@@ -47,10 +80,18 @@ public class GitServiceTests
         return repositoryFacade;
     }
 
+    static IRepository CreateRepositoryWithOrigin(string originUrl)
+    {
+        var repo = CreateRepository();
+        var origin = Substitute.For<Remote>();
+        origin.Url.Returns(originUrl);
+        repo.Network.Remotes["origin"].Returns(origin);
+        return repo;
+    }
+
     static IRepository CreateRepository()
     {
-        var repo = Substitute.For<IRepository>();
-        return repo;
+        return Substitute.For<IRepository>();
     }
 
     public class TheGetLatestPushedShaMethod : TestBaseClass
