@@ -19,5 +19,6 @@ namespace GitHub.Models
         public List<CheckRunModel> CheckRuns { get; set; }
 
         public string ApplicationName { get; set; }
+        public string ApplicationSlug { get; set; }
     }
 }

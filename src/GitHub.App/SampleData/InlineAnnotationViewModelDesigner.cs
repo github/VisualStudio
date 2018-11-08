@@ -35,6 +35,6 @@ namespace GitHub.SampleData
             Model= new InlineAnnotationModel(checkSuiteModel, checkRunModel, checkRunAnnotationModel);
         }
 
-        public IInlineAnnotationModel Model { get; }
+        public InlineAnnotationModel Model { get; }
     }
 }

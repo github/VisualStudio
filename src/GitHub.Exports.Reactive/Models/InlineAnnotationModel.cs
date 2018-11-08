@@ -2,8 +2,10 @@
 
 namespace GitHub.Models
 {
-    /// <inheritdoc />
-    public class InlineAnnotationModel: IInlineAnnotationModel
+    /// <summary>
+    /// Represents an inline annotation on an <see cref="IPullRequestSessionFile"/>.
+    /// </summary>
+    public class InlineAnnotationModel
     {
         readonly CheckSuiteModel checkSuite;
         readonly CheckRunModel checkRun;
@@ -27,33 +29,54 @@ namespace GitHub.Models
             this.annotation = annotation;
         }
 
+        /// <summary>
+        /// Gets the annotation path.
+        /// </summary>
         public string Path => annotation.Path;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the start line of the annotation.
+        /// </summary>
         public int StartLine => annotation.StartLine;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the end line of the annotation.
+        /// </summary>
         public int EndLine => annotation.EndLine;
-
-        /// <inheritdoc />
+        
+        /// <summary>
+        /// Gets the annotation level.
+        /// </summary>
         public CheckAnnotationLevel AnnotationLevel => annotation.AnnotationLevel;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the name of the check suite.
+        /// </summary>
         public string CheckSuiteName => checkSuite.ApplicationName;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the name of the check run.
+        /// </summary>
         public string CheckRunName => checkRun.Name;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the annotation title.
+        /// </summary>
         public string Title => annotation.Title;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the annotation message.
+        /// </summary>
         public string Message => annotation.Message;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the sha the check run was created on.
+        /// </summary>
         public string HeadSha => checkSuite.HeadSha;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the a descriptor for the line(s) reported.
+        /// </summary>
         public string LineDescription => $"{StartLine}:{EndLine}";
     }
 }

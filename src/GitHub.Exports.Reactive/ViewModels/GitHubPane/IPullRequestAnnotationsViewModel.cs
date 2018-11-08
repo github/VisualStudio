@@ -39,7 +39,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the id of the check run.
         /// </summary>
-        int CheckRunId { get; }
+        string CheckRunId { get; }
 
         /// <summary>
         /// Gets the name of the check run.
@@ -52,14 +52,14 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
-        /// Gets the list of annotations.
-        /// </summary>
-        IReadOnlyList<IPullRequestAnnotationItemViewModel> Annotations { get; }
-
-        /// <summary>
         /// Name of the Check Suite.
         /// </summary>
         string CheckSuiteName { get; }
+
+        /// <summary>
+        /// Gets a dictionary of annotations by file path.
+        /// </summary>
+        IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary { get; }
 
         /// <summary>
         /// Initializes the view model.
@@ -76,6 +76,6 @@ namespace GitHub.ViewModels.GitHubPane
             string owner,
             string repo,
             int pullRequestNumber,
-            int checkRunId);
+            string checkRunId);
     }
 }

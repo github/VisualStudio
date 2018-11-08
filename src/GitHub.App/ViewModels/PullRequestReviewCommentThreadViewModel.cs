@@ -79,7 +79,6 @@ namespace GitHub.ViewModels
             IPullRequestSession session,
             IInlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
-            PullRequestReviewModel review,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
         {
@@ -98,7 +97,7 @@ namespace GitHub.ViewModels
                 await vm.InitializeAsync(
                     session,
                     this,
-                    review,
+                    comment.Review,
                     comment.Comment,
                     CommentEditState.None).ConfigureAwait(false);
                 Comments.Add(vm);
@@ -111,7 +110,7 @@ namespace GitHub.ViewModels
                 await vm.InitializeAsPlaceholderAsync(
                     session,
                     this,
-                    review.State == PullRequestReviewState.Pending,
+                    session.HasPendingReview,
                     false).ConfigureAwait(true);
 
                 var (key, secondaryKey) = GetDraftKeys(vm);
@@ -164,35 +163,43 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(comment, nameof(comment));
 
-            if (IsNewThread)
-            {
-                var diffPosition = File.Diff
-                    .SelectMany(x => x.Lines)
-                    .FirstOrDefault(x =>
-                    {
-                        var line = Side == DiffSide.Left ? x.OldLineNumber : x.NewLineNumber;
-                        return line == LineNumber + 1;
-                    });
-
-                if (diffPosition == null)
-                {
-                    throw new InvalidOperationException("Unable to locate line in diff.");
-                }
-
-                await Session.PostReviewComment(
-                    comment.Body,
-                    File.CommitSha,
-                    File.RelativePath.Replace("\\", "/"),
-                    File.Diff,
-                    diffPosition.DiffLineNumber).ConfigureAwait(false);
-            }
-            else
-            {
-                var replyId = Comments[0].Id;
-                await Session.PostReviewComment(comment.Body, replyId).ConfigureAwait(false);
-            }
-
             await DeleteDraft(comment).ConfigureAwait(false);
+
+            try
+            {
+                if (IsNewThread)
+                {
+                    var diffPosition = File.Diff
+                        .SelectMany(x => x.Lines)
+                        .FirstOrDefault(x =>
+                        {
+                            var line = Side == DiffSide.Left ? x.OldLineNumber : x.NewLineNumber;
+                            return line == LineNumber + 1;
+                        });
+
+                    if (diffPosition == null)
+                    {
+                        throw new InvalidOperationException("Unable to locate line in diff.");
+                    }
+
+                    await Session.PostReviewComment(
+                        comment.Body,
+                        File.CommitSha,
+                        File.RelativePath.Replace("\\", "/"),
+                        File.Diff,
+                        diffPosition.DiffLineNumber).ConfigureAwait(false);
+                }
+                else
+                {
+                    var replyId = Comments[0].Id;
+                    await Session.PostReviewComment(comment.Body, replyId).ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                UpdateDraft(comment).Forget();
+                throw;
+            }
         }
 
         public override async Task EditComment(ICommentViewModel comment)
@@ -222,12 +229,13 @@ namespace GitHub.ViewModels
 
         protected override CommentDraft BuildDraft(ICommentViewModel comment)
         {
-            return new PullRequestReviewCommentDraft
-            {
-                Body = comment.Body,
-                Side = Side,
-                UpdatedAt = DateTimeOffset.UtcNow,
-            };
+            return !string.IsNullOrEmpty(comment.Body) ?
+                new PullRequestReviewCommentDraft
+                {
+                    Body = comment.Body,
+                    Side = Side,
+                    UpdatedAt = DateTimeOffset.UtcNow,
+                } : null;
         }
 
         protected override (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment)
@@ -237,6 +245,13 @@ namespace GitHub.ViewModels
                 Session.PullRequest.Number,
                 File.RelativePath,
                 LineNumber);
+        }
+        
+        async Task UpdateDraft(ICommentViewModel comment)
+        {
+            var draft = BuildDraft(comment);
+            var (key, secondaryKey) = GetDraftKeys(comment);
+            await DraftStore.UpdateDraft(key, secondaryKey, draft).ConfigureAwait(true);
         }
     }
 }

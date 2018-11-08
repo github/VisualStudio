@@ -241,7 +241,7 @@ namespace GitHub.ViewModels.GitHubPane
             return threads.FirstOrDefault();
         }
 
-        async Task<IInlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
+        async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
             CheckAnnotationLevel annotationLevel)
         {
             var sessionFile = await pullRequestSession.GetFile(file.RelativePath);

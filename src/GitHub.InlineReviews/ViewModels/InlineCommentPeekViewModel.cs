@@ -186,7 +186,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (thread?.Comments.Count > 0)
             {
-                await vm.InitializeAsync(session, annotationModels, file, thread.Comments[0].Review, thread, true);
+                await vm.InitializeAsync(session, annotationModels, file, thread, true);
             }
             else
             {
