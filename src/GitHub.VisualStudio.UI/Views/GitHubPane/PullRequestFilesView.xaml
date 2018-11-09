@@ -109,7 +109,7 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
-                        <ghfvs:OcticonImage Icon="alert" Height="10" Margin="-2 0"/>
+                        <imaging:CrispImage Width="10" Height="24" 
                                             Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Margin="-2 0" />
                         <Label Content="{Binding AnnotationNoticeCount}"></Label>
                     </TextBlock>
@@ -124,7 +124,7 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
-                        <imaging:CrispImage Width="10" Height="10" 
+                        <imaging:CrispImage Width="10" Height="24"
                                             Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Margin="-2 0"/>
                         <Label Content="{Binding AnnotationWarningCount}"></Label>
                     </TextBlock>
@@ -139,7 +139,7 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
-                        <imaging:CrispImage Width="10" Height="10" 
+                        <imaging:CrispImage Width="10" Height="24" 
                                             Moniker="{x:Static catalog:KnownMonikers.StatusError}" Margin="-2 0" />
                         <Label Content="{Binding AnnotationFailureCount}"></Label>
                     </TextBlock>
