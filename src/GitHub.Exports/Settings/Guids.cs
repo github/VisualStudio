@@ -41,6 +41,6 @@ namespace GitHub.VisualStudio
         public static readonly Guid CommandSetGuid = new Guid(CommandSetString);
 
         // Callout notification IDs
-        public static readonly Guid NoOriginRemoteCalloutId = new Guid("B5679412-58A1-49CD-96E9-8F093FE3DC79");
+        public static readonly Guid NoRemoteOriginCalloutId = new Guid("B5679412-58A1-49CD-96E9-8F093FE3DC79");
     }
 }

@@ -5,15 +5,15 @@ using GitHub.ViewModels.GitHubPane;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
-    public class GenericNoOriginRemoteView : ViewBase<INoOriginRemoteViewModel, GenericNoOriginRemoteView>
+    public class GenericNoRemoteOriginView : ViewBase<INoRemoteOriginViewModel, GenericNoRemoteOriginView>
     {
     }
 
-    [ExportViewFor(typeof(INoOriginRemoteViewModel))]
+    [ExportViewFor(typeof(INoRemoteOriginViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class NoOriginRemoteView : GenericNoOriginRemoteView
+    public partial class NoRemoteOriginView : GenericNoRemoteOriginView
     {
-        public NoOriginRemoteView()
+        public NoRemoteOriginView()
         {
             InitializeComponent();
         }

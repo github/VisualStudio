@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\GitHubPane\NoOriginRemoteView.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
+    <Compile Update="Views\GitHubPane\NoRemoteOriginView.xaml.cs">
+      <DependentUpon>NoRemoteOriginView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
