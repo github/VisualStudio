@@ -102,6 +102,20 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationNoticeCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <ghfvs:OcticonImage Icon="beaker" Height="10" Margin="-2 0"/>
+                        <Label Content="{Binding AnnotationNoticeCount}"></Label>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
                                     <DataTrigger Binding="{Binding AnnotationWarningCount}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
