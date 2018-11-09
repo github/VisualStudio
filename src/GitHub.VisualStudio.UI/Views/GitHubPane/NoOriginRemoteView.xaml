@@ -1,0 +1,44 @@
+﻿<local:GenericNoOriginRemoteView x:Class="GitHub.VisualStudio.Views.GitHubPane.NoOriginRemoteView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ghfvs="https://github.com/github/VisualStudio"
+    xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding ViewModel}"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <DockPanel>
+        <StackPanel Margin="10" Orientation="Vertical">
+            <ghfvs:OcticonImage Icon="mark_github"
+                Foreground="{DynamicResource GitHubVsWindowText}"
+                Margin="0,5"
+                Width="48"
+                Height="48" />
+            <Label
+                Foreground="{DynamicResource GitHubVsWindowText}"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Content="Can't find GitHub URL for repository" />
+            <TextBlock
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                HorizontalAlignment="Center">
+                <Run Text="Repositories must have a remote named "/>
+                <Run FontStyle="Italic" Text="origin"/>
+                <Run Text=" in order to locate their GitHub URL."/>
+            </TextBlock>
+        </StackPanel>
+    </DockPanel>
+</local:GenericNoOriginRemoteView>

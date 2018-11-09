@@ -44,6 +44,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ILoggedOutViewModel loggedOut;
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
         readonly INotAGitRepositoryViewModel notAGitRepository;
+        readonly INoOriginRemoteViewModel noOriginRemote;
         readonly ILoginFailedViewModel loginFailed;
         readonly SemaphoreSlim navigating = new SemaphoreSlim(1);
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
@@ -71,6 +72,7 @@ namespace GitHub.ViewModels.GitHubPane
             ILoggedOutViewModel loggedOut,
             INotAGitHubRepositoryViewModel notAGitHubRepository,
             INotAGitRepositoryViewModel notAGitRepository,
+            INoOriginRemoteViewModel noOriginRemote,
             ILoginFailedViewModel loginFailed)
         {
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
@@ -83,6 +85,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(loggedOut, nameof(loggedOut));
             Guard.ArgumentNotNull(notAGitHubRepository, nameof(notAGitHubRepository));
             Guard.ArgumentNotNull(notAGitRepository, nameof(notAGitRepository));
+            Guard.ArgumentNotNull(noOriginRemote, nameof(noOriginRemote));
             Guard.ArgumentNotNull(loginFailed, nameof(loginFailed));
 
             this.viewModelFactory = viewModelFactory;
@@ -93,6 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.loggedOut = loggedOut;
             this.notAGitHubRepository = notAGitHubRepository;
             this.notAGitRepository = notAGitRepository;
+            this.noOriginRemote = noOriginRemote;
             this.loginFailed = loginFailed;
 
             var contentAndNavigatorContent = Observable.CombineLatest(
@@ -409,8 +413,18 @@ namespace GitHub.ViewModels.GitHubPane
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
-                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
-                Content = notAGitHubRepository;
+                var remotes = repository.Remotes;
+                if (remotes != null && remotes.Count > 0 && !remotes.ContainsKey("origin"))
+                {
+                    log.Debug("No origin remote");
+                    Content = noOriginRemote;
+                }
+                else
+                {
+                    log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
+                    Content = notAGitHubRepository;
+                }
+
                 return;
             }
 
@@ -466,7 +480,7 @@ namespace GitHub.ViewModels.GitHubPane
                     Content = loggedOut;
                 }
             }
-            
+
             if (notGitHubRepo)
             {
                 log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
