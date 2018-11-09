@@ -66,8 +66,8 @@ namespace GitHub.ViewModels.Documents
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
-            IRemoteRepositoryModel repository,
-            ILocalRepositoryModel localRepository,
+            RemoteRepositoryModel repository,
+            LocalRepositoryModel localRepository,
             ActorModel currentUser,
             PullRequestDetailModel model)
         {

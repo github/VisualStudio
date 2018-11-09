@@ -20,7 +20,7 @@ namespace GitHub.Services
         /// <remarks>
         /// This property might be changed by a non-UI thread.
         /// </remarks>
-        ILocalRepositoryModel ActiveRepository { get; }
+        LocalRepositoryModel ActiveRepository { get; }
 
         /// <summary>
         /// Fired when the CurrentBranch or HeadSha changes.

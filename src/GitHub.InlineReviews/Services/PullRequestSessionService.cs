@@ -80,7 +80,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -89,7 +89,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -217,7 +217,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
+        public virtual async Task<string> GetTipSha(LocalRepositoryModel repository)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -226,7 +226,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
+        public async Task<bool> IsUnmodifiedAndPushed(LocalRepositoryModel repository, string relativePath, byte[] contents)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -238,7 +238,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<byte[]> ExtractFileFromGit(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             int pullRequestNumber,
             string sha,
             string relativePath)
@@ -425,7 +425,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<string> GetGraphQLPullRequestId(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string repositoryOwner,
             int number)
         {
@@ -441,7 +441,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public virtual async Task<string> GetPullRequestMergeBase(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             var baseSha = pullRequest.BaseRefSha;
             var headSha = pullRequest.HeadRefSha;
@@ -485,7 +485,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> CreatePendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
@@ -500,7 +500,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> CancelPendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string reviewId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
@@ -525,7 +525,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string commitId,
             string body,
@@ -556,7 +556,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<PullRequestDetailModel> SubmitPendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             PullRequestReviewEvent e)
@@ -586,7 +586,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostPendingReviewComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             string commitId,
@@ -620,7 +620,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostPendingReviewCommentReply(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             string inReplyTo)
@@ -650,7 +650,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostStandaloneReviewComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
             string commitId,
@@ -692,7 +692,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostStandaloneReviewCommentReply(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
             string inReplyTo)
@@ -704,7 +704,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> DeleteComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             int pullRequestId,
             int commentDatabaseId)
@@ -722,7 +722,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestDetailModel> EditComment(ILocalRepositoryModel localRepository,
+        public async Task<PullRequestDetailModel> EditComment(LocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             string commentNodeId,
             string body)
@@ -748,7 +748,7 @@ namespace GitHub.InlineReviews.Services
             return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
-        async Task<(string id, string owner, int number)> CreatePendingReviewCore(ILocalRepositoryModel localRepository, string pullRequestId)
+        async Task<(string id, string owner, int number)> CreatePendingReviewCore(LocalRepositoryModel localRepository, string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var graphql = await graphqlFactory.CreateConnection(address);
@@ -785,7 +785,7 @@ namespace GitHub.InlineReviews.Services
             return -1;
         }
 
-        Task<IRepository> GetRepository(ILocalRepositoryModel repository)
+        Task<IRepository> GetRepository(LocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }

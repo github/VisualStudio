@@ -10,7 +10,7 @@ namespace GitHub.Extensions
     {
         public static async Task<IModelService> GetModelService(
             this IConnectionManager cm,
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             IModelServiceFactory factory)
         {
             var connection = await cm.GetConnection(repository);

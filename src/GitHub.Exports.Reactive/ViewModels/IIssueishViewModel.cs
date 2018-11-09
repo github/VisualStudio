@@ -33,7 +33,7 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the repository that the issue or pull request comes from.
         /// </summary>
-        IRemoteRepositoryModel Repository { get; }
+        RemoteRepositoryModel Repository { get; }
 
         /// <summary>
         /// Gets the issue or pull request title.

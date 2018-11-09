@@ -27,7 +27,7 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         public PullRequestState State
         {
@@ -48,8 +48,8 @@ namespace GitHub.ViewModels
         }
 
         protected virtual async Task InitializeAsync(
-            IRemoteRepositoryModel repository,
-            ILocalRepositoryModel localRepository,
+            RemoteRepositoryModel repository,
+            LocalRepositoryModel localRepository,
             PullRequestDetailModel model)
         {
             await base.InitializeAsync(repository, model).ConfigureAwait(true);

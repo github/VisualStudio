@@ -50,7 +50,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager = null,
             IRepositoryService repositoryService = null,
             IPullRequestService service = null,
-            ILocalRepositoryModel repository = null,
+            LocalRepositoryModel repository = null,
             IConnection connection = null)
         {
             var result = CreateTarget(sessionManager, repositoryService, service);

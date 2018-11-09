@@ -30,7 +30,7 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
-        public IRemoteRepositoryModel Repository { get; private set; }
+        public RemoteRepositoryModel Repository { get; private set; }
 
         /// <inheritdoc/>
         public string Id { get; private set; }
@@ -70,7 +70,7 @@ namespace GitHub.ViewModels
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         protected Task InitializeAsync(
-            IRemoteRepositoryModel repository,
+            RemoteRepositoryModel repository,
             IssueishDetailModel model)
         {
             Repository = repository;

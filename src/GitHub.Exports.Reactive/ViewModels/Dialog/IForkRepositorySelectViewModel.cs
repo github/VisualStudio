@@ -20,7 +20,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a list of existing forks for accounts that the owner has access to.
         /// </summary>
-        IReadOnlyList<IRemoteRepositoryModel> ExistingForks { get; }
+        IReadOnlyList<RemoteRepositoryModel> ExistingForks { get; }
 
         /// <summary>
         /// Gets a value indicating whether the view model is loading.
@@ -30,18 +30,18 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="Accounts"/>.
         /// </summary>
-        ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
+        ReactiveCommand<IAccount, IAccount> SelectedAccount { get; }
 
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="ExistingForks"/>.
         /// </summary>
-        ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin { get; }
+        ReactiveCommand<RemoteRepositoryModel, Unit> SwitchOrigin { get; }
 
         /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="repository">The repository to fork.</param>
         /// <param name="connection">The connection to use.</param>
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

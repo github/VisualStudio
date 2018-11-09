@@ -23,15 +23,15 @@ namespace GitHub.ViewModels.Dialog
 
         readonly IModelServiceFactory modelServiceFactory;
         IReadOnlyList<IAccount> accounts;
-        IReadOnlyList<IRemoteRepositoryModel> existingForks;
+        IReadOnlyList<RemoteRepositoryModel> existingForks;
         bool isLoading;
 
         [ImportingConstructor]
         public ForkRepositorySelectViewModel(IModelServiceFactory modelServiceFactory)
         {
             this.modelServiceFactory = modelServiceFactory;
-            SelectedAccount = ReactiveCommand.Create<IAccount>(_ => { });
-            SwitchOrigin = ReactiveCommand.Create<IRemoteRepositoryModel>(_ => { });
+            SelectedAccount = ReactiveCommand.Create<IAccount, IAccount>(account => account);
+            SwitchOrigin = ReactiveCommand.Create<RemoteRepositoryModel>(_ => { });
         }
 
         public string Title => Resources.ForkRepositoryTitle;
@@ -42,7 +42,7 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref accounts, value); }
         }
 
-        public IReadOnlyList<IRemoteRepositoryModel> ExistingForks
+        public IReadOnlyList<RemoteRepositoryModel> ExistingForks
         {
             get { return existingForks; }
             private set { this.RaiseAndSetIfChanged(ref existingForks, value); }
@@ -54,13 +54,13 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        public ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
+        public ReactiveCommand<IAccount, IAccount> SelectedAccount { get; }
 
-        public ReactiveCommand<IRemoteRepositoryModel, Unit> SwitchOrigin { get; }
+        public ReactiveCommand<RemoteRepositoryModel, Unit> SwitchOrigin { get; }
 
-        public IObservable<object> Done => SelectedAccount.SelectNull();
+        public IObservable<object> Done => SelectedAccount;
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             IsLoading = true;
 
@@ -78,7 +78,7 @@ namespace GitHub.ViewModels.Dialog
                     {
                         var forks = x.Forks;
 
-                        var parents = new List<IRemoteRepositoryModel>();
+                        var parents = new List<RemoteRepositoryModel>();
                         var current = x.Respoitory;
                         while (current.Parent != null)
                         {
@@ -97,7 +97,7 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        void BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, ILocalRepositoryModel currentRepository, IList<IRemoteRepositoryModel> forks, List<IRemoteRepositoryModel> parents)
+        void BuildAccounts(IReadOnlyList<IAccount> accessibleAccounts, LocalRepositoryModel currentRepository, IList<RemoteRepositoryModel> forks, List<RemoteRepositoryModel> parents)
         {
             log.Verbose("BuildAccounts: {AccessibleAccounts} accessibleAccounts, {Forks} forks, {Parents} parents", accessibleAccounts.Count, forks.Count, parents.Count);
 
@@ -105,7 +105,7 @@ namespace GitHub.ViewModels.Dialog
 
             var readOnlyList = accessibleAccounts
                 .Where(account => account.Login != currentRepository.Owner)
-                .Select(account => new {Account = account, Fork = existingForksAndParents.ContainsKey(account.Login) ? existingForksAndParents[account.Login] : null })
+                .Select(account => new { Account = account, Fork = existingForksAndParents.ContainsKey(account.Login) ? existingForksAndParents[account.Login] : null })
                 .ToArray();
 
             Accounts = readOnlyList.Where(arg => arg.Fork == null).Select(arg => arg.Account).ToList();

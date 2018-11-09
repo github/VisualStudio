@@ -96,7 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public string RemoteRepositoryOwner { get; private set; }
@@ -152,7 +152,7 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public async Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

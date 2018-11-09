@@ -34,8 +34,8 @@ namespace GitHub.ViewModels.Documents
         /// <param name="currentUser">The currently logged in user.</param>
         /// <param name="model">The pull request model.</param>
         Task InitializeAsync(
-            IRemoteRepositoryModel repository,
-            ILocalRepositoryModel localRepository,
+            RemoteRepositoryModel repository,
+            LocalRepositoryModel localRepository,
             ActorModel currentUser,
             PullRequestDetailModel model);
     }
