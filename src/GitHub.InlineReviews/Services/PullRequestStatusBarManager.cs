@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Primitives;
+using GitHub.VisualStudio;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
@@ -16,12 +17,6 @@ using GitHub.Models;
 using GitHub.Logging;
 using Serilog;
 using ReactiveUI;
-using GitHub.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft;
-using GitHub.Services.Vssdk.Services;
-using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.InlineReviews.Services
 {
@@ -63,7 +58,6 @@ namespace GitHub.InlineReviews.Services
             this.teamExplorerContext = teamExplorerContext;
             this.connectionManager = connectionManager;
             this.tippingService = tippingService;
-            JoinableTaskFactory = ThreadHelper.JoinableTaskFactory;
         }
 
         /// <summary>
@@ -92,35 +86,40 @@ namespace GitHub.InlineReviews.Services
 
         async Task RefreshCurrentSession(LocalRepositoryModel repository, IPullRequestSession session)
         {
+            if (repository != null && repository.Remotes.Count > 0 && !repository.Remotes.ContainsKey("origin"))
+            {
+                NoOriginRemoteCallout();
+            }
+
             var showStatus = await IsDotComOrEnterpriseRepository(repository);
             if (!showStatus)
             {
-                ShowStatus(null);
+                var view = ShowStatus(null);
                 return;
             }
 
             var viewModel = CreatePullRequestStatusViewModel(session);
-            var view = ShowStatus(viewModel);
-
-            ShowCallout(view, repository);
+            ShowStatus(viewModel);
         }
 
-        void ShowCallout(FrameworkElement view, LocalRepositoryModel repository)
+        [STAThread]
+        void NoOriginRemoteCallout()
         {
-            JoinableTaskFactory.RunAsync(async () =>
+            var view = FindSccStatusBar(Application.Current.MainWindow);
+            if (view == null)
             {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                log.Warning("Couldn't find SccStatusBar");
+                return;
+            }
 
-                await Task.Delay(1000);
-                var calloutId = new Guid("63b813cd-9292-4c0f-aa49-ebd888b791fa");
-                var title = "GitHub repository opened";
-                var message = repository.CloneUrl;
-                var isDismissable = true;
-                var commandSet = new Guid("E234E66E-BA64-4D71-B304-16F0A4C793F5");
-                var commandId = (uint)0x4010; // View.TfsTeamExplorer
-                tippingService.Value.RequestCalloutDisplay(calloutId, title, message,
-                        isDismissable, view, commandSet, commandId);
-            });
+            var calloutId = Guids.NoOriginRemoteCalloutId;
+            var title = "Can't find GitHub URL for repository";
+            var message = $"Repositories must have a remote called `origin` defined in order to locate their GitHub URL.";
+            var isDismissable = true;
+            var commandSet = Guids.guidGitHubCmdSet;
+            var commandId = (uint)PkgCmdIDList.showGitHubPaneCommand;
+            tippingService.Value.RequestCalloutDisplay(calloutId, title, message,
+                    isDismissable, view, commandSet, commandId);
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(LocalRepositoryModel repository)
@@ -199,7 +198,5 @@ namespace GitHub.InlineReviews.Services
             var contentControl = mainWindow?.Template?.FindName(StatusBarPartName, mainWindow) as ContentControl;
             return contentControl?.Content as StatusBar;
         }
-
-        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

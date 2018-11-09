@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.Models;
@@ -38,18 +39,23 @@ namespace GitHub.Services
                 throw new ArgumentException("Path does not exist", nameof(localPath));
             }
 
-            var cloneUrl = GetUri(localPath);
-            var name = cloneUrl?.RepositoryName ?? dir.Name;
-
-            var model = new LocalRepositoryModel
+            using (var repository = GetRepository(localPath))
             {
-                LocalPath = localPath,
-                CloneUrl = cloneUrl,
-                Name = name,
-                Icon = Octicon.repo
-            };
+                var cloneUrl = GetUri(repository);
+                var remotes = GetRemotes(repository);
+                var name = cloneUrl?.RepositoryName ?? dir.Name;
 
-            return model;
+                var model = new LocalRepositoryModel
+                {
+                    LocalPath = localPath,
+                    CloneUrl = cloneUrl,
+                    Remotes = remotes,
+                    Name = name,
+                    Icon = Octicon.repo
+                };
+
+                return model;
+            }
         }
 
         public BranchModel GetBranch(LocalRepositoryModel model)
@@ -117,6 +123,11 @@ namespace GitHub.Services
         {
             var repoPath = repositoryFacade.Discover(path);
             return repoPath == null ? null : repositoryFacade.NewRepository(repoPath);
+        }
+
+        public IDictionary<string, UriString> GetRemotes(IRepository repo)
+        {
+            return repo.Network.Remotes.ToDictionary(r => r.Name, r => new UriString(r.Url));
         }
 
         /// <summary>

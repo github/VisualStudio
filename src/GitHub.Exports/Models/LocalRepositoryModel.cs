@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.ComponentModel;
+using System.Collections.Generic;
+using GitHub.Primitives;
 
 namespace GitHub.Models
 {
@@ -18,6 +20,11 @@ namespace GitHub.Models
         /// Gets the local path of the repository.
         /// </summary>
         public string LocalPath
+        {
+            get; set;
+        }
+
+        public IDictionary<string, UriString> Remotes
         {
             get; set;
         }
