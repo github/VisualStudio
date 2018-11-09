@@ -30,7 +30,7 @@ namespace GitHub.ViewModels.Dialog
         public ForkRepositorySelectViewModel(IModelServiceFactory modelServiceFactory)
         {
             this.modelServiceFactory = modelServiceFactory;
-            SelectedAccount = ReactiveCommand.Create<IAccount>(_ => { });
+            SelectedAccount = ReactiveCommand.Create<IAccount, IAccount>(account => account);
             SwitchOrigin = ReactiveCommand.Create<RemoteRepositoryModel>(_ => { });
         }
 
@@ -54,11 +54,11 @@ namespace GitHub.ViewModels.Dialog
             private set { this.RaiseAndSetIfChanged(ref isLoading, value); }
         }
 
-        public ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
+        public ReactiveCommand<IAccount, IAccount> SelectedAccount { get; }
 
         public ReactiveCommand<RemoteRepositoryModel, Unit> SwitchOrigin { get; }
 
-        public IObservable<object> Done => SelectedAccount.SelectNull();
+        public IObservable<object> Done => SelectedAccount;
 
         public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
