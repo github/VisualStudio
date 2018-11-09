@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.Services
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IConnectionManager> connectionManager;
-        readonly Lazy<IVsTippingService> tippingService;
+        readonly Lazy<ITippingService> tippingService;
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
@@ -47,7 +47,7 @@ namespace GitHub.InlineReviews.Services
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
             Lazy<ITeamExplorerContext> teamExplorerContext,
             Lazy<IConnectionManager> connectionManager,
-            Lazy<IVsTippingService> tippingService)
+            Lazy<ITippingService> tippingService)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(usageTracker,
                 x => x.NumberOfStatusBarOpenPullRequestList, openPullRequestsCommand);

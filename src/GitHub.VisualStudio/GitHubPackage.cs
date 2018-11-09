@@ -152,7 +152,7 @@ namespace GitHub.VisualStudio
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         [ExportForVisualStudioProcess]
-        public IVsTippingService TippingService => GetService<IVsTippingService>();
+        public ITippingService TippingService => GetService<ITippingService>();
 
         T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
     }
@@ -165,7 +165,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IUsageService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
-    [ProvideService(typeof(IVsTippingService))]
+    [ProvideService(typeof(ITippingService))]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
@@ -183,7 +183,7 @@ namespace GitHub.VisualStudio
             AddService(typeof(ILoginManager), CreateService, true);
             AddService(typeof(IGitHubToolWindowManager), CreateService, true);
             AddService(typeof(IPackageSettings), CreateService, true);
-            AddService(typeof(IVsTippingService), CreateService, true);
+            AddService(typeof(ITippingService), CreateService, true);
         }
 
 #if DEBUG
@@ -317,9 +317,9 @@ namespace GitHub.VisualStudio
                 var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 return new PackageSettings(sp);
             }
-            else if (serviceType == typeof(IVsTippingService))
+            else if (serviceType == typeof(ITippingService))
             {
-                return new VsTippingService(this);
+                return new TippingService(this);
             }
             // go the mef route
             else

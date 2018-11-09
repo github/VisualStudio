@@ -8,14 +8,14 @@ using IServiceProvider = System.IServiceProvider;
 
 namespace GitHub.Services.Vssdk.Services
 {
-    public class VsTippingService : IVsTippingService
+    public class TippingService : ITippingService
     {
         // This is the only supported ClientId
         readonly Guid ClientId = new Guid("D5D3B674-05BB-4942-B8EC-C3D13B5BD6EE");
 
         readonly IServiceProvider serviceProvider;
 
-        public VsTippingService(IServiceProvider serviceProvider)
+        public TippingService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
