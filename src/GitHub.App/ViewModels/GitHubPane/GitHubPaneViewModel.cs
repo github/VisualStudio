@@ -44,7 +44,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ILoggedOutViewModel loggedOut;
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
         readonly INotAGitRepositoryViewModel notAGitRepository;
-        readonly INoOriginRemoteViewModel noOriginRemote;
+        readonly INoRemoteOriginViewModel noRemoteOrigin;
         readonly ILoginFailedViewModel loginFailed;
         readonly SemaphoreSlim navigating = new SemaphoreSlim(1);
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
@@ -72,7 +72,7 @@ namespace GitHub.ViewModels.GitHubPane
             ILoggedOutViewModel loggedOut,
             INotAGitHubRepositoryViewModel notAGitHubRepository,
             INotAGitRepositoryViewModel notAGitRepository,
-            INoOriginRemoteViewModel noOriginRemote,
+            INoRemoteOriginViewModel noRemoteOrigin,
             ILoginFailedViewModel loginFailed)
         {
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
@@ -85,7 +85,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(loggedOut, nameof(loggedOut));
             Guard.ArgumentNotNull(notAGitHubRepository, nameof(notAGitHubRepository));
             Guard.ArgumentNotNull(notAGitRepository, nameof(notAGitRepository));
-            Guard.ArgumentNotNull(noOriginRemote, nameof(noOriginRemote));
+            Guard.ArgumentNotNull(noRemoteOrigin, nameof(noRemoteOrigin));
             Guard.ArgumentNotNull(loginFailed, nameof(loginFailed));
 
             this.viewModelFactory = viewModelFactory;
@@ -96,7 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.loggedOut = loggedOut;
             this.notAGitHubRepository = notAGitHubRepository;
             this.notAGitRepository = notAGitRepository;
-            this.noOriginRemote = noOriginRemote;
+            this.noRemoteOrigin = noRemoteOrigin;
             this.loginFailed = loginFailed;
 
             var contentAndNavigatorContent = Observable.CombineLatest(
@@ -413,11 +413,10 @@ namespace GitHub.ViewModels.GitHubPane
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
-                var remotes = repository.Remotes;
-                if (remotes != null && remotes.Count > 0 && !remotes.ContainsKey("origin"))
+                if (repository.HasNoRemoteOrigin)
                 {
                     log.Debug("No origin remote");
-                    Content = noOriginRemote;
+                    Content = noRemoteOrigin;
                 }
                 else
                 {

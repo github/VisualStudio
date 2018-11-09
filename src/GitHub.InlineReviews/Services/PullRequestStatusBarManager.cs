@@ -86,9 +86,9 @@ namespace GitHub.InlineReviews.Services
 
         async Task RefreshCurrentSession(LocalRepositoryModel repository, IPullRequestSession session)
         {
-            if (repository != null && repository.Remotes.Count > 0 && !repository.Remotes.ContainsKey("origin"))
+            if (repository.HasNoRemoteOrigin)
             {
-                NoOriginRemoteCallout();
+                NoRemoteOriginCallout();
             }
 
             var showStatus = await IsDotComOrEnterpriseRepository(repository);
@@ -103,7 +103,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         [STAThread]
-        void NoOriginRemoteCallout()
+        void NoRemoteOriginCallout()
         {
             var view = FindSccStatusBar(Application.Current.MainWindow);
             if (view == null)
@@ -112,7 +112,7 @@ namespace GitHub.InlineReviews.Services
                 return;
             }
 
-            var calloutId = Guids.NoOriginRemoteCalloutId;
+            var calloutId = Guids.NoRemoteOriginCalloutId;
             var title = "Can't find GitHub URL for repository";
             var message = $"Repositories must have a remote called `origin` defined in order to locate their GitHub URL.";
             var isDismissable = true;

@@ -24,7 +24,10 @@ namespace GitHub.Models
             get; set;
         }
 
-        public IDictionary<string, UriString> Remotes
+        /// <summary>
+        /// True if repository has remotes but none are named "origin".
+        /// </summary>
+        public bool HasNoRemoteOrigin
         {
             get; set;
         }
