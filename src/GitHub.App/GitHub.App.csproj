@@ -48,8 +48,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Editor" Version="14.3.25407" />
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />
