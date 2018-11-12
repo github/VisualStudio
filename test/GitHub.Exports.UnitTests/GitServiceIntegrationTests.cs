@@ -25,6 +25,16 @@ public class GitServiceIntegrationTests
             }
         }
 
+        [Test]
+        public void No_Directory()
+        {
+            var unknownPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+            var target = new GitService(new RepositoryFacade());
+
+            Assert.Throws<ArgumentException>(() => target.CreateLocalRepositoryModel(unknownPath));
+        }
+
         [TestCase("origin", "https://github.com/github/VisualStudio", false)]
         [TestCase("not_origin", "https://github.com/github/VisualStudio", true)]
         [TestCase(null, null, false, Description = "Has no remotes")]
