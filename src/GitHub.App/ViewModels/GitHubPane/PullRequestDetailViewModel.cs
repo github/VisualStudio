@@ -20,6 +20,8 @@ using LibGit2Sharp;
 using ReactiveUI;
 using Serilog;
 using static System.FormattableString;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
+using System.Threading;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -28,7 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     [Export(typeof(IPullRequestDetailViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IStaticReviewFileMap
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -40,6 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
         readonly IGitService gitService;
+
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -98,6 +101,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
+
             Files = files;
 
             Checkout = ReactiveCommand.CreateFromObservable(
@@ -133,6 +137,9 @@ namespace GitHub.ViewModels.GitHubPane
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
         }
+
+        [Import]
+        private Lazy<IStaticReviewFileMapManager> IntelliNavService { get; set; }
 
         private void DoOpenDetailsUrl()
         {
@@ -469,6 +476,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                     CheckoutState = new CheckoutCommandState(caption, disabled);
                     UpdateState = null;
+                    this.IntelliNavService.Value?.RegisterStaticReviewFileMap(this);
                 }
 
                 sessionSubscription?.Dispose();
@@ -544,7 +552,55 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public override void Deactivated() => active = false;
+        public override void Deactivated()
+        {
+            this.IntelliNavService.Value?.UnregisterStaticReviewFileMap(this);
+            active = false;
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetFileRepoPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
+            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
+            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
+            {
+                return staticReviewFileMap.GetFileRepoPathAsync(localPath, cancellationToken);
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetLocalPathForRepoPathAsync(string relativePath, string commitId, CancellationToken cancellationToken)
+        {
+            if (this.pullRequestsService != null)
+            {
+                relativePath = relativePath.TrimStart('/');
+
+                return this.pullRequestsService.ExtractToTempFile(
+                    this.Session.LocalRepository,
+                    this.Session.PullRequest,
+                    relativePath,
+                    commitId,
+                    this.pullRequestsService.GetEncoding(this.Session.LocalRepository, relativePath));
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetCommitIdForLocalFileAsync(string localPath, CancellationToken cancellationToken)
+        {
+            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
+            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
+            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
+            {
+                return staticReviewFileMap.GetCommitIdForLocalFileAsync(localPath, cancellationToken);
+            }
+
+            return Task.FromResult<string>(null);
+        }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
