@@ -7,12 +7,13 @@ namespace GitHub.Models
     public class BranchModel : ICopyable<BranchModel>,
         IEquatable<BranchModel>, IComparable<BranchModel>
     {
-        public BranchModel(string name, RepositoryModel repo, string sha, bool isTracking, string trackedSha) :
+        public BranchModel(string name, RepositoryModel repo, string sha, bool isTracking, string trackedSha, string trackedRemoteName) :
             this(name, repo)
         {
             IsTracking = isTracking;
             Sha = sha;
             TrackedSha = trackedSha;
+            TrackedRemoteName = trackedRemoteName;
         }
 
         public BranchModel(string name, RepositoryModel repo)
@@ -32,6 +33,7 @@ namespace GitHub.Models
         public string DisplayName { get; set; }
         public string Sha { get; private set; }
         public string TrackedSha { get; private set; }
+        public string TrackedRemoteName { get; private set; }
 
         #region Equality things
         public void CopyFrom(BranchModel other)

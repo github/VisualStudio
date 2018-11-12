@@ -72,6 +72,55 @@ public class GitServiceIntegrationTests
         }
     }
 
+    public class TheGetBranchMethod
+    {
+        [Test]
+        public void Master_Branch()
+        {
+            using (var temp = new TempRepository())
+            {
+                var signature = new Signature("Me", "my@email.com", DateTimeOffset.Now);
+                temp.Repository.Commit("First", signature, signature);
+                var expectSha = temp.Repository.Head.Tip.Sha;
+                var path = temp.Directory.FullName;
+                var target = new GitService(new RepositoryFacade());
+
+                var localRepository = target.CreateLocalRepositoryModel(path);
+                var branch = target.GetBranch(localRepository);
+
+                Assert.That(branch.Name, Is.EqualTo("master"));
+                Assert.That(branch.DisplayName, Is.EqualTo("master"));
+                Assert.That(branch.Id, Is.EqualTo("/master")); // We don't know owner
+                Assert.That(branch.IsTracking, Is.EqualTo(false));
+                Assert.That(branch.TrackedSha, Is.EqualTo(null));
+                Assert.That(branch.Sha, Is.EqualTo(expectSha));
+            }
+        }
+
+        [Test]
+        public void Branch_With_Remote()
+        {
+            using (var temp = new TempRepository())
+            {
+                var repository = temp.Repository;
+                var owner = "owner";
+                var remoteName = "remoteName";
+                var remote = repository.Network.Remotes.Add(remoteName, $"https://github.com/{owner}/VisualStudio");
+                var localBranch = repository.Head;
+                repository.Branches.Update(temp.Repository.Head,
+                    b => b.Remote = remote.Name,
+                    b => b.UpstreamBranch = localBranch.CanonicalName);
+                var path = temp.Directory.FullName;
+                var target = new GitService(new RepositoryFacade());
+                var localRepository = target.CreateLocalRepositoryModel(path);
+
+                var branch = target.GetBranch(localRepository);
+
+                Assert.That(branch.TrackedRemoteName, Is.EqualTo(remoteName));
+            }
+        }
+    }
+
     public class TheGetLatestPushedShaMethod : TestBaseClass
     {
         [Test]

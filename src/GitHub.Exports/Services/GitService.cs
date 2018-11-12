@@ -80,7 +80,8 @@ namespace GitHub.Services
                     repo: model,
                     sha: branch.Tip?.Sha,
                     isTracking: branch.IsTracking,
-                    trackedSha: branch.TrackedBranch?.Tip?.Sha);
+                    trackedSha: branch.TrackedBranch?.Tip?.Sha,
+                    trackedRemoteName: branch.TrackedBranch?.RemoteName);
             }
         }
 
