@@ -7,20 +7,50 @@ using NUnit.Framework;
 
 public class GitServiceIntegrationTests
 {
-    public class TheCreateLocalRepositoryModelMethod : TestBaseClass
+    public class TheCreateLocalRepositoryModelMethod
     {
-        [TestCase(true)]
-        [TestCase(false)]
-        public void NoRepository_Same_As_Repository_With_No_CloneUrl(bool createRepository)
+        [Test]
+        public void Empty_Repository()
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = temp.Directory.FullName;
+                var target = new GitService(new RepositoryFacade());
+
+                var model = target.CreateLocalRepositoryModel(path);
+
+                Assert.That(model, Is.Not.Null);
+                Assert.That(model.LocalPath, Is.EqualTo(path));
+                Assert.That(model.Name, Is.EqualTo(temp.Directory.Name));
+            }
+        }
+
+        [TestCase("origin", "https://github.com/github/VisualStudio", false)]
+        [TestCase("not_origin", "https://github.com/github/VisualStudio", true)]
+        [TestCase(null, null, false, Description = "Has no remotes")]
+        public void Check_HasNoRemoteOrigin(string remoteName, string remoteUrl, bool hasNoRemoteOrigin)
+        {
+            using (var temp = new TempRepository())
+            {
+                if (remoteName != null)
+                {
+                    temp.Repository.Network.Remotes.Add(remoteName, remoteUrl);
+                }
+                var path = temp.Directory.FullName;
+                var target = new GitService(new RepositoryFacade());
+
+                var model = target.CreateLocalRepositoryModel(path);
+
+                Assert.That(model.HasNoRemoteOrigin, Is.EqualTo(hasNoRemoteOrigin));
+            }
+        }
+
+        [Test]
+        public void NoRepository_Same_As_Repository_With_No_CloneUrl()
         {
             using (var temp = new TempDirectory())
             {
                 var path = temp.Directory.FullName;
-                if (createRepository)
-                {
-                    using (var repo = new Repository(Repository.Init(path))) { }
-                }
-
                 var target = new GitService(new RepositoryFacade());
 
                 var model = target.CreateLocalRepositoryModel(path);
@@ -232,6 +262,59 @@ public class GitServiceIntegrationTests
             var canonicalName = $"refs/remotes/{remoteName}/{trackedBranchName}";
             repo.Refs.Add(canonicalName, commit.Id);
             repo.Branches.Update(branch, b => b.TrackedBranch = canonicalName);
+        }
+    }
+
+    protected class TempRepository : TempDirectory
+    {
+        public TempRepository()
+            : base()
+        {
+            Repository = CreateRepository(Directory.FullName);
+        }
+
+        static Repository CreateRepository(string path)
+        {
+            return new Repository(Repository.Init(path));
+        }
+
+        public Repository Repository
+        {
+            get;
+        }
+    }
+
+    protected class TempDirectory : IDisposable
+    {
+        public TempDirectory()
+        {
+            var f = Path.GetTempFileName();
+            var name = Path.GetFileNameWithoutExtension(f);
+            File.Delete(f);
+            Directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), name));
+            Directory.Create();
+        }
+
+        public DirectoryInfo Directory { get; }
+
+        public void Dispose()
+        {
+            // Remove any read-only attributes
+            SetFileAttributes(Directory, FileAttributes.Normal);
+            Directory.Delete(true);
+        }
+
+        static void SetFileAttributes(DirectoryInfo dir, FileAttributes attributes)
+        {
+            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            {
+                SetFileAttributes(subdir, attributes);
+            }
+
+            foreach (var file in dir.GetFiles())
+            {
+                File.SetAttributes(file.FullName, attributes);
+            }
         }
     }
 }
