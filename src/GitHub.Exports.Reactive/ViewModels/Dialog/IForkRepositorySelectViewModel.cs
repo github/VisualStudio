@@ -30,7 +30,7 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="Accounts"/>.
         /// </summary>
-        ReactiveCommand<IAccount, Unit> SelectedAccount { get; }
+        ReactiveCommand<IAccount, IAccount> SelectedAccount { get; }
 
         /// <summary>
         /// Gets a command that is executed when the user selects an item in <see cref="ExistingForks"/>.

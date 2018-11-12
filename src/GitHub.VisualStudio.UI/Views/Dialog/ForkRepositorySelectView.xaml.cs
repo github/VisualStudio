@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.Views.Dialog
 
             if (account != null)
             {
-                ((IForkRepositorySelectViewModel)DataContext).SelectedAccount.Execute(account);
+                ((IForkRepositorySelectViewModel)DataContext).SelectedAccount.Execute(account).Subscribe();
             }
         }
 
@@ -33,7 +33,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             var repository = e.AddedItems.OfType<RemoteRepositoryModel>().FirstOrDefault();
             if (repository != null)
             {
-                ((IForkRepositorySelectViewModel)DataContext).SwitchOrigin.Execute(repository);
+                ((IForkRepositorySelectViewModel)DataContext).SwitchOrigin.Execute(repository).Subscribe();
             }
         }
     }
