@@ -259,6 +259,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find GitHub URL for repository.
+        /// </summary>
+        public static string CantFindGitHubUrlForRepository {
+            get {
+                return ResourceManager.GetString("CantFindGitHubUrlForRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changes ({0}).
         /// </summary>
         public static string ChangesCountFormat {
@@ -1608,6 +1617,15 @@ namespace GitHub {
         public static string RepoNameText {
             get {
                 return ResourceManager.GetString("RepoNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repositories must have a remote called &quot;origin&quot; defined in order to locate their GitHub URL..
+        /// </summary>
+        public static string RepositoriesMustHaveRemoteOrigin {
+            get {
+                return ResourceManager.GetString("RepositoriesMustHaveRemoteOrigin", resourceCulture);
             }
         }
         

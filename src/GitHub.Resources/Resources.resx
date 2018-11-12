@@ -836,4 +836,10 @@ https://git-scm.com/download/win</value>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
+  <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
+    <value>Can't find GitHub URL for repository</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
+    <value>Repositories must have a remote called "origin" defined in order to locate their GitHub URL.</value>
+  </data>
 </root>

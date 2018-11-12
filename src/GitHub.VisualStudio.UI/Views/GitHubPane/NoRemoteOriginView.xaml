@@ -30,15 +30,13 @@
                 Foreground="{DynamicResource GitHubVsWindowText}"
                 HorizontalAlignment="Center"
                 FontSize="16"
-                Content="Can't find GitHub URL for repository" />
+                Content="{x:Static ghfvs:Resources.CantFindGitHubUrlForRepository}" />
+
             <TextBlock
+                Text="{x:Static ghfvs:Resources.RepositoriesMustHaveRemoteOrigin}"
                 TextWrapping="Wrap"
                 TextAlignment="Center"
-                HorizontalAlignment="Center">
-                <Run Text="Repositories must have a remote named "/>
-                <Run FontStyle="Italic" Text="origin"/>
-                <Run Text=" in order to locate their GitHub URL."/>
-            </TextBlock>
+                HorizontalAlignment="Center" />
         </StackPanel>
     </DockPanel>
 </local:GenericNoRemoteOriginView>

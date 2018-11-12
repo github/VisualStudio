@@ -113,8 +113,8 @@ namespace GitHub.InlineReviews.Services
             }
 
             var calloutId = Guids.NoRemoteOriginCalloutId;
-            var title = "Can't find GitHub URL for repository";
-            var message = $"Repositories must have a remote called `origin` defined in order to locate their GitHub URL.";
+            var title = Resources.CantFindGitHubUrlForRepository;
+            var message = Resources.RepositoriesMustHaveRemoteOrigin;
             var isDismissable = true;
             var commandSet = Guids.guidGitHubCmdSet;
             var commandId = (uint)PkgCmdIDList.showGitHubPaneCommand;
