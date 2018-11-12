@@ -41,8 +41,14 @@ namespace GitHub.Services
 
             using (var repository = GetRepository(localPath))
             {
-                var cloneUrl = GetUri(repository);
-                var noRemoteOrigin = HasNoRemoteOrigin(repository);
+                UriString cloneUrl = null;
+                bool noRemoteOrigin = false;
+                if (repository != null)
+                {
+                    cloneUrl = GetUri(repository);
+                    noRemoteOrigin = HasNoRemoteOrigin(repository);
+                }
+
                 var name = cloneUrl?.RepositoryName ?? dir.Name;
 
                 var model = new LocalRepositoryModel
