@@ -7,6 +7,31 @@ using NUnit.Framework;
 
 public class GitServiceIntegrationTests
 {
+    public class TheCreateLocalRepositoryModelMethod : TestBaseClass
+    {
+        [TestCase(true)]
+        [TestCase(false)]
+        public void NoRepository_Same_As_Repository_With_No_CloneUrl(bool createRepository)
+        {
+            using (var temp = new TempDirectory())
+            {
+                var path = temp.Directory.FullName;
+                if (createRepository)
+                {
+                    using (var repo = new Repository(Repository.Init(path))) { }
+                }
+
+                var target = new GitService(new RepositoryFacade());
+
+                var model = target.CreateLocalRepositoryModel(path);
+
+                Assert.That(model, Is.Not.Null);
+                Assert.That(model.LocalPath, Is.EqualTo(path));
+                Assert.That(model.Name, Is.EqualTo(temp.Directory.Name));
+            }
+        }
+    }
+
     public class TheGetLatestPushedShaMethod : TestBaseClass
     {
         [Test]
