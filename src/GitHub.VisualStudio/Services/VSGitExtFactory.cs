@@ -1,13 +1,7 @@
-﻿extern alias TF14;
-extern alias TF15;
-extern alias TF16;
-
-using System;
+﻿using System;
 using GitHub.Logging;
+using GitHub.VisualStudio.Base;
 using Serilog;
-using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
-using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
-using VSGitExt16 = TF16.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.Services
 {
