@@ -15,7 +15,7 @@ namespace GitHub.Services.Vssdk.Services
         static readonly ILogger log = LogManager.ForContext<TippingService>();
 
         // This is the only supported ClientId
-        readonly Guid ClientId = new Guid("D5D3B674-05BB-4942-B8EC-C3D13B5BD6EE");
+        public static readonly Guid ClientId = new Guid("D5D3B674-05BB-4942-B8EC-C3D13B5BD6EE");
 
         readonly IServiceProvider serviceProvider;
 
