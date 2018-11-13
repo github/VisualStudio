@@ -64,7 +64,14 @@ namespace GitHub.Services.Vssdk.Services
             Assumes.Present(tippingService);
             var currentMethod = MethodBase.GetCurrentMethod();
             var parameterTypes = currentMethod.GetParameters().Select(p => p.ParameterType).ToArray();
-            var method = tippingService.GetType().GetMethod(currentMethod.Name, parameterTypes);
+            var tippingServiceType = tippingService.GetType();
+            var method = tippingServiceType.GetMethod(currentMethod.Name, parameterTypes);
+            if (method == null)
+            {
+                log.Error("Couldn't find method on {Type} with parameters like {Method}", tippingServiceType, currentMethod);
+                return;
+            }
+
             var arguments = new object[] { clientId, calloutId, title, message, isPermanentlyDismissible, anchor,
                     vsCommandGroupId, vsCommandId };
             method.Invoke(tippingService, arguments);
