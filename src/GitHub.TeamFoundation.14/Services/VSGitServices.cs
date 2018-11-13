@@ -90,7 +90,7 @@ namespace GitHub.Services
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
             Assumes.NotNull(cloneAsyncMethod);
-            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, default, null };
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, null, null };
             var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
