@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" Link="SplatModeDetectorSetUp.cs" />
   </ItemGroup>
 
   <ItemGroup>

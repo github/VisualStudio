@@ -3,13 +3,17 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using GitHub.Logging;
 using Microsoft;
+using Serilog;
 using IServiceProvider = System.IServiceProvider;
 
 namespace GitHub.Services.Vssdk.Services
 {
     public class TippingService : ITippingService
     {
+        static readonly ILogger log = LogManager.ForContext<TippingService>();
+
         // This is the only supported ClientId
         readonly Guid ClientId = new Guid("D5D3B674-05BB-4942-B8EC-C3D13B5BD6EE");
 
@@ -24,7 +28,8 @@ namespace GitHub.Services.Vssdk.Services
             bool isPermanentlyDismissible, FrameworkElement targetElement,
             Guid vsCommandGroupId, uint vsCommandId)
         {
-            var screenPoint = targetElement.PointToScreen(new Point(targetElement.ActualWidth / 2, 0));
+            var screenPoint = !Splat.ModeDetector.InUnitTestRunner() ?
+                    targetElement.PointToScreen(new Point(targetElement.ActualWidth / 2, 0)) : default;
             var point = new Microsoft.VisualStudio.OLE.Interop.POINT { x = (int)screenPoint.X, y = (int)screenPoint.Y };
             RequestCalloutDisplay(ClientId, calloutId, title, message, isPermanentlyDismissible,
                 point, vsCommandGroupId, vsCommandId);
@@ -50,6 +55,12 @@ namespace GitHub.Services.Vssdk.Services
             Microsoft.VisualStudio.OLE.Interop.POINT anchor, Guid vsCommandGroupId, uint vsCommandId)
         {
             var tippingService = serviceProvider.GetService(typeof(SVsTippingService));
+            if (tippingService == null)
+            {
+                log.Error("Can't find {ServiceType}", typeof(SVsTippingService));
+                return;
+            }
+
             Assumes.Present(tippingService);
             var currentMethod = MethodBase.GetCurrentMethod();
             var parameterTypes = currentMethod.GetParameters().Select(p => p.ParameterType).ToArray();
