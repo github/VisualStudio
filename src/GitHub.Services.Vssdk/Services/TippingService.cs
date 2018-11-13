@@ -10,6 +10,13 @@ using IServiceProvider = System.IServiceProvider;
 
 namespace GitHub.Services.Vssdk.Services
 {
+    /// <summary>
+    /// This service is a thin wrapper around <see cref="Microsoft.Internal.VisualStudio.Shell.Interop.IVsTippingService"/>.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="IVsTippingService"/> interface is public, but contained within the 'Microsoft.VisualStudio.Shell.UI.Internal' assembly.
+    /// To avoid a direct dependency on 'Microsoft.VisualStudio.Shell.UI.Internal', we use reflection to call this service.
+    /// </remarks>
     public class TippingService : ITippingService
     {
         static readonly ILogger log = LogManager.ForContext<TippingService>();
@@ -24,6 +31,7 @@ namespace GitHub.Services.Vssdk.Services
             this.serviceProvider = serviceProvider;
         }
 
+        /// <inheritdoc/>
         public void RequestCalloutDisplay(Guid calloutId, string title, string message,
             bool isPermanentlyDismissible, FrameworkElement targetElement,
             Guid vsCommandGroupId, uint vsCommandId)
@@ -35,7 +43,7 @@ namespace GitHub.Services.Vssdk.Services
                 point, vsCommandGroupId, vsCommandId);
         }
 
-        // Available on Visual Studio 2017
+        // The option to pass a command option is only available on Visual Studio 2017+.
         void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message,
             bool isPermanentlyDismissible, FrameworkElement targetElement,
             Guid vsCommandGroupId, uint vsCommandId, object commandOption = null)
