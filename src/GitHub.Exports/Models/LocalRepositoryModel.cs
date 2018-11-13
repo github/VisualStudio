@@ -27,7 +27,7 @@ namespace GitHub.Models
         /// <summary>
         /// True if repository has remotes but none are named "origin".
         /// </summary>
-        public bool HasNoRemoteOrigin
+        public bool HasRemotesButNoOrigin
         {
             get; set;
         }

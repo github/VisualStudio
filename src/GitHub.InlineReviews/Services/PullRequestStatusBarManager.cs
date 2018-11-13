@@ -86,7 +86,7 @@ namespace GitHub.InlineReviews.Services
 
         async Task RefreshCurrentSession(LocalRepositoryModel repository, IPullRequestSession session)
         {
-            if (repository.HasNoRemoteOrigin)
+            if (repository.HasRemotesButNoOrigin)
             {
                 NoRemoteOriginCallout();
             }

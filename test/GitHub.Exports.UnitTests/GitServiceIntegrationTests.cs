@@ -38,7 +38,7 @@ public class GitServiceIntegrationTests
         [TestCase("origin", "https://github.com/github/VisualStudio", false)]
         [TestCase("not_origin", "https://github.com/github/VisualStudio", true)]
         [TestCase(null, null, false, Description = "Has no remotes")]
-        public void Check_HasNoRemoteOrigin(string remoteName, string remoteUrl, bool hasNoRemoteOrigin)
+        public void Check_HasRemotesButNoOrigin(string remoteName, string remoteUrl, bool noOrigin)
         {
             using (var temp = new TempRepository())
             {
@@ -51,7 +51,7 @@ public class GitServiceIntegrationTests
 
                 var model = target.CreateLocalRepositoryModel(path);
 
-                Assert.That(model.HasNoRemoteOrigin, Is.EqualTo(hasNoRemoteOrigin));
+                Assert.That(model.HasRemotesButNoOrigin, Is.EqualTo(noOrigin));
             }
         }
 

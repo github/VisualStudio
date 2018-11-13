@@ -42,11 +42,11 @@ namespace GitHub.Services
             using (var repository = GetRepository(localPath))
             {
                 UriString cloneUrl = null;
-                bool noRemoteOrigin = false;
+                bool noOrigin = false;
                 if (repository != null)
                 {
                     cloneUrl = GetUri(repository);
-                    noRemoteOrigin = HasNoRemoteOrigin(repository);
+                    noOrigin = HasRemotesButNoOrigin(repository);
                 }
 
                 var name = cloneUrl?.RepositoryName ?? dir.Name;
@@ -55,7 +55,7 @@ namespace GitHub.Services
                 {
                     LocalPath = localPath,
                     CloneUrl = cloneUrl,
-                    HasNoRemoteOrigin = noRemoteOrigin,
+                    HasRemotesButNoOrigin = noOrigin,
                     Name = name,
                     Icon = Octicon.repo
                 };
@@ -137,7 +137,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repo">The target repository.</param>
         /// <returns>True if repository has remotes but none are called "origin".</returns>
-        public bool HasNoRemoteOrigin(IRepository repo)
+        public bool HasRemotesButNoOrigin(IRepository repo)
         {
             var remotes = repo.Network.Remotes;
             return remotes["origin"] == null && remotes.Any();

@@ -413,7 +413,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
-                if (repository.HasNoRemoteOrigin)
+                if (repository.HasRemotesButNoOrigin)
                 {
                     log.Debug("No origin remote");
                     Content = noRemoteOrigin;
