@@ -38,6 +38,12 @@
                 TextAlignment="Center"
                 HorizontalAlignment="Center" />
 
+            <TextBlock
+                Text="Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below."
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                HorizontalAlignment="Center" />
+
             <Button HorizontalAlignment="Center"
                 Margin="0,15"
                 Style="{DynamicResource GitHubVsPrimaryActionButton}"
