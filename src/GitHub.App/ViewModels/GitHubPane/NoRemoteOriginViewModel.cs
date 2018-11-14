@@ -1,4 +1,9 @@
+using System;
+using System.Reactive;
+using System.Threading.Tasks;
 using System.ComponentModel.Composition;
+using GitHub.Services;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -9,5 +14,17 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class NoRemoteOriginViewModel : PanePageViewModelBase, INoRemoteOriginViewModel
     {
+        ITeamExplorerServices teamExplorerServices;
+
+        [ImportingConstructor]
+        public NoRemoteOriginViewModel(ITeamExplorerServices teamExplorerServices)
+        {
+            this.teamExplorerServices = teamExplorerServices;
+            EditRemotes = ReactiveCommand.CreateFromTask(OnEditRemotesAsync);
+        }
+
+        Task OnEditRemotesAsync() => teamExplorerServices.ShowRepositorySettingsRemotesAsync();
+
+        public ReactiveCommand<Unit, Unit> EditRemotes { get; }
     }
 }

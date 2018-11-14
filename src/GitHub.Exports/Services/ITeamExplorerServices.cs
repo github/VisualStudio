@@ -1,4 +1,4 @@
-using System.Windows.Input;
+using System.Threading.Tasks;
 
 namespace GitHub.Services
 {
@@ -7,6 +7,7 @@ namespace GitHub.Services
         void ShowConnectPage();
         void ShowHomePage();
         void ShowPublishSection();
+        Task ShowRepositorySettingsRemotesAsync();
         void ClearNotifications();
         void OpenRepository(string repositoryPath);
     }

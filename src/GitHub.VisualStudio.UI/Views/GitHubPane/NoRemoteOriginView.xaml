@@ -37,6 +37,13 @@
                 TextWrapping="Wrap"
                 TextAlignment="Center"
                 HorizontalAlignment="Center" />
+
+            <Button HorizontalAlignment="Center"
+                Margin="0,15"
+                Style="{DynamicResource GitHubVsPrimaryActionButton}"
+                Command="{Binding EditRemotes}" >
+                <TextBlock Text="Edit Remotes" />
+            </Button>
         </StackPanel>
     </DockPanel>
 </local:GenericNoRemoteOriginView>
