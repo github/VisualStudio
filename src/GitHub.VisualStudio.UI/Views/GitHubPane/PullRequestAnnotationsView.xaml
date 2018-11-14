@@ -42,20 +42,49 @@
                            Margin="0"
                            Text="{Binding PullRequestTitle}"
                            TextWrapping="Wrap"/>
-                <StackPanel Orientation="Horizontal" Margin="0 4">
-                </StackPanel>
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
                 <ItemsControl ItemsSource="{Binding AnnotationsDictionary}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <Label Content="{Binding Key}"></Label>
+                                <Expander>
+                                    <Expander.Header>
+                                        <Label Content="{Binding Key}"></Label>
+                                    </Expander.Header>
 
+                                    <ItemsControl ItemsSource="{Binding Value}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="22 0 0 0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="search" Foreground="CornflowerBlue" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                                                        <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="alert" Foreground="#f1c647" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                                                        <ghfvs:OcticonImage Margin="0 0 0 0" MinWidth="20" Icon="x" Foreground="#cb2431" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                                                        <TextBlock FontWeight="SemiBold" Margin="2 0">
+                                                        <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                    </StackPanel>
+
+                                                    <StackPanel Margin="21 4 0 4">
+                                                        <TextBlock Margin="5 4 0 0">
+                                                        <Run Text="{Binding Annotation.Path, Mode=OneWay}"/>
+                                                        <Run FontWeight="SemiBold" Text="{Binding LineDescription, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                        <markdig:MarkdownViewer Margin="5 0 0 0" Markdown="{Binding Annotation.Message}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </StackPanel>
+
+                            <!--
                                 <ItemsControl ItemsSource="{Binding Value}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel>
-                                                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
                                                 <Expander Margin="0 0 4 0" Foreground="{DynamicResource GitHubVsToolWindowText}" IsExpanded="{Binding IsExpanded, Mode=OneTime}">
                                                     <Expander.Header>
@@ -81,6 +110,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </StackPanel>
+                            -->
 
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
