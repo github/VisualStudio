@@ -138,8 +138,8 @@ namespace GitHub.ViewModels.GitHubPane
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
         }
 
-        [Import]
-        private Lazy<IStaticReviewFileMapManager> IntelliNavService { get; set; }
+        [Import(AllowDefault = true)]
+        private IStaticReviewFileMapManager StaticReviewFileMapManager { get; set; }
 
         private void DoOpenDetailsUrl()
         {
@@ -476,7 +476,6 @@ namespace GitHub.ViewModels.GitHubPane
 
                     CheckoutState = new CheckoutCommandState(caption, disabled);
                     UpdateState = null;
-                    this.IntelliNavService.Value?.RegisterStaticReviewFileMap(this);
                 }
 
                 sessionSubscription?.Dispose();
@@ -543,6 +542,7 @@ namespace GitHub.ViewModels.GitHubPane
         public override void Activated()
         {
             active = true;
+            this.StaticReviewFileMapManager?.RegisterStaticReviewFileMap(this);
 
             if (refreshOnActivate)
             {
@@ -554,7 +554,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public override void Deactivated()
         {
-            this.IntelliNavService.Value?.UnregisterStaticReviewFileMap(this);
+            this.StaticReviewFileMapManager?.UnregisterStaticReviewFileMap(this);
             active = false;
         }
 
