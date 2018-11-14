@@ -27,7 +27,7 @@
     </Control.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <DockPanel>
+        <StackPanel>
             <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
                 <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
@@ -93,7 +93,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-        </DockPanel>
+        </StackPanel>
     </ScrollViewer>
 
 </UserControl>
