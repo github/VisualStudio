@@ -88,5 +88,26 @@ namespace GitHub.Services
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             return await graphql.Run(postComment, vars).ConfigureAwait(false);
         }
+
+        public async Task DeleteComment(
+            HostAddress address,
+            string owner,
+            string repository,
+            int commentId)
+        {
+            var client = await apiClientFactory.CreateGitHubClient(address).ConfigureAwait(false);
+            await client.Issue.Comment.Delete(owner, repository, commentId).ConfigureAwait(false);
+        }
+
+        public async Task EditComment(
+            HostAddress address,
+            string owner,
+            string repository,
+            int commentId,
+            string body)
+        {
+            var client = await apiClientFactory.CreateGitHubClient(address).ConfigureAwait(false);
+            await client.Issue.Comment.Update(owner, repository, commentId, body).ConfigureAwait(false);
+        }
     }
 }

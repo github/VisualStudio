@@ -143,14 +143,24 @@ namespace GitHub.ViewModels.Documents
             await AddPlaceholder().ConfigureAwait(true);
         }
 
-        Task ICommentThreadViewModel.DeleteComment(ICommentViewModel comment)
+        public async Task DeleteComment(ICommentViewModel comment)
         {
-            throw new NotImplementedException();
+            await service.DeleteComment(
+                HostAddress.Create(Repository.CloneUrl),
+                Repository.Owner,
+                Repository.Name,
+                comment.DatabaseId).ConfigureAwait(true);
+            timeline.Remove(comment);
         }
 
-        Task ICommentThreadViewModel.EditComment(ICommentViewModel comment)
+        public async Task EditComment(ICommentViewModel comment)
         {
-            throw new NotImplementedException();
+            await service.EditComment(
+                HostAddress.Create(Repository.CloneUrl),
+                Repository.Owner,
+                Repository.Name,
+                comment.DatabaseId,
+                comment.Body).ConfigureAwait(false);
         }
 
         async Task AddComment(CommentModel comment)
