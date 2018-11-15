@@ -72,13 +72,15 @@
                                                     </StackPanel>
 
                                                     <StackPanel Margin="8,0,0,0" Grid.Column="1">
-                                                        <TextBlock FontFamily="Consolas" Foreground="{DynamicResource VsBrush.GrayText}" Grid.Row="0">
-                                                            <Run Text="Line" />
-                                                            <Run Text="{Binding LineDescription, Mode=OneWay}"/>
+                                                        <TextBlock FontWeight="SemiBold" Grid.Row="0">
+                                                            <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
                                                         </TextBlock>
 
-                                                        <TextBlock FontWeight="SemiBold" Grid.Row="1">
-                                                            <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
+                                                        <TextBlock FontFamily="Consolas" Foreground="{DynamicResource VsBrush.GrayText}" Grid.Row="1" Visibility="{Binding IsFileInPullRequest, Converter={ghfvs:BooleanToVisibilityConverter}}">
+		                                                    <Hyperlink Command="{Binding OpenAnnotation}">
+                                                                <Run Text="Line" />
+                                                                <Run Text="{Binding LineDescription, Mode=OneWay}"/>
+		                                                    </Hyperlink>
                                                         </TextBlock>
 
                                                         <markdig:MarkdownViewer Grid.Column="1" Grid.Row="2"
