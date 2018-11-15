@@ -368,6 +368,7 @@
     </ProjectReference>
     <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
       <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
+      <PrivateAssets>All</PrivateAssets>
       <Name>GitHub.StartPage</Name>
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>

@@ -15,17 +15,17 @@ public class OpenFromClipboardCommandTests
 {
     public class TheExecuteMethod
     {
-        //[Test]
-        //public async Task NothingInClipboard()
-        //{
-        //    var vsServices = Substitute.For<IVSServices>();
-        //    vsServices.ShowMessageBoxInfo(null).Returns(VSConstants.MessageBoxResult.IDOK);
-        //    var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: null);
+        [Test]
+        public async Task NothingInClipboard()
+        {
+            var vsServices = Substitute.For<IVSServices>();
+            vsServices.ShowMessageBoxInfo(null).Returns(VSConstants.MessageBoxResult.IDOK);
+            var target = CreateOpenFromClipboardCommand(vsServices: vsServices, contextFromClipboard: null);
 
-        //    await target.Execute(null);
+            await target.Execute(null);
 
-        //    vsServices.Received(1).ShowMessageBoxInfo(Resources.NoGitHubUrlMessage);
-        //}
+            vsServices.Received(1).ShowMessageBoxInfo(Resources.NoGitHubUrlMessage);
+        }
 
         [Test]
         public async Task NoLocalRepository()

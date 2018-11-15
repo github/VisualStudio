@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Codecov" Version="1.1.0" />
-    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="15.8.75-pre" />
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
