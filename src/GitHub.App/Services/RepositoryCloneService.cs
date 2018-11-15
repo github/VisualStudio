@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Helpers;
 using GitHub.Logging;
@@ -36,6 +36,8 @@ namespace GitHub.Services
         readonly IVSGitServices vsGitServices;
         readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
+        readonly IGitHubContextService gitHubContextService;
+        readonly IVSServices vsServices;
         readonly IUsageTracker usageTracker;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
@@ -45,12 +47,16 @@ namespace GitHub.Services
             IVSGitServices vsGitServices,
             ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
+            IGitHubContextService gitHubContextService,
+            IVSServices vsServices,
             IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
             this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
+            this.gitHubContextService = gitHubContextService;
+            this.vsServices = vsServices;
             this.usageTracker = usageTracker;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
@@ -153,6 +159,21 @@ namespace GitHub.Services
 
             // Give user a chance to choose a solution
             teamExplorerServices.ShowHomePage();
+
+            var context = gitHubContextService.FindContextFromUrl(url);
+            if (context.LinkType == LinkType.Blob)
+            {
+                // Navigate to file for /blob/ type URLs
+                var (commitish, path, isSha) = gitHubContextService.ResolveBlob(repositoryPath, context);
+
+                var hasChanges = gitHubContextService.HasChangesInWorkingDirectory(repositoryPath, commitish, path);
+                if (hasChanges)
+                {
+                    vsServices.ShowMessageBoxInfo(Resources.ChangesInWorkingDirectoryMessage);
+                }
+
+                gitHubContextService.TryOpenFile(repositoryPath, context);
+            }
         }
 
         /// <inheritdoc/>
