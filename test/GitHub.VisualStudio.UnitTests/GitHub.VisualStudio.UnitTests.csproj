@@ -12,11 +12,9 @@
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
-      <Aliases>TF15</Aliases>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj" />
     <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj" />
   </ItemGroup>
 
