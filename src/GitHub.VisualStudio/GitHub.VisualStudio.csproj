@@ -407,7 +407,12 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre"/>
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools">
+      <Version>15.8.3252</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
