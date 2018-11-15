@@ -199,18 +199,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="EnvDTE100, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="EnvDTE80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="EnvDTE90, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -297,23 +285,8 @@
     <PackageReference Include="Markdig.Wpf.Signed">
       <Version>0.2.1</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost">
-      <Version>14.0.25424</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Editor">
-      <Version>14.3.25407</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense">
-      <Version>14.3.25407</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
       <Version>15.8.33</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0">
-      <Version>14.3.25407</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime">
-      <Version>14.3.25407</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <Version>15.8.122</Version>

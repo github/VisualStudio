@@ -27,6 +27,5 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="14.3.25407" />
   </ItemGroup>
 </Project>

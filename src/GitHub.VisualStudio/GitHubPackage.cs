@@ -265,12 +265,14 @@ namespace GitHub.VisualStudio
                 // HACK: We need to make sure this is run on the main thread. We really
                 // shouldn't be injecting a view model concern into LoginManager - this
                 // needs to be refactored. See #1398.
+#pragma warning disable VSTHRD011 // Use AsyncLazy<T>
                 var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() =>
                     ThreadHelper.JoinableTaskFactory.Run(async () =>
                     {
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                         return serviceProvider.GetService<ITwoFactorChallengeHandler>();
                     }));
+#pragma warning restore VSTHRD011 // Use AsyncLazy<T>
 
                 return new LoginManager(
                     keychain,
