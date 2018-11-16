@@ -78,7 +78,7 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0,16"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0 16 0 8"/>
 
         <markdig:MarkdownViewer Name="bodyMarkdown" Markdown="{Binding Body}"/>
 
@@ -125,8 +125,8 @@
                 <DataTemplate>
                     <Border BorderThickness="0,1,0,0"
                             BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
-                            Margin="0,16,0,0"
-                            Padding="0,16,0,0">
+                            Margin="0,8,0,0"
+                            Padding="0,8,0,0">
                         <ContentControl Content="{Binding}"/>
                     </Border>
                 </DataTemplate>
