@@ -20,6 +20,7 @@ namespace GitHub.VisualStudio
         // VisualStudio IDs
         public const string GitSccProviderId = "11B8E6D7-C08B-4385-B321-321078CDD1F8";
         public const string TeamExplorerInstall3rdPartyGitTools = "DF785C7C-8454-4836-9686-D1C4A01D0BB9";
+        public static readonly Guid SccProviderPackageGuid = new Guid("7FE30A77-37F9-4CF2-83DD-96B207028E1B");
 
         // UIContexts
         public const string UIContext_Git = "565515AD-F4C1-4D59-BC14-AE77396DDDD7";

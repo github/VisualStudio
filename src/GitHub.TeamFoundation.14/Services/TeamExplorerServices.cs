@@ -3,8 +3,12 @@ using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using EnvDTE;
+using GitHub.VisualStudio;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.TeamFoundation.Git.Controls.Extensibility;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitHub.Services
 {
@@ -31,8 +35,7 @@ namespace GitHub.Services
         public void OpenRepository(string repositoryPath)
         {
 #if TEAMEXPLORER14
-            var vsServices = serviceProvider.GetService<IVSServices>();
-            vsServices.TryOpenRepository(repositoryPath);
+            SetActiveRepository(repositoryPath);
 #else
             OpenFolder(repositoryPath);
 #endif
@@ -103,6 +106,27 @@ namespace GitHub.Services
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             return manager?.IsNotificationVisible(guid) ?? false;
+        }
+
+        public void SetActiveRepository(string repositoryPath, bool silent = false)
+        {
+            var sccUIService = FindSccUIService();
+            var method = sccUIService.GetType().GetMethod("SetActiveRepository", new[] { typeof(string), typeof(bool) });
+            method.Invoke(sccUIService, new object[] { repositoryPath, silent });
+        }
+
+        object FindSccUIService()
+        {
+            var sccServiceProvider = FindSccServiceProvider();
+            var sccUIServiceType = typeof(IGitRepositoriesExt).Assembly.GetType("Microsoft.TeamFoundation.Git.Controls.ISccUIService", false);
+            return sccServiceProvider.GetService(sccUIServiceType);
+        }
+
+        IServiceProvider FindSccServiceProvider()
+        {
+            var shell = (IVsShell)serviceProvider.GetService(typeof(SVsShell));
+            ErrorHandler.ThrowOnFailure(shell.LoadPackage(Guids.SccProviderPackageGuid, out var sccProviderPackage));
+            return sccProviderPackage as IServiceProvider;
         }
 
         void OpenFolder(string repositoryPath)

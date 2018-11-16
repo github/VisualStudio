@@ -9,5 +9,6 @@ namespace GitHub.Services
         void ShowPublishSection();
         void ClearNotifications();
         void OpenRepository(string repositoryPath);
+        void SetActiveRepository(string repositoryPath, bool silent = false);
     }
 }
