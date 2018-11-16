@@ -136,6 +136,7 @@
                     <Border Padding="20 0 8 0">
                         <DockPanel>
                             <ghfvs:OcticonImage DockPanel.Dock="Left"
+                                                Foreground="{DynamicResource VsBrush.GrayText}"
                                                 Margin="0,0,2,0"
                                                 Icon="git_commit"/>
                             <v:ActorAvatarView DockPanel.Dock="Left"
