@@ -7,6 +7,7 @@
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
+             xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
              mc:Ignorable="d"  d:DesignHeight="1200" d:DesignWidth="800"
              MaxWidth="800">
     <d:DesignData.DataContext>
@@ -80,7 +81,36 @@
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0 16 0 8"/>
 
-        <markdig:MarkdownViewer Name="bodyMarkdown" Markdown="{Binding Body}"/>
+        <Border BorderBrush="#D1D5DA" BorderThickness="1">
+            <StackPanel Orientation="Vertical">
+                <Border Padding="8" Background="#F6F8FA" BorderBrush="#D1D5DA" BorderThickness="0 0 0 1">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
+                        <v:ActorAvatarView Width="16" 
+                                               Height="16" 
+                                               ViewModel="{Binding Author}"/>
+
+                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
+                            <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                            <Run Text="commented" />
+                        </TextBlock>
+                        <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
+                                         Command="{Binding OpenOnGitHub}"
+                                         Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                         Opacity="0.75" />
+                        <Border Background="{DynamicResource VsBrush.InfoBackground}"
+                                BorderBrush="{DynamicResource VsBrush.AccentPale}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="2 1"
+                                Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                          <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <markdig:MarkdownViewer Name="bodyMarkdown" Margin="8" Markdown="{Binding Body}"/>
+            </StackPanel>
+        </Border>
 
         <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
             <ItemsControl.Resources>
