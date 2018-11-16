@@ -34,9 +34,8 @@ namespace GitHub.Services
 
         public void OpenRepository(string repositoryPath)
         {
-#if TEAMEXPLORER14
             SetActiveRepository(repositoryPath);
-#else
+#if !TEAMEXPLORER14
             OpenFolder(repositoryPath);
 #endif
         }
