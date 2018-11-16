@@ -55,11 +55,14 @@
                                        Height="16" 
                                        ViewModel="{Binding Author}"/>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
+                    <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                    <Run Text="commented" />
+                </TextBlock>
                 <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
-                                     Command="{Binding OpenOnGitHub}"
-                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                     Opacity="0.75" />
+                                 Command="{Binding OpenOnGitHub}"
+                                 Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                 Opacity="0.75" />
                 <Border Background="{DynamicResource VsBrush.InfoBackground}"
                         BorderBrush="{DynamicResource VsBrush.AccentPale}"
                         BorderThickness="1"
