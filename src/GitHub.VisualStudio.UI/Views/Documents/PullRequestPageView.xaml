@@ -75,7 +75,6 @@
                         </Border>
                     </InlineUIContainer>
                 </TextBlock>
-                
             </StackPanel>
         </Grid>
 
@@ -112,6 +111,21 @@
             </StackPanel>
         </Border>
 
+        <StackPanel Orientation="Vertical" Margin="0 8">
+            <StackPanel Orientation="Horizontal">
+                <ghfvs:OcticonImage DockPanel.Dock="Left"
+                                    Margin="0,0,4,0"
+                                    Icon="repo_push"/>
+                <v:ActorAvatarView Width="16" 
+                                       Height="16" 
+                                       ViewModel="{Binding Author}"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
+                    <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                    <Run Text="added some commits" />
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+
         <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummariesViewModel}">
@@ -119,46 +133,53 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummaryViewModel}">
-                    <DockPanel>
-                        <ghfvs:OcticonImage DockPanel.Dock="Left"
-                                            Margin="0,0,2,0"
-                                            Icon="git_commit"/>
-                        <v:ActorAvatarView DockPanel.Dock="Left"
-                                           Width="16"
-                                           Height="16"
-                                           Margin="2"
-                                           ViewModel="{Binding Author}"/>
-                        <TextBlock DockPanel.Dock="Right"
-                                   FontFamily="Consolas"
-                                   Margin="0,0,0,2"
-                                   VerticalAlignment="Center">
-                            <Hyperlink Command="{Binding DataContext.ShowCommit, ElementName=timeline}"
-                                       CommandParameter="{Binding Oid}">
-                                <Run Text="{Binding AbbreviatedOid, Mode=OneWay}"/>
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Margin="0,0,0,2"
-                                   Text="{Binding Header}" 
-                                   VerticalAlignment="Center"/>
-                    </DockPanel>
+                    <Border Padding="20 0 8 0">
+                        <DockPanel>
+                            <ghfvs:OcticonImage DockPanel.Dock="Left"
+                                                Margin="0,0,2,0"
+                                                Icon="git_commit"/>
+                            <v:ActorAvatarView DockPanel.Dock="Left"
+                                               Width="16"
+                                               Height="16"
+                                               Margin="2"
+                                               ViewModel="{Binding Author}"/>
+                            <TextBlock DockPanel.Dock="Right"
+                                       FontFamily="Consolas"
+                                       Margin="0,0,0,2"
+                                       VerticalAlignment="Center">
+                                <Hyperlink Command="{Binding DataContext.ShowCommit, ElementName=timeline}"
+                                           CommandParameter="{Binding Oid}">
+                                    <Run Text="{Binding AbbreviatedOid, Mode=OneWay}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Margin="0,0,0,2"
+                                       Text="{Binding Header}" 
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommentViewModel}">
-                    <v:CommentView/>
-                </DataTemplate>
-
-                <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
-                    <v:CommentView/>
-                </DataTemplate>
-            </ItemsControl.Resources>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
                     <Border BorderThickness="0,1,0,0"
                             BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
                             Margin="0,8,0,0"
                             Padding="0,8,0,0">
-                        <ContentControl Content="{Binding}"/>
+                        <v:CommentView/>
                     </Border>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
+                    <Border BorderThickness="0,1,0,0"
+                            BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
+                            Margin="0,8,0,0"
+                            Padding="0,8,0,0">
+                        <v:CommentView />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.Resources>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
