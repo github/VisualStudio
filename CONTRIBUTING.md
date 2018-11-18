@@ -41,6 +41,7 @@ Here are a few helpful tips when reporting a bug:
 - Verify that the bug resides in the GitHub for Visual Studio extension
   - A lot of functionality provided by this extension resides in the Team Explorer pane, alongside other non-GitHub tools to manage and collaborate on source code, including Visual Studio's Git support, which is owned by Microsoft.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
+- To report a bug use the [bug report template](ISSUE_TEMPLATE/bug_report.md).
 - Screenshots are very helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems. Please include them whenever possible.
 - A log file is helpful in diagnosing bug issues. To include log files in your issue:
 
@@ -56,6 +57,7 @@ Here are a few helpful tips when reporting a bug:
 
 ### Feature Requests
 If you have a feature that you think would be a great addition to the extension, we might already have thought about it too, so be sure to check if your suggestion matches our [roadmap](#roadmap-and-future-feature-ideas) before making a request. Also take a peek at our [pull requests](https://github.com/github/VisualStudio/pulls) to see what we're currently working on. Additionally, someone might have already thought of your idea, so check out Issues labeled as [features](https://github.com/github/VisualStudio/issues?q=is%3Aopen+is%3Aissue+label%3Afeature) to see if it already exists.
+To suggest a feature use the [feature request template](ISSUE_TEMPLATE/feature_request.md).
 
 ## Things to improve in the current version
 
