@@ -96,7 +96,7 @@ Logs can be viewed at the following location:
 
 ## Contributing
 
-Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
+Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Contributor Code of Conduct](CODE_OF_CONDUCT.md) for details on how to participate.
 
 ## Copyright
 
