@@ -122,7 +122,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 var checkSuiteRun = pullRequest
                     .CheckSuites.SelectMany(checkSuite => checkSuite.CheckRuns
                             .Select(checkRun => new{checkSuite, checkRun}))
-                    .First(arg => arg.checkRun.CheckRunId == CheckRunId);
+                    .First(arg => arg.checkRun.Id == CheckRunId);
 
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
