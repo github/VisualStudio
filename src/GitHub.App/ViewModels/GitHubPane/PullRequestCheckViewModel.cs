@@ -100,7 +100,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
-                    pullRequestCheckViewModel.CheckRunId = arg.checkRun.CheckRunId;
+                    pullRequestCheckViewModel.CheckRunId = arg.checkRun.Id;
                     pullRequestCheckViewModel.HasAnnotations = arg.checkRun.Annotations?.Any() ?? false;
                     pullRequestCheckViewModel.Title = arg.checkRun.Name;
                     pullRequestCheckViewModel.Description = arg.checkRun.Summary;
