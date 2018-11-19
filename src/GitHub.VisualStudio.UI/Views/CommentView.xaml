@@ -155,7 +155,7 @@
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4"
+                              Margin="4 8"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
@@ -205,7 +205,7 @@
 
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
-                        Margin="4 8" 
+                        Margin="4 4 4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">
