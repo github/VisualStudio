@@ -13,7 +13,7 @@
     <RootNamespace>GitHub.TeamFoundation</RootNamespace>
     <AssemblyName>GitHub.TeamFoundation.16</AssemblyName>
     <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisRuleSet>..\common\GitHubVS.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -22,6 +22,7 @@
     </NuGetPackageImportStamp>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
