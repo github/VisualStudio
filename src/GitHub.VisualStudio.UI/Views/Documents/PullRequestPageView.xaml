@@ -141,7 +141,17 @@
         <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummariesViewModel}">
-                    <ItemsControl ItemsSource="{Binding Commits}"/>
+                    <Border>
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Commits}"/>
+
+                            <Border BorderThickness="0,1,0,0"
+                                    BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
+                                    DockPanel.Dock="Bottom"
+                                    Margin="0,4,0,0"
+                                    Padding="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummaryViewModel}">
@@ -173,21 +183,11 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommentViewModel}">
-                    <Border BorderThickness="0,1,0,0"
-                            BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
-                            Margin="0,8,0,0"
-                            Padding="0,8,0,0">
-                        <v:CommentView/>
-                    </Border>
+                    <v:CommentView/>
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
-                    <Border BorderThickness="0,1,0,0"
-                            BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
-                            Margin="0,8,0,0"
-                            Padding="0,8,0,0">
-                        <v:CommentView />
-                    </Border>
+                    <v:CommentView />
                 </DataTemplate>
             </ItemsControl.Resources>
             <ItemsControl.ItemTemplate>
