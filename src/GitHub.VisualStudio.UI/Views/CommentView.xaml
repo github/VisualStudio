@@ -37,7 +37,7 @@
 
     <Grid IsEnabled="{Binding IsSubmitting, Converter={ui:InverseBooleanConverter}}">
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Vertical" Margin="0 4 0 0">
             <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -118,8 +118,7 @@
 
             <Border BorderThickness="0,1,0,0"
                     BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
-                    Margin="0,4,0,0"
-                    Padding="0,4,0,0" />
+                    Margin="0,8,0,0" />
         </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
@@ -156,7 +155,7 @@
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 0 4 4"
+                              Margin="4"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
