@@ -787,7 +787,7 @@ namespace GitHub.InlineReviews.Services
                                           CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                               .Select(run => new CheckRunModel
                                               {
-                                                  CheckRunId = run.Id.Value,
+                                                  Id = run.Id.Value,
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
