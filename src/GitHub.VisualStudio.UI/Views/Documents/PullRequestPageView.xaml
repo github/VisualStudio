@@ -112,18 +112,30 @@
         </Border>
 
         <StackPanel Orientation="Vertical" Margin="0 8">
-            <StackPanel Orientation="Horizontal">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="24" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
                 <ghfvs:OcticonImage DockPanel.Dock="Left"
-                                    Margin="0,0,4,0"
-                                    Icon="repo_push"/>
+                                    Margin="2 0 4 0"
+                                    Width="16"
+                                    Icon="repo_push"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center" />
+
                 <v:ActorAvatarView Width="16" 
-                                       Height="16" 
-                                       ViewModel="{Binding Author}"/>
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
+                                   Height="16" 
+                                   Grid.Column="1"
+                                   ViewModel="{Binding Author}"/>
+
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0" Grid.Column="2">
                     <Run FontWeight="Bold" Text="{Binding Author.Login}" />
                     <Run Text="added some commits" />
                 </TextBlock>
-            </StackPanel>
+            </Grid>
         </StackPanel>
 
         <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
@@ -133,7 +145,7 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type ghfvs:CommitSummaryViewModel}">
-                    <Border Padding="20 0 8 0">
+                    <Border Padding="24 0 8 0">
                         <DockPanel>
                             <ghfvs:OcticonImage DockPanel.Dock="Left"
                                                 Foreground="{DynamicResource VsBrush.GrayText}"
