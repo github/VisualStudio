@@ -41,7 +41,7 @@ Here are a few helpful tips when reporting a bug:
 - Verify that the bug resides in the GitHub for Visual Studio extension
   - A lot of functionality provided by this extension resides in the Team Explorer pane, alongside other non-GitHub tools to manage and collaborate on source code, including Visual Studio's Git support, which is owned by Microsoft.
   - If this bug not is related to the GitHub extension, visit the [Visual Studio support page](https://www.visualstudio.com/support/support-overview-vs) for help
-- To report a bug use the [bug report template](ISSUE_TEMPLATE/bug_report.md).
+- To report a bug use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md).
 - Screenshots are very helpful in diagnosing bugs and understanding the state of the extension when it's experiencing problems. Please include them whenever possible.
 - A log file is helpful in diagnosing bug issues. To include log files in your issue:
 
