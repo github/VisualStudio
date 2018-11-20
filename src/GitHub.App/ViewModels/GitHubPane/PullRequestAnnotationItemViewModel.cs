@@ -1,4 +1,8 @@
-﻿using GitHub.Models;
+﻿using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -14,16 +18,26 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// Initializes the <see cref="PullRequestAnnotationItemViewModel"/>.
         /// </summary>
         /// <param name="annotation">The check run annotation model.</param>
-        public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel annotation)
+        /// <param name="isFileInPullRequest">A flag that denotes if the annotation is part of the pull request's changes.</param>
+        public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel annotation, bool isFileInPullRequest)
         {
-            this.Annotation = annotation;
+            Annotation = annotation;
+            IsFileInPullRequest = isFileInPullRequest;
+
+            OpenAnnotation = ReactiveCommand.Create(() => { });
         }
+
+        /// <inheritdoc />
+        public bool IsFileInPullRequest { get; }
 
         /// <inheritdoc />
         public CheckRunAnnotationModel Annotation { get; }
 
         /// <inheritdoc />
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
+
+        /// <inheritdoc />
+        public ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
 
         /// <inheritdoc />
         public bool IsExpanded
