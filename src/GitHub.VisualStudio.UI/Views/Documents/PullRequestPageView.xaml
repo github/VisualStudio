@@ -40,6 +40,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Margin="0 8"
+                       Foreground="{DynamicResource VsBrush.WindowText}"
                        Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment200PercentFontSizeStyleKey}}">
                 <Run Text="{Binding Title, Mode=OneWay}"/>
                 <Hyperlink Command="{Binding OpenOnGitHub}">
@@ -48,7 +49,7 @@
             </TextBlock>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <TextBlock >
+                <TextBlock Foreground="{DynamicResource VsBrush.WindowText}">
                     <InlineUIContainer BaselineAlignment="Bottom">
                         <v:IssueishStateBadge DataContext="{Binding State}" Margin="0,0,0,-2"/>
                     </InlineUIContainer>
@@ -107,7 +108,7 @@
                     </StackPanel>
                 </Border>
 
-                <markdig:MarkdownViewer Name="bodyMarkdown" Margin="8" Markdown="{Binding Body}"/>
+                <markdig:MarkdownViewer Name="bodyMarkdown" Margin="8" Foreground="{DynamicResource VsBrush.WindowText}" Markdown="{Binding Body}"/>
             </StackPanel>
         </Border>
 
@@ -122,6 +123,7 @@
                 <ghfvs:OcticonImage DockPanel.Dock="Left"
                                     Margin="2 0 4 0"
                                     Width="16"
+                                    Foreground="{DynamicResource VsBrush.WindowText}"
                                     Icon="repo_push"
                                     Grid.Column="0"
                                     HorizontalAlignment="Center" />
@@ -176,6 +178,7 @@
                                 </Hyperlink>
                             </TextBlock>
                             <TextBlock Margin="0,0,0,2"
+                                       Foreground="{DynamicResource VsBrush.WindowText}"
                                        Text="{Binding Header}" 
                                        VerticalAlignment="Center"/>
                         </DockPanel>
