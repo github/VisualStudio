@@ -81,9 +81,9 @@
 
         <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0 16 0 8"/>
 
-        <Border BorderBrush="#D1D5DA" BorderThickness="1" Margin="0 4">
+        <Border BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="1" Margin="0 4">
             <StackPanel Orientation="Vertical">
-                <Border Padding="8" Background="#F6F8FA" BorderBrush="#D1D5DA" BorderThickness="0 0 0 1">
+                <Border Padding="8" Background="{DynamicResource GitHubBranchNameBackgroundBrush}" BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="0 0 0 1">
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                         <v:ActorAvatarView Width="16" 
                                                Height="16" 

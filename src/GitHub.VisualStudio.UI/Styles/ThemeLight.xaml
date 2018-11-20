@@ -13,7 +13,7 @@
   <Color x:Key="GitHubActionLinkItemColor">#FF0E70C0</Color>
   <SolidColorBrush x:Key="GitHubActionLinkItemBrush" Color="{StaticResource GitHubActionLinkItemColor}" PresentationOptions:Freeze="true" />
 
-  <Color x:Key="GitHubHeaderSeparatorColor">#FFEEEEF2</Color>
+  <Color x:Key="GitHubHeaderSeparatorColor">#FFcccedb</Color>
   <SolidColorBrush x:Key="GitHubHeaderSeparatorBrush" Color="{StaticResource GitHubHeaderSeparatorColor}" PresentationOptions:Freeze="true" />
   
   <Color x:Key="GitHubPaneTitleColor">#FF1B293E</Color>
