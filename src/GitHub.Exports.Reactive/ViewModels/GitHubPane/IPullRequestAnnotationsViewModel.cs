@@ -62,6 +62,11 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary { get; }
 
         /// <summary>
+        /// Gets a dictionary of annotations by file path.
+        /// </summary>
+        IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> OtherAnnotationsDictionary { get; }
+
+        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>

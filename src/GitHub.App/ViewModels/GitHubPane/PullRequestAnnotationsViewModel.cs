@@ -20,10 +20,12 @@ namespace GitHub.App.ViewModels.GitHubPane
     {
         private readonly IPullRequestSessionManager sessionManager;
 
+        IPullRequestSession session;
         string title;
         string checkSuiteName;
         string checkRunName;
         IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> annotationsDictionary;
+        IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> otherAnnotationsDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
@@ -56,7 +58,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 CheckRunId = checkRunId;
-                var session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
                 Load(session.PullRequest);
             }
             finally
@@ -107,6 +109,12 @@ namespace GitHub.App.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref annotationsDictionary, value); }
         }
 
+        public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> OtherAnnotationsDictionary
+        {
+            get { return otherAnnotationsDictionary; }
+            private set { this.RaiseAndSetIfChanged(ref otherAnnotationsDictionary, value); }
+        }
+
         void Load(PullRequestDetailModel pullRequest)
         {
             IsBusy = true;
@@ -123,11 +131,41 @@ namespace GitHub.App.ViewModels.GitHubPane
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
 
-                AnnotationsDictionary = checkSuiteRun.checkRun.Annotations
-                    .GroupBy(annotation => annotation.Path)
+                var changedFileDictionary = session.PullRequest.ChangedFiles.ToDictionary(model => model.FileName);
+
+                var annotationsLookup = checkSuiteRun.checkRun.Annotations
+                    .ToLookup(annotation =>
+                    {
+                        var inPullRequest = false;
+
+                        if (changedFileDictionary.TryGetValue(annotation.Path, out var pullRequestFile))
+                        {
+                            
+                        }
+
+                        return ValueTuple.Create(annotation.Path, inPullRequest);
+                    });
+
+                var annotationPaths = annotationsLookup
+                    .Select(models => models.Key.Item1)
+                    .OrderBy(s => s)
+                    .ToArray();
+
+                AnnotationsDictionary = annotationPaths
+                    .Where(path => changedFileDictionary.ContainsKey(path))
                     .ToDictionary(
-                        grouping => grouping.Key,
-                        grouping => grouping
+                        path => path,
+                        path => annotationsLookup[ValueTuple.Create(path, true)]
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation))
+                            .Cast<IPullRequestAnnotationItemViewModel>()
+                            .ToArray()
+                        );
+
+                OtherAnnotationsDictionary = annotationPaths
+                    .Where(path => !changedFileDictionary.ContainsKey(path))
+                    .ToDictionary(
+                        path => path,
+                        path => annotationsLookup[ValueTuple.Create(path, false)]
                             .Select(annotation => new PullRequestAnnotationItemViewModel(annotation))
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
@@ -138,6 +176,5 @@ namespace GitHub.App.ViewModels.GitHubPane
                 IsBusy = false;
             }
         }
-
     }
 }

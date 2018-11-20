@@ -76,6 +76,62 @@ namespace GitHub.SampleData
                 },
             };
 
+        public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> OtherAnnotationsDictionary { get; }
+            = new Dictionary<string, IPullRequestAnnotationItemViewModel[]>
+            {
+                {
+                    "asdf/asdf.cs",
+                    new IPullRequestAnnotationItemViewModel[] 
+                    {
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Warning,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "asdf/asdf.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                        },
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Failure,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "asdf/asdf.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                        },
+                    }
+                },
+                {
+                    "blah.cs",
+                    new IPullRequestAnnotationItemViewModel[] 
+                    {
+                        new PullRequestAnnotationItemViewModelDesigner
+                        {
+                            Annotation = new CheckRunAnnotationModel
+                            {
+                                AnnotationLevel = CheckAnnotationLevel.Notice,
+                                StartLine = 3,
+                                EndLine = 4,
+                                Path = "blah.cs",
+                                Message = "; is expected",
+                                Title = "CS 12345"
+                            },
+                            IsExpanded = true,
+                        }
+                    }
+                },
+            };
+
         public string CheckRunName { get; } = "Psuedo Check Run";
 
         public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner,

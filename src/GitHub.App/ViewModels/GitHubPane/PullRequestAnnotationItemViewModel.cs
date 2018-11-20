@@ -1,4 +1,8 @@
-﻿using GitHub.Models;
+﻿using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -17,6 +21,8 @@ namespace GitHub.App.ViewModels.GitHubPane
         public PullRequestAnnotationItemViewModel(CheckRunAnnotationModel annotation)
         {
             this.Annotation = annotation;
+
+            OpenAnnotation = ReactiveCommand.Create(() => { });
         }
 
         /// <inheritdoc />
@@ -24,6 +30,9 @@ namespace GitHub.App.ViewModels.GitHubPane
 
         /// <inheritdoc />
         public string LineDescription => $"{Annotation.StartLine}:{Annotation.EndLine}";
+
+        /// <inheritdoc />
+        public ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
 
         /// <inheritdoc />
         public bool IsExpanded
