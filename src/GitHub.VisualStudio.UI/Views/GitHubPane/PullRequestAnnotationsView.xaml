@@ -83,6 +83,11 @@
 		                                                    </Hyperlink>
                                                         </TextBlock>
 
+                                                        <TextBlock FontFamily="Consolas" Foreground="{DynamicResource VsBrush.GrayText}" Grid.Row="1" Visibility="{Binding IsFileInPullRequest, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
+                                                            <Run Text="Line" />
+                                                            <Run Text="{Binding LineDescription, Mode=OneWay}"/>
+                                                        </TextBlock>
+
                                                         <markdig:MarkdownViewer Grid.Column="1" Grid.Row="2"
                                                                                 FontFamily="Consolas" Markdown="{Binding Annotation.Message}" />
                                                     </StackPanel>
