@@ -836,7 +836,4 @@ https://git-scm.com/download/win</value>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
   </data>
-  <data name="PrivateGitHubAppName" xml:space="preserve">
-    <value>Private GitHub App</value>
-  </data>
 </root>
