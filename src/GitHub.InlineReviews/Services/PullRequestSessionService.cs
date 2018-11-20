@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.App.Services;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -18,22 +17,15 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using Octokit;
 using Octokit.GraphQL;
-using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
 using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
-using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
-using CheckConclusionState = GitHub.Models.CheckConclusionState;
-using CheckStatusState = GitHub.Models.CheckStatusState;
 using DraftPullRequestReviewComment = Octokit.GraphQL.Model.DraftPullRequestReviewComment;
 using FileMode = System.IO.FileMode;
 using NotFoundException = LibGit2Sharp.NotFoundException;
-using PullRequestReviewState = Octokit.GraphQL.Model.PullRequestReviewState;
-using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 

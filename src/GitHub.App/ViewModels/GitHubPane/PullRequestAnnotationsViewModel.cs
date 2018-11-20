@@ -127,12 +127,20 @@ namespace GitHub.App.ViewModels.GitHubPane
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
 
-                AnnotationsDictionary = checkSuiteRun.checkRun.Annotations
-                    .GroupBy(annotation => annotation.Path)
+//                            .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService))
+
+                var changedFiles = new HashSet<string>(session.PullRequest.ChangedFiles.Select(model => model.FileName));
+
+                var annotationsLookup = checkSuiteRun.checkRun.Annotations
+                    .ToLookup(annotation => annotation.Path);
+
+                AnnotationsDictionary = annotationsLookup
+                    .Select(models => models.Key)
+                    .OrderBy(s => s)
                     .ToDictionary(
-                        grouping => grouping.Key,
-                        grouping => grouping
-                            .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService))
+                        path => path,
+                        path => annotationsLookup[path]
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path)))
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
                         );
@@ -142,6 +150,5 @@ namespace GitHub.App.ViewModels.GitHubPane
                 IsBusy = false;
             }
         }
-
     }
 }

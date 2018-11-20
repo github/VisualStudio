@@ -22,14 +22,18 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// <summary>
         /// Initializes the <see cref="PullRequestAnnotationItemViewModel"/>.
         /// </summary>
+        /// <param name="annotation">The check run annotation model.</param>
+        /// <param name="isFileInPullRequest">A flag that denotes if the annotation is part of the pull request's changes.</param>
         /// <param name="checkSuite">The check suite model.</param>
         /// <param name="checkRun">The check run model.</param>
         /// <param name="annotation">The check run annotation model.</param>
         /// <param name="session">The pull request session.</param>
         /// <param name="editorService">The pull request editor service.</param>
-        public PullRequestAnnotationItemViewModel(CheckSuiteModel checkSuite, 
+        public PullRequestAnnotationItemViewModel(
+            CheckRunAnnotationModel annotation, 
+            bool isFileInPullRequest,
             CheckRunModel checkRun,
-            CheckRunAnnotationModel annotation,
+            CheckSuiteModel checkSuite, 
             IPullRequestSession session,
             IPullRequestEditorService editorService)
         {
@@ -37,9 +41,8 @@ namespace GitHub.App.ViewModels.GitHubPane
             this.checkRun = checkRun;
             this.session = session;
             this.editorService = editorService;
-            this.Annotation = annotation;
-
-            IsFileInPullRequest = session.PullRequest.ChangedFiles.Any(model => model.FileName == annotation.Path);
+            Annotation = annotation;
+            IsFileInPullRequest = isFileInPullRequest;
 
             OpenAnnotation = ReactiveCommand.CreateFromTask<Unit>(
                 async _ => await editorService.OpenDiff(session, annotation.Path, checkSuite.HeadSha, annotation.EndLine - 1),
