@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reactive;
+﻿using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Models;
 using GitHub.Services;
@@ -12,11 +11,6 @@ namespace GitHub.App.ViewModels.GitHubPane
     /// <inheritdoc cref="IPullRequestAnnotationItemViewModel"/>
     public class PullRequestAnnotationItemViewModel : ViewModelBase, IPullRequestAnnotationItemViewModel
     {
-        readonly CheckSuiteModel checkSuite;
-        readonly CheckRunModel checkRun;
-        readonly IPullRequestSession session;
-        readonly IPullRequestEditorService editorService;
-
         bool isExpanded;
 
         /// <summary>
@@ -25,22 +19,15 @@ namespace GitHub.App.ViewModels.GitHubPane
         /// <param name="annotation">The check run annotation model.</param>
         /// <param name="isFileInPullRequest">A flag that denotes if the annotation is part of the pull request's changes.</param>
         /// <param name="checkSuite">The check suite model.</param>
-        /// <param name="checkRun">The check run model.</param>
-        /// <param name="annotation">The check run annotation model.</param>
         /// <param name="session">The pull request session.</param>
         /// <param name="editorService">The pull request editor service.</param>
         public PullRequestAnnotationItemViewModel(
-            CheckRunAnnotationModel annotation, 
+            CheckRunAnnotationModel annotation,
             bool isFileInPullRequest,
-            CheckRunModel checkRun,
-            CheckSuiteModel checkSuite, 
+            CheckSuiteModel checkSuite,
             IPullRequestSession session,
             IPullRequestEditorService editorService)
         {
-            this.checkSuite = checkSuite;
-            this.checkRun = checkRun;
-            this.session = session;
-            this.editorService = editorService;
             Annotation = annotation;
             IsFileInPullRequest = isFileInPullRequest;
 

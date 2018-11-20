@@ -127,8 +127,6 @@ namespace GitHub.App.ViewModels.GitHubPane
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
 
-//                            .Select(annotation => new PullRequestAnnotationItemViewModel(checkSuiteRun.checkSuite, checkSuiteRun.checkRun, annotation, session, pullRequestEditorService))
-
                 var changedFiles = new HashSet<string>(session.PullRequest.ChangedFiles.Select(model => model.FileName));
 
                 var annotationsLookup = checkSuiteRun.checkRun.Annotations
@@ -140,7 +138,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                     .ToDictionary(
                         path => path,
                         path => annotationsLookup[path]
-                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path)))
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path), checkSuiteRun.checkSuite, session, pullRequestEditorService))
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
                         );
