@@ -1,4 +1,6 @@
-﻿using GitHub.Models;
+﻿using System.Reactive;
+using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -21,5 +23,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets or sets a flag to control the expanded state.
         /// </summary>
         bool IsExpanded { get; set; }
+
+        /// <summary>
+        /// Gets a flag which indicates this annotation item is from a file changed in this pull request.
+        /// </summary>
+        bool IsFileInPullRequest { get; }
+
+        /// <summary>
+        /// Gets a command which opens the annotation in the diff view.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> OpenAnnotation { get; }
     }
 }

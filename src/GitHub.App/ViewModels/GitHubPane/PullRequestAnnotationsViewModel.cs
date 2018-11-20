@@ -20,6 +20,7 @@ namespace GitHub.App.ViewModels.GitHubPane
     {
         private readonly IPullRequestSessionManager sessionManager;
 
+        IPullRequestSession session;
         string title;
         string checkSuiteName;
         string checkRunName;
@@ -56,7 +57,7 @@ namespace GitHub.App.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 CheckRunId = checkRunId;
-                var session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
                 Load(session.PullRequest);
             }
             finally
@@ -123,12 +124,18 @@ namespace GitHub.App.ViewModels.GitHubPane
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
 
-                AnnotationsDictionary = checkSuiteRun.checkRun.Annotations
-                    .GroupBy(annotation => annotation.Path)
+                var changedFiles = new HashSet<string>(session.PullRequest.ChangedFiles.Select(model => model.FileName));
+
+                var annotationsLookup = checkSuiteRun.checkRun.Annotations
+                    .ToLookup(annotation => annotation.Path);
+
+                AnnotationsDictionary = annotationsLookup
+                    .Select(models => models.Key)
+                    .OrderBy(s => s)
                     .ToDictionary(
-                        grouping => grouping.Key,
-                        grouping => grouping
-                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation))
+                        path => path,
+                        path => annotationsLookup[path]
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path)))
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
                         );
@@ -138,6 +145,5 @@ namespace GitHub.App.ViewModels.GitHubPane
                 IsBusy = false;
             }
         }
-
     }
 }
