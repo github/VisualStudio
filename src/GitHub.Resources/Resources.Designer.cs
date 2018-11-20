@@ -1405,6 +1405,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Private GitHub App.
+        /// </summary>
+        public static string PrivateGitHubAppName {
+            get {
+                return ResourceManager.GetString("PrivateGitHubAppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to by.
         /// </summary>
         public static string prUpdatedByText {

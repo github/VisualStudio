@@ -116,7 +116,7 @@ namespace GitHub.Services
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
                                                       }).ToList(),
-                                                  ApplicationName = suite.App != null ? suite.App.Name : "Private App"
+                                                  ApplicationName = suite.App != null ? suite.App.Name : Resources.PrivateGitHubAppName
                                               }).ToList(),
                                           Statuses = commit.Commit.Status
                                                   .Select(context =>
