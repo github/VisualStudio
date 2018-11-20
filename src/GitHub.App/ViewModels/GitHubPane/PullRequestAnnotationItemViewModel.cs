@@ -1,13 +1,8 @@
-﻿using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
+﻿using System.Reactive;
 using GitHub.Models;
-using GitHub.Services;
-using GitHub.ViewModels;
-using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
-namespace GitHub.App.ViewModels.GitHubPane
+namespace GitHub.ViewModels.GitHubPane
 {
     /// <inheritdoc cref="IPullRequestAnnotationItemViewModel"/>
     public class PullRequestAnnotationItemViewModel : ViewModelBase, IPullRequestAnnotationItemViewModel

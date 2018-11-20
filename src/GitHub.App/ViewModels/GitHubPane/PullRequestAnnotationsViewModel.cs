@@ -6,12 +6,9 @@ using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
-using ReactiveUI.Legacy;
-using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
-namespace GitHub.App.ViewModels.GitHubPane
+namespace GitHub.ViewModels.GitHubPane
 {
     /// <inheritdoc cref="IPullRequestAnnotationsViewModel"/>
     [Export(typeof(IPullRequestAnnotationsViewModel))]
