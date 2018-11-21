@@ -41,12 +41,6 @@ namespace GitHub.VisualStudio.Commands
 
         public override async Task Execute(string url)
         {
-            if (string.IsNullOrEmpty(url))
-            {
-                var clipboardContext = gitHubContextService.Value.FindContextFromClipboard();
-                url = clipboardContext?.Url;
-            }
-
             var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null, url);
             if (cloneDialogResult != null)
             {
