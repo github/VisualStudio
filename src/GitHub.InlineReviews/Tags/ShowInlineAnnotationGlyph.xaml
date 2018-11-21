@@ -19,7 +19,7 @@
                          Height="10" 
                          Canvas.Top="3"
                          Canvas.Left="3"
-                         Fill="AliceBlue"
+                         Fill="#23A1D0"
                          Stroke="White"
                          StrokeThickness="1"/>
             </Canvas>
