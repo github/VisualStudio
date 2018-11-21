@@ -9,6 +9,11 @@ namespace GitHub.Models
     public class CheckRunModel
     {
         /// <summary>
+        /// The id of a Check Run.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// The conclusion of the check run.
         /// </summary>
         public CheckConclusionState? Conclusion { get; set; }
@@ -44,8 +49,8 @@ namespace GitHub.Models
         public string Summary { get; set; }
 
         /// <summary>
-        /// The database id of a Check Run.
+        /// The detail of a Check Run.
         /// </summary>
-        public string Id { get; set; }
+        public string Text { get; set; }
     }
 }

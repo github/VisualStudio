@@ -57,6 +57,16 @@ namespace GitHub.ViewModels.GitHubPane
         string CheckSuiteName { get; }
 
         /// <summary>
+        /// Summary of the Check Run
+        /// </summary>
+        string CheckRunSummary { get; }
+
+        /// <summary>
+        /// Text of the Check Run
+        /// </summary>
+        string CheckRunText { get; }
+
+        /// <summary>
         /// Gets a dictionary of annotations by file path.
         /// </summary>
         IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary { get; }

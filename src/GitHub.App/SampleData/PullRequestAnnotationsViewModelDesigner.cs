@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 
 namespace GitHub.SampleData
 {
@@ -19,6 +18,9 @@ namespace GitHub.SampleData
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public string PullRequestTitle { get; } = "Fixing stuff in this PR";
         public string CheckSuiteName { get; } = "Awesome Check Suite";
+        public string CheckRunSummary { get; } = "Awesome Check Run Summary";
+        public string CheckRunText { get; } = "Awesome Check Run Text";
+
         public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary { get; }
             = new Dictionary<string, IPullRequestAnnotationItemViewModel[]>
             {
