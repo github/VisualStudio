@@ -77,7 +77,7 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         public async Task InitializeAsync(IPullRequestSession session,
-            IReadOnlyCollection<IInlineAnnotationViewModel> annotations,
+            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)

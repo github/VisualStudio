@@ -53,7 +53,7 @@ namespace GitHub.ViewModels
         ///     Whether to add a placeholder comment at the end of the thread.
         /// </param>
         Task InitializeAsync(IPullRequestSession session,
-            IReadOnlyCollection<IInlineAnnotationViewModel> annotations,
+            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder);
