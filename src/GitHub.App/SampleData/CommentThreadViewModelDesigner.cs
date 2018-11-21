@@ -75,7 +75,7 @@ namespace GitHub.SampleData
         public IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
             = new ReactiveList<ICommentViewModel>();
 
-        public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
+        public IReadOnlyCollection<IInlineAnnotationViewModel> Annotations { get; }
 
         public IActorViewModel CurrentUser { get; set; }
             = new ActorViewModel { Login = "shana" };

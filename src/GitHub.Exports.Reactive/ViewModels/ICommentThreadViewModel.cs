@@ -41,6 +41,6 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets the annotations displayed.
         /// </summary>
-        IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
+        IReadOnlyCollection<IInlineAnnotationViewModel> Annotations { get; }
     }
 }

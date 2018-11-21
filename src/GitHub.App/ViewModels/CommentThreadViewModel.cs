@@ -58,7 +58,7 @@ namespace GitHub.ViewModels
         public IActorViewModel CurrentUser { get; private set; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; private set; }
+        public IReadOnlyCollection<IInlineAnnotationViewModel> Annotations { get; private set; }
 
         /// <inheritdoc/>
         IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => comments;
@@ -96,7 +96,7 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="currentUser">The current user.</param>
         /// <param name="annotations"></param>
-        protected Task InitializeAsync(ActorModel currentUser, IReadOnlyList<IInlineAnnotationViewModel> annotations)
+        protected Task InitializeAsync(ActorModel currentUser, IReadOnlyCollection<IInlineAnnotationViewModel> annotations)
         {
             Annotations = annotations;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
