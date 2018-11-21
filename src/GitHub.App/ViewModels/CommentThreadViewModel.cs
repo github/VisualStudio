@@ -58,9 +58,6 @@ namespace GitHub.ViewModels
         public IActorViewModel CurrentUser { get; private set; }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; private set; }
-
-        /// <inheritdoc/>
         IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => comments;
 
         protected IMessageDraftStore DraftStore { get; }
@@ -95,10 +92,8 @@ namespace GitHub.ViewModels
         /// Intializes a new instance of the <see cref="CommentThreadViewModel"/> class.
         /// </summary>
         /// <param name="currentUser">The current user.</param>
-        /// <param name="annotations"></param>
-        protected Task InitializeAsync(ActorModel currentUser, IReadOnlyList<IInlineAnnotationViewModel> annotations)
+        protected Task InitializeAsync(ActorModel currentUser)
         {
-            Annotations = annotations;
             Guard.ArgumentNotNull(currentUser, nameof(currentUser));
             CurrentUser = new ActorViewModel(currentUser);
             return Task.CompletedTask;

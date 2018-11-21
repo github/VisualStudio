@@ -77,14 +77,13 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         public async Task InitializeAsync(IPullRequestSession session,
-            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User, annotations).ConfigureAwait(true);
+            await base.InitializeAsync(session.User).ConfigureAwait(true);
 
             Session = session;
             File = file;
@@ -129,7 +128,6 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public async Task InitializeNewAsync(
             IPullRequestSession session,
-            IInlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
             int lineNumber,
             DiffSide side,
@@ -137,7 +135,7 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User, annotations).ConfigureAwait(false);
+            await base.InitializeAsync(session.User).ConfigureAwait(false);
 
             Session = session;
             File = file;

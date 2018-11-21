@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -111,7 +110,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             IMessageDraftStore draftStore = null,
             IViewViewModelFactory factory = null,
             IPullRequestSession session = null,
-            IInlineAnnotationViewModel[] annotations = null,
             IPullRequestSessionFile file = null,
             IEnumerable<InlineCommentModel> comments = null,
             bool newThread = false)
@@ -119,7 +117,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             draftStore = draftStore ?? Substitute.For<IMessageDraftStore>();
             factory = factory ?? CreateFactory();
             session = session ?? CreateSession();
-            annotations = annotations ?? Array.Empty<IInlineAnnotationViewModel>();
             file = file ?? CreateFile();
             comments = comments ?? CreateComments();
 
@@ -127,7 +124,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
 
             if (newThread)
             {
-                await result.InitializeNewAsync(session, annotations, file, 10, DiffSide.Right, true);
+                await result.InitializeNewAsync(session, file, 10, DiffSide.Right, true);
             }
             else
             {
@@ -135,7 +132,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 thread.Comments.Returns(comments.ToList());
                 thread.LineNumber.Returns(10);
 
-                await result.InitializeAsync(session, annotations, file, thread, true);
+                await result.InitializeAsync(session, file, thread, true);
             }
 
             return result;
