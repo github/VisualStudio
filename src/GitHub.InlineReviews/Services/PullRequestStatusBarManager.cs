@@ -94,7 +94,7 @@ namespace GitHub.InlineReviews.Services
             var showStatus = await IsDotComOrEnterpriseRepository(repository);
             if (!showStatus)
             {
-                var view = ShowStatus(null);
+                ShowStatus(null);
                 return;
             }
 
@@ -112,14 +112,14 @@ namespace GitHub.InlineReviews.Services
                 return;
             }
 
-            var calloutId = Guids.NoRemoteOriginCalloutId;
-            var title = Resources.CantFindGitHubUrlForRepository;
-            var message = Resources.RepositoriesMustHaveRemoteOrigin;
-            var isDismissable = true;
-            var commandSet = Guids.guidGitHubCmdSet;
-            var commandId = (uint)PkgCmdIDList.showGitHubPaneCommand;
-            tippingService.Value.RequestCalloutDisplay(calloutId, title, message,
-                    isDismissable, view, commandSet, commandId);
+            tippingService.Value.RequestCalloutDisplay(
+                calloutId: Guids.NoRemoteOriginCalloutId,
+                title: Resources.CantFindGitHubUrlForRepository,
+                message: Resources.RepositoriesMustHaveRemoteOrigin,
+                isPermanentlyDismissible: true,
+                targetElement: view,
+                vsCommandGroupId: Guids.guidGitHubCmdSet,
+                vsCommandId: PkgCmdIDList.showGitHubPaneCommand);
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(LocalRepositoryModel repository)
