@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 
@@ -45,13 +46,14 @@ namespace GitHub.ViewModels
         /// Initializes the view model with data.
         /// </summary>
         /// <param name="session">The pull request session.</param>
+        /// <param name="annotations"></param>
         /// <param name="file">The file that the comment is on.</param>
         /// <param name="thread">The thread.</param>
         /// <param name="addPlaceholder">
-        /// Whether to add a placeholder comment at the end of the thread.
+        ///     Whether to add a placeholder comment at the end of the thread.
         /// </param>
-        Task InitializeAsync(
-            IPullRequestSession session,
+        Task InitializeAsync(IPullRequestSession session,
+            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder);
@@ -66,6 +68,7 @@ namespace GitHub.ViewModels
         /// <param name="isEditing">Whether to start the placeholder in edit state.</param>
         Task InitializeNewAsync(
             IPullRequestSession session,
+            IInlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
             int lineNumber,
             DiffSide side,

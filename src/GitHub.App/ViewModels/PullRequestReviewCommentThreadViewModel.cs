@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -75,15 +76,15 @@ namespace GitHub.ViewModels
         public bool NeedsPush => needsPush.Value;
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(
-            IPullRequestSession session,
+        public async Task InitializeAsync(IPullRequestSession session,
+            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User).ConfigureAwait(true);
+            await base.InitializeAsync(session.User, annotations).ConfigureAwait(true);
 
             Session = session;
             File = file;
@@ -128,6 +129,7 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public async Task InitializeNewAsync(
             IPullRequestSession session,
+            IInlineAnnotationViewModel[] annotations,
             IPullRequestSessionFile file,
             int lineNumber,
             DiffSide side,
@@ -135,7 +137,7 @@ namespace GitHub.ViewModels
         {
             Guard.ArgumentNotNull(session, nameof(session));
 
-            await base.InitializeAsync(session.User).ConfigureAwait(false);
+            await base.InitializeAsync(session.User, annotations).ConfigureAwait(false);
 
             Session = session;
             File = file;

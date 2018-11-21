@@ -177,15 +177,20 @@ namespace GitHub.InlineReviews.ViewModels
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
+
+            var annotationModels = file.InlineAnnotations?.Where(model => model.EndLine - 1 == lineNumber)
+                .Select(model => new InlineAnnotationViewModel(model))
+                .ToArray();
+
             var vm = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
 
             if (thread?.Comments.Count > 0)
             {
-                await vm.InitializeAsync(session, file, thread, true);
+                await vm.InitializeAsync(session, annotationModels, file, thread, true);
             }
             else
             {
-                await vm.InitializeNewAsync(session, file, lineNumber, side, true);
+                await vm.InitializeNewAsync(session, annotationModels, file, lineNumber, side, true);
             }
 
             Thread = vm;

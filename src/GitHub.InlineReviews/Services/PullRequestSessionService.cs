@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -101,7 +101,7 @@ namespace GitHub.InlineReviews.Services
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
                         .Where(annotation => annotation.Path == relativePath)
-                        .Select(annotation => new InlineAnnotationModel(arg.checkRun, annotation)))
+                        .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
                 .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
         }
@@ -366,6 +366,10 @@ namespace GitHub.InlineReviews.Services
 
             result.Statuses = lastCommitModel.Statuses;
             result.CheckSuites = lastCommitModel.CheckSuites;
+            foreach (var checkSuite in result.CheckSuites)
+            {
+                checkSuite.HeadSha = lastCommitModel.HeadSha;
+            }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -773,6 +777,7 @@ namespace GitHub.InlineReviews.Services
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
+                                  HeadSha = commit.Commit.Oid,
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                       .Select(suite => new CheckSuiteModel
                                       {
@@ -805,7 +810,7 @@ namespace GitHub.InlineReviews.Services
                                               State = statusContext.State.FromGraphQl(),
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
-                                              Description = statusContext.Description,
+                                              Description = statusContext.Description
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
@@ -942,6 +947,8 @@ namespace GitHub.InlineReviews.Services
             public List<CheckSuiteModel> CheckSuites { get; set; }
 
             public List<StatusModel> Statuses { get; set; }
+
+            public string HeadSha { get; set; }
         }
     }   
 }

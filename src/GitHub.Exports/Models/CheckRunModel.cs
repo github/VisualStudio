@@ -27,7 +27,7 @@ namespace GitHub.Models
         /// The check run's annotations.
         /// </summary>
         public List<CheckRunAnnotationModel> Annotations { get; set; }
-
+        
         /// <summary>
         /// The name of the check for this check run.
         /// </summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Models;
 using ReactiveUI;
 

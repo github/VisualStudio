@@ -38,6 +38,7 @@ namespace GitHub.SampleData
                                 Title = "CS 12345"
                             },
                             IsExpanded = true,
+                            IsFileInPullRequest = true
                         },
                         new PullRequestAnnotationItemViewModelDesigner
                         {
@@ -51,6 +52,7 @@ namespace GitHub.SampleData
                                 Title = "CS 12345"
                             },
                             IsExpanded = true,
+                            IsFileInPullRequest = true
                         },
                     }
                 },

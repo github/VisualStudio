@@ -10,11 +10,22 @@
         <sampleData:CommentThreadViewModelDesigner />
     </d:DesignProperties.DataContext>
 
-    <ItemsControl ItemsSource="{Binding Comments}">
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <local:CommentView Margin="0 4"/>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <StackPanel Orientation="Vertical" Margin="0 0 0 4">
+        <ItemsControl ItemsSource="{Binding Annotations}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:InlineAnnotationView />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding Comments}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:CommentView Margin="0"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
 </UserControl>
+
