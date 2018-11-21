@@ -11,15 +11,16 @@
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0,1,0,0">
             <Canvas Width="16" Height="16">
                 <Canvas.Resources>
-                    <Style TargetType="Path">
+                    <Style TargetType="Rectangle">
                         <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
+                        <Setter Property="Stroke" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                     </Style>
                 </Canvas.Resources>
                 <Rectangle Width="8"
                          Height="8" 
                          Canvas.Top="2.3"
                          Canvas.Left="2.3"
-                         Fill="#23A1D0"
+                         Fill="#959da5"
                          Stroke="White"
                          StrokeThickness="1">
                     <Rectangle.LayoutTransform>
