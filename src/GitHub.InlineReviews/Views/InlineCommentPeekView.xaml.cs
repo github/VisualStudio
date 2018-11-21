@@ -15,17 +15,19 @@ namespace GitHub.InlineReviews.Views
             InitializeComponent();
 
             desiredHeight = new Subject<double>();
-            threadView.LayoutUpdated += ThreadViewLayoutUpdated;
+            threadView.LayoutUpdated += ChildLayoutUpdated;
+            annotationsView.LayoutUpdated += ChildLayoutUpdated;
             threadScroller.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
 
         public IObservable<double> DesiredHeight => desiredHeight;
 
-        void ThreadViewLayoutUpdated(object sender, EventArgs e)
+        void ChildLayoutUpdated(object sender, EventArgs e)
         {
             var otherControlsHeight = ActualHeight - threadScroller.ActualHeight;
             var threadViewHeight = threadView.DesiredSize.Height + threadView.Margin.Top + threadView.Margin.Bottom;
-            desiredHeight.OnNext(threadViewHeight + otherControlsHeight);
+            var annotationsViewHeight = annotationsView.DesiredSize.Height + annotationsView.Margin.Top + annotationsView.Margin.Bottom;
+            desiredHeight.OnNext(threadViewHeight + annotationsViewHeight + otherControlsHeight);
         }
     }
 }

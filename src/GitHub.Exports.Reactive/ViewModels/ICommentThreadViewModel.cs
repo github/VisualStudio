@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReactiveUI;
 
@@ -37,10 +36,5 @@ namespace GitHub.ViewModels
         /// </summary>
         /// <param name="comment">The comment to delete.</param>
         Task DeleteComment(ICommentViewModel comment);
-
-        /// <summary>
-        /// Gets the annotations displayed.
-        /// </summary>
-        IReadOnlyList<IInlineAnnotationViewModel> Annotations { get; }
     }
 }
