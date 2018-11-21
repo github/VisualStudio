@@ -252,7 +252,7 @@
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="0 4 12 4">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Grid.IsSharedSizeScope="True" />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>

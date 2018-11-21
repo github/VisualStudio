@@ -1,5 +1,7 @@
 ﻿using System.Reactive;
+using System.Reactive.Linq;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane

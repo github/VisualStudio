@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
@@ -75,9 +76,8 @@ namespace GitHub.ViewModels
         public bool NeedsPush => needsPush.Value;
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(
-            IPullRequestSession session,
-            IInlineAnnotationViewModel[] annotations,
+        public async Task InitializeAsync(IPullRequestSession session,
+            IReadOnlyList<IInlineAnnotationViewModel> annotations,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)

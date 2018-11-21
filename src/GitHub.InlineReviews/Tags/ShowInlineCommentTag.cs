@@ -15,8 +15,8 @@ namespace GitHub.InlineReviews.Tags
         /// Initializes a new instance of the <see cref="ShowInlineCommentTag"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
-        /// <param name="lineNumber"></param>
-        /// <param name="diffLineType"></param>
+        /// <param name="lineNumber">0-based index of the inline tag</param>
+        /// <param name="diffLineType">The diff type for the inline comment</param>
         public ShowInlineCommentTag(IPullRequestSession session, int lineNumber, DiffChangeType diffLineType)
             : base(session, lineNumber, diffLineType)
         {

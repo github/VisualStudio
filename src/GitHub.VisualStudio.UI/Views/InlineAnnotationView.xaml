@@ -6,7 +6,6 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
              xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"  
-             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
     <d:DesignProperties.DataContext>

@@ -9,7 +9,6 @@ namespace GitHub.VisualStudio.Views
         public InlineAnnotationView()
         {
             InitializeComponent();
-            PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
     }
 }

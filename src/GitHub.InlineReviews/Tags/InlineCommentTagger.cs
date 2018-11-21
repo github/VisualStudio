@@ -110,8 +110,7 @@ namespace GitHub.InlineReviews.Tags
                         var snapshot = span.Snapshot;
                         var snapshotLine = snapshot.GetLineFromLineNumber(line);
 
-                        IInlineCommentThreadModel thread;
-                        if (spanThreadsByLine.TryGetValue(line, out thread))
+                        if (spanThreadsByLine.TryGetValue(line, out var thread))
                         {
                             var isThreadDeleteSide = thread.DiffLineType == DiffChangeType.Delete;
                             var sidesMatch = side == DiffSide.Left && isThreadDeleteSide || side == DiffSide.Right && !isThreadDeleteSide;
