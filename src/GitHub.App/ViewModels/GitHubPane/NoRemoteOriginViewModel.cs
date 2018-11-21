@@ -20,10 +20,8 @@ namespace GitHub.ViewModels.GitHubPane
         public NoRemoteOriginViewModel(ITeamExplorerServices teamExplorerServices)
         {
             this.teamExplorerServices = teamExplorerServices;
-            EditRemotes = ReactiveCommand.CreateFromTask(OnEditRemotesAsync);
+            EditRemotes = ReactiveCommand.CreateFromTask(teamExplorerServices.ShowRepositorySettingsRemotesAsync);
         }
-
-        Task OnEditRemotesAsync() => teamExplorerServices.ShowRepositorySettingsRemotesAsync();
 
         public ReactiveCommand<Unit, Unit> EditRemotes { get; }
     }
