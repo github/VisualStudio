@@ -50,9 +50,9 @@ namespace GitHub.Services.Vssdk.Services
         {
             var tippingService = serviceProvider.GetService(typeof(SVsTippingService));
             Assumes.Present(tippingService);
-            var currentMethod = MethodBase.GetCurrentMethod();
-            var parameterTypes = currentMethod.GetParameters().Select(p => p.ParameterType).ToArray();
-            var method = tippingService.GetType().GetMethod(currentMethod.Name, parameterTypes);
+            var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string),
+                typeof(bool), typeof(FrameworkElement), typeof(Guid), typeof(uint), typeof(object) };
+            var method = tippingService.GetType().GetMethod("RequestCalloutDisplay", parameterTypes);
             var arguments = new object[] { clientId, calloutId, title, message, isPermanentlyDismissible, targetElement,
                     vsCommandGroupId, vsCommandId, commandOption };
             method.Invoke(tippingService, arguments);
@@ -70,13 +70,13 @@ namespace GitHub.Services.Vssdk.Services
             }
 
             Assumes.Present(tippingService);
-            var currentMethod = MethodBase.GetCurrentMethod();
-            var parameterTypes = currentMethod.GetParameters().Select(p => p.ParameterType).ToArray();
+            var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string), typeof(bool),
+                typeof(Microsoft.VisualStudio.OLE.Interop.POINT), typeof(Guid), typeof(uint) };
             var tippingServiceType = tippingService.GetType();
-            var method = tippingServiceType.GetMethod(currentMethod.Name, parameterTypes);
+            var method = tippingServiceType.GetMethod("RequestCalloutDisplay", parameterTypes);
             if (method == null)
             {
-                log.Error("Couldn't find method on {Type} with parameters like {Method}", tippingServiceType, currentMethod);
+                log.Error("Couldn't find method on {Type} with parameters {Parameters}", tippingServiceType, parameterTypes);
                 return;
             }
 
@@ -92,5 +92,8 @@ namespace GitHub.Services.Vssdk.Services
     [ComImport]
     public interface SVsTippingService
     {
+        void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message,
+            bool isPermanentlyDismissible, FrameworkElement targetElement,
+            Guid vsCommandGroupId, uint vsCommandId, object commandOption = null);
     }
 }
