@@ -47,7 +47,9 @@
         -->
         <StackPanel Background="Blue" Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2">
             <Label HorizontalContentAlignment="Stretch" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
-                <Hyperlink ToolTip="View checks"  Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}">
+                <Hyperlink ToolTip="View checks"
+                           Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                           CommandParameter="{Binding}">
                     Checks
                 </Hyperlink>
             </Label>
