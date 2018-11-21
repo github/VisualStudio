@@ -15,13 +15,17 @@
                         <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                     </Style>
                 </Canvas.Resources>
-                <Ellipse Width="10"
-                         Height="10" 
-                         Canvas.Top="3"
-                         Canvas.Left="3"
+                <Rectangle Width="8"
+                         Height="8" 
+                         Canvas.Top="2.3"
+                         Canvas.Left="2.3"
                          Fill="#23A1D0"
                          Stroke="White"
-                         StrokeThickness="1"/>
+                         StrokeThickness="1">
+                    <Rectangle.LayoutTransform>
+                        <RotateTransform Angle="-45" />
+                    </Rectangle.LayoutTransform>
+                </Rectangle>
             </Canvas>
         </Viewbox>
     </Grid>
