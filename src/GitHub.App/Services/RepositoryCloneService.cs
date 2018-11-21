@@ -161,7 +161,7 @@ namespace GitHub.Services
             teamExplorerServices.ShowHomePage();
 
             var context = gitHubContextService.FindContextFromUrl(url);
-            if (context.LinkType == LinkType.Blob)
+            if (context?.LinkType == LinkType.Blob)
             {
                 // Navigate to file for /blob/ type URLs
                 var (commitish, path, isSha) = gitHubContextService.ResolveBlob(repositoryPath, context);
