@@ -19,6 +19,9 @@ namespace GitHub.Services
     {
         readonly IGitHubServiceProvider serviceProvider;
 
+        readonly static Guid repositorySettingsPageId = new Guid("96903923-97e0-474a-9346-31a3ba28e6ff");
+        readonly static Guid remotesSectionId = new Guid("2e31f317-7144-4316-8aae-a796e4be1fd4");
+
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. ITeamExplorerNotificationManager is declared here so
         /// that instances of this type cannot be created if the TeamFoundation dlls are not available
@@ -66,8 +69,8 @@ namespace GitHub.Services
         public async Task ShowRepositorySettingsRemotesAsync()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();
-            var page = await NavigateToPageAsync(te, new Guid("96903923-97e0-474a-9346-31a3ba28e6ff"));
-            var remotes = page?.GetSection(new Guid("2e31f317-7144-4316-8aae-a796e4be1fd4"));
+            var page = await NavigateToPageAsync(te, repositorySettingsPageId);
+            var remotes = page?.GetSection(remotesSectionId);
             BringIntoView(remotes);
         }
 
