@@ -22,6 +22,8 @@ namespace GitHub.ViewModels.GitHubPane
         string checkSuiteName;
         string checkRunName;
         IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> annotationsDictionary;
+        string checkRunSummary;
+        string checkRunText;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
@@ -99,6 +101,21 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref checkRunName, value); }
         }
 
+        /// <inheritdoc/>
+        public string CheckRunSummary
+        {
+            get { return checkRunSummary; }
+            private set { this.RaiseAndSetIfChanged(ref checkRunSummary, value); }
+        }
+
+        /// <inheritdoc/>
+        public string CheckRunText
+        {
+            get { return checkRunText; }
+            private set { this.RaiseAndSetIfChanged(ref checkRunText, value); }
+        }
+
+        /// <inheritdoc/>
         public IReadOnlyDictionary<string, IPullRequestAnnotationItemViewModel[]> AnnotationsDictionary
         {
             get { return annotationsDictionary; }
@@ -120,6 +137,8 @@ namespace GitHub.ViewModels.GitHubPane
 
                 CheckSuiteName = checkSuiteRun.checkSuite.ApplicationName;
                 CheckRunName = checkSuiteRun.checkRun.Name;
+                CheckRunSummary = checkSuiteRun.checkRun.Summary;
+                CheckRunText = checkSuiteRun.checkRun.Text;
 
                 var changedFiles = new HashSet<string>(session.PullRequest.ChangedFiles.Select(model => model.FileName));
 

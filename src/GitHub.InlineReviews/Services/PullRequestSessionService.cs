@@ -785,6 +785,7 @@ namespace GitHub.InlineReviews.Services
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
+                                                  Text = run.Text,
                                                   Annotations = run.Annotations(null, null, null, null).AllPages()
                                                       .Select(annotation => new CheckRunAnnotationModel
                                                       {
