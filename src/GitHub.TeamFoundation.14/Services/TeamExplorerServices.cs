@@ -71,7 +71,7 @@ namespace GitHub.Services
             var te = serviceProvider.TryGetService<ITeamExplorer>();
             var page = await NavigateToPageAsync(te, repositorySettingsPageId);
             var remotes = page?.GetSection(remotesSectionId);
-            BringIntoView(remotes);
+            await BringIntoViewAsync(remotes);
         }
 
         public void ShowMessage(string message)
@@ -127,26 +127,24 @@ namespace GitHub.Services
             dte?.ExecuteCommand("File.OpenFolder", repositoryPath);
         }
 
-        static void BringIntoView(ITeamExplorerSection section)
+        static async Task BringIntoViewAsync(ITeamExplorerSection section)
         {
-            var control = section?.SectionContent as UserControl;
-            if (control != null)
+            var content = section?.SectionContent as UserControl;
+            if (section == null)
             {
-                if (control.IsLoaded)
-                {
-                    BringIntoView();
-                }
-                else
-                {
-                    control.Loaded += (s, e) => BringIntoView();
-                }
+                return;
             }
 
-            void BringIntoView()
-            {
-                var targetRectangle = new Rect(0, 0, 0, 1000);
-                control.BringIntoView(targetRectangle);
-            }
+            // Wait for section content to load
+            await Observable.FromEventPattern(content, nameof(content.Loaded))
+                .Select(e => content.IsLoaded)
+                .StartWith(content.IsLoaded)
+                .Where(l => l == true)
+                .Take(1);
+
+            // Specify a tall rectangle to bring section to the top
+            var targetRectangle = new Rect(0, 0, 0, 1000);
+            content.BringIntoView(targetRectangle);
         }
 
         static async Task<ITeamExplorerPage> NavigateToPageAsync(ITeamExplorer teamExplorer, Guid pageId)
