@@ -52,7 +52,9 @@ namespace GitHub.Services.Vssdk.Services
             Assumes.Present(tippingService);
             var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string),
                 typeof(bool), typeof(FrameworkElement), typeof(Guid), typeof(uint), typeof(object) };
-            var method = tippingService.GetType().GetMethod("RequestCalloutDisplay", parameterTypes);
+            var method = tippingService.GetType().GetInterfaces()
+                .Where(i => i.Name == "IVsTippingService")
+                .FirstOrDefault()?.GetMethod("RequestCalloutDisplay", parameterTypes);
             var arguments = new object[] { clientId, calloutId, title, message, isPermanentlyDismissible, targetElement,
                     vsCommandGroupId, vsCommandId, commandOption };
             method.Invoke(tippingService, arguments);
@@ -73,7 +75,8 @@ namespace GitHub.Services.Vssdk.Services
             var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string), typeof(bool),
                 typeof(Microsoft.VisualStudio.OLE.Interop.POINT), typeof(Guid), typeof(uint) };
             var tippingServiceType = tippingService.GetType();
-            var method = tippingServiceType.GetMethod("RequestCalloutDisplay", parameterTypes);
+            var method = tippingService.GetType().GetInterfaces().Where(i => i.Name == "IVsTippingService")
+                .FirstOrDefault()?.GetMethod("RequestCalloutDisplay", parameterTypes);
             if (method == null)
             {
                 log.Error("Couldn't find method on {Type} with parameters {Parameters}", tippingServiceType, parameterTypes);
