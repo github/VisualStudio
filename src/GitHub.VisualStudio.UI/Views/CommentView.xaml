@@ -37,7 +37,7 @@
 
     <Grid IsEnabled="{Binding IsSubmitting, Converter={ui:InverseBooleanConverter}}">
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical" Margin="4">
+        <StackPanel Orientation="Vertical" Margin="0 4 0 0">
             <StackPanel.Style>
                 <Style TargetType="FrameworkElement">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -49,17 +49,20 @@
                 </Style>
             </StackPanel.Style>
 
-            <DockPanel>
+            <DockPanel Margin="4">
               <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                 <views:ActorAvatarView Width="16" 
                                        Height="16" 
                                        ViewModel="{Binding Author}"/>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="Bold" Text="{Binding Author.Login}" Margin="4 0"/>
+                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
+                    <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                    <Run Text="commented" />
+                </TextBlock>
                 <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
-                                     Command="{Binding OpenOnGitHub}"
-                                     Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                     Opacity="0.75" />
+                                 Command="{Binding OpenOnGitHub}"
+                                 Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                 Opacity="0.75" />
                 <Border Background="{DynamicResource VsBrush.InfoBackground}"
                         BorderBrush="{DynamicResource VsBrush.AccentPale}"
                         BorderThickness="1"
@@ -91,7 +94,7 @@
 
             <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1"
                                     Name="bodyMarkdown"
-                                    Margin="0 2 0 0"
+                                    Margin="24 4 0 0"
                                     Foreground="{DynamicResource VsBrush.WindowText}"
                                     Markdown="{Binding Body}"/>
 
@@ -108,9 +111,14 @@
                         </Style.Triggers>
                     </Style>
                 </DockPanel.Style>
+
                 <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
                 <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
             </DockPanel>
+
+            <Border BorderThickness="0,1,0,0"
+                    BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
+                    Margin="0,8,0,0" />
         </StackPanel>
 
         <!-- Displays edit view or a reply placeholder-->
@@ -141,16 +149,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
-                       Background="{DynamicResource GitHubButtonBorderBrush}"/>
-
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
                               Grid.Row="1"
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 0"
+                              Margin="4 8"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
@@ -200,7 +205,7 @@
 
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
-                        Margin="4 8" 
+                        Margin="4 4 4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">

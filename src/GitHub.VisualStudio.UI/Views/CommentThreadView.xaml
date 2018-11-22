@@ -33,7 +33,7 @@
     <ItemsControl ItemsSource="{Binding Comments}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <local:CommentView Margin="0 4"/>
+                <local:CommentView />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>
