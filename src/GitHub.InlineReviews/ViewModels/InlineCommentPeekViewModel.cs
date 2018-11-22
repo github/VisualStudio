@@ -40,6 +40,7 @@ namespace GitHub.InlineReviews.ViewModels
         ITrackingPoint triggerPoint;
         string relativePath;
         DiffSide side;
+        bool availableForComment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
@@ -85,6 +86,12 @@ namespace GitHub.InlineReviews.ViewModels
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }),
                 Observable.Return(previousCommentCommand.Enabled));
+        }
+
+        public bool AvailableForComment
+        {
+            get { return availableForComment; }
+            private set { this.RaiseAndSetIfChanged(ref availableForComment, value); }
         }
 
         /// <summary>
@@ -186,6 +193,11 @@ namespace GitHub.InlineReviews.ViewModels
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
+
+            AvailableForComment =
+                file.Diff.Any(chunk => chunk.Lines
+                    .Any(line => line.NewLineNumber == lineNumber));
+
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
