@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using GitHub.Exports;
 using GitHub.ViewModels.Documents;
 
-namespace GitHub.VisualStudio.UI.Views.Documents
+namespace GitHub.VisualStudio.Views.Documents
 {
     [ExportViewFor(typeof(IIssueishPaneViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

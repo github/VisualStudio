@@ -84,7 +84,7 @@ namespace GitHub.ViewModels.Documents
             {
                 if (!(i is CommitModel) && commits.Count > 0)
                 {
-                    timeline.Add(new CommitSummariesViewModel(commits));
+                    timeline.Add(new CommitListViewModel(commits));
                     commits.Clear();
                 }
 
@@ -102,7 +102,7 @@ namespace GitHub.ViewModels.Documents
 
             if (commits.Count > 0)
             {
-                timeline.Add(new CommitSummariesViewModel(commits));
+                timeline.Add(new CommitListViewModel(commits));
             }
 
             await AddPlaceholder().ConfigureAwait(true);

@@ -863,4 +863,10 @@ https://git-scm.com/download/win</value>
   <data name="CommitCountFormat" xml:space="preserve">
     <value>{0} commits</value>
   </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>added some commits</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>and others</value>
+  </data>
 </root>

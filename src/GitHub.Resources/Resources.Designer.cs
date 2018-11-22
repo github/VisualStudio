@@ -70,6 +70,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to added some commits.
+        /// </summary>
+        public static string AddedSomeCommits {
+            get {
+                return ResourceManager.GetString("AddedSomeCommits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add review comment.
         /// </summary>
         public static string AddReviewComment {
@@ -93,6 +102,15 @@ namespace GitHub {
         public static string AddYourReview {
             get {
                 return ResourceManager.GetString("AddYourReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to and others.
+        /// </summary>
+        public static string AndOthers {
+            get {
+                return ResourceManager.GetString("AndOthers", resourceCulture);
             }
         }
         

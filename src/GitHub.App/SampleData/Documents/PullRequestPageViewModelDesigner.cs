@@ -56,7 +56,7 @@ Depends on #1993
 Fixes #1905";
             Timeline = new IViewModel[]
             {
-                new CommitSummariesViewModel(
+                new CommitListViewModel(
                     new CommitSummaryViewModel(new CommitModel
                     {
                         Author = new ActorModel { Login = "grokys" },
@@ -65,7 +65,7 @@ Fixes #1905";
                     }),
                     new CommitSummaryViewModel(new CommitModel
                     {
-                        Author = new ActorModel { Login = "grokys" },
+                        Author = new ActorModel { Login = "shana" },
                         AbbreviatedOid = "04e6a90",
                         MessageHeadline = "Refactor comment view models.",
                     })),

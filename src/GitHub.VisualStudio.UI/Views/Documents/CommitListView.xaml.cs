@@ -2,19 +2,16 @@
 using System.Windows.Controls;
 using GitHub.Exports;
 using GitHub.ViewModels.Documents;
-using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.VisualStudio.Views.Documents
 {
-    [ExportViewFor(typeof(IPullRequestPageViewModel))]
+    [ExportViewFor(typeof(ICommitListViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class PullRequestPageView : UserControl
+    public partial class CommitListView : UserControl
     {
-        public PullRequestPageView()
+        public CommitListView()
         {
             InitializeComponent();
-
-            bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
     }
 }

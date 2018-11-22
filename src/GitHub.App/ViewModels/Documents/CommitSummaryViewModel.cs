@@ -2,7 +2,10 @@
 
 namespace GitHub.ViewModels.Documents
 {
-    public class CommitSummaryViewModel : ViewModelBase
+    /// <summary>
+    /// Displays a one-line summary of a commit in a pull request timeline.
+    /// </summary>
+    public class CommitSummaryViewModel : ViewModelBase, ICommitSummaryViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CommitSummaryViewModel"/> class.
