@@ -105,21 +105,28 @@ namespace GitHub.InlineReviews.Services
         [STAThread]
         void NoRemoteOriginCallout()
         {
-            var view = FindSccStatusBar(Application.Current.MainWindow);
-            if (view == null)
+            try
             {
-                log.Warning("Couldn't find SccStatusBar");
-                return;
-            }
+                var view = FindSccStatusBar(Application.Current.MainWindow);
+                if (view == null)
+                {
+                    log.Warning("Couldn't find SccStatusBar");
+                    return;
+                }
 
-            tippingService.Value.RequestCalloutDisplay(
-                calloutId: Guids.NoRemoteOriginCalloutId,
-                title: Resources.CantFindGitHubUrlForRepository,
-                message: Resources.RepositoriesMustHaveRemoteOrigin,
-                isPermanentlyDismissible: true,
-                targetElement: view,
-                vsCommandGroupId: Guids.guidGitHubCmdSet,
-                vsCommandId: PkgCmdIDList.showGitHubPaneCommand);
+                tippingService.Value.RequestCalloutDisplay(
+                    calloutId: Guids.NoRemoteOriginCalloutId,
+                    title: Resources.CantFindGitHubUrlForRepository,
+                    message: Resources.RepositoriesMustHaveRemoteOrigin,
+                    isPermanentlyDismissible: true,
+                    targetElement: view,
+                    vsCommandGroupId: Guids.guidGitHubCmdSet,
+                    vsCommandId: PkgCmdIDList.showGitHubPaneCommand);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(NoRemoteOriginCallout));
+            }
         }
 
         async Task<bool> IsDotComOrEnterpriseRepository(LocalRepositoryModel repository)
