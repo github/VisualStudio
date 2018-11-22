@@ -128,6 +128,7 @@ namespace GitHub.VisualStudio
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ServiceProviderExports
     {
+        static readonly ILogger log = LogManager.ForContext<ServiceProviderExports>();
         readonly IServiceProvider serviceProvider;
 
         [ImportingConstructor]
@@ -152,9 +153,33 @@ namespace GitHub.VisualStudio
         public IPackageSettings PackageSettings => GetService<IPackageSettings>();
 
         [ExportForVisualStudioProcess]
-        public ITippingService TippingService => GetService<ITippingService>();
+        public ITippingService TippingService
+        {
+            get
+            {
+                var tippingService = GetService<ITippingService>();
+                if (tippingService == null)
+                {
+                    // GetService<TippingService>() was returning null on Visual Studio 2015, so fall back to using new TippingService(...)
+                    log.Warning("Couldn't find service of type {Type}, using new TippingService(...) instead", typeof(ITippingService));
+                    tippingService = new TippingService(serviceProvider);
+                }
 
-        T GetService<T>() => (T)serviceProvider.GetService(typeof(T));
+                return tippingService;
+            }
+        }
+
+        T GetService<T>() where T : class
+        {
+            var service = (T)serviceProvider.GetService(typeof(T));
+            if (service == null)
+            {
+                log.Error("Couldn't find service of type {Type}", typeof(T));
+                return null;
+            }
+
+            return service;
+        }
     }
 
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
