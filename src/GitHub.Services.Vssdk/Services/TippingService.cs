@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using GitHub.Logging;
@@ -44,23 +43,6 @@ namespace GitHub.Services.Vssdk.Services
                 point, vsCommandGroupId, vsCommandId);
         }
 
-        // The option to pass a command option is only available on Visual Studio 2017+.
-        void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message,
-            bool isPermanentlyDismissible, FrameworkElement targetElement,
-            Guid vsCommandGroupId, uint vsCommandId, object commandOption = null)
-        {
-            var tippingService = serviceProvider.GetService(typeof(SVsTippingService));
-            Assumes.Present(tippingService);
-            var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string),
-                typeof(bool), typeof(FrameworkElement), typeof(Guid), typeof(uint), typeof(object) };
-            var method = tippingService.GetType().GetInterfaces()
-                .Where(i => i.Name == "IVsTippingService")
-                .FirstOrDefault()?.GetMethod("RequestCalloutDisplay", parameterTypes);
-            var arguments = new object[] { clientId, calloutId, title, message, isPermanentlyDismissible, targetElement,
-                    vsCommandGroupId, vsCommandId, commandOption };
-            method.Invoke(tippingService, arguments);
-        }
-
         // Available on Visual Studio 2015
         void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message, bool isPermanentlyDismissible,
             Microsoft.VisualStudio.OLE.Interop.POINT anchor, Guid vsCommandGroupId, uint vsCommandId)
@@ -96,8 +78,5 @@ namespace GitHub.Services.Vssdk.Services
     [ComImport]
     public interface SVsTippingService
     {
-        void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message,
-            bool isPermanentlyDismissible, FrameworkElement targetElement,
-            Guid vsCommandGroupId, uint vsCommandId, object commandOption = null);
     }
 }
