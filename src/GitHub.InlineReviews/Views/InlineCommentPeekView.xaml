@@ -104,7 +104,7 @@
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
-            <StackPanel Orientation="Vertical" Margin="0 0 0 4">
+            <StackPanel Orientation="Vertical">
                 <ItemsControl x:Name="annotationsView" ItemsSource="{Binding Annotations}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
