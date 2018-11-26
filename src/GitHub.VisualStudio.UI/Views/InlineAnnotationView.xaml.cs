@@ -4,9 +4,9 @@ using GitHub.VisualStudio.UI.Helpers;
 
 namespace GitHub.VisualStudio.Views
 {
-    public partial class CommentThreadView : UserControl
+    public partial class InlineAnnotationView : UserControl
     {
-        public CommentThreadView()
+        public InlineAnnotationView()
         {
             InitializeComponent();
         }

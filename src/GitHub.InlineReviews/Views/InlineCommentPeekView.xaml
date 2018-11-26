@@ -104,9 +104,19 @@
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
-            <Grid>
-                <ghfvs:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
-            </Grid>
+            <StackPanel Orientation="Vertical" Margin="0 0 0 4">
+                <ItemsControl x:Name="annotationsView" ItemsSource="{Binding Annotations}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ghfvs:InlineAnnotationView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ghfvs:CommentThreadView x:Name="threadView"
+                                         Visibility="{Binding DataContext.AvailableForComment, Converter={ghfvs:BooleanToVisibilityConverter}, ElementName=annotationsView}"
+                                         DataContext="{Binding Thread}"/>
+            </StackPanel>
         </ScrollViewer>
     </DockPanel>
 </UserControl>

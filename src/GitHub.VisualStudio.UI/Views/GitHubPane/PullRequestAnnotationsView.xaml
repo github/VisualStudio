@@ -64,13 +64,13 @@
                             <StackPanel>
                                 <Expander>
                                     <Expander.Header>
-                                        <Label Content="{Binding Key}" FontWeight="SemiBold" ToolTip="{Binding Key}" />
+                                        <Label Foreground="{DynamicResource VsBrush.WindowText}" Content="{Binding Key}" FontWeight="SemiBold" ToolTip="{Binding Key}" />
                                     </Expander.Header>
 
                                     <ItemsControl ItemsSource="{Binding Value}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Margin="22 0 0 8" >
+                                                <Grid Margin="26 0 0 8" >
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="16" />
                                                         <ColumnDefinition Width="*" />

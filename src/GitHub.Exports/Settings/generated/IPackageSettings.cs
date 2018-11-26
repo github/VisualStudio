@@ -1,4 +1,4 @@
-﻿// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
+﻿﻿// This is an automatically generated file, based on settings.json and PackageSettingsGen.tt
 /* settings.json content:
 {
   "settings": [

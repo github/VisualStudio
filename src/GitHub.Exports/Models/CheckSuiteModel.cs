@@ -9,6 +9,11 @@ namespace GitHub.Models
     public class CheckSuiteModel
     {
         /// <summary>
+        /// The head sha of a Check Suite.
+        /// </summary>
+        public string HeadSha { get; set; }
+
+        /// <summary>
         /// The check runs associated with a check suite.
         /// </summary>
         public List<CheckRunModel> CheckRuns { get; set; }

@@ -65,6 +65,26 @@ namespace GitHub.ViewModels.GitHubPane
                     await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
+
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice));
+
+            OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
+
+            OpenFirstAnnotationFailure = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
+        }
+
+        private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
+            CheckAnnotationLevel checkAnnotationLevel)
+        {
+            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel);
+
+            if (annotationModel != null)
+            {
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, annotationModel.EndLine);
+            }
         }
 
         /// <inheritdoc/>
@@ -160,6 +180,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
 
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
+
         static int CountComments(
             IEnumerable<IInlineCommentThreadModel> thread,
             Func<IInlineCommentThreadModel, bool> commentFilter)
@@ -210,6 +239,15 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             return threads.FirstOrDefault();
+        }
+
+        async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
+            CheckAnnotationLevel annotationLevel)
+        {
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var annotations = sessionFile.InlineAnnotations;
+
+            return annotations.FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
         }
 
         /// <summary>

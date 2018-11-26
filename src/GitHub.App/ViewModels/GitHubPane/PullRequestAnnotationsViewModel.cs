@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -15,7 +15,8 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestAnnotationsViewModel : PanePageViewModelBase, IPullRequestAnnotationsViewModel
     {
-        private readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestSessionManager sessionManager;
+        readonly IPullRequestEditorService pullRequestEditorService;
 
         IPullRequestSession session;
         string title;
@@ -29,10 +30,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// Initializes a new instance of the <see cref="PullRequestAnnotationsViewModel"/> class.
         /// </summary>
         /// <param name="sessionManager">The pull request session manager.</param>
+        /// <param name="pullRequestEditorService">The pull request editor service.</param>
         [ImportingConstructor]
-        public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager)
+        public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager, IPullRequestEditorService pullRequestEditorService)
         {
             this.sessionManager = sessionManager;
+            this.pullRequestEditorService = pullRequestEditorService;
             NavigateToPullRequest = ReactiveCommand.Create(() => {
                     NavigateTo(FormattableString.Invariant(
                         $"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}"));
@@ -151,7 +154,7 @@ namespace GitHub.ViewModels.GitHubPane
                     .ToDictionary(
                         path => path,
                         path => annotationsLookup[path]
-                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path)))
+                            .Select(annotation => new PullRequestAnnotationItemViewModel(annotation, changedFiles.Contains(path), checkSuiteRun.checkSuite, session, pullRequestEditorService))
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
                         );
