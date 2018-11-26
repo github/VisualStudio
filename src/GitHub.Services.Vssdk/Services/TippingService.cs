@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using GitHub.Logging;
@@ -58,8 +59,10 @@ namespace GitHub.Services.Vssdk.Services
             var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string), typeof(bool),
                 typeof(Microsoft.VisualStudio.OLE.Interop.POINT), typeof(Guid), typeof(uint) };
             var tippingServiceType = tippingService.GetType();
-            var method = tippingService.GetType().GetInterfaces().Where(i => i.GUID == IVsTippingServiceGuid)
-                .FirstOrDefault()?.GetMethod("RequestCalloutDisplay", parameterTypes);
+            var method = tippingServiceType.GetInterfaces()
+                .FirstOrDefault(i => i.GUID == IVsTippingServiceGuid)?.GetMethod("RequestCalloutDisplay",
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+                    null, parameterTypes, null);
             if (method == null)
             {
                 log.Error("Couldn't find method on {Type} with parameters {Parameters}", tippingServiceType, parameterTypes);
