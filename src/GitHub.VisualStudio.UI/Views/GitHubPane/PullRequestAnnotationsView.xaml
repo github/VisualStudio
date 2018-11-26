@@ -46,15 +46,18 @@
                            Text="{Binding PullRequestTitle}"
                            TextWrapping="Wrap"/>
 
-                <markdig:MarkdownViewer FontFamily="Consolas"
-                                        Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}"
-                                        Markdown="{Binding CheckRunSummary}" />
+                <Expander Header="Body"
+                          Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                    <markdig:MarkdownViewer FontFamily="Consolas" Markdown="{Binding CheckRunSummary}" />
+                </Expander>
 
-                <TextBlock FontFamily="Consolas" 
-                           Foreground="{DynamicResource VsBrush.GrayText}"
-                           Visibility="{Binding CheckRunText, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
-                    <Run Text="{Binding CheckRunText, Mode=OneWay}"/>
-                </TextBlock>
+                <Expander Header="Details"
+                          Visibility="{Binding CheckRunText, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                    <TextBlock FontFamily="Consolas" 
+                           Foreground="{DynamicResource VsBrush.GrayText}">
+                        <Run Text="{Binding CheckRunText, Mode=OneWay}"/>
+                    </TextBlock>
+                </Expander>
 
                 <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="-8 4"/>
 
