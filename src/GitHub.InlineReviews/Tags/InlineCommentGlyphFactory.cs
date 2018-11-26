@@ -66,10 +66,7 @@ namespace GitHub.InlineReviews.Tags
 
                 if (showTag.Thread != null)
                 {
-                    return new ShowInlineCommentGlyph
-                    {
-                        Opacity = showTag.Thread.IsStale ? 0.5 : 1,
-                    };
+                    return new ShowInlineCommentGlyph();
                 }
 
                 if (showTag.Annotations != null)
