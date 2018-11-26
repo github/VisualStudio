@@ -23,6 +23,7 @@ namespace GitHub.Services.Vssdk.Services
 
         // This is the only supported ClientId
         public static readonly Guid ClientId = new Guid("D5D3B674-05BB-4942-B8EC-C3D13B5BD6EE");
+        public static readonly Guid IVsTippingServiceGuid = new Guid("756F1DC9-47FA-42C5-9C06-252B54148EB8");
 
         readonly IServiceProvider serviceProvider;
 
@@ -75,7 +76,7 @@ namespace GitHub.Services.Vssdk.Services
             var parameterTypes = new Type[] { typeof(Guid), typeof(Guid), typeof(string), typeof(string), typeof(bool),
                 typeof(Microsoft.VisualStudio.OLE.Interop.POINT), typeof(Guid), typeof(uint) };
             var tippingServiceType = tippingService.GetType();
-            var method = tippingService.GetType().GetInterfaces().Where(i => i.Name == "IVsTippingService")
+            var method = tippingService.GetType().GetInterfaces().Where(i => i.GUID == IVsTippingServiceGuid)
                 .FirstOrDefault()?.GetMethod("RequestCalloutDisplay", parameterTypes);
             if (method == null)
             {

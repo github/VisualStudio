@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using GitHub.Services.Vssdk.Services;
 using NSubstitute;
@@ -49,6 +50,7 @@ public class TippingServiceTests
                 default, commandGroupId, commandId);
         }
 
+        [Guid("756F1DC9-47FA-42C5-9C06-252B54148EB8")]
         public interface IVsTippingService
         {
             void RequestCalloutDisplay(Guid clientId, Guid calloutId, string title, string message, bool isPermanentlyDismissible,
