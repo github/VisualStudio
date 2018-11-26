@@ -114,7 +114,7 @@
                 </ItemsControl>
 
                 <ghfvs:CommentThreadView x:Name="threadView"
-                                         Visibility="{Binding AvailableForComment, Converter={ghfvs:BooleanToVisibilityConverter}}"
+                                         Visibility="{Binding DataContext.AvailableForComment, Converter={ghfvs:BooleanToVisibilityConverter}, ElementName=annotationsView}"
                                          DataContext="{Binding Thread}"/>
             </StackPanel>
         </ScrollViewer>
