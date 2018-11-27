@@ -91,7 +91,7 @@
                                                     </StackPanel>
 
                                                     <StackPanel Margin="8,0,0,0" Grid.Column="1">
-                                                        <TextBlock FontWeight="SemiBold">
+                                                        <TextBlock FontWeight="SemiBold" TextWrapping="Wrap">
                                                             <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
                                                         </TextBlock>
 
