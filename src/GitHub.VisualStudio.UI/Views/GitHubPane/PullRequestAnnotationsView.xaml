@@ -47,6 +47,9 @@
                                Text="{Binding PullRequestTitle}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
+
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+
                 <Expander Header="Body" Margin="0 4"
                           FontWeight="SemiBold"
                           Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
