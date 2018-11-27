@@ -49,14 +49,18 @@
 
                     
                 </StackPanel>
-                <Expander Header="Body"
+                <Expander Header="Body" Margin="0 4"
+                          FontWeight="SemiBold"
                           Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
-                    <markdig:MarkdownViewer FontFamily="Consolas" Markdown="{Binding CheckRunSummary}" />
+                    <markdig:MarkdownViewer Margin="21 0 8 0" FontWeight="Normal" Markdown="{Binding CheckRunSummary}" />
                 </Expander>
 
                 <Expander Header="Details"
+                          FontWeight="SemiBold"
+                          Margin="0 4"
                           Visibility="{Binding CheckRunText, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
-                    <TextBlock FontFamily="Consolas" 
+                    <TextBlock Margin="21 0 8 0" FontFamily="Consolas" 
+                           FontWeight="Normal" 
                            Foreground="{DynamicResource VsBrush.GrayText}">
                         <Run Text="{Binding CheckRunText, Mode=OneWay}"/>
                     </TextBlock>
