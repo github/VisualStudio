@@ -53,7 +53,7 @@ namespace GitHub.InlineReviews.Commands
             if (tags.Count > 0)
             {
                 var cursorPoint = GetCursorPoint(textViews[0], parameter);
-                var next = tags.FirstOrDefault(x => x.Point > cursorPoint) ?? tags.First();
+                var next = tags.FirstOrDefault(x => x.Point >= cursorPoint) ?? tags.First();
                 ShowPeekComments(parameter, next.TextView, next.Tag, textViews);
             }
 

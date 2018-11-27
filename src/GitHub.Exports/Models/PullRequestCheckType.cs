@@ -1,4 +1,4 @@
-﻿namespace GitHub.ViewModels.GitHubPane
+﻿namespace GitHub.Models
 {
     public enum PullRequestCheckType
     {
