@@ -27,7 +27,7 @@
     </Control.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel>
+        <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                 <StackPanel Margin="8 0">
                     <TextBlock FontSize="16" VerticalAlignment="Center">
@@ -123,7 +123,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-        </StackPanel>
+        </DockPanel>
     </ScrollViewer>
 
 </UserControl>
