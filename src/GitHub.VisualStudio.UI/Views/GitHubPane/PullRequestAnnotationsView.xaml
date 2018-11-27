@@ -81,13 +81,13 @@
                                     <ItemsControl ItemsSource="{Binding Value}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Margin="26 0 0 8" >
+                                                <Grid Margin="22 0 0 8" >
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="16" />
+                                                        <ColumnDefinition Width="20" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
 
-                                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
                                                         <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
                                                         <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
                                                         <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
