@@ -56,12 +56,10 @@ namespace GitHub.InlineReviews.Tags
             {
                 return new AddInlineCommentGlyph();
             }
-            else if (showTag != null)
+
+            if (showTag != null)
             {
-                return new ShowInlineCommentGlyph()
-                {
-                    Opacity = showTag.Thread.IsStale ? 0.5 : 1,
-                };
+                return new ShowInlineCommentGlyph();
             }
 
             throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
