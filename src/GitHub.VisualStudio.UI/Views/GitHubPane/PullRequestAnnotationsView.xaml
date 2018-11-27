@@ -30,24 +30,22 @@
         <StackPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
                 <StackPanel Margin="8 0">
-                <TextBlock FontSize="16" VerticalAlignment="Center">
-                        <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
-                        <Run Text="/"/>
-                        <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
+                    <TextBlock FontSize="16" VerticalAlignment="Center">
+                            <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
+                            <Run Text="/"/>
+                            <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
 
-                        <Run>for</Run>
+                            <Run>for</Run>
 
-                        <Hyperlink Command="{Binding NavigateToPullRequest}">
-                            <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
-                        </Hyperlink>
-                </TextBlock>
+                            <Hyperlink Command="{Binding NavigateToPullRequest}">
+                                <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                            </Hyperlink>
+                    </TextBlock>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
-                           Margin="0"
-                           Text="{Binding PullRequestTitle}"
-                           TextWrapping="Wrap"/>
-
-                    
+                    <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
+                               Margin="0"
+                               Text="{Binding PullRequestTitle}"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
                 <Expander Header="Body" Margin="0 4"
                           FontWeight="SemiBold"
@@ -55,12 +53,12 @@
                     <markdig:MarkdownViewer Margin="21 0 8 0" FontWeight="Normal" Markdown="{Binding CheckRunSummary}" />
                 </Expander>
 
-                <Expander Header="Details"
-                          FontWeight="SemiBold"
-                          Margin="0 4"
+                <Expander Margin="0 4"
                           Visibility="{Binding CheckRunText, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                    <Expander.Header>
+                        <TextBlock FontWeight="SemiBold" Text="Details" />
+                    </Expander.Header>
                     <TextBlock Margin="21 0 8 0" FontFamily="Consolas" 
-                           FontWeight="Normal" 
                            Foreground="{DynamicResource VsBrush.GrayText}">
                         <Run Text="{Binding CheckRunText, Mode=OneWay}"/>
                     </TextBlock>
@@ -71,10 +69,10 @@
                 <ItemsControl ItemsSource="{Binding AnnotationsDictionary}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
+                            <StackPanel Margin="0 4">
                                 <Expander>
                                     <Expander.Header>
-                                        <Label Foreground="{DynamicResource VsBrush.WindowText}" Content="{Binding Key}" FontWeight="SemiBold" ToolTip="{Binding Key}" />
+                                        <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Key}" FontWeight="SemiBold" ToolTip="{Binding Key}" />
                                     </Expander.Header>
 
                                     <ItemsControl ItemsSource="{Binding Value}">
