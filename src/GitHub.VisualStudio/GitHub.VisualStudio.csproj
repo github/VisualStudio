@@ -419,7 +419,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
-      <Version>15.8.28010</Version>
+      <Version>14.1.24720</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup>
