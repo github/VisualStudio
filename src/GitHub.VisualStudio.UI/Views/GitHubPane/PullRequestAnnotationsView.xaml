@@ -28,7 +28,8 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
-            <StackPanel DockPanel.Dock="Top" Margin="8 0" Orientation="Vertical">
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                <StackPanel Margin="8 0">
                 <TextBlock FontSize="16" VerticalAlignment="Center">
                         <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
                         <Run Text="/"/>
@@ -46,6 +47,8 @@
                            Text="{Binding PullRequestTitle}"
                            TextWrapping="Wrap"/>
 
+                    
+                </StackPanel>
                 <Expander Header="Body"
                           Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
                     <markdig:MarkdownViewer FontFamily="Consolas" Markdown="{Binding CheckRunSummary}" />
@@ -59,9 +62,9 @@
                     </TextBlock>
                 </Expander>
 
-                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="-8 4"/>
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
 
-                <ItemsControl Margin="-4 0"  ItemsSource="{Binding AnnotationsDictionary}">
+                <ItemsControl ItemsSource="{Binding AnnotationsDictionary}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
