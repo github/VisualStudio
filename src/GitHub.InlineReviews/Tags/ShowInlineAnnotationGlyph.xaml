@@ -17,27 +17,13 @@
                     </Style>
                 </Canvas.Resources>
 
-                <Canvas Canvas.Top="5"
+                <Canvas Canvas.Top="6"
                         Canvas.Left="1">
                     <Rectangle Width="14"
-                             Height="5" 
+                             Height="4" 
                              Fill="#959da5"
                              Stroke="White"
                              StrokeThickness="1" />
-
-                    <Rectangle 
-                        Canvas.Top="2"
-                        Canvas.Left="2"
-                        Width="1"
-                        Height="1" 
-                        Fill="White" />
-
-                <Rectangle 
-                    Canvas.Top="2"
-                    Canvas.Left="4"
-                    Width="7"
-                    Height="1" 
-                    Fill="White" />
                 </Canvas>
             </Canvas>
         </Viewbox>
