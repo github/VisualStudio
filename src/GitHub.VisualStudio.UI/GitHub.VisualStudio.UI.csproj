@@ -22,11 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnvDTE" Version="8.0.1" />
     <PackageReference Include="Markdig.Signed" version="0.13.0" />
     <PackageReference Include="Markdig.Wpf.Signed" version="0.2.1" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
-    <PackageReference Include="Microsoft.VisualStudio.ImageCatalog" version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime" version="14.3.25407" />
   </ItemGroup>
 </Project>
