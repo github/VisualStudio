@@ -1630,6 +1630,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please rename one of your existing remotes to &apos;origin&apos; or add a new remote named &apos;origin&apos; and fetch. This can be done from the command line or by clicking the button below..
+        /// </summary>
+        public static string RepositoriesMustHaveRemoteOriginHowToFix {
+            get {
+                return ResourceManager.GetString("RepositoriesMustHaveRemoteOriginHowToFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No selected repository..
         /// </summary>
         public static string RepositoryCloneFailedNoSelectedRepo {

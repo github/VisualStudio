@@ -842,4 +842,7 @@ https://git-scm.com/download/win</value>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
     <value>Repositories must have a remote called "origin" defined in order to locate their GitHub URL.</value>
   </data>
+  <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
+    <value>Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below.</value>
+  </data>
 </root>

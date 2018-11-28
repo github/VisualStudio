@@ -36,13 +36,15 @@
                 Text="{x:Static ghfvs:Resources.RepositoriesMustHaveRemoteOrigin}"
                 TextWrapping="Wrap"
                 TextAlignment="Center"
-                HorizontalAlignment="Center" />
+                HorizontalAlignment="Center"
+                Margin="4" />
 
-            <TextBlock
-                Text="Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below."
+            <TextBlock                
+                Text="{x:Static ghfvs:Resources.RepositoriesMustHaveRemoteOriginHowToFix}"
                 TextWrapping="Wrap"
                 TextAlignment="Center"
-                HorizontalAlignment="Center" />
+                HorizontalAlignment="Center" 
+                Margin="4" />
 
             <Button HorizontalAlignment="Center"
                 Margin="0,15"
