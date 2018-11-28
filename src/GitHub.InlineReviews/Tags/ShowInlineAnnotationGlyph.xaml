@@ -21,7 +21,7 @@
                         Canvas.Left="1">
                     <Rectangle Width="14"
                              Height="4" 
-                             Fill="#959da5"
+                             Fill="#23A1D0"
                              Stroke="White"
                              StrokeThickness="1" />
                 </Canvas>

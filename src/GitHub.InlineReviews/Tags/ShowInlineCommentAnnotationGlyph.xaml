@@ -21,18 +21,16 @@
                     Canvas.Left="1"
                     Canvas.Top="4.5">
                     <Rectangle Width="14"
-                             Height="7" 
-                             Fill="#959da5"
+                             Height="4" 
+                             Fill="#23A1D0"
+                             Canvas.Top="3"
                              Stroke="White"
                              StrokeThickness="1" />
-
-                    <Line
-                        Width="14"
-                        Canvas.Top="5.5"
-                        X1="1" X2="13"
-                        Y1="-2" Y2="-2"
-                        StrokeThickness="1"
-                        Stroke="White" />
+                    <Rectangle Width="14"
+                             Height="4" 
+                             Fill="#82909E"
+                             Stroke="White"
+                             StrokeThickness="1" />
                 </Canvas>
             </Canvas>
         </Viewbox>
