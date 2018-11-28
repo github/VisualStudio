@@ -17,10 +17,10 @@
                     </Style>
                 </Canvas.Resources>
 
-                <Ellipse Width="6"
-                         Height="6" 
-                         Canvas.Top="5"
-                         Canvas.Left="5"
+                <Ellipse Width="9"
+                         Height="9" 
+                         Canvas.Top="3.5"
+                         Canvas.Left="3.5"
                          Fill="#959DA5"
                          Stroke="White"
                          StrokeThickness="1" />
