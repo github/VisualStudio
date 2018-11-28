@@ -36,6 +36,13 @@
 
                 <Rectangle 
                     Canvas.Top="2"
+                    Canvas.Left="4"
+                    Width="7"
+                    Height="1" 
+                    Fill="White" />
+
+                <Rectangle 
+                    Canvas.Top="2"
                     Canvas.Left="2"
                     Width="1"
                     Height="1" 
@@ -43,8 +50,15 @@
 
                 <Rectangle 
                     Canvas.Top="6"
-                    Canvas.Left="2"
-                    Width="1"
+                    Canvas.Left="4"
+                    Width="4"
+                    Height="1" 
+                    Fill="White" />
+
+                <Rectangle 
+                    Canvas.Top="6"
+                    Canvas.Left="9"
+                    Width="2"
                     Height="1" 
                     Fill="White" />
                 </Canvas>

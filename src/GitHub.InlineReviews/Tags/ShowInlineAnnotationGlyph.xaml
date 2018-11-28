@@ -31,6 +31,13 @@
                         Width="1"
                         Height="1" 
                         Fill="White" />
+
+                <Rectangle 
+                    Canvas.Top="2"
+                    Canvas.Left="4"
+                    Width="7"
+                    Height="1" 
+                    Fill="White" />
                 </Canvas>
             </Canvas>
         </Viewbox>
