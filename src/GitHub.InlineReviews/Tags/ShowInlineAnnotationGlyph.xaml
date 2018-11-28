@@ -17,14 +17,19 @@
                     </Style>
                 </Canvas.Resources>
 
-                <Canvas Canvas.Top="6"
-                        Canvas.Left="1">
-                    <Rectangle Width="14"
-                             Height="4" 
-                             Fill="#23A1D0"
-                             Stroke="White"
-                             StrokeThickness="1" />
-                </Canvas>
+                <Rectangle Width="7"
+                         Height="7" 
+                         Canvas.Top="3"
+                         Canvas.Left="3"
+                         Fill="#2b91af"
+                         Stroke="White"
+                         StrokeThickness="1">
+                    <Rectangle.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="-45" />
+                        </TransformGroup>
+                    </Rectangle.LayoutTransform>
+                </Rectangle>
             </Canvas>
         </Viewbox>
     </Grid>

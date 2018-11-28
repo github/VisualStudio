@@ -17,14 +17,13 @@
                     </Style>
                 </Canvas.Resources>
 
-                <Canvas Canvas.Top="6"
-                        Canvas.Left="1">
-                    <Rectangle Width="14"
-                             Height="4" 
-                             Fill="#82909E"
-                             Stroke="White"
-                             StrokeThickness="1" />
-                </Canvas>
+                <Ellipse Width="6"
+                         Height="6" 
+                         Canvas.Top="5"
+                         Canvas.Left="5"
+                         Fill="#959DA5"
+                         Stroke="White"
+                         StrokeThickness="1" />
             </Canvas>
         </Viewbox>
     </Grid>
