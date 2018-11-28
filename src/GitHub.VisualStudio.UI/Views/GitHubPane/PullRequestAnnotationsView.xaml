@@ -75,7 +75,7 @@
                             <StackPanel Margin="0 4">
                                 <Expander>
                                     <Expander.Header>
-                                        <TextBlock Margin="0 0 0 4" Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Key}" FontWeight="SemiBold" ToolTip="{Binding Key}" />
+                                        <TextBlock Margin="0 0 0 4" Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Key}" FontWeight="SemiBold" />
                                     </Expander.Header>
 
                                     <ItemsControl ItemsSource="{Binding Value}">
