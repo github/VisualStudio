@@ -24,5 +24,6 @@
   <ItemGroup>
     <PackageReference Include="Markdig.Signed" version="0.13.0" />
     <PackageReference Include="Markdig.Wpf.Signed" version="0.2.1" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.27" />
   </ItemGroup>
 </Project>
