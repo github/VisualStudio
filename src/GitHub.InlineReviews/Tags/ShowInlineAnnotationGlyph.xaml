@@ -20,7 +20,7 @@
                 <Rectangle Width="7"
                          Height="7" 
                          Canvas.Top="3"
-                         Canvas.Left="3"
+                         Canvas.Left="2.5"
                          Fill="#2b91af"
                          Stroke="White"
                          StrokeThickness="1">
