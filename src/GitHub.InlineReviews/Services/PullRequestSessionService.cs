@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.App.Services;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -18,22 +17,15 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using Octokit;
 using Octokit.GraphQL;
-using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
 using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
-using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
-using CheckConclusionState = GitHub.Models.CheckConclusionState;
-using CheckStatusState = GitHub.Models.CheckStatusState;
 using DraftPullRequestReviewComment = Octokit.GraphQL.Model.DraftPullRequestReviewComment;
 using FileMode = System.IO.FileMode;
 using NotFoundException = LibGit2Sharp.NotFoundException;
-using PullRequestReviewState = Octokit.GraphQL.Model.PullRequestReviewState;
-using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -95,6 +87,23 @@ namespace GitHub.InlineReviews.Services
             {
                 return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
             }
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<InlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                .SelectMany(arg =>
+                    arg.checkRun.Annotations
+                        .Where(annotation => annotation.Path == relativePath)
+                        .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
+                .OrderBy(tuple => tuple.StartLine)
+                .ToArray();
         }
 
         /// <inheritdoc/>
@@ -357,6 +366,10 @@ namespace GitHub.InlineReviews.Services
 
             result.Statuses = lastCommitModel.Statuses;
             result.CheckSuites = lastCommitModel.CheckSuites;
+            foreach (var checkSuite in result.CheckSuites)
+            {
+                checkSuite.HeadSha = lastCommitModel.HeadSha;
+            }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -764,18 +777,32 @@ namespace GitHub.InlineReviews.Services
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
+                                  HeadSha = commit.Commit.Oid,
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                       .Select(suite => new CheckSuiteModel
                                       {
                                           CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                               .Select(run => new CheckRunModel
                                               {
+                                                  Id = run.Id.Value,
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
-                                              }).ToList()
+                                                  Text = run.Text,
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Path = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.Value.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
+                                              }).ToList(),
+                                          ApplicationName = suite.App != null ? suite.App.Name : "Private App"
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -784,7 +811,7 @@ namespace GitHub.InlineReviews.Services
                                               State = statusContext.State.FromGraphQl(),
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
-                                              Description = statusContext.Description,
+                                              Description = statusContext.Description
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
@@ -921,6 +948,8 @@ namespace GitHub.InlineReviews.Services
             public List<CheckSuiteModel> CheckSuites { get; set; }
 
             public List<StatusModel> Statuses { get; set; }
+
+            public string HeadSha { get; set; }
         }
     }   
 }

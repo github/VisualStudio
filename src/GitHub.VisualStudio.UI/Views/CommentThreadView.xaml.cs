@@ -9,7 +9,6 @@ namespace GitHub.VisualStudio.Views
         public CommentThreadView()
         {
             InitializeComponent();
-            PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
         }
     }
 }
