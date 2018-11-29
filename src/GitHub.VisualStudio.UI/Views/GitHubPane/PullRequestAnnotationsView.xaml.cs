@@ -18,9 +18,6 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             InitializeComponent();
         }
 
-        [Import]
-        public IVisualStudioBrowser Browser { get; set; }
-
         void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
         {
             Uri uri;
@@ -30,5 +27,8 @@ namespace GitHub.VisualStudio.Views.GitHubPane
                 Browser.OpenUrl(uri);
             }
         }
+
+        [Import]
+        public IVisualStudioBrowser Browser { get; set; }
     }
 }
