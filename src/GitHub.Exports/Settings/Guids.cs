@@ -39,5 +39,8 @@ namespace GitHub.VisualStudio
         // Guids defined in InlineReviewsPackage.vsct
         public const string CommandSetString = "C5F1193E-F300-41B3-B4C4-5A703DD3C1C6";
         public static readonly Guid CommandSetGuid = new Guid(CommandSetString);
+
+        // Callout notification IDs
+        public static readonly Guid NoRemoteOriginCalloutId = new Guid("B5679412-58A1-49CD-96E9-8F093FE3DC79");
     }
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.Models;
@@ -38,18 +39,29 @@ namespace GitHub.Services
                 throw new ArgumentException("Path does not exist", nameof(localPath));
             }
 
-            var cloneUrl = GetUri(localPath);
-            var name = cloneUrl?.RepositoryName ?? dir.Name;
-
-            var model = new LocalRepositoryModel
+            using (var repository = GetRepository(localPath))
             {
-                LocalPath = localPath,
-                CloneUrl = cloneUrl,
-                Name = name,
-                Icon = Octicon.repo
-            };
+                UriString cloneUrl = null;
+                bool noOrigin = false;
+                if (repository != null)
+                {
+                    cloneUrl = GetUri(repository);
+                    noOrigin = HasRemotesButNoOrigin(repository);
+                }
 
-            return model;
+                var name = cloneUrl?.RepositoryName ?? dir.Name;
+
+                var model = new LocalRepositoryModel
+                {
+                    LocalPath = localPath,
+                    CloneUrl = cloneUrl,
+                    HasRemotesButNoOrigin = noOrigin,
+                    Name = name,
+                    Icon = Octicon.repo
+                };
+
+                return model;
+            }
         }
 
         public BranchModel GetBranch(LocalRepositoryModel model)
@@ -68,7 +80,8 @@ namespace GitHub.Services
                     repo: model,
                     sha: branch.Tip?.Sha,
                     isTracking: branch.IsTracking,
-                    trackedSha: branch.TrackedBranch?.Tip?.Sha);
+                    trackedSha: branch.TrackedBranch?.Tip?.Sha,
+                    trackedRemoteName: branch.TrackedBranch?.RemoteName);
             }
         }
 
@@ -117,6 +130,17 @@ namespace GitHub.Services
         {
             var repoPath = repositoryFacade.Discover(path);
             return repoPath == null ? null : repositoryFacade.NewRepository(repoPath);
+        }
+
+        /// <summary>
+        /// Find out if repository has remotes but none are called "origin".
+        /// </summary>
+        /// <param name="repo">The target repository.</param>
+        /// <returns>True if repository has remotes but none are called "origin".</returns>
+        public bool HasRemotesButNoOrigin(IRepository repo)
+        {
+            var remotes = repo.Network.Remotes;
+            return remotes["origin"] == null && remotes.Any();
         }
 
         /// <summary>
