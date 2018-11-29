@@ -127,10 +127,21 @@ namespace GitHub.InlineReviews.Tags
                         {
                             linesWithTags[line - startLine] = true;
 
+                            CheckAnnotationLevel? summaryAnnotationLevel = null;
+                            if (annotations != null)
+                            {
+                                var hasFailure = annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+                                var hasWarning = !hasFailure && annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+
+                                summaryAnnotationLevel = hasFailure ? CheckAnnotationLevel.Failure :
+                                    hasWarning ? CheckAnnotationLevel.Warning : CheckAnnotationLevel.Notice;
+                            }
+
                             var showInlineTag = new ShowInlineCommentTag(currentSession, line, thread?.DiffLineType ?? DiffChangeType.Add)
                             {
                                 Thread = thread,
-                                Annotations = annotations
+                                Annotations = annotations,
+                                SummaryAnnotationLevel = summaryAnnotationLevel,
                             };
 
                             result.Add(new TagSpan<ShowInlineCommentTag>(

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
              mc:Ignorable="d">
 
     <Grid>
@@ -29,7 +30,6 @@
                          Height="7" 
                          Canvas.Top="3.5"
                          Canvas.Left="1"
-                         Fill="#2b91af"
                          Stroke="White"
                          StrokeThickness="1">
                     <Rectangle.LayoutTransform>
@@ -37,6 +37,21 @@
                             <RotateTransform Angle="-45" />
                         </TransformGroup>
                     </Rectangle.LayoutTransform>
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Fill" Value="#2b91af"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
+                                             Value="{x:Static models:CheckAnnotationLevel.Failure}">
+                                    <Setter Property="Fill" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
+                                             Value="{x:Static models:CheckAnnotationLevel.Warning}">
+                                    <Setter Property="Fill" Value="Yellow"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
                 </Rectangle>
             </Canvas>
         </Viewbox>
