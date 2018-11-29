@@ -31,15 +31,15 @@
                     </Rectangle.LayoutTransform>
                     <Rectangle.Style>
                         <Style TargetType="Rectangle">
-                            <Setter Property="Fill" Value="#2b91af"/>
+                            <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerInfoFill}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
                                              Value="Failure">
-                                    <Setter Property="Fill" Value="Red"/>
+                                    <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerFailureFill}"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
                                              Value="Warning">
-                                    <Setter Property="Fill" Value="Yellow"/>
+                                    <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerWarningFill}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
