@@ -129,5 +129,8 @@
         </DockPanel>
     </ScrollViewer>
 
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
 </UserControl>
 
