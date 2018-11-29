@@ -13,6 +13,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
 
@@ -25,5 +26,11 @@
     <PackageReference Include="Markdig.Signed" version="0.13.0" />
     <PackageReference Include="Markdig.Wpf.Signed" version="0.2.1" />
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.27" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\GitHubPane\NoRemoteOriginView.xaml.cs">
+      <DependentUpon>NoRemoteOriginView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

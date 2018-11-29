@@ -15,4 +15,10 @@
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
 </Project>
