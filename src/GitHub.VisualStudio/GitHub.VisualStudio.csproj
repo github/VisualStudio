@@ -79,6 +79,10 @@
     <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <!-- Only deploy extension when building inside Visual Studio -->
+    <DeployExtension>False</DeployExtension>
+  </PropertyGroup>
   <Import Project="..\common\signing.props" />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
