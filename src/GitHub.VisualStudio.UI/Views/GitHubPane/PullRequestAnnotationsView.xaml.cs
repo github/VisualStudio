@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Services;
-using GitHub.UI;
 using GitHub.ViewModels.GitHubPane;
-using ReactiveUI;
-using UserControl = System.Windows.Controls.UserControl;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
