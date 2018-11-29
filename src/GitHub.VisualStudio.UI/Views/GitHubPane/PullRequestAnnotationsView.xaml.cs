@@ -18,5 +18,21 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             InitializeComponent();
         }
+
+        IVisualStudioBrowser GetBrowser()
+        {
+            var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
+            return serviceProvider.GetService<IVisualStudioBrowser>();
+        }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                GetBrowser().OpenUrl(uri);
+            }
+        }
     }
 }
