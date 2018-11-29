@@ -113,7 +113,7 @@ namespace UnitTests
             var vsgit = IVSGitServices;
             var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<ITeamExplorerServices>(),
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                Substitute.For<IVSServices>(), Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>());
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitService)).Returns(gitservice);

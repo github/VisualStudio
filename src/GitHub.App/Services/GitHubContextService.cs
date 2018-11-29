@@ -25,6 +25,7 @@ namespace GitHub.Services
     {
         readonly IGitHubServiceProvider serviceProvider;
         readonly IGitService gitService;
+        readonly IVSServices vsServices;
         readonly Lazy<IVsTextManager2> textManager;
 
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
@@ -61,11 +62,30 @@ namespace GitHub.Services
         static readonly Regex tempFileObjectishRegex = new Regex(@"\\TFSTemp\\[^\\]*[.](?<objectish>[a-z0-9]{8})[.][^.\\]*$", RegexOptions.Compiled);
 
         [ImportingConstructor]
-        public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService)
+        public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService, IVSServices vsServices)
         {
             this.serviceProvider = serviceProvider;
             this.gitService = gitService;
+            this.vsServices = vsServices;
             textManager = new Lazy<IVsTextManager2>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager2>());
+        }
+
+        /// <inheritdoc/>
+        public void TryNavigateToContext(string repositoryDir, GitHubContext context)
+        {
+            if (context?.LinkType == LinkType.Blob)
+            {
+                // Navigate to file for /blob/ type URLs
+                var (commitish, path, commitSha) = ResolveBlob(repositoryDir, context);
+
+                var hasChanges = HasChangesInWorkingDirectory(repositoryDir, commitish, path);
+                if (hasChanges)
+                {
+                    vsServices.ShowMessageBoxInfo(Resources.ChangesInWorkingDirectoryMessage + Environment.NewLine + commitish);
+                }
+
+                TryOpenFile(repositoryDir, context);
+            }
         }
 
         /// <inheritdoc/>
