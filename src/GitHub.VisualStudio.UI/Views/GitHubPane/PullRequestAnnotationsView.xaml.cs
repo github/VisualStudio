@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Input;
 using GitHub.Exports;
 using GitHub.Services;
-using GitHub.UI;
 using GitHub.ViewModels.GitHubPane;
-using ReactiveUI;
-using UserControl = System.Windows.Controls.UserControl;
+using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio.Views.GitHubPane
 {
@@ -18,5 +17,18 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             InitializeComponent();
         }
+
+        void OpenHyperlink(object sender, ExecutedRoutedEventArgs e)
+        {
+            Uri uri;
+
+            if (Uri.TryCreate(e.Parameter?.ToString(), UriKind.Absolute, out uri))
+            {
+                Browser.OpenUrl(uri);
+            }
+        }
+
+        [Import]
+        public IVisualStudioBrowser Browser { get; set; }
     }
 }
