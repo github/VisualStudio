@@ -7,7 +7,6 @@ using GitHub.Services;
 using System.Linq.Expressions;
 using System;
 using GitHub.Models;
-using GitHub.Api;
 
 public class RepositoryCloneServiceTests
 {
@@ -16,10 +15,10 @@ public class RepositoryCloneServiceTests
         [Test]
         public async Task ClonesToRepositoryPathAsync()
         {
-            var serviceProvider = Substitutes.ServiceProvider;
+            var serviceProvider = Substitutes.GetServiceProvider();
             var operatingSystem = serviceProvider.GetOperatingSystem();
             var vsGitServices = serviceProvider.GetVSGitServices();
-            var cloneService = serviceProvider.GetRepositoryCloneService();
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
 
             await cloneService.CloneRepository("https://github.com/foo/bar", @"c:\dev\bar");
 
@@ -35,15 +34,9 @@ public class RepositoryCloneServiceTests
         [TestCase("https://enterprise.com/foo/bar", 0, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
         public async Task UpdatesMetricsWhenRepositoryClonedAsync(string cloneUrl, int numberOfCalls, string counterName)
         {
-            var serviceProvider = Substitutes.ServiceProvider;
-            var operatingSystem = serviceProvider.GetOperatingSystem();
-            var vsGitServices = serviceProvider.GetVSGitServices();
-            var teamExplorerServices = Substitute.For<ITeamExplorerServices>();
-            var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
-            var gitHubContextService = Substitute.For<IGitHubContextService>();
-            var usageTracker = Substitute.For<IUsageTracker>();
-            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
-                graphqlFactory, gitHubContextService, usageTracker);
+            var serviceProvider = Substitutes.GetServiceProvider();
+            var usageTracker = serviceProvider.GetUsageTracker();
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
 
             await cloneService.CloneRepository(cloneUrl, @"c:\dev\bar");
             var model = UsageModel.Create(Guid.NewGuid());
@@ -68,16 +61,11 @@ public class RepositoryCloneServiceTests
         {
             var repositoryPath = @"c:\dev\bar";
             var cloneDialogResult = new CloneDialogResult(repositoryPath, cloneUrl);
-            var serviceProvider = Substitutes.ServiceProvider;
+            var serviceProvider = Substitutes.GetServiceProvider();
             var operatingSystem = serviceProvider.GetOperatingSystem();
             operatingSystem.Directory.DirectoryExists(repositoryPath).Returns(dirExists);
-            var vsGitServices = serviceProvider.GetVSGitServices();
-            var teamExplorerServices = Substitute.For<ITeamExplorerServices>();
-            var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
-            var gitHubContextService = Substitute.For<IGitHubContextService>();
-            var usageTracker = Substitute.For<IUsageTracker>();
-            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
-                graphqlFactory, gitHubContextService, usageTracker);
+            var usageTracker = serviceProvider.GetUsageTracker();
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
 
             await cloneService.CloneOrOpenRepository(cloneDialogResult);
 
@@ -90,16 +78,11 @@ public class RepositoryCloneServiceTests
         [TestCase(@"c:\not_default\repo", @"c:\default", 0, nameof(UsageModel.MeasuresModel.NumberOfClonesToDefaultClonePath))]
         public async Task UpdatesMetricsWhenDefaultClonePath(string targetPath, string defaultPath, int numberOfCalls, string counterName)
         {
-            var serviceProvider = Substitutes.ServiceProvider;
-            var operatingSystem = serviceProvider.GetOperatingSystem();
+            var serviceProvider = Substitutes.GetServiceProvider();
             var vsGitServices = serviceProvider.GetVSGitServices();
-            var teamExplorerServices = Substitute.For<ITeamExplorerServices>();
             vsGitServices.GetLocalClonePathFromGitProvider().Returns(defaultPath);
-            var graphqlFactory = Substitute.For<IGraphQLClientFactory>();
-            var gitHubContextService = Substitute.For<IGitHubContextService>();
-            var usageTracker = Substitute.For<IUsageTracker>();
-            var cloneService = new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
-                graphqlFactory, gitHubContextService, usageTracker);
+            var usageTracker = serviceProvider.GetUsageTracker();
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
 
             await cloneService.CloneRepository("https://github.com/foo/bar", targetPath);
             var model = UsageModel.Create(Guid.NewGuid());
@@ -107,6 +90,13 @@ public class RepositoryCloneServiceTests
             await usageTracker.Received(numberOfCalls).IncrementCounter(
                 Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
                     ((MemberExpression)x.Body).Member.Name == counterName));
+        }
+
+        static RepositoryCloneService CreateRepositoryCloneService(IGitHubServiceProvider sp)
+        {
+            return new RepositoryCloneService(sp.GetOperatingSystem(), sp.GetVSGitServices(), sp.GetTeamExplorerServices(),
+                sp.GetGraphQLClientFactory(), sp.GetGitHubContextService(), sp.GetUsageTracker());
+
         }
     }
 }
