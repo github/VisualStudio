@@ -59,7 +59,22 @@ namespace GitHub.InlineReviews.Tags
 
             if (showTag != null)
             {
-                return new ShowInlineCommentGlyph();
+                if (showTag.Thread != null && showTag.Annotations != null)
+                {
+                    return new ShowInlineCommentAnnotationGlyph();
+                }
+
+                if (showTag.Thread != null)
+                {
+                    return new ShowInlineCommentGlyph();
+                }
+
+                if (showTag.Annotations != null)
+                {
+                    return new ShowInlineAnnotationGlyph();
+                }
+
+                throw new ArgumentException($"{nameof(showTag)} does not have a thread or annotations");
             }
 
             throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
