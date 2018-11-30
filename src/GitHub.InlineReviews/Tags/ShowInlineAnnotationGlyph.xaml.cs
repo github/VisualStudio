@@ -3,9 +3,9 @@ using System.Windows.Controls;
 
 namespace GitHub.InlineReviews.Tags
 {
-    public partial class ShowInlineCommentGlyph : UserControl
+    public partial class ShowInlineAnnotationGlyph : UserControl
     {
-        public ShowInlineCommentGlyph()
+        public ShowInlineAnnotationGlyph()
         {
             InitializeComponent();
         }

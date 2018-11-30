@@ -31,5 +31,10 @@ namespace GitHub.InlineReviews.Tags
         /// Gets a list of models holding details of the annotations at the tagged line.
         /// </summary>
         public IReadOnlyList<InlineAnnotationModel> Annotations { get; set; }
+
+        /// <summary>
+        /// Gets a summary annotation level is Annotations are present
+        /// </summary>
+        public CheckAnnotationLevel? SummaryAnnotationLevel { get; set; }
     }
 }
