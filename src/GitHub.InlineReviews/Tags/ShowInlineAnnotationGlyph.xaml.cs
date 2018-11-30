@@ -9,6 +9,5 @@ namespace GitHub.InlineReviews.Tags
         {
             InitializeComponent();
         }
-
     }
 }
