@@ -113,7 +113,7 @@ namespace UnitTests
             var vsgit = IVSGitServices;
             var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<ITeamExplorerServices>(),
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IUsageTracker>(), ret);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitService)).Returns(gitservice);
@@ -121,6 +121,7 @@ namespace UnitTests
             ret.GetService(typeof(ITeamExplorerServices)).Returns(Substitute.For<ITeamExplorerServices>());
             ret.GetService(typeof(IGraphQLClientFactory)).Returns(Substitute.For<IGraphQLClientFactory>());
             ret.GetService(typeof(IGitHubContextService)).Returns(Substitute.For<IGitHubContextService>());
+            ret.GetService(typeof(IVSGitExt)).Returns(Substitute.For<IVSGitExt>());
             ret.GetService(typeof(IUsageTracker)).Returns(Substitute.For<IUsageTracker>());
             ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
@@ -154,6 +155,11 @@ namespace UnitTests
         public static IGitHubContextService GetGitHubContextService(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IGitHubContextService)) as IGitHubContextService;
+        }
+
+        public static IVSGitExt GetVSGitExt(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IVSGitExt)) as IVSGitExt;
         }
 
         public static IUsageTracker GetUsageTracker(this IServiceProvider provider)

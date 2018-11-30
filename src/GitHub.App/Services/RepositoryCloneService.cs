@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace GitHub.Services
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IGitHubContextService gitHubContextService;
         readonly IUsageTracker usageTracker;
+        readonly Lazy<EnvDTE.DTE> dte;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
         [ImportingConstructor]
@@ -46,7 +48,8 @@ namespace GitHub.Services
             ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
             IGitHubContextService gitHubContextService,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IGitHubServiceProvider sp)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
@@ -54,6 +57,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
+            dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -127,7 +131,10 @@ namespace GitHub.Services
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             if (DestinationDirectoryExists(repositoryPath))
             {
-                teamExplorerServices.OpenRepository(repositoryPath);
+                if (!IsSolutionInRepository(repositoryPath))
+                {
+                    teamExplorerServices.OpenRepository(repositoryPath);
+                }
 
                 if (isDotCom)
                 {
@@ -162,6 +169,29 @@ namespace GitHub.Services
             {
                 gitHubContextService.TryNavigateToContext(repositoryPath, context);
             }
+        }
+
+        bool IsSolutionInRepository(string repositoryPath)
+        {
+            var solutionPath = dte.Value.Solution.FileName;
+            if (string.IsNullOrEmpty(solutionPath))
+            {
+                return false;
+            }
+
+            var isFolder = operatingSystem.Directory.DirectoryExists(solutionPath);
+            var solutionDir = isFolder ? solutionPath : Path.GetDirectoryName(solutionPath);
+            if (string.Equals(repositoryPath, solutionDir, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (solutionDir.StartsWith(repositoryPath + '\\', StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>

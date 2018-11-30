@@ -46,6 +46,36 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
+        [TestCase(@"c:\repository", "", true, 1)]
+        [TestCase(@"c:\repository", @"c:\solution", true, 1)]
+        [TestCase(@"c:\already\open", @"c:\already\open", true, 0)]
+        [TestCase(@"c:\already\open", @"c:\already\open\nested", true, 0, Description = "Solution folder in repository")]
+        [TestCase(@"c:\already\open", @"c:\already\open\my.sln", false, 0)]
+        [TestCase(@"c:\already\open", @"c:\already\open\nested\my.sln", false, 0)]
+        [TestCase(@"c:\already\open\nested", @"c:\already\open", true, 1, Description = "Repository in solution folder")]
+        public async Task Skip_OpenRepository_When_Already_Open(string repositoryPath, string solutionPath,
+            bool isFolder, int openRepository)
+        {
+            var repositoryUrl = "https://github.com/owner/repo";
+            var cloneDialogResult = new CloneDialogResult(repositoryPath, repositoryUrl);
+            var serviceProvider = Substitutes.GetServiceProvider();
+            var operatingSystem = serviceProvider.GetOperatingSystem();
+            operatingSystem.Directory.DirectoryExists(repositoryPath).Returns(true);
+            var dte = Substitute.For<EnvDTE.DTE>();
+            serviceProvider.GetService<EnvDTE.DTE>().Returns(dte);
+            dte.Solution.FileName.Returns(solutionPath);
+            if (isFolder)
+            {
+                operatingSystem.Directory.DirectoryExists(solutionPath).Returns(true);
+            }
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
+
+            await cloneService.CloneOrOpenRepository(cloneDialogResult);
+
+            var teamExplorerServices = serviceProvider.GetTeamExplorerServices();
+            teamExplorerServices.Received(openRepository).OpenRepository(repositoryPath);
+        }
+
         [TestCase("https://github.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfClones))]
         [TestCase("https://github.com/foo/bar", false, 1, nameof(UsageModel.MeasuresModel.NumberOfGitHubClones))]
         [TestCase("https://github.com/foo/bar", false, 0, nameof(UsageModel.MeasuresModel.NumberOfEnterpriseClones))]
@@ -95,8 +125,7 @@ public class RepositoryCloneServiceTests
         static RepositoryCloneService CreateRepositoryCloneService(IGitHubServiceProvider sp)
         {
             return new RepositoryCloneService(sp.GetOperatingSystem(), sp.GetVSGitServices(), sp.GetTeamExplorerServices(),
-                sp.GetGraphQLClientFactory(), sp.GetGitHubContextService(), sp.GetUsageTracker());
-
+                sp.GetGraphQLClientFactory(), sp.GetGitHubContextService(), sp.GetUsageTracker(), sp);
         }
     }
 }
