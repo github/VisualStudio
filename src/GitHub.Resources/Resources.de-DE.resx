@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>There is no active repository to navigate</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>This file has changed since the permalink was created</value>
+    <value>The working file is different to the file at '{0}'. Please checkout the corresponding branch, pull request or commit.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Please open the repository '{0}' and try again</value>
@@ -844,5 +844,8 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
     <value>Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below.</value>
+  </data>
+  <data name="CouldntFindCorrespondingFile" xml:space="preserve">
+    <value>Couldn't find file corresponding to '{0}' in the repository. Please do a 'git fetch' or checkout the target pull request.</value>
   </data>
 </root>
