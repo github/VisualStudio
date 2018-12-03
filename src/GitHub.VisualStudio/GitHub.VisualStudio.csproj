@@ -425,6 +425,10 @@
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
       <Version>14.1.24720</Version>
     </PackageReference>
+    <!-- Ensure e_sqlite.dll is included in .vsix when built using Visual Studio -->
+    <PackageReference Include="SQLitePCL.raw_basic">
+      <Version>0.7.3-vs2012</Version>
+    </PackageReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
