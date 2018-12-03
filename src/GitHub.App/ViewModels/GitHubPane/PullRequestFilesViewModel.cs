@@ -83,7 +83,10 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (annotationModel != null)
             {
-                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, annotationModel.EndLine);
+                //AnnotationModel.EndLine is a 1-based number
+                //EditorService.OpenDiff takes a 0-based line number to start searching AFTER and will open the next tag
+                var nextInlineCommentFromLine = annotationModel.EndLine - 2;
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
             }
         }
 
@@ -247,7 +250,7 @@ namespace GitHub.ViewModels.GitHubPane
             var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
             var annotations = sessionFile.InlineAnnotations;
 
-            return annotations.FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
+            return annotations.OrderBy(model => model.EndLine).FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
         }
 
         /// <summary>
