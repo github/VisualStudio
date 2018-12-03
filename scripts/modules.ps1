@@ -115,7 +115,9 @@ New-Module -ScriptBlock {
     }
 
     function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy = $false) {
-        Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
+        $msbuild = Find-MSBuild
+
+        Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed -MSBuildPath (Split-Path -parent $msbuild) }
         $flag1 = ""
         $flag2 = ""
         if ($ForVSInstaller) {
@@ -126,8 +128,6 @@ New-Module -ScriptBlock {
             $configuration += "WithoutVsix"
             $flag1 = "/p:Package=Skip"
         }
-
-        $msbuild = Find-MSBuild
 
         Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 /bl:output.binlog $flag1 $flag2"
         Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 /bl:output.binlog $flag1 $flag2 }
