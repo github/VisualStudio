@@ -498,8 +498,9 @@ public class GitHubContextServiceTests
     {
         var sp = Substitute.For<IGitHubServiceProvider>();
         var gitService = Substitute.For<IGitService>();
+        var vsServices = Substitute.For<IVSServices>();
         gitService.GetRepository(repositoryDir).Returns(repository);
 
-        return new GitHubContextService(sp, gitService);
+        return new GitHubContextService(sp, gitService, vsServices);
     }
 }

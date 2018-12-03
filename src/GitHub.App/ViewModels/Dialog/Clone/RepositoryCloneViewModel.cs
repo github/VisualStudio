@@ -137,8 +137,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
 
-            // Users in group A will see the URL tab by default
-            if (await IsGroupA().ConfigureAwait(false))
+            // When a clipboard URL has been set or a user is in group A, show the URL tab by default
+            if (!string.IsNullOrEmpty(UrlTab.Url) || await IsGroupA().ConfigureAwait(false))
             {
                 SelectedTabIndex = 2;
             }

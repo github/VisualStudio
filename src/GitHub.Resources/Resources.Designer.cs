@@ -277,7 +277,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This file has changed since the permalink was created.
+        ///   Looks up a localized string similar to The working file is different to the file at &apos;{0}&apos;. Please checkout the corresponding branch, pull request or commit..
         /// </summary>
         public static string ChangesInWorkingDirectoryMessage {
             get {
@@ -381,6 +381,15 @@ namespace GitHub {
         public static string couldNotConnectToTheServerText {
             get {
                 return ResourceManager.GetString("couldNotConnectToTheServerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t find file corresponding to &apos;{0}&apos; in the repository. Please do a &apos;git fetch&apos; or checkout the target pull request..
+        /// </summary>
+        public static string CouldntFindCorrespondingFile {
+            get {
+                return ResourceManager.GetString("CouldntFindCorrespondingFile", resourceCulture);
             }
         }
         
