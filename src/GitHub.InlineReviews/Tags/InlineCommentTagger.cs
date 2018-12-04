@@ -95,12 +95,11 @@ namespace GitHub.InlineReviews.Tags
                     Dictionary<int, InlineAnnotationModel[]> spanAnnotationsByLine = null;
                     if (side == DiffSide.Right)
                     {
-                        var spanAnnotations = file.InlineAnnotations.Where(x =>
+                        var spanAnnotations = file.InlineAnnotations?.Where(x =>
                                 x.EndLine - 1 >= startLine &&
                                 x.EndLine - 1 <= endLine);
 
-                        spanAnnotationsByLine = spanAnnotations
-                            .GroupBy(model => model.EndLine)
+                        spanAnnotationsByLine = spanAnnotations?.GroupBy(model => model.EndLine)
                             .ToDictionary(models => models.Key - 1, models => models.ToArray());
                     }
 
