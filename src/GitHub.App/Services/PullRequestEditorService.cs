@@ -298,13 +298,13 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int fromLine)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine)
         {
             var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false);
 
             var param = (object) new InlineCommentNavigationParams
             {
-                FromLine = fromLine,
+                FromLine = nextInlineTagFromLine,
             };
 
             // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.

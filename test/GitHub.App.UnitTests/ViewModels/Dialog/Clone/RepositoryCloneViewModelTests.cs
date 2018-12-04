@@ -35,16 +35,19 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             target.EnterpriseTab.DidNotReceiveWithAnyArgs().Initialize(null);
         }
 
-        [TestCase("https://github.com", false, 0)]
-        [TestCase("https://enterprise.com", false, 1)]
-        [TestCase("https://github.com", true, 2, Description = "Show URL tab for GitHub connections")]
-        [TestCase("https://enterprise.com", true, 2, Description = "Show URL tab for Enterprise connections")]
-        public async Task Default_SelectedTabIndex_For_Group(string address, bool isGroupA, int expectTabIndex)
+        [TestCase("https://github.com", null, false, 0)]
+        [TestCase("https://enterprise.com", null, false, 1)]
+        [TestCase("https://github.com", null, true, 2, Description = "Show URL tab for GitHub connections")]
+        [TestCase("https://enterprise.com", null, true, 2, Description = "Show URL tab for Enterprise connections")]
+        [TestCase("https://github.com", "https://github.com/github/visualstudio", false, 2)]
+        [TestCase("https://enterprise.com", "https://enterprise.com/owner/repo", false, 2)]
+        public async Task Default_SelectedTabIndex_For_Group(string address, string clipboardUrl, bool isGroupA, int expectTabIndex)
         {
             var cm = CreateConnectionManager(address);
             var connection = cm.Connections[0];
             var usageService = CreateUsageService(isGroupA);
             var target = CreateTarget(connectionManager: cm, usageService: usageService);
+            target.UrlTab.Url = clipboardUrl;
 
             await target.InitializeAsync(connection);
 
