@@ -429,6 +429,12 @@
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Include a reference to this package so that x86|x64\e_sqlite3.dll are copied to the output directory -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3">
+      <Version>1.1.11</Version>
+    </PackageReference>
+  </ItemGroup>
   <!-- Include required NuGet dependencies-->
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
