@@ -11,7 +11,6 @@ namespace GitHub.VisualStudio.Commands
     public class OpenFromUrlCommand : VsCommand<string>, IOpenFromUrlCommand
     {
         readonly Lazy<IDialogService> dialogService;
-        readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<IRepositoryCloneService> repositoryCloneService;
 
         /// <summary>
@@ -27,12 +26,10 @@ namespace GitHub.VisualStudio.Commands
         [ImportingConstructor]
         public OpenFromUrlCommand(
             Lazy<IDialogService> dialogService,
-            Lazy<IGitHubContextService> gitHubContextService,
             Lazy<IRepositoryCloneService> repositoryCloneService) :
             base(CommandSet, CommandId)
         {
             this.dialogService = dialogService;
-            this.gitHubContextService = gitHubContextService;
             this.repositoryCloneService = repositoryCloneService;
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
@@ -41,12 +38,6 @@ namespace GitHub.VisualStudio.Commands
 
         public override async Task Execute(string url)
         {
-            if (string.IsNullOrEmpty(url))
-            {
-                var clipboardContext = gitHubContextService.Value.FindContextFromClipboard();
-                url = clipboardContext?.Url;
-            }
-
             var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null, url);
             if (cloneDialogResult != null)
             {

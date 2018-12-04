@@ -35,12 +35,12 @@ namespace GitHub.Models
         public string Path => annotation.Path;
 
         /// <summary>
-        /// Gets the start line of the annotation.
+        /// Gets the 1-based start line of the annotation.
         /// </summary>
         public int StartLine => annotation.StartLine;
 
         /// <summary>
-        /// Gets the end line of the annotation.
+        /// Gets the 1-based end line of the annotation.
         /// </summary>
         public int EndLine => annotation.EndLine;
         

@@ -9,6 +9,13 @@ namespace GitHub.Services
     public interface IGitHubContextService
     {
         /// <summary>
+        /// Attempt to navigate to the equivalent context inside Visual Studio.
+        /// </summary>
+        /// <param name="repositoryDir">The target repository</param>
+        /// <param name="context">The context to open.</param>
+        void TryNavigateToContext(string repositoryDir, GitHubContext context);
+
+        /// <summary>
         /// Find the context from a URL in the clipboard if any.
         /// </summary>
         /// <returns>The context or null if clipboard doesn't contain a GitHub URL</returns>
