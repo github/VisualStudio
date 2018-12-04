@@ -138,8 +138,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                var firstLoad = (PullRequestTitle == null);
-
                 PullRequestTitle = pullRequest.Title;
 
                 var checkSuiteRun = pullRequest
@@ -168,10 +166,7 @@ namespace GitHub.ViewModels.GitHubPane
                             .ToArray()
                         );
 
-                if (firstLoad)
-                {
-                    usageTracker.IncrementCounter(x => x.NumberOfPullRequestOpenAnnotationsList).Forget();
-                }
+                usageTracker.IncrementCounter(x => x.NumberOfPullRequestOpenAnnotationsList).Forget();
             }
             finally
             {
