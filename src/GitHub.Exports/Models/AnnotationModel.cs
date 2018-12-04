@@ -6,12 +6,12 @@
     public class CheckRunAnnotationModel
     {
         /// <summary>
-        /// The starting line number (1 indexed).
+        /// The starting 1-based line number (1 indexed).
         /// </summary>
         public int StartLine { get; set; }
 
         /// <summary>
-        /// The ending line number (1 indexed).
+        /// The ending 1-based line number (1 indexed).
         /// </summary>
         public int EndLine { get; set; }
 
