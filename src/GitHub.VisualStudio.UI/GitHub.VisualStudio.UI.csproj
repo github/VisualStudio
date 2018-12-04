@@ -1,6 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -13,6 +13,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
 
@@ -22,11 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnvDTE" Version="8.0.1" />
     <PackageReference Include="Markdig.Signed" version="0.13.0" />
     <PackageReference Include="Markdig.Wpf.Signed" version="0.2.1" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
-    <PackageReference Include="Microsoft.VisualStudio.ImageCatalog" version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime" version="14.3.25407" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.27" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\GitHubPane\NoRemoteOriginView.xaml.cs">
+      <DependentUpon>NoRemoteOriginView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

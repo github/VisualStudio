@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -40,16 +40,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnvDTE" Version="8.0.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.23.1" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
-    <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="14.0.25424" />
-    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.1-beta" />
+    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />

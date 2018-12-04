@@ -16,21 +16,31 @@ namespace GitHub.Services
     {
         readonly IViewViewModelFactory factory;
         readonly IShowDialogService showDialog;
+        readonly IGitHubContextService gitHubContextService;
 
         [ImportingConstructor]
         public DialogService(
             IViewViewModelFactory factory,
-            IShowDialogService showDialog)
+            IShowDialogService showDialog,
+            IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(showDialog, nameof(showDialog));
+            Guard.ArgumentNotNull(showDialog, nameof(gitHubContextService));
 
             this.factory = factory;
             this.showDialog = showDialog;
+            this.gitHubContextService = gitHubContextService;
         }
 
         public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                var clipboardContext = gitHubContextService.FindContextFromClipboard();
+                url = clipboardContext?.Url;
+            }
+
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
             if (url != null)
             {

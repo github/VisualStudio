@@ -1,0 +1,64 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+pool:
+  vmImage: 'VS2017-Win2016'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: InstallSSHKey@0
+  inputs:
+    hostName: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+    sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCx/AxLjr4mhH7XFlbISb65GBxQnVnKh1owmAT1bK/Qt1b4/Z0SL68IvV88DpgLyKbica2giEVfKo/Z4dkO+P8M2bGXrNgazzfO910DlR+e1vt8BSU/Dbvscz0i1lsfKb3PnfSouCkQev6Th0v+hBdgkuackWgaBw22DDLkp9Uf/cAo+QYLz56p5KVctEESRRgGgIIlZyUc8OYDMSU2wQhG9x31mSyJ4ODuOZsi1RgBBHrgUb2QRhLJ9nZWfQgGBRDxGYTKLWiWIQwgSVQ9x1Az/Rei+CbPRvLcVGg+5vHt8lcu+HxEgrY4IsjXdMqosPqxQ+TT6f+G4GQDn8+IQ4wOpTVi84PkOQX3JPE2QSJwWA0AHNe5NTSns6WWYQyzxFJYBN2pLPuMnj9/+ozV3GaeQqn47WHfUH3s5IawNQPTFDxcl4qsmU66Ybfqa4eFIPEvCCp1leQcuXyDHxKLq80x1szN4kn0oyL2W0zbkwTaZG4I5l4Rto0hErUf3qx7FlZjMGEFMdJVskgnRMkKdqngF0FmSYQICpmqqYD8TydUc6jxZVOCvFF5gbqwxV/F2lk10D7FnetUNeWvpcZKbFUX4e5Ff15vibJZp4/5FUbksv+glfbPwk6tGuNj3xPFODP7KG8Y5wtcbknX11XI0vi+iL8TxL0Vk30TpZUMXWYYvQ==
+    sshKeySecureFile: id_rsa
+
+- script: git submodule init && git submodule deinit script && git submodule update
+  displayName: Submodule init
+
+# Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
+#- task: NuGetToolInstaller@0
+#- task: NuGetCommand@2
+#  inputs:
+#    restoreSolution: '$(solution)'
+#    feedsToUse: 'config'
+#    nugetConfigPath: nuget.config
+
+# Instead run nuget manually.
+- script: tools\nuget\nuget.exe restore
+  displayName: NuGet restore
+
+# Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
+# version with the azure BuildId
+- task: PowerShell@2
+  inputs:
+    targetType: filePath
+    filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
+    arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
+    displayName: Bump version
+
+- task: VSBuild@1
+  inputs:
+    solution: GitHubVS.sln
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# VSTest is hanging. Skip tests for now; we're still running Appveyor which will handle the tests.
+#- task: VSTest@2
+#  inputs:
+#    searchFolder: '$(Build.SourcesDirectory)\test'
+#    testAssemblyVer2: '**\bin\**\*Tests.dll'
+#    platform: '$(buildPlatform)'
+#    configuration: '$(buildConfiguration)'
+#    diagnosticsEnabled: true
+#    runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.SourcesDirectory)\build\Release\GitHub.VisualStudio.vsix' 
+    artifactName: 'vsix' 
