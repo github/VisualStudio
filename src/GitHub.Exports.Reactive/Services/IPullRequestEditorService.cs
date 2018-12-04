@@ -55,9 +55,9 @@ namespace GitHub.Services
         /// The commit SHA of the right hand side of the diff. Pass null to compare with the
         /// working directory, or "HEAD" to compare with the HEAD commit of the pull request.
         /// </param>
-        /// <param name="fromLine">The line number to open</param>
+        /// <param name="nextInlineTagFromLine">The 0-based line number to execute NextInlineCommentCommand from</param>
         /// <returns>The opened diff viewer.</returns>
-        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int fromLine);
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine);
 
         /// <summary>
         /// Find the active text view.
