@@ -8,7 +8,7 @@
     <MoreInfo>https://visualstudio.github.com</MoreInfo>
     <License>LICENSE.txt</License>
     <ReleaseNotes>https://visualstudio.github.com/release-notes.html</ReleaseNotes>
-    <Icon>Resources\logo_32x32@2x.png</Icon>
+    <Icon>Resources\logo_128x128.png</Icon>
     <PreviewImage>Resources\preview_200x200.png</PreviewImage>
     <Tags>GitHub;git;open source;source control;branch;pull request;team explorer;commit;publish</Tags>
   </Metadata>
