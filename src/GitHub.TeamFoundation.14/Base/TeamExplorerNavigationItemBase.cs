@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
 using GitHub.Logging;
@@ -39,10 +40,14 @@ namespace GitHub.VisualStudio.Base
             SubscribeToRepoChanges();
         }
 
-        public override async void Invalidate()
+        public override void Invalidate()
         {
             IsVisible = false;
+            InvalidateAsync().Forget(log);
+        }
 
+        async Task InvalidateAsync()
+        {
             var uri = ActiveRepoUri;
             var isVisible = await IsAGitHubRepo(uri);
             if (ActiveRepoUri != uri)
