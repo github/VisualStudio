@@ -196,7 +196,7 @@ namespace GitHub.InlineReviews.ViewModels
 
             AvailableForComment =
                 file.Diff.Any(chunk => chunk.Lines
-                    .Any(line => line.NewLineNumber == lineNumber));
+                    .Any(line => line.NewLineNumber - 1 == lineNumber));
 
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&

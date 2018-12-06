@@ -12,12 +12,12 @@ namespace GitHub.Services
     public interface IInlineCommentPeekService
     {
         /// <summary>
-        /// Gets the line number for a peek session tracking point.
+        /// Gets the 0-based line number for a peek session tracking point.
         /// </summary>
         /// <param name="session">The peek session.</param>
         /// <param name="point">The peek session tracking point</param>
         /// <returns>
-        /// A tuple containing the line number and whether the line number represents a line in the
+        /// A tuple containing the 0-based line number and whether the line number represents a line in the
         /// left hand side of a diff view.
         /// </returns>
         Tuple<int, bool> GetLineNumber(IPeekSession session, ITrackingPoint point);
