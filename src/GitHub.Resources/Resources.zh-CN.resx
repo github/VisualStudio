@@ -673,9 +673,6 @@
   <data name="BlendDialogText" xml:space="preserve">
     <value>GitHub括在在Blend内部无效</value>
   </data>
-  <data name="Options_ForkButtonLabel" xml:space="preserve">
-    <value>在团队资源管理器中显示分叉按钮</value>
-  </data>
   <data name="UpdateComment" xml:space="preserve">
     <value>更新注释</value>
   </data>
