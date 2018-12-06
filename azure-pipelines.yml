@@ -61,4 +61,9 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.SourcesDirectory)\build\Release\GitHub.VisualStudio.vsix' 
-    artifactName: 'vsix' 
+    artifactName: 'vsix'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.SourcesDirectory)\marketplace'
+    artifactName: 'marketplace'
