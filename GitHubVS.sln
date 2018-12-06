@@ -139,6 +139,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.TeamFoundation.16", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.Services.Vssdk.UnitTests", "test\GitHub.Services.Vssdk.UnitTests\GitHub.Services.Vssdk.UnitTests.csproj", "{65542DEE-D3BE-4810-B85A-08E970413A21}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "marketplace", "marketplace", "{3F96C12D-10E3-4F43-B418-C5F31272D568}"
+	ProjectSection(SolutionItems) = preProject
+		marketplace\Publish-Vsix.ps1 = marketplace\Publish-Vsix.ps1
+		marketplace\Publish.ps1 = marketplace\Publish.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -507,6 +513,7 @@ Global
 		{C6E8D1E1-FAAC-4E02-B6A1-6164EC5E704E} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
 		{E899B03C-6E8E-4375-AB65-FC925D721D8B} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB9}
 		{65542DEE-D3BE-4810-B85A-08E970413A21} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
+		{3F96C12D-10E3-4F43-B418-C5F31272D568} = {7B6C5F8D-14B3-443D-B044-0E209AE12BDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}
