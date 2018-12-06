@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
+using Serilog;
 
 namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2
     {
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerNavigationItemBase>();
+
         readonly Octicon octicon;
 
         public TeamExplorerNavigationItemBase(IGitHubServiceProvider serviceProvider,
@@ -35,10 +40,23 @@ namespace GitHub.VisualStudio.Base
             SubscribeToRepoChanges();
         }
 
-        public override async void Invalidate()
+        public override void Invalidate()
         {
             IsVisible = false;
-            IsVisible = await IsAGitHubRepo();
+            InvalidateAsync().Forget(log);
+        }
+
+        async Task InvalidateAsync()
+        {
+            var uri = ActiveRepoUri;
+            var isVisible = await IsAGitHubRepo(uri);
+            if (ActiveRepoUri != uri)
+            {
+                log.Information("Not setting button visibility because repository changed from {BeforeUrl} to {AfterUrl}", uri, ActiveRepoUri);
+                return;
+            }
+
+            IsVisible = isVisible;
         }
 
         void OnThemeChanged()

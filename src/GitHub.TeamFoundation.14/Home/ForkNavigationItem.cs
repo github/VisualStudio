@@ -86,7 +86,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             {
                 IsVisible = false;
 
-                if (await IsAGitHubDotComRepo())
+                if (await IsAGitHubDotComRepo(ActiveRepoUri))
                 {
                     var connection = await ConnectionManager.GetConnection(ActiveRepo);
                     IsVisible = connection?.IsLoggedIn ?? false;
