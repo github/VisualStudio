@@ -97,7 +97,7 @@ namespace GitHub.Services
                         Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
-                        OrganizationRepositories = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
+                        Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
                             Repositories = org.Repositories(null, null, null, null, null, order, null, null, null)
