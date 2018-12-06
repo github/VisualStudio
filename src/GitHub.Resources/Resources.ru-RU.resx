@@ -674,9 +674,6 @@ https://git-scm.com/download/win</value>
   <data name="BlendDialogText" xml:space="preserve">
     <value>The GitHub extension is not available inside Blend</value>
   </data>
-  <data name="Options_ForkButtonLabel" xml:space="preserve">
-    <value>Show Fork button in Team Explorer</value>
-  </data>
   <data name="UpdateComment" xml:space="preserve">
     <value>Update comment</value>
   </data>
