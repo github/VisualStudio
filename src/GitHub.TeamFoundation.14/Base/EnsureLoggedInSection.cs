@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (ActiveRepo == null || ActiveRepoUri == null)
                 return;
 
-            var isgithub = await IsAGitHubRepo();
+            var isgithub = await IsAGitHubRepo(ActiveRepoUri);
             if (!isgithub)
                 return;
 

@@ -64,7 +64,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
             base.RepoChanged();
 
-            IsVisible = await IsAGitHubRepo();
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
 
             if (IsVisible)
             {
@@ -93,7 +93,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public override async void Refresh()
         {
-            IsVisible = await IsAGitHubRepo();
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
             if (IsVisible)
             {
                 IsLoggedIn = await IsUserAuthenticated();

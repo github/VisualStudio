@@ -13,11 +13,6 @@
       "default": "false"
     },
     {
-      "name": "ForkButton",
-      "type": "bool",
-      "default": "false"
-    },
-    {
       "name": "UIState",
       "type": "object",
       "typename": "UIState",
@@ -93,7 +88,6 @@ namespace GitHub.VisualStudio.Settings {
         {
             CollectMetrics = (bool)settingsStore.Read("CollectMetrics", true);
             EditorComments = (bool)settingsStore.Read("EditorComments", false);
-            ForkButton = (bool)settingsStore.Read("ForkButton", false);
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
             EnableTraceLogging = (bool)settingsStore.Read("EnableTraceLogging", false);
@@ -103,7 +97,6 @@ namespace GitHub.VisualStudio.Settings {
         {
             settingsStore.Write("CollectMetrics", CollectMetrics);
             settingsStore.Write("EditorComments", EditorComments);
-            settingsStore.Write("ForkButton", ForkButton);
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
             settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
             settingsStore.Write("EnableTraceLogging", EnableTraceLogging);
