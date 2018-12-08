@@ -34,8 +34,6 @@ install:
 
     git submodule update --recursive --force
     nuget restore GitHubVS.sln
-- choco install --no-progress BCC-MSBuildLog
-- choco install --no-progress BCC-Submission
 
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -Package:$package -BuildNumber:$env:APPVEYOR_BUILD_NUMBER -ForVSInstaller:$forVSInstaller
@@ -49,10 +47,6 @@ on_success:
       Write-Host "Signing and packaging"
       script\Sign-Package -AppVeyor -ForVSInstaller:$forVSInstaller
     }
-
-on_finish:
-- IF NOT "%BCC_TOKEN%x"=="x" BCCMSBuildLog --cloneRoot "%APPVEYOR_BUILD_FOLDER%" --input output.binlog --output checkrun.json --ownerRepo %APPVEYOR_REPO_NAME% --hash %APPVEYOR_REPO_COMMIT%
-- IF NOT "%BCC_TOKEN%x"=="x" BCCSubmission -h %APPVEYOR_REPO_COMMIT% -i checkrun.json -t %BCC_TOKEN%
 
 for:
 -
