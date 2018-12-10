@@ -59,19 +59,19 @@ namespace GitHub.VisualStudio
         /// <inheritdoc/>
         public async Task<IConnection> GetConnection(HostAddress address)
         {
-            return (await GetLoadedConnections()).FirstOrDefault(x => x.HostAddress == address);
+            return (await GetLoadedConnections().ConfigureAwait(false)).FirstOrDefault(x => x.HostAddress == address);
         }
 
         /// <inheritdoc/>
         public async Task<IReadOnlyObservableCollection<IConnection>> GetLoadedConnections()
         {
-            return await GetLoadedConnectionsInternal();
+            return await GetLoadedConnectionsInternal().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<IConnection> LogIn(HostAddress address, string userName, string password)
         {
-            var conns = await GetLoadedConnectionsInternal();
+            var conns = await GetLoadedConnectionsInternal().ConfigureAwait(false);
 
             if (conns.Any(x => x.HostAddress == address))
             {
@@ -79,19 +79,19 @@ namespace GitHub.VisualStudio
             }
 
             var client = CreateClient(address);
-            var login = await loginManager.Login(address, client, userName, password);
+            var login = await loginManager.Login(address, client, userName, password).ConfigureAwait(false);
             var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
-            await SaveConnections();
-            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+            await SaveConnections().ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins).ConfigureAwait(false);
             return connection;
         }
 
         /// <inheritdoc/>
         public async Task<IConnection> LogInViaOAuth(HostAddress address, CancellationToken cancel)
         {
-            var conns = await GetLoadedConnectionsInternal();
+            var conns = await GetLoadedConnectionsInternal().ConfigureAwait(false);
 
             if (conns.Any(x => x.HostAddress == address))
             {
@@ -100,20 +100,21 @@ namespace GitHub.VisualStudio
 
             var client = CreateClient(address);
             var oauthClient = new OauthClient(client.Connection);
-            var login = await loginManager.LoginViaOAuth(address, client, oauthClient, OpenBrowser, cancel);
+            var login = await loginManager.LoginViaOAuth(address, client, oauthClient, OpenBrowser, cancel)
+                .ConfigureAwait(false);
             var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
-            await SaveConnections();
-            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
-            await usageTracker.IncrementCounter(x => x.NumberOfOAuthLogins);
+            await SaveConnections().ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfOAuthLogins).ConfigureAwait(false);
             return connection;
         }
 
         /// <inheritdoc/>
         public async Task<IConnection> LogInWithToken(HostAddress address, string token)
         {
-            var conns = await GetLoadedConnectionsInternal();
+            var conns = await GetLoadedConnectionsInternal().ConfigureAwait(false);
 
             if (conns.Any(x => x.HostAddress == address))
             {
@@ -121,20 +122,20 @@ namespace GitHub.VisualStudio
             }
 
             var client = CreateClient(address);
-            var login = await loginManager.LoginWithToken(address, client, token);
+            var login = await loginManager.LoginWithToken(address, client, token).ConfigureAwait(false);
             var connection = new Connection(address, login.User, login.Scopes);
 
             conns.Add(connection);
-            await SaveConnections();
-            await usageTracker.IncrementCounter(x => x.NumberOfLogins);
-            await usageTracker.IncrementCounter(x => x.NumberOfTokenLogins);
+            await SaveConnections().ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfLogins).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfTokenLogins).ConfigureAwait(false);
             return connection;
         }
 
         /// <inheritdoc/>
         public async Task LogOut(HostAddress address)
         {
-            var connection = await GetConnection(address);
+            var connection = await GetConnection(address).ConfigureAwait(false);
 
             if (connection == null)
             {
@@ -142,9 +143,9 @@ namespace GitHub.VisualStudio
             }
 
             var client = CreateClient(address);
-            await loginManager.Logout(address, client);
+            await loginManager.Logout(address, client).ConfigureAwait(false);
             connections.Value.Remove(connection);
-            await SaveConnections();
+            await SaveConnections().ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -156,9 +157,9 @@ namespace GitHub.VisualStudio
             try
             {
                 var client = CreateClient(c.HostAddress);
-                var login = await loginManager.LoginFromCache(connection.HostAddress, client);
+                var login = await loginManager.LoginFromCache(connection.HostAddress, client).ConfigureAwait(false);
                 c.SetSuccess(login.User, login.Scopes);
-                await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+                await usageTracker.IncrementCounter(x => x.NumberOfLogins).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -184,7 +185,7 @@ namespace GitHub.VisualStudio
         async Task<ObservableCollectionEx<IConnection>> GetLoadedConnectionsInternal()
         {
             var result = Connections;
-            await loaded.Task;
+            await loaded.Task.ConfigureAwait(false);
             return connections.Value;
         }
 
@@ -192,7 +193,7 @@ namespace GitHub.VisualStudio
         {
             try
             {
-                foreach (var c in await cache.Load())
+                foreach (var c in await cache.Load().ConfigureAwait(false))
                 {
                     var connection = new Connection(c.HostAddress, c.UserName);
                     result.Add(connection);
@@ -205,9 +206,11 @@ namespace GitHub.VisualStudio
 
                     try
                     {
-                        login = await loginManager.LoginFromCache(connection.HostAddress, client);
+                        login = await loginManager.LoginFromCache(connection.HostAddress, client)
+                            .ConfigureAwait(false);
                         connection.SetSuccess(login.User, login.Scopes);
-                        await usageTracker.IncrementCounter(x => x.NumberOfLogins);
+                        await usageTracker.IncrementCounter(x => x.NumberOfLogins)
+                            .ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -223,9 +226,9 @@ namespace GitHub.VisualStudio
 
         async Task SaveConnections()
         {
-            var conns = await GetLoadedConnectionsInternal();
+            var conns = await GetLoadedConnectionsInternal().ConfigureAwait(false);
             var details = conns.Select(x => new ConnectionDetails(x.HostAddress, x.Username));
-            await cache.Save(details);
+            await cache.Save(details).ConfigureAwait(false);
         }
 
         void OpenBrowser(Uri uri) => browser.OpenUrl(uri);

@@ -206,7 +206,7 @@ namespace GitHub.Collections
             try
             {
                 pages.Add(number, placeholderPage);
-                var page = await source.GetPage(number);
+                var page = await source.GetPage(number).ConfigureAwait(false);
 
                 if (page != null)
                 {

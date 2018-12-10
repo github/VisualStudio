@@ -100,13 +100,14 @@ namespace GitHub.Services
                 }
                 else
                 {
-                    var file = await session.GetFile(relativePath);
+                    var file = await session.GetFile(relativePath).ConfigureAwait(true);
                     fileName = await pullRequestService.ExtractToTempFile(
                         session.LocalRepository,
                         session.PullRequest,
                         file.RelativePath,
                         file.CommitSha,
-                        pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath));
+                        pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath))
+                            .ConfigureAwait(false);
                     commitSha = file.CommitSha;
                 }
 
@@ -125,9 +126,9 @@ namespace GitHub.Services
                 }
 
                 if (workingDirectory)
-                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution);
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsOpenFileInSolution).ConfigureAwait(false);
                 else
-                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile);
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewFile).ConfigureAwait(false);
 
                 return wpfTextView;
             }
@@ -147,8 +148,8 @@ namespace GitHub.Services
             try
             {
                 var workingDirectory = headSha == null;
-                var file = await session.GetFile(relativePath, headSha ?? "HEAD");
-                var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest);
+                var file = await session.GetFile(relativePath, headSha ?? "HEAD").ConfigureAwait(true);
+                var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest).ConfigureAwait(true);
                 var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
                 var rightFile = workingDirectory ?
                     Path.Combine(session.LocalRepository.LocalPath, relativePath) :
@@ -157,7 +158,7 @@ namespace GitHub.Services
                         session.PullRequest,
                         relativePath,
                         file.CommitSha,
-                        encoding);
+                        encoding).ConfigureAwait(true);
 
                 var diffViewer = FocusExistingDiffViewer(session, mergeBase, rightFile);
                 if (diffViewer != null)
@@ -170,8 +171,8 @@ namespace GitHub.Services
                     session.PullRequest,
                     relativePath,
                     mergeBase,
-                    encoding);
-                var leftPath = await GetBaseFileName(session, file);
+                    encoding).ConfigureAwait(true);
+                var leftPath = await GetBaseFileName(session, file).ConfigureAwait(true);
                 var rightPath = file.RelativePath;
                 var leftLabel = $"{leftPath};{session.GetBaseBranchDisplay()}";
                 var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {session.PullRequest.Number}";
@@ -259,9 +260,9 @@ namespace GitHub.Services
                 }
 
                 if (workingDirectory)
-                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution);
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsCompareWithSolution).ConfigureAwait(true);
                 else
-                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
+                    await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges).ConfigureAwait(true);
 
                 if (openThread.line != -1)
                 {
@@ -300,7 +301,7 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine)
         {
-            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false);
+            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false).ConfigureAwait(true);
 
             var param = (object) new InlineCommentNavigationParams
             {
@@ -309,7 +310,7 @@ namespace GitHub.Services
 
             // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.
             // There must be a better way of doing this.
-            await Task.Delay(1500);
+            await Task.Delay(1500).ConfigureAwait(true);
             RaiseWhenAvailable(Guids.CommandSetString, PkgCmdIDList.NextInlineCommentId, param);
 
             return diffViewer;

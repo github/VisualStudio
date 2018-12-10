@@ -104,8 +104,8 @@ namespace GitHub.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 this.login = login;
-                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
-                await Load(session.PullRequest);                
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber).ConfigureAwait(true);
+                await Load(session.PullRequest).ConfigureAwait(true);
             }
             finally
             {
@@ -120,8 +120,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
-                await session.Refresh();
-                await Load(session.PullRequest);
+                await session.Refresh().ConfigureAwait(true);
+                await Load(session.PullRequest).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -144,7 +144,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();

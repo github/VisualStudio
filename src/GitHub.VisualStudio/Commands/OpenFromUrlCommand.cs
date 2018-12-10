@@ -38,10 +38,10 @@ namespace GitHub.VisualStudio.Commands
 
         public override async Task Execute(string url)
         {
-            var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null, url);
+            var cloneDialogResult = await dialogService.Value.ShowCloneDialog(null, url).ConfigureAwait(true);
             if (cloneDialogResult != null)
             {
-                await repositoryCloneService.Value.CloneOrOpenRepository(cloneDialogResult);
+                await repositoryCloneService.Value.CloneOrOpenRepository(cloneDialogResult).ConfigureAwait(true);
             }
         }
     }

@@ -66,7 +66,7 @@ namespace GitHub.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 PullRequestNumber = pullRequestNumber;
                 CheckRunId = checkRunId;
-                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber).ConfigureAwait(true);
                 Load(session.PullRequest);
             }
             finally

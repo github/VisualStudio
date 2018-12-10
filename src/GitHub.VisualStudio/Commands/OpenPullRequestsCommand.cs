@@ -43,8 +43,8 @@ namespace GitHub.VisualStudio.Commands
         {
             try
             {
-                var host = await serviceProvider.TryGetService<IGitHubToolWindowManager>().ShowGitHubPane();
-                await host.ShowPullRequests();
+                var host = await serviceProvider.TryGetService<IGitHubToolWindowManager>().ShowGitHubPane().ConfigureAwait(true);
+                await host.ShowPullRequests().ConfigureAwait(true);
             }
             catch (Exception ex)
             {

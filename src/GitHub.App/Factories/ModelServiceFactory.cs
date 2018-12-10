@@ -36,15 +36,15 @@ namespace GitHub.Factories
         {
             ModelService result;
 
-            await cacheLock.WaitAsync();
+            await cacheLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
                 if (!cache.TryGetValue(connection, out result))
                 {
                     result = new ModelService(
-                        await apiClientFactory.Create(connection.HostAddress),
-                        await hostCacheFactory.Create(connection.HostAddress),
+                        await apiClientFactory.Create(connection.HostAddress).ConfigureAwait(false),
+                        await hostCacheFactory.Create(connection.HostAddress).ConfigureAwait(false),
                         avatarProvider);
                     result.InsertUser(AccountCacheItem.Create(connection.User));
                     cache.Add(connection, result);

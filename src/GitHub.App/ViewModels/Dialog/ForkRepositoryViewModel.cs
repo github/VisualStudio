@@ -49,18 +49,18 @@ namespace GitHub.ViewModels.Dialog
         {
             Repository = repository;
             Connection = connection;
-            await ShowSelectPage();
+            await ShowSelectPage().ConfigureAwait(false);
         }
 
         async Task ShowSelectPage()
         {
-            await selectPage.InitializeAsync(Repository, Connection);
+            await selectPage.InitializeAsync(Repository, Connection).ConfigureAwait(true);
             Content = selectPage;
         }
 
         async Task ShowExecutePage(IAccount account)
         {
-            await executePage.InitializeAsync(Repository, account, Connection);
+            await executePage.InitializeAsync(Repository, account, Connection).ConfigureAwait(true);
             Content = executePage;
         }
 

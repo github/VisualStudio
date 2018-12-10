@@ -68,7 +68,7 @@ namespace GitHub.Services
 
             var viewModel = factory.CreateViewModel<IRepositoryRecloneViewModel>();
             viewModel.SelectedRepository = repository;
-            return (string)await showDialog.ShowWithFirstConnection(viewModel);
+            return (string)await showDialog.ShowWithFirstConnection(viewModel).ConfigureAwait(false);
         }
 
         public async Task ShowCreateGist(IConnection connection)
@@ -77,12 +77,12 @@ namespace GitHub.Services
 
             if (connection != null)
             {
-                await viewModel.InitializeAsync(connection);
-                await showDialog.Show(viewModel);
+                await viewModel.InitializeAsync(connection).ConfigureAwait(true);
+                await showDialog.Show(viewModel).ConfigureAwait(false);
             }
             else
             {
-                await showDialog.ShowWithFirstConnection(viewModel);
+                await showDialog.ShowWithFirstConnection(viewModel).ConfigureAwait(false);
             }
         }
 
@@ -91,14 +91,14 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(connection, nameof(connection));
 
             var viewModel = factory.CreateViewModel<IRepositoryCreationViewModel>();
-            await viewModel.InitializeAsync(connection);
-            await showDialog.Show(viewModel);
+            await viewModel.InitializeAsync(connection).ConfigureAwait(true);
+            await showDialog.Show(viewModel).ConfigureAwait(false);
         }
 
         public async Task<IConnection> ShowLoginDialog()
         {
             var viewModel = factory.CreateViewModel<ILoginViewModel>();
-            return (IConnection)await showDialog.Show(viewModel);
+            return (IConnection)await showDialog.Show(viewModel).ConfigureAwait(false);
         }
 
         public async Task ShowForkDialog(LocalRepositoryModel repository, IConnection connection)
@@ -107,8 +107,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(connection, nameof(connection));
 
             var viewModel = factory.CreateViewModel<IForkRepositoryViewModel>();
-            await viewModel.InitializeAsync(repository, connection);
-            await showDialog.Show(viewModel);
+            await viewModel.InitializeAsync(repository, connection).ConfigureAwait(true);
+            await showDialog.Show(viewModel).ConfigureAwait(false);
         }
     }
 }

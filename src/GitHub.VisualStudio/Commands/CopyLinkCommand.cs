@@ -37,11 +37,11 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public async override Task Execute()
         {
-            var isgithub = await IsGitHubRepo();
+            var isgithub = await IsGitHubRepo().ConfigureAwait(false);
             if (!isgithub)
                 return;
 
-            var link = await GenerateLink(LinkType.Blob);
+            var link = await GenerateLink(LinkType.Blob).ConfigureAwait(false);
             if (link == null)
                 return;
             try
@@ -49,7 +49,7 @@ namespace GitHub.VisualStudio.Commands
                 Clipboard.SetText(link);
                 var ns = ServiceProvider.TryGetService<IStatusBarNotificationService>();
                 ns?.ShowMessage(Resources.LinkCopiedToClipboardMessage);
-                await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub);
+                await UsageTracker.IncrementCounter(x => x.NumberOfLinkToGitHub).ConfigureAwait(false);
             }
             catch
             {

@@ -69,7 +69,7 @@ namespace GitHub.ViewModels.TeamExplorer
 
             accounts = this.WhenAnyValue(x => x.SelectedConnection)
                 .Where(x => x != null)
-                .SelectMany(async c => (await modelServiceFactory.CreateAsync(c)).GetAccounts())
+                .SelectMany(async c => (await modelServiceFactory.CreateAsync(c).ConfigureAwait(true)).GetAccounts())
                 .Switch()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
@@ -109,8 +109,8 @@ namespace GitHub.ViewModels.TeamExplorer
                 {
                     var name = RepositoryName;
                     RepositoryName = null;
-                    await RepositoryNameValidator.ResetAsync();
-                    await SafeRepositoryNameWarningValidator.ResetAsync();
+                    await RepositoryNameValidator.ResetAsync().ConfigureAwait(true);
+                    await SafeRepositoryNameWarningValidator.ResetAsync().ConfigureAwait(true);
                     RepositoryName = name;
                 });
         }

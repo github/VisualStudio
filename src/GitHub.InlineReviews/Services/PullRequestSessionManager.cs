@@ -99,7 +99,7 @@ namespace GitHub.InlineReviews.Services
                     typeof(IPullRequestSessionFile),
                     result);
 
-                await UpdateLiveFile(result, true);
+                await UpdateLiveFile(result, true).ConfigureAwait(false);
 
                 textBuffer.Changed += TextBufferChanged;
                 textView.Closed += TextViewClosed;
@@ -146,14 +146,14 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<IPullRequestSession> GetSession(string owner, string name, int number)
         {
-            var session = await GetSessionInternal(owner, name, number);
+            var session = await GetSessionInternal(owner, name, number).ConfigureAwait(false);
 
             if (await service.EnsureLocalBranchesAreMarkedAsPullRequests(repository, session.PullRequest))
             {
                 // The branch for the PR was not previously marked with the PR number in the git
                 // config so we didn't pick up that the current branch is a PR branch. That has
                 // now been corrected, so call StatusChanged to make sure everything is up-to-date.
-                await StatusChanged();
+                await StatusChanged().ConfigureAwait(false);
             }
 
             return session;
@@ -190,7 +190,7 @@ namespace GitHub.InlineReviews.Services
 
             if (localRepositoryModel != null)
             {
-                await StatusChanged();
+                await StatusChanged().ConfigureAwait(false);
             }
             else
             {
@@ -211,7 +211,7 @@ namespace GitHub.InlineReviews.Services
 
                 if (changePR)
                 {
-                    var newSession = await GetSessionInternal(pr.Item1, repository.Name, pr.Item2);
+                    var newSession = await GetSessionInternal(pr.Item1, repository.Name, pr.Item2).ConfigureAwait(false);
                     if (newSession != null) newSession.IsCheckedOut = true;
                     session = newSession;
                 }
@@ -246,11 +246,11 @@ namespace GitHub.InlineReviews.Services
             if (session == null)
             {
                 var address = HostAddress.Create(cloneUrl);
-                var pullRequest = await sessionService.ReadPullRequestDetail(address, owner, name, number);
+                var pullRequest = await sessionService.ReadPullRequestDetail(address, owner, name, number).ConfigureAwait(false);
 
                 session = new PullRequestSession(
                     sessionService,
-                    await sessionService.ReadViewer(address),
+                    await sessionService.ReadViewer(address).ConfigureAwait(false),
                     pullRequest,
                     repository,
                     key.Item1,
@@ -267,16 +267,16 @@ namespace GitHub.InlineReviews.Services
 
             if (session != null)
             {
-                var mergeBase = await session.GetMergeBase();
+                var mergeBase = await session.GetMergeBase().ConfigureAwait(false);
                 var contents = sessionService.GetContents(file.TextBuffer);
                 file.BaseSha = session.PullRequest.BaseRefSha;
-                file.CommitSha = await CalculateCommitSha(session, file, contents);
+                file.CommitSha = await CalculateCommitSha(session, file, contents).ConfigureAwait(false);
                 file.Diff = await sessionService.Diff(
                     session.LocalRepository,
                     mergeBase,
                     session.PullRequest.HeadRefSha,
                     file.RelativePath,
-                    contents);
+                    contents).ConfigureAwait(false);
 
                 if (rebuildThreads)
                 {
@@ -316,7 +316,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (file.TextBuffer.CurrentSnapshot == snapshot)
             {
-                await UpdateLiveFile(file, false);
+                await UpdateLiveFile(file, false).ConfigureAwait(false);
             }
         }
 
@@ -382,8 +382,8 @@ namespace GitHub.InlineReviews.Services
             byte[] content)
         {
             var repo = session.LocalRepository;
-            return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content) ?
-                   await sessionService.GetTipSha(repo) : null;
+            return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content).ConfigureAwait(false) ?
+                   await sessionService.GetTipSha(repo).ConfigureAwait(false) : null;
         }
 
         private void CloseLiveFiles(ITextBuffer textBuffer)

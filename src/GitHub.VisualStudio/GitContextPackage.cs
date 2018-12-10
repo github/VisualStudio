@@ -27,7 +27,7 @@ namespace GitHub.VisualStudio
                 return;
             }
 
-            var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt));
+            var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt)).ConfigureAwait(true);
             var context = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
             RefreshContext(context, gitExt);
             gitExt.ActiveRepositoriesChanged += () =>

@@ -53,7 +53,7 @@ namespace GitHub.VisualStudio.Commands
         {
             try
             {
-                var complete = await SyncSubmodules();
+                var complete = await SyncSubmodules().ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -85,7 +85,7 @@ namespace GitHub.VisualStudio.Commands
             {
                 writer.WriteLine(line);
                 statusBarNotificationService.ShowMessage(line);
-            });
+            }).ConfigureAwait(true);
 
             if (!complete)
             {

@@ -86,7 +86,7 @@ namespace GitHub.Services
         {
             if (refreshJoinableTask != null)
             {
-                await refreshJoinableTask.JoinAsync(); // make sure StartRefresh has completed
+                await refreshJoinableTask.JoinAsync().ConfigureAwait(false); // make sure StartRefresh has completed
             }
 
             await (refreshJoinableTask = JoinableTaskFactory.RunAsync(RefreshAsync));
@@ -99,7 +99,7 @@ namespace GitHub.Services
                 await TaskScheduler.Default; // switch to threadpool
 
                 var repo = gitExt.ActiveRepositories?.FirstOrDefault();
-                string newSolutionPath = await GetSolutionPath();
+                string newSolutionPath = await GetSolutionPath().ConfigureAwait(true);
                 if (repo == null && newSolutionPath == solutionPath)
                 {
                     // Ignore when ActiveRepositories is empty and solution hasn't changed.
@@ -149,7 +149,7 @@ namespace GitHub.Services
         async Task<string> GetSolutionPath()
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            var dte = await dteAsync.GetValueAsync();
+            var dte = await dteAsync.GetValueAsync().ConfigureAwait(true);
             return dte.Solution?.FullName;
         }
 

@@ -202,8 +202,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 Error = null;
                 IsBusy = true;
-                await session.Refresh();
-                await Load(session.PullRequest);
+                await session.Refresh().ConfigureAwait(true);
+                await Load(session.PullRequest).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -252,7 +252,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = Model.Body;
 
                 sessionSubscription?.Dispose();
-                await UpdateFileComments();
+                await UpdateFileComments().ConfigureAwait(true);
                 sessionSubscription = session.PullRequestChanged.Subscribe(_ => UpdateFileComments().Forget());
             }
             finally
@@ -275,7 +275,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Model.Id = session.PendingReviewId;
             }
 
-            foreach (var file in await session.GetAllFiles())
+            foreach (var file in await session.GetAllFiles().ConfigureAwait(true))
             {
                 foreach (var thread in file.InlineCommentThreads)
                 {
@@ -294,7 +294,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             FileComments = result;
-            await Files.InitializeAsync(session, FilterComments);
+            await Files.InitializeAsync(session, FilterComments).ConfigureAwait(true);
         }
 
         async Task DoSubmit(Octokit.PullRequestReviewEvent e)
@@ -329,7 +329,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     if (pullRequestService.ConfirmCancelPendingReview())
                     {
-                        await session.CancelReview();
+                        await session.CancelReview().ConfigureAwait(true);
                         Close();
                     }
                 }

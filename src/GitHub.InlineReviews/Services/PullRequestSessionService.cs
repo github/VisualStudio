@@ -74,18 +74,18 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
-                return await diffService.Diff(repo, baseSha, headSha, relativePath);
+                return await diffService.Diff(repo, baseSha, headSha, relativePath).ConfigureAwait(false);
             }
         }
 
         /// <inheritdoc/>
         public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
-                return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
+                return await diffService.Diff(repo, baseSha, headSha, relativePath, contents).ConfigureAwait(false);
             }
         }
 
@@ -228,7 +228,7 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public virtual async Task<string> GetTipSha(LocalRepositoryModel repository)
         {
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
                 return repo.Head.Tip.Sha;
             }
@@ -237,10 +237,10 @@ namespace GitHub.InlineReviews.Services
         /// <inheritdoc/>
         public async Task<bool> IsUnmodifiedAndPushed(LocalRepositoryModel repository, string relativePath, byte[] contents)
         {
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
-                var modified = await gitClient.IsModified(repo, relativePath, contents);
-                var pushed = await gitClient.IsHeadPushed(repo);
+                var modified = await gitClient.IsModified(repo, relativePath, contents).ConfigureAwait(false);
+                var pushed = await gitClient.IsHeadPushed(repo).ConfigureAwait(false);
 
                 return !modified && pushed;
             }
@@ -252,17 +252,17 @@ namespace GitHub.InlineReviews.Services
             string sha,
             string relativePath)
         {
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
                 try
                 {
-                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath).ConfigureAwait(false);
                 }
                 catch (FileNotFoundException)
                 {
                     var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
-                    await gitClient.Fetch(repo, "origin", sha, pullHeadRef);
-                    return await gitClient.ExtractFileBinary(repo, sha, relativePath);
+                    await gitClient.Fetch(repo, "origin", sha, pullHeadRef).ConfigureAwait(false);
+                    return await gitClient.ExtractFileBinary(repo, sha, relativePath).ConfigureAwait(false);
                 }
             }
         }
@@ -277,7 +277,7 @@ namespace GitHub.InlineReviews.Services
                     using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
                     {
                         var buffer = new MemoryStream();
-                        await file.CopyToAsync(buffer);
+                        await file.CopyToAsync(buffer).ConfigureAwait(false);
                         return buffer.ToArray();
                     }
                 }
@@ -357,12 +357,12 @@ namespace GitHub.InlineReviews.Services
                 { nameof(number), number },
             };
 
-            var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(readPullRequest, vars);
+            var connection = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            var result = await connection.Run(readPullRequest, vars).ConfigureAwait(false);
 
-            var apiClient = await apiClientFactory.Create(address);
+            var apiClient = await apiClientFactory.Create(address).ConfigureAwait(false);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
-            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
+            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number).ConfigureAwait(false);
 
             result.Statuses = lastCommitModel.Statuses;
             result.CheckSuites = lastCommitModel.CheckSuites;
@@ -395,8 +395,8 @@ namespace GitHub.InlineReviews.Services
                     }).Compile();
             }
 
-            var connection = await graphqlFactory.CreateConnection(address);
-            return await connection.Run(readViewer);
+            var connection = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            return await connection.Run(readViewer).ConfigureAwait(false);
         }
 
         public async Task<string> GetGraphQLPullRequestId(
@@ -405,14 +405,14 @@ namespace GitHub.InlineReviews.Services
             int number)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var query = new Query()
                 .Repository(repositoryOwner, localRepository.Name)
                 .PullRequest(number)
                 .Select(x => x.Id);
 
-            return (await graphql.Run(query)).Value;
+            return (await graphql.Run(query).ConfigureAwait(false)).Value;
         }
 
         /// <inheritdoc/>
@@ -428,7 +428,7 @@ namespace GitHub.InlineReviews.Services
                 return mergeBase;
             }
 
-            using (var repo = await GetRepository(repository))
+            using (var repo = await GetRepository(repository).ConfigureAwait(false))
             {
                 var targetUrl = repository.CloneUrl.WithOwner(pullRequest.BaseRepositoryOwner);
                 var headUrl = repository.CloneUrl.WithOwner(pullRequest.HeadRepositoryOwner);
@@ -436,7 +436,8 @@ namespace GitHub.InlineReviews.Services
                 var pullNumber = pullRequest.Number;
                 try
                 {
-                    mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber);
+                    mergeBase = await gitClient.GetPullRequestMergeBase(repo, targetUrl, baseSha, headSha, baseRef, pullNumber)
+                        .ConfigureAwait(false);
                 }
                 catch (NotFoundException ex)
                 {
@@ -464,11 +465,11 @@ namespace GitHub.InlineReviews.Services
             string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
-            var (_, owner, number) = await CreatePendingReviewCore(localRepository, pullRequestId);
-            var detail = await ReadPullRequestDetail(address, owner, localRepository.Name, number);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            var (_, owner, number) = await CreatePendingReviewCore(localRepository, pullRequestId).ConfigureAwait(false);
+            var detail = await ReadPullRequestDetail(address, owner, localRepository.Name, number).ConfigureAwait(false);
 
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentStartReview).ConfigureAwait(false);
 
             return detail;
         }
@@ -479,7 +480,7 @@ namespace GitHub.InlineReviews.Services
             string reviewId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var delete = new DeletePullRequestReviewInput
             {
@@ -494,8 +495,8 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(mutation);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(mutation).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -507,7 +508,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestReviewEvent e)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var addReview = new AddPullRequestReviewInput
             {
@@ -525,9 +526,9 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(mutation);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(mutation).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         public async Task<PullRequestDetailModel> SubmitPendingReview(
@@ -537,7 +538,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestReviewEvent e)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var submit = new SubmitPullRequestReviewInput
             {
@@ -554,9 +555,9 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(mutation);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(mutation).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewPosts).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -569,7 +570,7 @@ namespace GitHub.InlineReviews.Services
             int position)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var comment = new AddPullRequestReviewCommentInput
             {
@@ -588,9 +589,9 @@ namespace GitHub.InlineReviews.Services
                     x.Comment.PullRequest.Number
                 });
 
-            var result = await graphql.Run(addComment);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(addComment).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -601,7 +602,7 @@ namespace GitHub.InlineReviews.Services
             string inReplyTo)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var comment = new AddPullRequestReviewCommentInput
             {
@@ -618,9 +619,9 @@ namespace GitHub.InlineReviews.Services
                     x.Comment.PullRequest.Number
                 });
 
-            var result = await graphql.Run(addComment);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(addComment).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -633,7 +634,7 @@ namespace GitHub.InlineReviews.Services
             int position)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var addReview = new AddPullRequestReviewInput
             {
@@ -660,9 +661,9 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(mutation);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(mutation).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -672,9 +673,9 @@ namespace GitHub.InlineReviews.Services
             string body,
             string inReplyTo)
         {
-            var (id, _, _) = await CreatePendingReviewCore(localRepository, pullRequestId);
-            var comment = await PostPendingReviewCommentReply(localRepository, id, body, inReplyTo);
-            return await SubmitPendingReview(localRepository, id, null, PullRequestReviewEvent.Comment);
+            var (id, _, _) = await CreatePendingReviewCore(localRepository, pullRequestId).ConfigureAwait(false);
+            var comment = await PostPendingReviewCommentReply(localRepository, id, body, inReplyTo).ConfigureAwait(false);
+            return await SubmitPendingReview(localRepository, id, null, PullRequestReviewEvent.Comment).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -685,15 +686,15 @@ namespace GitHub.InlineReviews.Services
             int commentDatabaseId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var apiClient = await apiClientFactory.Create(address);
+            var apiClient = await apiClientFactory.Create(address).ConfigureAwait(false);
 
             await apiClient.DeletePullRequestReviewComment(
                 remoteRepositoryOwner,
                 localRepository.Name,
                 commentDatabaseId);
 
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete);
-            return await ReadPullRequestDetail(address, remoteRepositoryOwner, localRepository.Name, pullRequestId);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentDelete).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, remoteRepositoryOwner, localRepository.Name, pullRequestId).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -703,7 +704,7 @@ namespace GitHub.InlineReviews.Services
             string body)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var updatePullRequestReviewCommentInput = new UpdatePullRequestReviewCommentInput
             {
@@ -718,15 +719,15 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReviewComment.PullRequest.Number
                 });
 
-            var result = await graphql.Run(editComment);
-            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost);
-            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
+            var result = await graphql.Run(editComment).ConfigureAwait(false);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRReviewDiffViewInlineCommentPost).ConfigureAwait(false);
+            return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number).ConfigureAwait(false);
         }
 
         async Task<(string id, string owner, int number)> CreatePendingReviewCore(LocalRepositoryModel localRepository, string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var input = new AddPullRequestReviewInput
             {
@@ -742,7 +743,7 @@ namespace GitHub.InlineReviews.Services
                     x.PullRequestReview.PullRequest.Number
                 });
 
-            var result = await graphql.Run(mutation);
+            var result = await graphql.Run(mutation).ConfigureAwait(false);
             return (result.Id, result.Owner, result.Number);
         }
 
@@ -853,8 +854,8 @@ namespace GitHub.InlineReviews.Services
                 { nameof(number), number },
             };
 
-            var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(query, vars);
+            var connection = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            var result = await connection.Run(query, vars).ConfigureAwait(false);
             return result.First();
         }
 

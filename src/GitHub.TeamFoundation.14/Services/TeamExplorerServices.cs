@@ -69,9 +69,9 @@ namespace GitHub.Services
         public async Task ShowRepositorySettingsRemotesAsync()
         {
             var te = serviceProvider.TryGetService<ITeamExplorer>();
-            var page = await NavigateToPageAsync(te, repositorySettingsPageId);
+            var page = await NavigateToPageAsync(te, repositorySettingsPageId).ConfigureAwait(true);
             var remotes = page?.GetSection(remotesSectionId);
-            await BringIntoViewAsync(remotes);
+            await BringIntoViewAsync(remotes).ConfigureAwait(true);
         }
 
         public void ShowMessage(string message)

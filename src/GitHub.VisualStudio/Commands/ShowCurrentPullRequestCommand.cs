@@ -47,7 +47,7 @@ namespace GitHub.VisualStudio.Commands
             try
             {
                 var pullRequestSessionManager = serviceProvider.ExportProvider.GetExportedValueOrDefault<IPullRequestSessionManager>();
-                await pullRequestSessionManager.EnsureInitialized();
+                await pullRequestSessionManager.EnsureInitialized().ConfigureAwait(true);
 
                 var session = pullRequestSessionManager?.CurrentSession;
                 if (session == null)
@@ -57,8 +57,8 @@ namespace GitHub.VisualStudio.Commands
 
                 var pullRequest = session.PullRequest;
                 var manager = serviceProvider.TryGetService<IGitHubToolWindowManager>();
-                var host = await manager.ShowGitHubPane();
-                await host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number);
+                var host = await manager.ShowGitHubPane().ConfigureAwait(true);
+                await host.ShowPullRequest(session.RepositoryOwner, host.LocalRepository.Name, pullRequest.Number).ConfigureAwait(true);
             }
             catch (Exception ex)
             {

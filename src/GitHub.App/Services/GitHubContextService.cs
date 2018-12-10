@@ -411,7 +411,7 @@ namespace GitHub.Services
 
             if (context.Line != null)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000).ConfigureAwait(true);
                 var activeView = FindActiveView();
                 SetSelection(activeView, context);
             }

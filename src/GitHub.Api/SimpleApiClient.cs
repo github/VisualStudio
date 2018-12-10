@@ -45,7 +45,7 @@ namespace GitHub.Api
             // to read. This way, lock queues will only form once on first load
             if (owner != null)
                 return repositoryCache;
-            return await GetRepositoryInternal();
+            return await GetRepositoryInternal().ConfigureAwait(false);
         }
         
         public bool IsAuthenticated()
@@ -58,7 +58,7 @@ namespace GitHub.Api
 
         async Task<Repository> GetRepositoryInternal()
         {
-            await sem.WaitAsync();
+            await sem.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (owner == null)
@@ -68,11 +68,11 @@ namespace GitHub.Api
 
                     if (ownerLogin != null && repositoryName != null)
                     {
-                        var repo = await Client.Repository.Get(ownerLogin, repositoryName);
+                        var repo = await Client.Repository.Get(ownerLogin, repositoryName).ConfigureAwait(false);
                         if (repo != null)
                         {
-                            hasWiki = await HasWikiInternal(repo);
-                            isEnterprise = isEnterprise ?? await IsEnterpriseInternal();
+                            hasWiki = await HasWikiInternal(repo).ConfigureAwait(false);
+                            isEnterprise = isEnterprise ?? await IsEnterpriseInternal().ConfigureAwait(false);
                             repositoryCache = repo;
                         }
                         owner = ownerLogin;
@@ -103,7 +103,7 @@ namespace GitHub.Api
         {
             if (!isEnterprise.HasValue)
             {
-                isEnterprise = await IsEnterpriseInternal();
+                isEnterprise = await IsEnterpriseInternal().ConfigureAwait(false);
             }
 
             return isEnterprise ?? false;
@@ -126,7 +126,7 @@ namespace GitHub.Api
             if (probe == null)
                 return false;
 #endif
-            var ret = await probe.ProbeAsync(repo);
+            var ret = await probe.ProbeAsync(repo).ConfigureAwait(false);
             return (ret == WikiProbeResult.Ok);
         }
 
@@ -141,7 +141,7 @@ namespace GitHub.Api
             if (probe == null)
                 return false;
 #endif
-            var ret = await probe.Probe(HostAddress.WebUri);
+            var ret = await probe.Probe(HostAddress.WebUri).ConfigureAwait(false);
             return (ret == EnterpriseProbeResult.Ok);
         }
     }

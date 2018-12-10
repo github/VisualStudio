@@ -91,7 +91,7 @@ namespace GitHub.InlineReviews.Services
                 NoRemoteOriginCallout();
             }
 
-            var showStatus = await IsDotComOrEnterpriseRepository(repository);
+            var showStatus = await IsDotComOrEnterpriseRepository(repository).ConfigureAwait(true);
             if (!showStatus)
             {
                 ShowStatus(null);
@@ -145,7 +145,7 @@ namespace GitHub.InlineReviews.Services
                 return true;
             }
 
-            var connection = await connectionManager.Value.GetConnection(repository);
+            var connection = await connectionManager.Value.GetConnection(repository).ConfigureAwait(false);
             if (connection != null)
             {
                 // This is an enterprise repository

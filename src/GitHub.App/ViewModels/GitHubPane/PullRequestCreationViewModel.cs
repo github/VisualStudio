@@ -142,7 +142,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
-            modelService = await modelServiceFactory.CreateAsync(connection);
+            modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
             activeLocalRepo = repository;
             SourceBranch = gitService.GetBranch(repository);
 

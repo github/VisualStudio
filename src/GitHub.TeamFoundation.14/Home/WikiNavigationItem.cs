@@ -38,10 +38,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public override async void Invalidate()
         {
-            var visible = await IsAGitHubRepo(ActiveRepoUri);
+            var visible = await IsAGitHubRepo(ActiveRepoUri).ConfigureAwait(true);
             if (visible)
             {
-                var repo = await SimpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(true);
                 visible = repo.HasWiki && SimpleApiClient.HasWiki();
             }
             IsVisible = visible;

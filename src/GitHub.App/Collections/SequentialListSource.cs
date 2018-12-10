@@ -82,7 +82,7 @@ namespace GitHub.Collections
         {
             dispatcher?.VerifyAccess();
 
-            var page = await EnsureLoaded(pageNumber);
+            var page = await EnsureLoaded(pageNumber).ConfigureAwait(false);
 
             if (page == null)
             {

@@ -9,7 +9,7 @@ namespace GitHub.Extensions
         {
             using (var writer = fileInfo.AppendText())
             {
-                await writer.WriteAsync(text);
+                await writer.WriteAsync(text).ConfigureAwait(false);
             }
         }
 
@@ -17,7 +17,7 @@ namespace GitHub.Extensions
         {
             using (var reader = fileInfo.OpenText())
             {
-                return await reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync().ConfigureAwait(false);
             }
         }
     }

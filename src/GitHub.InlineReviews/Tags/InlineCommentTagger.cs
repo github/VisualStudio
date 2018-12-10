@@ -193,7 +193,7 @@ namespace GitHub.InlineReviews.Tags
                 var commitSha = bufferInfo.Side == DiffSide.Left ? "HEAD" : bufferInfo.CommitSha;
                 session = bufferInfo.Session;
                 relativePath = bufferInfo.RelativePath;
-                file = await session.GetFile(relativePath, commitSha);
+                file = await session.GetFile(relativePath, commitSha).ConfigureAwait(false);
                 fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
                 side = bufferInfo.Side ?? DiffSide.Right;
                 NotifyTagsChanged();
@@ -201,7 +201,7 @@ namespace GitHub.InlineReviews.Tags
             else
             {
                 side = DiffSide.Right;
-                await InitializeLiveFile();
+                await InitializeLiveFile().ConfigureAwait(false);
                 sessionManagerSubscription = sessionManager
                     .WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
@@ -218,7 +218,7 @@ namespace GitHub.InlineReviews.Tags
 
             if (relativePath != null)
             {
-                file = await sessionManager.GetLiveFile(relativePath, view, buffer);
+                file = await sessionManager.GetLiveFile(relativePath, view, buffer).ConfigureAwait(true);
 
                 var options = view.Options;
                 visibleSubscription =

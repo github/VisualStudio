@@ -243,25 +243,25 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (uri.AbsolutePath == "/pulls")
             {
-                await ShowPullRequests();
+                await ShowPullRequests().ConfigureAwait(true);
             }
             else if (uri.AbsolutePath == "/pull/new")
             {
-                await ShowCreatePullRequest();
+                await ShowCreatePullRequest().ConfigureAwait(true);
             }
             else if ((match = pullUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
                 var number = int.Parse(match.Groups["number"].Value);
-                await ShowPullRequest(owner, repo, number);
+                await ShowPullRequest(owner, repo, number).ConfigureAwait(true);
             }
             else if ((match = pullNewReviewUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
                 var number = int.Parse(match.Groups["number"].Value);
-                await ShowPullRequestReviewAuthoring(owner, repo, number);
+                await ShowPullRequestReviewAuthoring(owner, repo, number).ConfigureAwait(true);
             }
             else if ((match = pullUserReviewsUri.Match(uri.AbsolutePath))?.Success == true)
             {
@@ -269,7 +269,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var repo = match.Groups["repo"].Value;
                 var number = int.Parse(match.Groups["number"].Value);
                 var login = match.Groups["login"].Value;
-                await ShowPullRequestReviews(owner, repo, number, login);
+                await ShowPullRequestReviews(owner, repo, number, login).ConfigureAwait(true);
             }
             else if ((match = pullCheckRunsUri.Match(uri.AbsolutePath))?.Success == true)
             {
@@ -278,7 +278,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var number = int.Parse(match.Groups["number"].Value);
                 var id = match.Groups["id"].Value;
 
-                await ShowPullRequestCheckRun(owner, repo, number, id);
+                await ShowPullRequestCheckRun(owner, repo, number, id).ConfigureAwait(true);
             }
             else
             {
@@ -289,7 +289,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             if (queries["refresh"] == "true")
             {
-                await navigator.Content.Refresh();
+                await navigator.Content.Refresh().ConfigureAwait(true);
             }
         }
 
@@ -362,7 +362,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task CreateInitializeTask(IServiceProvider paneServiceProvider)
         {
-            await UpdateContent(teamExplorerContext.ActiveRepository);
+            await UpdateContent(teamExplorerContext.ActiveRepository).ConfigureAwait(true);
             teamExplorerContext.WhenAnyValue(x => x.ActiveRepository)
                .Skip(1)
                .ObserveOn(RxApp.MainThreadScheduler)
@@ -393,7 +393,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(initialize, nameof(initialize));
 
             if (Content != navigator) return;
-            await navigating.WaitAsync();
+            await navigating.WaitAsync().ConfigureAwait(true);
 
             try
             {
@@ -405,7 +405,7 @@ namespace GitHub.ViewModels.GitHubPane
                 {
                     viewModel = viewModelFactory.CreateViewModel<TViewModel>();
                     navigator.NavigateTo(viewModel);
-                    await initialize(viewModel);
+                    await initialize(viewModel).ConfigureAwait(true);
                 }
                 else if (navigator.Content != viewModel)
                 {
@@ -453,8 +453,8 @@ namespace GitHub.ViewModels.GitHubPane
 
             var repositoryUrl = repository.CloneUrl.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-            var client = await apiClientFactory.Create(repository.CloneUrl);
-            var isEnterprise = isDotCom ? false : await client.IsEnterprise();
+            var client = await apiClientFactory.Create(repository.CloneUrl).ConfigureAwait(true);
+            var isEnterprise = isDotCom ? false : await client.IsEnterprise().ConfigureAwait(true);
             var notGitHubRepo = true;
 
             if (isDotCom || isEnterprise)
@@ -463,7 +463,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 notGitHubRepo = false;
 
-                Connection = await connectionManager.GetConnection(hostAddress);
+                Connection = await connectionManager.GetConnection(hostAddress).ConfigureAwait(true);
                 Connection?.WhenAnyValue(
                     x => x.IsLoggedIn,
                     x => x.IsLoggingIn,
@@ -475,11 +475,11 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (Connection?.IsLoggedIn == true)
                 {
-                    if (await IsValidRepository(client) == true)
+                    if (await IsValidRepository(client).ConfigureAwait(true) == true)
                     {
                         log.Debug("Found a GitHub repository: {CloneUrl}", repository?.CloneUrl);
                         Content = navigator;
-                        await ShowDefaultPage();
+                        await ShowDefaultPage().ConfigureAwait(true);
                     }
                     else
                     {
@@ -515,7 +515,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                var repo = await client.GetRepository();
+                var repo = await client.GetRepository().ConfigureAwait(false);
                 return repo.Id != 0;
             }
             catch

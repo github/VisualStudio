@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio.Base
 
         async Task InitializeAsync()
         {
-            gitExt = await GetServiceAsync<IGitExt>();
+            gitExt = await GetServiceAsync<IGitExt>().ConfigureAwait(false);
             if (gitService == null)
             {
                 log.Error("Couldn't find IGitExt service");
@@ -90,7 +90,7 @@ namespace GitHub.VisualStudio.Base
             }
 
             // Refresh on background thread
-            await Task.Run(() => RefreshActiveRepositories());
+            await Task.Run(() => RefreshActiveRepositories()).ConfigureAwait(false);
 
             gitExt.PropertyChanged += (s, e) =>
             {
@@ -144,7 +144,7 @@ namespace GitHub.VisualStudio.Base
         {
             JoinableTaskFactory.Context.Factory.Run(async () =>
             {
-                await JoinableTaskCollection.JoinTillEmptyAsync();
+                await JoinableTaskCollection.JoinTillEmptyAsync().ConfigureAwait(false);
             });
         }
 

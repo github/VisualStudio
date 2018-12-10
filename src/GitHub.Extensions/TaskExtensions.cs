@@ -15,7 +15,7 @@ namespace GitHub.Extensions
 
             try
             {
-                return await source;
+                return await source.ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -31,7 +31,7 @@ namespace GitHub.Extensions
 
             try
             {
-                await source;
+                await source.ConfigureAwait(false);
             }
             catch (Exception ex)
             {

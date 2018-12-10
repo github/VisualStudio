@@ -45,8 +45,8 @@ namespace GitHub.Services
                 { nameof(name), name },
             };
 
-            var graphql = await graphqlFactory.CreateConnection(address);
-            var result = await graphql.Run(readParentOwnerLogin, vars);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
+            var result = await graphql.Run(readParentOwnerLogin, vars).ConfigureAwait(false);
             return result != null ? (result.Item1, result.Item2) : ((string, string)?)null;
         }
     }

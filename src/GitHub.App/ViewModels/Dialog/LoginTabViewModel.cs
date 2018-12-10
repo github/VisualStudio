@@ -151,26 +151,26 @@ namespace GitHub.ViewModels.Dialog
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
-            if (await ConnectionManager.GetConnection(hostAddress) != null)
+            if (await ConnectionManager.GetConnection(hostAddress).ConfigureAwait(false) != null)
             {
-                await ConnectionManager.LogOut(hostAddress);
+                await ConnectionManager.LogOut(hostAddress).ConfigureAwait(false);
             }
 
-            return await ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password);
+            return await ConnectionManager.LogIn(hostAddress, UsernameOrEmail, Password).ConfigureAwait(false);
         }
 
         protected async Task<IConnection> LoginToHostViaOAuth(HostAddress address)
         {
             oauthCancel = new CancellationTokenSource();
 
-            if (await ConnectionManager.GetConnection(address) != null)
+            if (await ConnectionManager.GetConnection(address).ConfigureAwait(false) != null)
             {
-                await ConnectionManager.LogOut(address);
+                await ConnectionManager.LogOut(address).ConfigureAwait(false);
             }
 
             try
             {
-                return await ConnectionManager.LogInViaOAuth(address, oauthCancel.Token);
+                return await ConnectionManager.LogInViaOAuth(address, oauthCancel.Token).ConfigureAwait(false);
             }
             finally
             {
@@ -183,9 +183,9 @@ namespace GitHub.ViewModels.Dialog
         {
             UsernameOrEmail = null;
             Password = null;
-            await UsernameOrEmailValidator.ResetAsync();
-            await PasswordValidator.ResetAsync();
-            await ResetValidation();
+            await UsernameOrEmailValidator.ResetAsync().ConfigureAwait(true);
+            await PasswordValidator.ResetAsync().ConfigureAwait(true);
+            await ResetValidation().ConfigureAwait(true);
         }
 
         protected virtual Task ResetValidation()

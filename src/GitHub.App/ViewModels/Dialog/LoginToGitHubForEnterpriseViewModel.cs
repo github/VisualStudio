@@ -131,7 +131,7 @@ namespace GitHub.ViewModels.Dialog
         protected override async Task ResetValidation()
         {
             EnterpriseUrl = null;
-            await EnterpriseUrlValidator.ResetAsync();
+            await EnterpriseUrlValidator.ResetAsync().ConfigureAwait(false);
         }
 
         async Task EnterpriseUrlChanged(string url, bool valid)
@@ -150,9 +150,9 @@ namespace GitHub.ViewModels.Dialog
 
             ProbeStatus = EnterpriseProbeStatus.Checking;
 
-            if (await enterpriseCapabilities.Probe(uri) == EnterpriseProbeResult.Ok)
+            if (await enterpriseCapabilities.Probe(uri).ConfigureAwait(true) == EnterpriseProbeResult.Ok)
             {
-                loginMethods = await enterpriseCapabilities.ProbeLoginMethods(uri);
+                loginMethods = await enterpriseCapabilities.ProbeLoginMethods(uri).ConfigureAwait(true);
                 enterpriseInstance = true;
             }
 
@@ -173,12 +173,12 @@ namespace GitHub.ViewModels.Dialog
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
 
-            if (await ConnectionManager.GetConnection(hostAddress) != null)
+            if (await ConnectionManager.GetConnection(hostAddress).ConfigureAwait(false) != null)
             {
-                await ConnectionManager.LogOut(hostAddress);
+                await ConnectionManager.LogOut(hostAddress).ConfigureAwait(false);
             }
 
-            return await ConnectionManager.LogInWithToken(hostAddress, token);
+            return await ConnectionManager.LogInWithToken(hostAddress, token).ConfigureAwait(false);
         }
     }
 }

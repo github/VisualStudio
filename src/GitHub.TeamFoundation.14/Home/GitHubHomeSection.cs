@@ -64,7 +64,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
             base.RepoChanged();
 
-            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri).ConfigureAwait(true);
 
             if (IsVisible)
             {
@@ -81,9 +81,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
                 Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
-                var repo = await SimpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(true);
                 Icon = GetIcon(repo.Private, true, repo.Fork);
-                IsLoggedIn = await IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated().ConfigureAwait(true);
             }
             else
             {
@@ -93,10 +93,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public override async void Refresh()
         {
-            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri).ConfigureAwait(true);
             if (IsVisible)
             {
-                IsLoggedIn = await IsUserAuthenticated();
+                IsLoggedIn = await IsUserAuthenticated().ConfigureAwait(true);
             }
 
             base.Refresh();

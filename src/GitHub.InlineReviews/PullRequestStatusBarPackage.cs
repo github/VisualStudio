@@ -27,7 +27,7 @@ namespace GitHub.InlineReviews
 
         async Task InitializeStatusBar()
         {
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(false));
             var exports = componentModel.DefaultExportProvider;
             var barManager = exports.GetExportedValue<PullRequestStatusBarManager>();
 

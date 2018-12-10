@@ -66,7 +66,7 @@ namespace GitHub.ViewModels.Dialog
 
             try
             {
-                var modelService = await modelServiceFactory.CreateAsync(connection);
+                var modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
 
                 Observable.CombineLatest(
                     modelService.GetAccounts(),

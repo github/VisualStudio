@@ -35,7 +35,7 @@ namespace GitHub.Factories
         {
             return new ApiClient(
                 hostAddress,
-                new ObservableGitHubClient(await CreateGitHubClient(hostAddress)));
+                new ObservableGitHubClient(await CreateGitHubClient(hostAddress).ConfigureAwait(false)));
         }
 
         protected IKeychain Keychain { get; private set; }

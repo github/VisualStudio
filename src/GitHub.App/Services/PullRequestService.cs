@@ -198,7 +198,7 @@ namespace GitHub.Services
                 query = readPullRequestsEnterprise;
             }
 
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             var vars = new Dictionary<string, object>
             {
                 { nameof(owner), owner },
@@ -207,7 +207,7 @@ namespace GitHub.Services
                 { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
             };
 
-            var result = await graphql.Run(query, vars);
+            var result = await graphql.Run(query, vars).ConfigureAwait(false);
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
@@ -305,7 +305,7 @@ namespace GitHub.Services
                     }).Compile();
             }
 
-            var graphql = await graphqlFactory.CreateConnection(address);
+            var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
             var vars = new Dictionary<string, object>
             {
                 { nameof(owner), owner },
@@ -313,7 +313,7 @@ namespace GitHub.Services
                 { nameof(after), after },
             };
 
-            return await graphql.Run(readAssignableUsers, vars);
+            return await graphql.Run(readAssignableUsers, vars).ConfigureAwait(false);
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
@@ -363,7 +363,7 @@ namespace GitHub.Services
                 // CommitMessage doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var messages = await gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits);
+                    var messages = await gitClient.GetMessagesForUniqueCommits(repo, baseBranch, compareBranch, maxCommits).ConfigureAwait(false);
                     return Observable.Return(messages);
                 }
             });
@@ -446,7 +446,7 @@ namespace GitHub.Services
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    await gitClient.Pull(repo);
+                    await gitClient.Pull(repo).ConfigureAwait(false);
                     return Observable.Return(Unit.Default);
                 }
             });
@@ -459,8 +459,9 @@ namespace GitHub.Services
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remoteName = repo.Head.RemoteName;
-                    var remote = await gitClient.GetHttpRemote(repo, remoteName);
-                    await gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name);
+                    var remote = await gitClient.GetHttpRemote(repo, remoteName).ConfigureAwait(false);
+                    await gitClient.Push(repo, repo.Head.TrackedBranch.UpstreamBranchCanonicalName, remote.Name)
+                        .ConfigureAwait(false);
                     return Observable.Return(Unit.Default);
                 }
             });
@@ -468,14 +469,14 @@ namespace GitHub.Services
 
         public async Task<bool> SyncSubmodules(LocalRepositoryModel repository, Action<string> progress)
         {
-            var exitCode = await Where("git");
+            var exitCode = await Where("git").ConfigureAwait(false);
             if (exitCode != 0)
             {
                 progress(Resources.CouldntFindGitOnPath);
                 return false;
             }
 
-            return await SyncSubmodules(repository.LocalPath, progress) == 0;
+            return await SyncSubmodules(repository.LocalPath, progress).ConfigureAwait(false) == 0;
         }
 
         // LibGit2Sharp has limited submodule support so shelling out Git.exe for submodule commands.
@@ -496,7 +497,7 @@ namespace GitHub.Services
                 await Task.WhenAll(
                     ReadLinesAsync(process.StandardOutput, progress),
                     ReadLinesAsync(process.StandardError, progress),
-                    Task.Run(() => process.WaitForExit()));
+                    Task.Run(() => process.WaitForExit())).ConfigureAwait(false);
                 return process.ExitCode;
             }
         }
@@ -523,7 +524,7 @@ namespace GitHub.Services
         static async Task ReadLinesAsync(TextReader reader, Action<string> progress)
         {
             string line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
             {
                 progress(line);
             }
@@ -539,28 +540,31 @@ namespace GitHub.Services
 
                     if (existing != null)
                     {
-                        await gitClient.Checkout(repo, localBranchName);
+                        await gitClient.Checkout(repo, localBranchName).ConfigureAwait(false);
                     }
                     else if (string.Equals(repository.CloneUrl.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase))
                     {
-                        var remote = await gitClient.GetHttpRemote(repo, "origin");
-                        await gitClient.Fetch(repo, remote.Name);
-                        await gitClient.Checkout(repo, localBranchName);
+                        var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                        await gitClient.Fetch(repo, remote.Name).ConfigureAwait(false);
+                        await gitClient.Checkout(repo, localBranchName).ConfigureAwait(false);
                     }
                     else
                     {
                         var refSpec = $"{pullRequest.HeadRefName}:{localBranchName}";
-                        var remoteName = await CreateRemote(repo, repository.CloneUrl.WithOwner(pullRequest.HeadRepositoryOwner));
+                        var remoteName = await CreateRemote(repo, repository.CloneUrl.WithOwner(pullRequest.HeadRepositoryOwner))
+                            .ConfigureAwait(false);
 
-                        await gitClient.Fetch(repo, remoteName);
-                        await gitClient.Fetch(repo, remoteName, new[] { refSpec });
-                        await gitClient.Checkout(repo, localBranchName);
-                        await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.HeadRefName}");
+                        await gitClient.Fetch(repo, remoteName).ConfigureAwait(false);
+                        await gitClient.Fetch(repo, remoteName, new[] { refSpec }).ConfigureAwait(false);
+                        await gitClient.Checkout(repo, localBranchName).ConfigureAwait(false);
+                        await gitClient.SetTrackingBranch(repo, localBranchName, $"refs/remotes/{remoteName}/{pullRequest.HeadRefName}")
+                            .ConfigureAwait(false);
                     }
 
                     // Store the PR number in the branch config with the key "ghfvs-pr".
                     var prConfigKey = $"branch.{localBranchName}.{SettingGHfVSPullRequest}";
-                    await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest.BaseRepositoryOwner, pullRequest.Number));
+                    await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(pullRequest.BaseRepositoryOwner, pullRequest.Number))
+                        .ConfigureAwait(false);
 
                     return Observable.Return(Unit.Default);
                 }
@@ -597,8 +601,8 @@ namespace GitHub.Services
                     var remoteName = repo.Head.RemoteName;
                     if (remoteName != null)
                     {
-                        var remote = await gitClient.GetHttpRemote(repo, remoteName);
-                        await gitClient.Fetch(repo, remote.Name);
+                        var remote = await gitClient.GetHttpRemote(repo, remoteName).ConfigureAwait(false);
+                        await gitClient.Fetch(repo, remote.Name).ConfigureAwait(false);
                     }
 
                     return Observable.Return(repo.Head.TrackingDetails);
@@ -616,7 +620,7 @@ namespace GitHub.Services
                     pullRequest.BaseRefSha,
                     pullRequest.HeadRefSha,
                     pullRequest.BaseRefName,
-                    pullRequest.Number);
+                    pullRequest.Number).ConfigureAwait(false);
             }
         }
 
@@ -627,9 +631,10 @@ namespace GitHub.Services
                 // TreeChanges doesn't keep a reference to Repository
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await gitClient.Fetch(repo, remote.Name);
-                    var changes = await gitClient.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
+                    var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                    await gitClient.Fetch(repo, remote.Name).ConfigureAwait(false);
+                    var changes = await gitClient.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true)
+                        .ConfigureAwait(false);
                     return Observable.Return(changes);
                 }
             });
@@ -659,9 +664,10 @@ namespace GitHub.Services
 
                     foreach (var branch in branches)
                     {
-                        if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest))
+                        if (!await IsBranchMarkedAsPullRequest(repo, branch.Name, pullRequest).ConfigureAwait(false))
                         {
-                            await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.BaseRepositoryOwner, pullRequest.Number);
+                            await MarkBranchAsPullRequest(repo, branch.Name, pullRequest.BaseRepositoryOwner, pullRequest.Number)
+                                .ConfigureAwait(false);
                             result = true;
                         }
                     }
@@ -688,8 +694,8 @@ namespace GitHub.Services
 
                     if (branchName != null)
                     {
-                        var remote = await gitClient.GetHttpRemote(repo, "origin");
-                        await gitClient.Fetch(repo, remote.Name);
+                        var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                        await gitClient.Fetch(repo, remote.Name).ConfigureAwait(false);
 
                         var branch = repo.Branches[branchName];
 
@@ -701,7 +707,7 @@ namespace GitHub.Services
                             if (trackedBranch != null)
                             {
                                 branch = repo.CreateBranch(branchName, trackedBranch.Tip);
-                                await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName);
+                                await gitClient.SetTrackingBranch(repo, branchName, trackedBranchName).ConfigureAwait(false);
                             }
                             else
                             {
@@ -709,8 +715,9 @@ namespace GitHub.Services
                             }
                         }
 
-                        await gitClient.Checkout(repo, branchName);
-                        await MarkBranchAsPullRequest(repo, branchName, pullRequest.BaseRepositoryOwner, pullRequest.Number);
+                        await gitClient.Checkout(repo, branchName).ConfigureAwait(false);
+                        await MarkBranchAsPullRequest(repo, branchName, pullRequest.BaseRepositoryOwner, pullRequest.Number)
+                            .ConfigureAwait(false);
                     }
                 }
 
@@ -729,7 +736,7 @@ namespace GitHub.Services
                         "branch.{0}.{1}",
                         repo.Head.FriendlyName,
                         SettingGHfVSPullRequest);
-                    var value = await gitClient.GetConfig<string>(repo, configKey);
+                    var value = await gitClient.GetConfig<string>(repo, configKey).ConfigureAwait(false);
                     return Observable.Return(ParseGHfVSConfigKeyValue(value));
                 }
             });
@@ -748,8 +755,9 @@ namespace GitHub.Services
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
-                    var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath);
+                    var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath)
+                        .ConfigureAwait(false);
                 }
             }
 
@@ -802,7 +810,7 @@ namespace GitHub.Services
                     foreach (var remote in repo.Network.Remotes)
                     {
                         var key = $"remote.{remote.Name}.{SettingCreatedByGHfVS}";
-                        var createdByUs = await gitClient.GetConfig<bool>(repo, key);
+                        var createdByUs = await gitClient.GetConfig<bool>(repo, key).ConfigureAwait(false);
 
                         if (createdByUs && !usedRemotes.Contains(remote.Name))
                         {
@@ -836,8 +844,8 @@ namespace GitHub.Services
             }
 
             var remoteName = CreateUniqueRemoteName(repo, cloneUri.Owner);
-            await gitClient.SetRemote(repo, remoteName, new Uri(cloneUri));
-            await gitClient.SetConfig(repo, $"remote.{remoteName}.{SettingCreatedByGHfVS}", "true");
+            await gitClient.SetRemote(repo, remoteName, new Uri(cloneUri)).ConfigureAwait(false);
+            await gitClient.SetConfig(repo, $"remote.{remoteName}.{SettingCreatedByGHfVS}", "true").ConfigureAwait(false);
             return remoteName;
         }
 
@@ -866,14 +874,14 @@ namespace GitHub.Services
 
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath).ConfigureAwait(false) ?? string.Empty;
             }
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef).ConfigureAwait(false);
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath).ConfigureAwait(false) ?? string.Empty;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));
@@ -911,7 +919,7 @@ namespace GitHub.Services
         async Task<bool> IsBranchMarkedAsPullRequest(IRepository repo, string branchName, PullRequestDetailModel pullRequest)
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
+            var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey).ConfigureAwait(false));
             return value != default &&
                 value.Item1 == pullRequest.BaseRepositoryOwner &&
                 value.Item2 == pullRequest.Number;
@@ -921,7 +929,7 @@ namespace GitHub.Services
         {
             // Store the PR number in the branch config with the key "ghfvs-pr".
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
-            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(owner, number));
+            await gitClient.SetConfig(repo, prConfigKey, BuildGHfVSConfigKeyValue(owner, number)).ConfigureAwait(false);
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
@@ -930,22 +938,22 @@ namespace GitHub.Services
             string title, string body)
         {
             // PullRequestModel doesn't keep a reference to repo
-            using (var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath)))
+            using (var repo = await Task.Run(() => gitService.GetRepository(sourceRepository.LocalPath)).ConfigureAwait(false))
             {
-                var remote = await gitClient.GetHttpRemote(repo, "origin");
-                await gitClient.Push(repo, sourceBranch.Name, remote.Name);
+                var remote = await gitClient.GetHttpRemote(repo, "origin").ConfigureAwait(false);
+                await gitClient.Push(repo, sourceBranch.Name, remote.Name).ConfigureAwait(false);
 
                 if (!repo.Branches[sourceBranch.Name].IsTracking)
-                    await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name);
+                    await gitClient.SetTrackingBranch(repo, sourceBranch.Name, remote.Name).ConfigureAwait(false);
 
                 // delay things a bit to avoid a race between pushing a new branch and creating a PR on it
                 if (!Splat.ModeDetector.InUnitTestRunner())
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
-                await MarkBranchAsPullRequest(repo, sourceBranch.Name, targetRepository.CloneUrl.Owner, ret.Number);
+                await MarkBranchAsPullRequest(repo, sourceBranch.Name, targetRepository.CloneUrl.Owner, ret.Number).ConfigureAwait(false);
                 gitExt.RefreshActiveRepositories();
-                await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
+                await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests).ConfigureAwait(false);
                 return ret;
             }
         }

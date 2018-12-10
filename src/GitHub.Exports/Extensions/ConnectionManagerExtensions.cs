@@ -13,7 +13,7 @@ namespace GitHub.Extensions
         {
             Guard.ArgumentNotNull(cm, nameof(cm));
 
-            var connections = await cm.GetLoadedConnections();
+            var connections = await cm.GetLoadedConnections().ConfigureAwait(false);
             return connections.Any(x => x.ConnectionError == null);
         }
 
@@ -22,7 +22,7 @@ namespace GitHub.Extensions
             Guard.ArgumentNotNull(cm, nameof(cm));
             Guard.ArgumentNotNull(address, nameof(address));
 
-            var connections = await cm.GetLoadedConnections();
+            var connections = await cm.GetLoadedConnections().ConfigureAwait(false);
             return connections.Any(x => x.HostAddress == address && x.ConnectionError == null);
         }
 
@@ -30,7 +30,7 @@ namespace GitHub.Extensions
         {
             Guard.ArgumentNotNull(cm, nameof(cm));
 
-            var connections = await cm.GetLoadedConnections();
+            var connections = await cm.GetLoadedConnections().ConfigureAwait(false);
             return connections.FirstOrDefault(x => x.IsLoggedIn);
         }
 

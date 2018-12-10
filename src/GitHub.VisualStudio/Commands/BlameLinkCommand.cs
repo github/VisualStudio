@@ -35,17 +35,17 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public async override Task Execute()
         {
-            var isgithub = await IsGitHubRepo();
+            var isgithub = await IsGitHubRepo().ConfigureAwait(false);
             if (!isgithub)
                 return;
 
-            var link = await GenerateLink(LinkType.Blame);
+            var link = await GenerateLink(LinkType.Blame).ConfigureAwait(false);
             if (link == null)
                 return;
             var browser = ServiceProvider.TryGetService<IVisualStudioBrowser>();
             browser?.OpenUrl(link.ToUri());
 
-            await UsageTracker.IncrementCounter(x => x.NumberOfOpenInGitHub);
+            await UsageTracker.IncrementCounter(x => x.NumberOfOpenInGitHub).ConfigureAwait(false);
         }
     }
 }

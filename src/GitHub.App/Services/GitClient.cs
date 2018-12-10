@@ -454,7 +454,7 @@ namespace GitHub.Services
                 // The PR base branch might no longer exist, so we fetch using `refs/pull/<PR>/head` first.
                 // This will often fetch the base commits, even when the base branch no longer exists.
                 var headRef = $"refs/pull/{pullNumber}/head";
-                await Fetch(repo, targetCloneUrl, headRef);
+                await Fetch(repo, targetCloneUrl, headRef).ConfigureAwait(false);
                 headCommit = repo.Lookup<Commit>(headSha);
                 if (headCommit == null)
                 {
@@ -465,7 +465,7 @@ namespace GitHub.Services
             var baseCommit = repo.Lookup<Commit>(baseSha);
             if (baseCommit == null)
             {
-                await Fetch(repo, targetCloneUrl, baseRef);
+                await Fetch(repo, targetCloneUrl, baseRef).ConfigureAwait(false);
                 baseCommit = repo.Lookup<Commit>(baseSha);
                 if (baseCommit == null)
                 {

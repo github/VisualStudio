@@ -144,7 +144,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         async Task DoClone()
         {
             var dialogService = ServiceProvider.GetService<IDialogService>();
-            var result = await dialogService.ShowCloneDialog(SectionConnection);
+            var result = await dialogService.ShowCloneDialog(SectionConnection).ConfigureAwait(true);
 
             if (result != null)
             {
@@ -152,7 +152,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
-                    await cloneService.CloneOrOpenRepository(result);
+                    await cloneService.CloneOrOpenRepository(result).ConfigureAwait(true);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
@@ -327,8 +327,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var api = await apiFactory.Create(newrepo.CloneUrl);
-                        var repo = await api.GetRepository();
+                        var api = await apiFactory.Create(newrepo.CloneUrl).ConfigureAwait(true);
+                        var repo = await api.GetRepository().ConfigureAwait(true);
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
                     catch (Exception ex)
@@ -352,8 +352,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                         try
                         {
                             // TODO: Cache the icon state.
-                            var api = await apiFactory.Create(r.CloneUrl);
-                            var repo = await api.GetRepository();
+                            var api = await apiFactory.Create(r.CloneUrl).ConfigureAwait(true);
+                            var repo = await api.GetRepository().ConfigureAwait(true);
                             r.SetIcon(repo.Private, repo.Fork);
                         }
                         catch (Exception ex)
@@ -430,7 +430,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         {
             // TODO: This is wasteful as we can be calling it multiple times for a single changed
             // signal, once from each section. Needs refactoring.
-            await localRepositories.Refresh();
+            await localRepositories.Refresh().ConfigureAwait(true);
             RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
         }
 

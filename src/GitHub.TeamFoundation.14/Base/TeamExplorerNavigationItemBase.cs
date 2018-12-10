@@ -49,7 +49,7 @@ namespace GitHub.VisualStudio.Base
         async Task InvalidateAsync()
         {
             var uri = ActiveRepoUri;
-            var isVisible = await IsAGitHubRepo(uri);
+            var isVisible = await IsAGitHubRepo(uri).ConfigureAwait(true);
             if (ActiveRepoUri != uri)
             {
                 log.Information("Not setting button visibility because repository changed from {BeforeUrl} to {AfterUrl}", uri, ActiveRepoUri);

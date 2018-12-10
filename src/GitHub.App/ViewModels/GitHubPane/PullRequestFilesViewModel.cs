@@ -58,35 +58,36 @@ namespace GitHub.ViewModels.GitHubPane
 
             OpenFirstComment = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(async file =>
             {
-                var thread = await GetFirstCommentThread(file);
+                var thread = await GetFirstCommentThread(file).ConfigureAwait(true);
 
                 if (thread != null)
                 {
-                    await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
+                    await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread).ConfigureAwait(true);
                 }
             });
 
             OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
-                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice));
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice).ConfigureAwait(true));
 
             OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
-                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning).ConfigureAwait(true));
 
             OpenFirstAnnotationFailure = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
-                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure).ConfigureAwait(true));
         }
 
         private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
             CheckAnnotationLevel checkAnnotationLevel)
         {
-            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel);
+            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel).ConfigureAwait(true);
 
             if (annotationModel != null)
             {
                 //AnnotationModel.EndLine is a 1-based number
                 //EditorService.OpenDiff takes a 0-based line number to start searching AFTER and will open the next tag
                 var nextInlineCommentFromLine = annotationModel.EndLine - 2;
-                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine)
+                    .ConfigureAwait(true);
             }
         }
 
@@ -139,7 +140,7 @@ namespace GitHub.ViewModels.GitHubPane
                         changedFile.Sha,
                         changedFile.Status,
                         GetOldFileName(changedFile, changes));
-                    var file = await session.GetFile(changedFile.FileName);
+                    var file = await session.GetFile(changedFile.FileName).ConfigureAwait(true);
 
                     if (file != null)
                     {
@@ -233,7 +234,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task<IInlineCommentThreadModel> GetFirstCommentThread(IPullRequestFileNode file)
         {
-            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath).ConfigureAwait(false);
             var threads = sessionFile.InlineCommentThreads.AsEnumerable();
 
             if (commentFilter != null)
@@ -247,7 +248,7 @@ namespace GitHub.ViewModels.GitHubPane
         async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
             CheckAnnotationLevel annotationLevel)
         {
-            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath).ConfigureAwait(false);
             var annotations = sessionFile.InlineAnnotations;
 
             return annotations.OrderBy(model => model.EndLine).FirstOrDefault(model => model.AnnotationLevel == annotationLevel);

@@ -67,7 +67,7 @@ namespace GitHub.InlineReviews.Margins
 
         async Task RefreshCurrentSession()
         {
-            var sessionFile = await FindSessionFile();
+            var sessionFile = await FindSessionFile().ConfigureAwait(true);
             hasChanges = sessionFile?.Diff != null && sessionFile.Diff.Count > 0;
 
             await Task.Yield(); // HACK: Give diff view a chance to initialize.
@@ -102,7 +102,7 @@ namespace GitHub.InlineReviews.Margins
 
         async Task<IPullRequestSessionFile> FindSessionFile()
         {
-            await sessionManager.EnsureInitialized();
+            await sessionManager.EnsureInitialized().ConfigureAwait(false);
 
             var session = sessionManager.CurrentSession;
             if (session == null)
@@ -116,7 +116,7 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            return await session.GetFile(relativePath);
+            return await session.GetFile(relativePath).ConfigureAwait(false);
         }
 
         bool IsDiffView() => textView.Roles.Contains("DIFF");

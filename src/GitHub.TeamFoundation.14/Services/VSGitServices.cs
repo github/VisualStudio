@@ -80,9 +80,9 @@ namespace GitHub.Services
             Assumes.Present(teamExplorer);
 
 #if TEAMEXPLORER14
-            await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
+            await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules).ConfigureAwait(true);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
-            await WaitForCloneOnHomePageAsync(teamExplorer);
+            await WaitForCloneOnHomePageAsync(teamExplorer).ConfigureAwait(true);
 #elif TEAMEXPLORER15 || TEAMEXPLORER16
             // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
             // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
@@ -94,7 +94,7 @@ namespace GitHub.Services
             var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
-            await cloneTask;
+            await cloneTask.ConfigureAwait(true);
 #endif
             // Change Team Explorer context to the newly cloned repository
             teamExplorerServices.Value.OpenRepository(clonePath);
@@ -103,7 +103,7 @@ namespace GitHub.Services
         static async Task StartClonenOnConnectPageAsync(
             ITeamExplorer teamExplorer, string cloneUrl, string clonePath, bool recurseSubmodules)
         {
-            var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect));
+            var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect)).ConfigureAwait(true);
             Assumes.Present(connectPage);
             var gitExt = connectPage.GetService<IGitRepositoriesExt>();
             Assumes.Present(gitExt);

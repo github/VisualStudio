@@ -65,7 +65,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (files == null)
             {
-                files = await CreateAllFiles();
+                files = await CreateAllFiles().ConfigureAwait(false);
             }
 
             return files;
@@ -76,7 +76,7 @@ namespace GitHub.InlineReviews.Services
             string relativePath,
             string commitSha = "HEAD")
         {
-            await getFilesLock.WaitAsync();
+            await getFilesLock.WaitAsync().ConfigureAwait(false);
 
             try
             {
@@ -87,7 +87,7 @@ namespace GitHub.InlineReviews.Services
                 if (!fileIndex.TryGetValue(key, out file))
                 {
                     file = new PullRequestSessionFile(normalizedPath, commitSha);
-                    await UpdateFile(file);
+                    await UpdateFile(file).ConfigureAwait(false);
                     fileIndex.Add(key, file);
                 }
 
@@ -104,7 +104,7 @@ namespace GitHub.InlineReviews.Services
         {
             if (mergeBase == null)
             {
-                mergeBase = await service.GetPullRequestMergeBase(LocalRepository, PullRequest);
+                mergeBase = await service.GetPullRequestMergeBase(LocalRepository, PullRequest).ConfigureAwait(false);
             }
 
             return mergeBase;
@@ -142,8 +142,8 @@ namespace GitHub.InlineReviews.Services
                     body,
                     commitId,
                     path,
-                    position);
-                await Update(model);
+                    position).ConfigureAwait(false);
+                await Update(model).ConfigureAwait(false);
             }
             else
             {
@@ -153,8 +153,8 @@ namespace GitHub.InlineReviews.Services
                     body,
                     commitId,
                     path,
-                    position);
-                await Update(model);
+                    position).ConfigureAwait(false);
+                await Update(model).ConfigureAwait(false);
             }
         }
 
@@ -165,9 +165,9 @@ namespace GitHub.InlineReviews.Services
                 LocalRepository,
                 RepositoryOwner,
                 pullRequestId,
-                commentDatabaseId);
+                commentDatabaseId).ConfigureAwait(false);
 
-            await Update(model);
+            await Update(model).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -177,9 +177,9 @@ namespace GitHub.InlineReviews.Services
                 LocalRepository,
                 RepositoryOwner,
                 commentNodeId,
-                body);
+                body).ConfigureAwait(false);
 
-            await Update(model);
+            await Update(model).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -193,8 +193,8 @@ namespace GitHub.InlineReviews.Services
                     LocalRepository,
                     PullRequest.Id,
                     body,
-                    inReplyTo);
-                await Update(model);
+                    inReplyTo).ConfigureAwait(false);
+                await Update(model).ConfigureAwait(false);
             }
             else
             {
@@ -202,8 +202,8 @@ namespace GitHub.InlineReviews.Services
                     LocalRepository,
                     PendingReviewId,
                     body,
-                    inReplyTo);
-                await Update(model);
+                    inReplyTo).ConfigureAwait(false);
+                await Update(model).ConfigureAwait(false);
             }
         }
 
@@ -217,9 +217,9 @@ namespace GitHub.InlineReviews.Services
 
             var model = await service.CreatePendingReview(
                 LocalRepository,
-                await GetPullRequestNodeId());
+                await GetPullRequestNodeId().ConfigureAwait(false)).ConfigureAwait(false);
 
-            await Update(model);
+            await Update(model).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -230,8 +230,9 @@ namespace GitHub.InlineReviews.Services
                 throw new InvalidOperationException("There is no pending review to cancel.");
             }
 
-            var pullRequest = await service.CancelPendingReview(LocalRepository, PendingReviewId);
-            await Update(pullRequest);
+            var pullRequest = await service.CancelPendingReview(LocalRepository, PendingReviewId)
+                .ConfigureAwait(false);
+            await Update(pullRequest).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -246,7 +247,7 @@ namespace GitHub.InlineReviews.Services
                     PullRequest.Id,
                     PullRequest.HeadRefSha,
                     body,
-                    e);
+                    e).ConfigureAwait(false);
             }
             else
             {
@@ -254,10 +255,10 @@ namespace GitHub.InlineReviews.Services
                     LocalRepository,
                     PendingReviewId,
                     body,
-                    e);
+                    e).ConfigureAwait(false);
             }
 
-            await Update(model);
+            await Update(model).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -268,8 +269,8 @@ namespace GitHub.InlineReviews.Services
                 address,
                 RepositoryOwner,
                 LocalRepository.Name,
-                PullRequest.Number);
-            await Update(model);
+                PullRequest.Number).ConfigureAwait(false);
+            await Update(model).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -280,7 +281,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var file in this.fileIndex.Values.ToList())
             {
-                await UpdateFile(file);
+                await UpdateFile(file).ConfigureAwait(false);
             }
 
             UpdatePendingReview();
@@ -299,16 +300,15 @@ namespace GitHub.InlineReviews.Services
             review.Comments = review.Comments
                 .Concat(new[] { comment })
                 .ToList();
-            await Update(PullRequest);
+            await Update(PullRequest).ConfigureAwait(false);
         }
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
-            await Task.Delay(0);
-            var mergeBaseSha = await GetMergeBase();
+            var mergeBaseSha = await GetMergeBase().ConfigureAwait(false);
             file.BaseSha = PullRequest.BaseRefSha;
             file.CommitSha = file.IsTrackingHead ? PullRequest.HeadRefSha : file.CommitSha;
-            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath).ConfigureAwait(false);
             file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff, file.CommitSha);
             file.InlineAnnotations = service.BuildAnnotations(PullRequest, file.RelativePath);
         }
@@ -336,7 +336,7 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var path in FilePaths)
             {
-                var file = await GetFile(path);
+                var file = await GetFile(path).ConfigureAwait(false);
                 result.Add(file);
             }
 
@@ -355,7 +355,7 @@ namespace GitHub.InlineReviews.Services
                 pullRequestNodeId = await service.GetGraphQLPullRequestId(
                     LocalRepository,
                     RepositoryOwner,
-                    PullRequest.Number);
+                    PullRequest.Number).ConfigureAwait(false);
             }
 
             return pullRequestNodeId;

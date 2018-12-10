@@ -52,13 +52,13 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (thread == null)
                 {
-                    var file = await session.GetFile(RelativePath, model.Thread.CommitSha);
+                    var file = await session.GetFile(RelativePath, model.Thread.CommitSha).ConfigureAwait(true);
                     thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
                 }
 
                 if (thread != null && thread.LineNumber != -1)
                 {
-                    await editorService.OpenDiff(session, RelativePath, thread);
+                    await editorService.OpenDiff(session, RelativePath, thread).ConfigureAwait(true);
                 }
             }
             catch (Exception)

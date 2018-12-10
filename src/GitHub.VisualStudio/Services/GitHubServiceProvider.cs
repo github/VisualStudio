@@ -77,7 +77,8 @@ namespace GitHub.VisualStudio
 
         public async Task Initialize()
         {
-            IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
+            IComponentModel componentModel = await asyncServiceProvider.GetServiceAsync(typeof(SComponentModel))
+                .ConfigureAwait(false) as IComponentModel;
 
             Log.Assert(componentModel != null, "Service of type SComponentModel not found");
             if (componentModel == null)

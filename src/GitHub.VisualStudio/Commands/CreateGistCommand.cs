@@ -98,8 +98,8 @@ namespace GitHub.VisualStudio.Commands
         /// </summary>
         public override async Task Execute()
         {
-            var connection = await FindConnectionAsync();
-            await dialogService.Value.ShowCreateGist(connection);
+            var connection = await FindConnectionAsync().ConfigureAwait(true);
+            await dialogService.Value.ShowCreateGist(connection).ConfigureAwait(true);
         }
 
         protected override void QueryStatus()
@@ -117,7 +117,7 @@ namespace GitHub.VisualStudio.Commands
 
         async Task<IConnection> FindConnectionAsync()
         {
-            var connections = await connectionManager.Value.GetLoadedConnections();
+            var connections = await connectionManager.Value.GetLoadedConnections().ConfigureAwait(false);
             return connections.FirstOrDefault(x => x.IsLoggedIn && x.HostAddress.IsGitHubDotCom() == isGitHubDotCom);
         }
 

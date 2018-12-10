@@ -144,16 +144,16 @@ namespace GitHub.InlineReviews.ViewModels
                 var commitSha = info.Side == DiffSide.Left ? "HEAD" : info.CommitSha;
                 relativePath = info.RelativePath;
                 side = info.Side ?? DiffSide.Right;
-                file = await info.Session.GetFile(relativePath, commitSha);
+                file = await info.Session.GetFile(relativePath, commitSha).ConfigureAwait(true);
                 session = info.Session;
-                await UpdateThread();
+                await UpdateThread().ConfigureAwait(true);
             }
             else
             {
                 relativePath = sessionManager.GetRelativePath(buffer);
                 side = DiffSide.Right;
-                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer);
-                await SessionChanged(sessionManager.CurrentSession);
+                file = await sessionManager.GetLiveFile(relativePath, peekSession.TextView, buffer).ConfigureAwait(true);
+                await SessionChanged(sessionManager.CurrentSession).ConfigureAwait(true);
                 sessionSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession)
                     .Skip(1)
                     .Subscribe(x => SessionChanged(x).Forget());
@@ -171,7 +171,7 @@ namespace GitHub.InlineReviews.ViewModels
 
                 if (lines.Contains(Tuple.Create(lineNumber, side)))
                 {
-                    await UpdateThread();
+                    await UpdateThread().ConfigureAwait(false);
                 }
             }
             catch (Exception e)
@@ -210,11 +210,11 @@ namespace GitHub.InlineReviews.ViewModels
 
             if (thread?.Comments.Count > 0)
             {
-                await threadModel.InitializeAsync(session, file, thread, true);
+                await threadModel.InitializeAsync(session, file, thread, true).ConfigureAwait(true);
             }
             else
             {
-                await threadModel.InitializeNewAsync(session, file, lineNumber, side, true);
+                await threadModel.InitializeNewAsync(session, file, lineNumber, side, true).ConfigureAwait(true);
             }
 
             Thread = threadModel;
@@ -233,7 +233,7 @@ namespace GitHub.InlineReviews.ViewModels
             }
             else
             {
-                await UpdateThread();
+                await UpdateThread().ConfigureAwait(true);
             }
         }
     }

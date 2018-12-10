@@ -45,13 +45,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (ActiveRepo == null || ActiveRepoUri == null)
                 return;
 
-            var isgithub = await IsAGitHubRepo(ActiveRepoUri);
+            var isgithub = await IsAGitHubRepo(ActiveRepoUri).ConfigureAwait(true);
             if (!isgithub)
                 return;
 
             teServices.ClearNotifications();
             var add = HostAddress.Create(ActiveRepoUri);
-            bool loggedIn = await connectionManager.IsLoggedIn(add);
+            bool loggedIn = await connectionManager.IsLoggedIn(add).ConfigureAwait(true);
             if (!loggedIn)
             {
                 var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);

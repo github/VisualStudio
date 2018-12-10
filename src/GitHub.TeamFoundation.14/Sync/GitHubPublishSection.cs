@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 IsVisible = true;
                 ShowGetStarted = true;
-                loggedIn = await connectionManager.IsLoggedIn();
+                loggedIn = await connectionManager.IsLoggedIn().ConfigureAwait(true);
                 ShowLogin = !loggedIn;
                 ShowSignup = !loggedIn;
             }
@@ -92,11 +92,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         public async Task Connect()
         {
-            loggedIn = await connectionManager.IsLoggedIn();
+            loggedIn = await connectionManager.IsLoggedIn().ConfigureAwait(true);
             if (loggedIn)
                 ShowPublish();
             else
-                await Login();
+                await Login().ConfigureAwait(true);
         }
 
         public void SignUp()
@@ -175,8 +175,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
         async Task Login()
         {
-            await dialogService.ShowLoginDialog();
-            loggedIn = await connectionManager.IsLoggedIn();
+            await dialogService.ShowLoginDialog().ConfigureAwait(true);
+            loggedIn = await connectionManager.IsLoggedIn().ConfigureAwait(true);
             if (loggedIn)
                 ShowPublish();
         }

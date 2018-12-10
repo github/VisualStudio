@@ -46,15 +46,15 @@ namespace GitHub.Services
 
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
-            await Initialize();
-            var data = await service.ReadLocalData();
-            var usage = await GetCurrentReport(data);
+            await Initialize().ConfigureAwait(false);
+            var data = await service.ReadLocalData().ConfigureAwait(false);
+            var usage = await GetCurrentReport(data).ConfigureAwait(false);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
             log.Verbose("Increment counter {Name}", propertyInfo.Name);
             var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
-            await service.WriteLocalData(data);
+            await service.WriteLocalData(data).ConfigureAwait(false);
         }
 
         IDisposable StartTimer()
@@ -79,11 +79,11 @@ namespace GitHub.Services
 
         async Task TimerTick()
         {
-            await Initialize();
+            await Initialize().ConfigureAwait(false);
 
             if (firstTick)
             {
-                await IncrementCounter(x => x.NumberOfStartups);
+                await IncrementCounter(x => x.NumberOfStartups).ConfigureAwait(false);
                 firstTick = false;
             }
 
@@ -94,7 +94,7 @@ namespace GitHub.Services
                 return;
             }
 
-            var data = await service.ReadLocalData();
+            var data = await service.ReadLocalData().ConfigureAwait(false);
 
             var changed = false;
             for (var i = data.Reports.Count - 1; i >= 0; --i)
@@ -103,7 +103,7 @@ namespace GitHub.Services
                 {
                     try
                     {
-                        await client.PostUsage(data.Reports[i]);
+                        await client.PostUsage(data.Reports[i]).ConfigureAwait(false);
                         data.Reports.RemoveAt(i);
                         changed = true;
                     }
@@ -116,7 +116,7 @@ namespace GitHub.Services
 
             if (changed)
             {
-                await service.WriteLocalData(data);
+                await service.WriteLocalData(data).ConfigureAwait(false);
             }
         }
 
@@ -126,7 +126,7 @@ namespace GitHub.Services
 
             if (current == null)
             {
-                var guid = await service.GetUserGuid();
+                var guid = await service.GetUserGuid().ConfigureAwait(false);
                 current = UsageModel.Create(guid);
                 data.Reports.Add(current);
             }

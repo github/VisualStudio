@@ -89,7 +89,7 @@ namespace GitHub.Commands
                 if (isEditableDiff)
                 {
                     // Navigating from editable diff to code view
-                    await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToCodeView);
+                    await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToCodeView).ConfigureAwait(true);
 
                     // Open active document in Code View
                     pullRequestEditorService.Value.OpenActiveDocumentInCodeView(sourceView);
@@ -106,9 +106,10 @@ namespace GitHub.Commands
                     }
 
                     // Navigate from PR file to solution
-                    await usageTracker.Value.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor);
+                    await usageTracker.Value.IncrementCounter(x => x.NumberOfPRDetailsNavigateToEditor).ConfigureAwait(true);
 
-                    var fileTextView = await pullRequestEditorService.Value.OpenFile(info.Session, info.RelativePath, true);
+                    var fileTextView = await pullRequestEditorService.Value.OpenFile(info.Session, info.RelativePath, true)
+                        .ConfigureAwait(true);
                     if (fileTextView == null)
                     {
                         ShowErrorInStatusBar("Couldn't find active target view");
@@ -140,9 +141,11 @@ namespace GitHub.Commands
                 }
 
                 // Navigate from solution file to PR diff file
-                await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToPullRequestFileDiff);
+                await usageTracker.Value.IncrementCounter(x => x.NumberOfNavigateToPullRequestFileDiff)
+                    .ConfigureAwait(true);
 
-                var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD", scrollToFirstDiff: false);
+                var diffViewer = await pullRequestEditorService.Value.OpenDiff(session, relativePath, "HEAD", scrollToFirstDiff: false)
+                    .ConfigureAwait(true);
                 if (diffViewer == null)
                 {
                     ShowErrorInStatusBar("Couldn't find active diff viewer");

@@ -120,7 +120,7 @@ namespace GitHub.ViewModels
 
             while (true)
             {
-                var page = await load(after);
+                var page = await load(after).ConfigureAwait(true);
 
                 foreach (var item in page.Items)
                 {

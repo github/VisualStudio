@@ -138,7 +138,7 @@ namespace GitHub.ViewModels.GitHubPane
                 var parent = await repositoryService.FindParent(
                     HostAddress.Create(repository.CloneUrl),
                     repository.Owner,
-                    repository.Name);
+                    repository.Name).ConfigureAwait(true);
 
                 if (parent == null)
                 {
@@ -167,7 +167,7 @@ namespace GitHub.ViewModels.GitHubPane
                     AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
                     .Subscribe(_ => FilterChanged());
 
-                await Refresh();
+                await Refresh().ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task OpenItemImpl(IIssueListItemViewModelBase item)
         {
-            if (item != null) await DoOpenItem(item);
+            if (item != null) await DoOpenItem(item).ConfigureAwait(true);
         }
 
         void UpdateState(bool loading, int count)

@@ -47,10 +47,10 @@ namespace GitHub.Services
                              {
                                  using (repo.LocalRepo)
                                  {
-                                     await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl));
-                                     await gitClient.Push(repo.LocalRepo, "master", "origin");
-                                     await gitClient.Fetch(repo.LocalRepo, "origin");
-                                     await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin");
+                                     await gitClient.SetRemote(repo.LocalRepo, "origin", new Uri(repo.RemoteRepo.CloneUrl)).ConfigureAwait(false);
+                                     await gitClient.Push(repo.LocalRepo, "master", "origin").ConfigureAwait(false);
+                                     await gitClient.Fetch(repo.LocalRepo, "origin").ConfigureAwait(false);
+                                     await gitClient.SetTrackingBranch(repo.LocalRepo, "master", "origin").ConfigureAwait(false);
                                      return repo.RemoteRepo;
                                  }
                              });

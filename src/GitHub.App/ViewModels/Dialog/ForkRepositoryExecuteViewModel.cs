@@ -67,7 +67,7 @@ namespace GitHub.ViewModels.Dialog
 
         public async Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
-            var modelService = await modelServiceFactory.CreateAsync(connection);
+            var modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
             apiClient = modelService.ApiClient;
 
             DestinationAccount = destinationAccount;

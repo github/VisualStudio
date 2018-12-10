@@ -52,11 +52,11 @@ namespace GitHub.VisualStudio.UI.Services
             {
                 if (!connection.Scopes.Matches(scopes))
                 {
-                    await dialogViewModel.StartWithLogout(viewModel, connection);
+                    await dialogViewModel.StartWithLogout(viewModel, connection).ConfigureAwait(true);
                 }
                 else
                 {
-                    await viewModel.InitializeAsync(connection);
+                    await viewModel.InitializeAsync(connection).ConfigureAwait(true);
                     dialogViewModel.Start(viewModel);
                 }
 
@@ -78,7 +78,7 @@ namespace GitHub.VisualStudio.UI.Services
                 var task = dialogViewModel.StartWithConnection(viewModel);
                 var window = new GitHubDialogWindow(dialogViewModel);
                 window.ShowModal();
-                await task;
+                await task.ConfigureAwait(true);
             }
 
             return result;

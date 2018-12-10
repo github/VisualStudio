@@ -303,9 +303,9 @@ namespace GitHub.ViewModels.GitHubPane
                 RemoteRepositoryOwner = owner;
                 Number = number;
                 WebUrl = localRepository.CloneUrl.ToRepositoryUrl(owner).Append("pull/" + number);
-                modelService = await modelServiceFactory.CreateAsync(connection);
-                Session = await sessionManager.GetSession(owner, repo, number);
-                await Load(Session.PullRequest);
+                modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
+                Session = await sessionManager.GetSession(owner, repo, number).ConfigureAwait(true);
+                await Load(Session.PullRequest).ConfigureAwait(true);
                 teamExplorerContext.StatusChanged += RefreshIfActive;
             }
             catch (Exception ex)
@@ -352,7 +352,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
 
-                await Files.InitializeAsync(Session);
+                await Files.InitializeAsync(Session).ConfigureAwait(true);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
@@ -455,8 +455,8 @@ namespace GitHub.ViewModels.GitHubPane
                 Error = null;
                 OperationError = null;
                 IsBusy = true;
-                await Session.Refresh();
-                await Load(Session.PullRequest);
+                await Session.Refresh().ConfigureAwait(true);
+                await Load(Session.PullRequest).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -584,7 +584,7 @@ namespace GitHub.ViewModels.GitHubPane
                 OperationError = null;
                 usageTracker.IncrementCounter(x => x.NumberOfSyncSubmodules).Forget();
 
-                var result = await syncSubmodulesCommand.SyncSubmodules();
+                var result = await syncSubmodulesCommand.SyncSubmodules().ConfigureAwait(true);
                 var complete = result.Item1;
                 var summary = result.Item2;
                 if (!complete)

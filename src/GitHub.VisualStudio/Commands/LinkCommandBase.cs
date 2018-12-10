@@ -107,21 +107,21 @@ namespace GitHub.VisualStudio.Commands
             if (uri == null)
                 return false;
 
-            var simpleApiClient = await ApiFactory.Create(uri);
+            var simpleApiClient = await ApiFactory.Create(uri).ConfigureAwait(false);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
             if (!isdotcom)
             {
-                var repo = await simpleApiClient.GetRepository();
+                var repo = await simpleApiClient.GetRepository().ConfigureAwait(false);
                 var activeRepoFullName = ActiveRepo.Owner + '/' + ActiveRepo.Name;
-                return (repo.FullName == activeRepoFullName || repo.Id == 0) && await simpleApiClient.IsEnterprise();
+                return (repo.FullName == activeRepoFullName || repo.Id == 0) && await simpleApiClient.IsEnterprise().ConfigureAwait(false);
             }
             return isdotcom;
         }
 
         protected async Task<bool> IsCurrentFileInGitHubRepository()
         {
-            if (!await IsGitHubRepo())
+            if (!await IsGitHubRepo().ConfigureAwait(false))
                 return false;
 
             var activeDocument = ServiceProvider.TryGetService<IActiveDocumentSnapshot>();
@@ -180,7 +180,7 @@ namespace GitHub.VisualStudio.Commands
             if (repo.CloneUrl == null)
                 return null;
 
-            var sha = await gitService.GetLatestPushedSha(path ?? repo.LocalPath);
+            var sha = await gitService.GetLatestPushedSha(path ?? repo.LocalPath).ConfigureAwait(false);
             // this also incidentally checks whether the repo has a valid LocalPath
             if (String.IsNullOrEmpty(sha))
                 return repo.CloneUrl.ToRepositoryUrl().AbsoluteUri;

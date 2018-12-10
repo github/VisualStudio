@@ -40,10 +40,10 @@ namespace GitHub.VisualStudio
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             LogVersionInformation();
-            await base.InitializeAsync(cancellationToken, progress);
+            await base.InitializeAsync(cancellationToken, progress).ConfigureAwait(false);
 
-            await InitializeLoggingAsync();
-            await GetServiceAsync(typeof(IUsageTracker));
+            await InitializeLoggingAsync().ConfigureAwait(false);
+            await GetServiceAsync(typeof(IUsageTracker)).ConfigureAwait(false);
 
             // Avoid delays when there is ongoing UI activity.
             // See: https://github.com/github/VisualStudio/issues/1537
@@ -52,7 +52,7 @@ namespace GitHub.VisualStudio
 
         async Task InitializeLoggingAsync()
         {
-            var packageSettings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+            var packageSettings = await GetServiceAsync(typeof(IPackageSettings)).ConfigureAwait(false) as IPackageSettings;
             LogManager.EnableTraceLogging(packageSettings?.EnableTraceLogging ?? false);
             if (packageSettings != null)
             {
@@ -79,7 +79,7 @@ namespace GitHub.VisualStudio
             IVsCommandBase[] commands;
             if (ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+                var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(true));
                 var exports = componentModel.DefaultExportProvider;
                 commands = new IVsCommandBase[]
                 {
@@ -110,13 +110,13 @@ namespace GitHub.VisualStudio
             }
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(true));
             menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
         {
-            var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
+            var shell = await GetServiceAsync(typeof(SVsShell)).ConfigureAwait(false) as IVsShell;
             if (shell != null)
             {
                 IVsPackage vsPackage;
@@ -199,7 +199,7 @@ namespace GitHub.VisualStudio
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await CheckBindingPathsAsync();
+            await CheckBindingPathsAsync().ConfigureAwait(false);
 
             AddService(typeof(IGitHubServiceProvider), CreateService, true);
             AddService(typeof(IVSGitExt), CreateService, true);
@@ -243,7 +243,7 @@ namespace GitHub.VisualStudio
             }
 
             var gitHubPane = (GitHubPane)pane;
-            return await gitHubPane.GetViewModelAsync();
+            return await gitHubPane.GetViewModelAsync().ConfigureAwait(false);
         }
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
@@ -282,14 +282,15 @@ namespace GitHub.VisualStudio
             {
                 //var sp = await GetServiceAsync(typeof(SVsServiceProvider)) as IServiceProvider;
                 var result = new GitHubServiceProvider(this, this);
-                await result.Initialize();
+                await result.Initialize().ConfigureAwait(false);
                 return result;
             }
             else if (serviceType == typeof(ILoginManager))
             {
                 // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
                 // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
-                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)).ConfigureAwait(false)
+                    as IGitHubServiceProvider;
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
 
@@ -318,15 +319,15 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IUsageService))
             {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)).ConfigureAwait(false) as IGitHubServiceProvider;
                 var environment = new Rothko.Environment();
                 return new UsageService(sp, environment);
             }
             else if (serviceType == typeof(IUsageTracker))
             {
-                var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
-                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-                var settings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+                var usageService = await GetServiceAsync(typeof(IUsageService)).ConfigureAwait(false) as IUsageService;
+                var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)).ConfigureAwait(false) as IGitHubServiceProvider;
+                var settings = await GetServiceAsync(typeof(IPackageSettings)).ConfigureAwait(false) as IPackageSettings;
                 return new UsageTracker(serviceProvider, usageService, settings);
             }
             else if (serviceType == typeof(IVSGitExt))
@@ -351,7 +352,7 @@ namespace GitHub.VisualStudio
             // go the mef route
             else
             {
-                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)).ConfigureAwait(false) as IGitHubServiceProvider;
                 return sp.TryGetService(serviceType);
             }
         }

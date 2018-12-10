@@ -138,11 +138,11 @@ namespace GitHub.Services
 
                 if (isDotCom)
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens);
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens).ConfigureAwait(true);
                 }
                 else
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens);
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens).ConfigureAwait(true);
                 }
             }
             else
@@ -152,11 +152,11 @@ namespace GitHub.Services
 
                 if (isDotCom)
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones).ConfigureAwait(true);
                 }
                 else
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones).ConfigureAwait(true);
                 }
             }
 
@@ -211,13 +211,13 @@ namespace GitHub.Services
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
-                await usageTracker.IncrementCounter(x => x.NumberOfClones);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress).ConfigureAwait(false);
+                await usageTracker.IncrementCounter(x => x.NumberOfClones).ConfigureAwait(false);
 
                 if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
                 {
                     // Count the number of times users clone into the Default Repository Location
-                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)

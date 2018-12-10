@@ -13,8 +13,10 @@ namespace GitHub.Extensions
             LocalRepositoryModel repository,
             IModelServiceFactory factory)
         {
-            var connection = await cm.GetConnection(repository);
-            return connection?.IsLoggedIn == true ? await factory.CreateAsync(connection) : null;
+            var connection = await cm.GetConnection(repository).ConfigureAwait(false);
+            return connection?.IsLoggedIn == true ?
+                await factory.CreateAsync(connection).ConfigureAwait(false) :
+                null;
         }
     }
 }

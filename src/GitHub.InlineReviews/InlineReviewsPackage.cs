@@ -27,8 +27,7 @@ namespace GitHub.InlineReviews
             CancellationToken cancellationToken,
             IProgress<ServiceProgressData> progress)
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var componentModel = (IComponentModel)await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(false);
             var exports = componentModel.DefaultExportProvider;
 
             // Avoid delays when there is ongoing UI activity.
@@ -44,7 +43,7 @@ namespace GitHub.InlineReviews
                 return;
             }
 
-            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)).ConfigureAwait(true));
             var exports = componentModel.DefaultExportProvider;
             var commands = new IVsCommandBase[]
             {
@@ -54,7 +53,7 @@ namespace GitHub.InlineReviews
             };
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)).ConfigureAwait(true));
             menuService.AddCommands(commands);
         }
     }

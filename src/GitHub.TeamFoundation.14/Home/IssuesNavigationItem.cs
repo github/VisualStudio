@@ -40,10 +40,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
         {
             IsVisible = false;
 
-            var visible = await IsAGitHubRepo(ActiveRepoUri);
+            var visible = await IsAGitHubRepo(ActiveRepoUri).ConfigureAwait(true);
             if (visible)
             {
-                var repo = await SimpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(true);
                 visible = repo.HasIssues;
             }
             IsVisible = visible;

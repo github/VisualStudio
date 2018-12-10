@@ -56,7 +56,7 @@ namespace GitHub.Services
                             var originUri = repo.RemoteRepo != null ? new Uri(repo.RemoteRepo.CloneUrl) : null;
                             var upstreamUri = addUpstream ? sourceRepository.CloneUrl.ToUri() : null;
 
-                            await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream);
+                            await SwitchRemotes(repo.ActiveRepo, originUri, upstreamUri, trackMasterUpstream).ConfigureAwait(false);
                         }
                     }
 
@@ -77,12 +77,12 @@ namespace GitHub.Services
 
                         if (addUpstream)
                         {
-                            var remote = await gitClient.GetHttpRemote(activeRepo, "origin");
+                            var remote = await gitClient.GetHttpRemote(activeRepo, "origin").ConfigureAwait(false);
                             currentOrigin = new Uri(remote.Url);
                         }
 
                         await SwitchRemotes(activeRepo, updateOrigin ? destinationRepository.CloneUrl.ToUri() : null,
-                            currentOrigin, trackMasterUpstream);
+                            currentOrigin, trackMasterUpstream).ConfigureAwait(false);
                     }
 
                     if (updateOrigin)
@@ -104,21 +104,21 @@ namespace GitHub.Services
 
             log.Verbose("Set remote origin to {OriginUri}", originUri);
 
-            await gitClient.SetRemote(repository, "origin", originUri);
+            await gitClient.SetRemote(repository, "origin", originUri).ConfigureAwait(false);
 
             if (upstreamUri != null)
             {
                 log.Verbose("Set remote upstream to {UpstreamUri}", upstreamUri);
 
-                await gitClient.SetRemote(repository, "upstream", upstreamUri);
+                await gitClient.SetRemote(repository, "upstream", upstreamUri).ConfigureAwait(false);
 
-                await gitClient.Fetch(repository, "upstream");
+                await gitClient.Fetch(repository, "upstream").ConfigureAwait(false);
 
                 if (trackMasterUpstream)
                 {
                     log.Verbose("set master tracking to upstream");
 
-                    await gitClient.SetTrackingBranch(repository, "master", "upstream");
+                    await gitClient.SetTrackingBranch(repository, "master", "upstream").ConfigureAwait(false);
                 }
             }
         }

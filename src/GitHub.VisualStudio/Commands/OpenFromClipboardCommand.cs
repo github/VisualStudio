@@ -101,7 +101,7 @@ namespace GitHub.VisualStudio.Commands
                 var branchName = currentBranch.Name;
 
                 // AnnotateFile expects a branch name so we use the current branch
-                if (await gitHubContextService.Value.TryAnnotateFile(repositoryDir, branchName, context))
+                if (await gitHubContextService.Value.TryAnnotateFile(repositoryDir, branchName, context).ConfigureAwait(true))
                 {
                     return;
                 }

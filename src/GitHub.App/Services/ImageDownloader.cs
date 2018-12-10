@@ -65,7 +65,7 @@ namespace GitHub.Services
 
             try
             {
-                return await DownloadImageBytesAsync(imageUri);
+                return await DownloadImageBytesAsync(imageUri).ConfigureAwait(false);
             }
             catch (NonImageContentException e)
             {
@@ -83,7 +83,7 @@ namespace GitHub.Services
                 Method = HttpMethod.Get,
             };
 
-            var response = await HttpClient.Send(request);
+            var response = await HttpClient.Send(request).ConfigureAwait(false);
             return GetSuccessfulBytes(imageUri, response);
         }
 

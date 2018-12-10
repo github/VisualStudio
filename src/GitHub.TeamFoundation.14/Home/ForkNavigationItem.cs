@@ -71,12 +71,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public override async void Execute()
         {
-            var connection = await connectionManager.GetConnection(ActiveRepo);
+            var connection = await connectionManager.GetConnection(ActiveRepo).ConfigureAwait(true);
 
             if (connection?.IsLoggedIn == true)
             {
                 usageTracker.IncrementCounter(model => model.NumberOfShowRepoForkDialogClicks).Forget();
-                await dialogService.ShowForkDialog(ActiveRepo, connection);
+                await dialogService.ShowForkDialog(ActiveRepo, connection).ConfigureAwait(true);
             }
         }
 
@@ -86,9 +86,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             {
                 IsVisible = false;
 
-                if (await IsAGitHubDotComRepo(ActiveRepoUri))
+                if (await IsAGitHubDotComRepo(ActiveRepoUri).ConfigureAwait(true))
                 {
-                    var connection = await ConnectionManager.GetConnection(ActiveRepo);
+                    var connection = await ConnectionManager.GetConnection(ActiveRepo).ConfigureAwait(true);
                     IsVisible = connection?.IsLoggedIn ?? false;
                 }
             }

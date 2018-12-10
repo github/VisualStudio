@@ -30,7 +30,8 @@ namespace GitHub.ViewModels.GitHubPane
             IsFileInPullRequest = isFileInPullRequest;
 
             OpenAnnotation = ReactiveCommand.CreateFromTask<Unit>(
-                async _ => await editorService.OpenDiff(session, annotation.Path, checkSuite.HeadSha, annotation.EndLine - 1),
+                async _ => await editorService.OpenDiff(session, annotation.Path, checkSuite.HeadSha, annotation.EndLine - 1)
+                    .ConfigureAwait(true),
                 Observable.Return(IsFileInPullRequest));
         }
 

@@ -129,7 +129,7 @@ namespace GitHub.VisualStudio.Base
                 return RepositoryOrigin.Other;
 
             Debug.Assert(apiFactory != null, "apiFactory cannot be null. Did you call the right constructor?");
-            SimpleApiClient = await apiFactory.Create(uri);
+            SimpleApiClient = await apiFactory.Create(uri).ConfigureAwait(false);
 
             var isdotcom = HostAddress.IsGitHubDotComUri(uri.ToRepositoryUrl());
 
@@ -139,9 +139,10 @@ namespace GitHub.VisualStudio.Base
             }
             else
             {
-                var repo = await SimpleApiClient.GetRepository();
+                var repo = await SimpleApiClient.GetRepository().ConfigureAwait(false);
 
-                if ((repo.FullName == ActiveRepoName || repo.Id == 0) && await SimpleApiClient.IsEnterprise())
+                if ((repo.FullName == ActiveRepoName || repo.Id == 0) &&
+                    await SimpleApiClient.IsEnterprise().ConfigureAwait(false))
                 {
                     return RepositoryOrigin.Enterprise;
                 }
@@ -152,13 +153,13 @@ namespace GitHub.VisualStudio.Base
 
         protected async Task<bool> IsAGitHubRepo(UriString uri)
         {
-            var origin = await GetRepositoryOrigin(uri);
+            var origin = await GetRepositoryOrigin(uri).ConfigureAwait(false);
             return origin == RepositoryOrigin.DotCom || origin == RepositoryOrigin.Enterprise;
         }
 
         protected async Task<bool> IsAGitHubDotComRepo(UriString uri)
         {
-            var origin = await GetRepositoryOrigin(uri);
+            var origin = await GetRepositoryOrigin(uri).ConfigureAwait(false);
             return origin == RepositoryOrigin.DotCom;
         }
 
@@ -173,7 +174,7 @@ namespace GitHub.VisualStudio.Base
                 if (uri == null)
                     return false;
 
-                SimpleApiClient = await apiFactory.Create(uri);
+                SimpleApiClient = await apiFactory.Create(uri).ConfigureAwait(false);
             }
 
             return SimpleApiClient?.IsAuthenticated() ?? false;

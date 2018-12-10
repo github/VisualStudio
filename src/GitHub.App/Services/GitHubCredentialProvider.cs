@@ -38,7 +38,7 @@ namespace GitHub.Services
 
             try
             {
-                var credentials = ThreadHelper.JoinableTaskFactory.Run(async () => await keychain.Load(host));
+                var credentials = ThreadHelper.JoinableTaskFactory.Run(async () => await keychain.Load(host).ConfigureAwait(false));
                 return new UsernamePasswordCredentials
                 {
                     Username = credentials.Item1,

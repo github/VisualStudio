@@ -44,7 +44,7 @@ namespace GitHub.Services
 
         public async Task<Guid> GetUserGuid()
         {
-            await Initialize();
+            await Initialize().ConfigureAwait(false);
 
             if (!userGuid.HasValue)
             {
@@ -52,7 +52,7 @@ namespace GitHub.Services
                 {
                     if (File.Exists(userStorePath))
                     {
-                        var json = await ReadAllTextAsync(userStorePath);
+                        var json = await ReadAllTextAsync(userStorePath).ConfigureAwait(false);
                         var data = SimpleJson.DeserializeObject<UserData>(json);
                         userGuid = data.UserGuid;
                     }
@@ -71,7 +71,7 @@ namespace GitHub.Services
                 {
                     var data = new UserData { UserGuid = userGuid.Value };
                     var json = SimpleJson.SerializeObject(data);
-                    await WriteAllTextAsync(userStorePath, json);
+                    await WriteAllTextAsync(userStorePath, json).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -87,7 +87,7 @@ namespace GitHub.Services
             return new Timer(
                 async _ =>
                 {
-                    try { await callback(); }
+                    try { await callback().ConfigureAwait(false); }
                     catch (Exception ex) { log.Warning(ex, "Failed submitting usage data"); }
                 },
                 null,
@@ -97,9 +97,11 @@ namespace GitHub.Services
 
         public async Task<UsageData> ReadLocalData()
         {
-            await Initialize();
+            await Initialize().ConfigureAwait(false);
 
-            var json = File.Exists(storePath) ? await ReadAllTextAsync(storePath) : null;
+            var json = File.Exists(storePath) ?
+                await ReadAllTextAsync(storePath).ConfigureAwait(false) :
+                null;
 
             try
             {
@@ -121,7 +123,7 @@ namespace GitHub.Services
                 Directory.CreateDirectory(Path.GetDirectoryName(storePath));
                 var json = SimpleJson.SerializeObject(data);
 
-                await WriteAllTextAsync(storePath, json);
+                await WriteAllTextAsync(storePath, json).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -147,13 +149,13 @@ namespace GitHub.Services
         async Task<string> ReadAllTextAsync(string path)
         {
             // Avoid IOException when metrics updated multiple times in quick succession
-            await semaphoreSlim.WaitAsync();
+            await semaphoreSlim.WaitAsync().ConfigureAwait(false);
             try
             {
                 using (var s = File.OpenRead(path))
                 using (var r = new StreamReader(s, Encoding.UTF8))
                 {
-                    return await r.ReadToEndAsync();
+                    return await r.ReadToEndAsync().ConfigureAwait(false);
                 }
             }
             finally
@@ -165,13 +167,13 @@ namespace GitHub.Services
         async Task WriteAllTextAsync(string path, string text)
         {
             // Avoid IOException when metrics updated multiple times in quick succession
-            await semaphoreSlim.WaitAsync();
+            await semaphoreSlim.WaitAsync().ConfigureAwait(false);
             try
             {
                 using (var s = new FileStream(path, FileMode.Create))
                 using (var w = new StreamWriter(s, Encoding.UTF8))
                 {
-                    await w.WriteAsync(text);
+                    await w.WriteAsync(text).ConfigureAwait(false);
                 }
             }
             finally

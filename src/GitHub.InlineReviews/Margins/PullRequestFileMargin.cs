@@ -75,7 +75,7 @@ namespace GitHub.InlineReviews.Margins
 
         async Task RefreshCurrentSession()
         {
-            var sessionFile = await FindSessionFile();
+            var sessionFile = await FindSessionFile().ConfigureAwait(true);
             if (sessionFile != null)
             {
                 viewModel.FileName = Path.GetFileName(sessionFile.RelativePath);
@@ -91,7 +91,7 @@ namespace GitHub.InlineReviews.Margins
 
         async Task<IPullRequestSessionFile> FindSessionFile()
         {
-            await sessionManager.EnsureInitialized();
+            await sessionManager.EnsureInitialized().ConfigureAwait(false);
 
             var session = sessionManager.CurrentSession;
             if (session == null)
@@ -105,7 +105,7 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            return await session.GetFile(relativePath);
+            return await session.GetFile(relativePath).ConfigureAwait(false);
         }
 
         public FrameworkElement VisualElement => visualElement;

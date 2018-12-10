@@ -93,14 +93,15 @@ namespace GitHub.VisualStudio.UI
                 ShowInitializing();
 
                 // Allow MEF to initialize its cache asynchronously
-                var provider = (IGitHubServiceProvider)await asyncPackage.GetServiceAsync(typeof(IGitHubServiceProvider));
+                var provider = (IGitHubServiceProvider)await asyncPackage.GetServiceAsync(typeof(IGitHubServiceProvider))
+                    .ConfigureAwait(true);
 
                 var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
                 teServiceHolder.ServiceProvider = this;
 
                 var factory = provider.GetService<IViewViewModelFactory>();
                 var viewModel = provider.ExportProvider.GetExportedValue<IGitHubPaneViewModel>();
-                await viewModel.InitializeAsync(this);
+                await viewModel.InitializeAsync(this).ConfigureAwait(true);
 
                 View = factory.CreateView<IGitHubPaneViewModel>();
                 View.DataContext = viewModel;

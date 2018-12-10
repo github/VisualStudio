@@ -39,7 +39,8 @@ namespace GitHub.Services
 
             var ret = await httpClient
                 .Send(request, CancellationToken.None)
-                .Catch();
+                .Catch()
+                .ConfigureAwait(false);
 
             if (ret == null)
                 return WikiProbeResult.Failed;

@@ -60,7 +60,7 @@ namespace GitHub.ViewModels.Dialog
 
         public async Task InitializeAsync(IConnection connection)
         {
-            var modelService = await modelServiceFactory.CreateAsync(connection);
+            var modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
             apiClient = modelService.ApiClient;
 
             // This class is only instantiated after we are logged into to a github account, so we should be safe to grab the first one here as the defaut.

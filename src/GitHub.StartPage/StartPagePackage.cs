@@ -40,13 +40,13 @@ namespace GitHub.StartPage
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
 
-            return await RunAcquisition(downloadProgress, cancellationToken, null);
+            return await RunAcquisition(downloadProgress, cancellationToken, null).ConfigureAwait(false);
         }
 
         public async Task<CodeContainer> AcquireCodeContainerAsync(RemoteCodeContainer onlineCodeContainer, IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
             var repository = new RepositoryModel(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
-            return await RunAcquisition(downloadProgress, cancellationToken, repository);
+            return await RunAcquisition(downloadProgress, cancellationToken, repository).ConfigureAwait(false);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
@@ -56,8 +56,8 @@ namespace GitHub.StartPage
 
             try
             {
-                var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
+                var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider).ConfigureAwait(true);
+                request = await ShowCloneDialog(uiProvider, downloadProgress, repository).ConfigureAwait(true);
             }
             catch (Exception e)
             {
@@ -93,11 +93,11 @@ namespace GitHub.StartPage
 
             if (repository == null)
             {
-                result = await dialogService.ShowCloneDialog(null);
+                result = await dialogService.ShowCloneDialog(null).ConfigureAwait(true);
             }
             else
             {
-                var basePath = await dialogService.ShowReCloneDialog(repository);
+                var basePath = await dialogService.ShowReCloneDialog(repository).ConfigureAwait(true);
 
                 if (basePath != null)
                 {
@@ -110,7 +110,7 @@ namespace GitHub.StartPage
             {
                 try
                 {
-                    await cloneService.CloneOrOpenRepository(result, progress);
+                    await cloneService.CloneOrOpenRepository(result, progress).ConfigureAwait(true);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
                 }
                 catch

@@ -31,7 +31,7 @@ namespace GitHub.InlineReviews.Services
             string headSha,
             string path)
         {
-            var patch = await gitClient.Compare(repo, baseSha, headSha, path);
+            var patch = await gitClient.Compare(repo, baseSha, headSha, path).ConfigureAwait(false);
 
             if (patch != null)
             {
@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews.Services
             string path,
             byte[] contents)
         {
-            var changes = await gitClient.CompareWith(repo, baseSha, headSha, path, contents);
+            var changes = await gitClient.CompareWith(repo, baseSha, headSha, path, contents).ConfigureAwait(false);
 
             if (changes?.Patch != null)
             {
