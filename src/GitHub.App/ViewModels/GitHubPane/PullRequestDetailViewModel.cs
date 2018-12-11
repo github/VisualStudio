@@ -58,7 +58,6 @@ namespace GitHub.ViewModels.GitHubPane
         Uri webUrl;
         IDisposable sessionSubscription;
         IReadOnlyList<IPullRequestCheckViewModel> checks;
-        bool hasChecks;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -284,13 +283,6 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public bool HasChecks
-        {
-            get { return hasChecks; }
-            private set { this.RaiseAndSetIfChanged(ref hasChecks, value); }
-        }
-
-        /// <inheritdoc/>
         public async Task InitializeAsync(
             LocalRepositoryModel localRepository,
             IConnection connection,
@@ -359,7 +351,6 @@ namespace GitHub.ViewModels.GitHubPane
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
                 Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
-                HasChecks = Checks?.Any() ?? false;
 
                 await Files.InitializeAsync(Session);
 

@@ -98,7 +98,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
             Files = new PullRequestFilesViewModelDesigner();
 
             Checks = Array.Empty<PullRequestCheckViewModelDesigner>();
-            HasChecks = false;
         }
 
         public PullRequestDetailModel Model { get; }
@@ -130,7 +129,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
-        public bool HasChecks { get; }
 
         public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
