@@ -192,6 +192,11 @@ namespace GitHub.ViewModels.GitHubPane
         IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
         /// <summary>
+        /// Flag that indicates if there are checks or statuses to display.
+        /// </summary>
+        bool HasChecks { get; }
+
+        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
