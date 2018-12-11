@@ -559,24 +559,12 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public Task<string> GetFileRepoPathAsync(string localPath, CancellationToken cancellationToken)
-        {
-            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
-            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
-            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
-            {
-                return staticReviewFileMap.GetFileRepoPathAsync(localPath, cancellationToken);
-            }
-
-            return Task.FromResult<string>(null);
-        }
-
-        /// <inheritdoc/>
-        public Task<string> GetLocalPathForRepoPathAsync(string relativePath, string commitId, CancellationToken cancellationToken)
+        public Task<string> GetLocalPathForObjectishAsync(string objectish, CancellationToken cancellationToken)
         {
             if (this.pullRequestsService != null)
             {
-                relativePath = relativePath.TrimStart('/');
+                string commitId = objectish.Substring(0, objectish.IndexOf(':'));
+                string relativePath = objectish.Substring(objectish.IndexOf(':')+1).TrimStart('/');
 
                 return this.pullRequestsService.ExtractToTempFile(
                     this.Session.LocalRepository,
@@ -590,13 +578,13 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public Task<string> GetCommitIdForLocalFileAsync(string localPath, CancellationToken cancellationToken)
+        public Task<string> GetObjectishAsync(string localPath, CancellationToken cancellationToken)
         {
             // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
             // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
             if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
             {
-                return staticReviewFileMap.GetCommitIdForLocalFileAsync(localPath, cancellationToken);
+                return staticReviewFileMap.GetObjectishAsync(localPath, cancellationToken);
             }
 
             return Task.FromResult<string>(null);

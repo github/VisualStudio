@@ -761,7 +761,8 @@ namespace GitHub.Services
 
             lock (this.tempFileMappings)
             {
-                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, relativePath);
+                string gitRelativePath = relativePath.TrimStart('/').Replace('\\', '/');
+                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitRelativePath);
             }
 
             return tempFilePath;
@@ -837,14 +838,14 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc />
-        public Task<string> GetFileRepoPathAsync(string localPath, CancellationToken cancellationToken)
+        public Task<string> GetObjectishAsync(string localPath, CancellationToken cancellationToken)
         {
             lock (this.tempFileMappings)
             {
                 var canonicalizedPath = CanonicalizeLocalFilePath(localPath);
-                if (this.tempFileMappings.ContainsKey(canonicalizedPath))
+                if (this.tempFileMappings.TryGetValue(canonicalizedPath, out (string commitId, string repoPath) result))
                 {
-                    return Task.FromResult(this.tempFileMappings[canonicalizedPath].repoPath);
+                    return Task.FromResult($"{result.commitId}:{result.repoPath}");
                 }
             }
 
@@ -852,22 +853,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc />
-        public Task<string> GetCommitIdForLocalFileAsync(string localPath, CancellationToken cancellationToken)
-        {
-            lock (this.tempFileMappings)
-            {
-                var canonicalizedPath = CanonicalizeLocalFilePath(localPath);
-                if (this.tempFileMappings.ContainsKey(canonicalizedPath))
-                {
-                    return Task.FromResult(this.tempFileMappings[canonicalizedPath].commitId);
-                }
-            }
-
-            return Task.FromResult<string>(null);
-        }
-
-        /// <inheritdoc />
-        public Task<string> GetLocalPathForRepoPathAsync(string relativePath, string commitId, CancellationToken cancellationToken)
+        public Task<string> GetLocalPathForObjectishAsync(string objectish, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
