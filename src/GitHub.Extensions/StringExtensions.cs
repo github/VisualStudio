@@ -169,7 +169,9 @@ namespace GitHub.Extensions
             foreach (var unwrappedLine in text.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
             {
                 var line = new StringBuilder();
-                foreach (var word in unwrappedLine.Split(' '))
+                var splittedLine = unwrappedLine.Split(' ');
+                var word;
+                foreach (word in splittedLine)
                 {
                     var needsLeadingSpace = line.Length > 0;
 
