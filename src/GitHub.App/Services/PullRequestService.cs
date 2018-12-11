@@ -838,7 +838,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc />
-        public Task<string> GetObjectishAsync(string localPath, CancellationToken cancellationToken)
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
         {
             lock (this.tempFileMappings)
             {
@@ -853,7 +853,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc />
-        public Task<string> GetLocalPathForObjectishAsync(string objectish, CancellationToken cancellationToken)
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
