@@ -9,6 +9,8 @@
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              mc:Ignorable="d"  d:DesignHeight="1200" d:DesignWidth="800"
              MaxWidth="800">
     <d:DesignData.DataContext>
@@ -158,64 +160,40 @@
                 </Border>
             </StackPanel>
 
-            <TextBlock Margin="20 4 0 4">
-                This is looking great! Really enjoying using this feature so far.
+            <StackPanel Margin="20 4 0 4">
+                <TextBlock TextWrapping="Wrap">
+                    This is looking great! Really enjoying using this feature so far.
 
-                When leaving an inline comment, the comment posts successfully
-                and then a new comment is drafted with the same text.
-            </TextBlock>
-        </StackPanel>
+                    When leaving an inline comment, the comment posts successfully
+                    and then a new comment is drafted with the same text.
+                </TextBlock>
 
-        <Border BorderBrush="#d1d5da" BorderThickness="1" Margin="24 0 0 0">
-            <StackPanel Orientation="Vertical">
-                <Border Padding="8" BorderBrush="#d1d5da" BorderThickness="0 0 0 1" Background="#edeff5">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock>
-                            somefile.cs
-                        </TextBlock>
-                    </StackPanel>    
-                </Border>
-
-                <Border BorderBrush="#d1d5da" BorderThickness="0 0 0 1">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="8">
-                            (Diff goes here.)
-                        </TextBlock>
-                    </StackPanel>    
-                </Border>
-
-                <StackPanel Orientation="Vertical" Margin="8">
-                    <StackPanel Orientation="Horizontal">
-                        <v:ActorAvatarView Width="16" 
-                                               Height="16" 
-                                               ViewModel="{Binding Author}"/>
-
-                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
-                            <Run FontWeight="Bold" Text="{Binding Author.Login}" />
-                            <Run Text="reviewed" />
-                        </TextBlock>
-
-                        <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
-                                         Command="{Binding OpenOnGitHub}"
-                                         Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                         Opacity="0.75" />
-                        <Border Background="{DynamicResource VsBrush.InfoBackground}" BorderBrush="{DynamicResource VsBrush.AccentPale}"
-                                BorderThickness="1"
-                                CornerRadius="3"
-                                Padding="2 1"
-                                Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                          <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
-                        </Border>
-                    </StackPanel>
-
-                    <TextBlock Margin="20 4 0 4">
-                        This is looking great! Really enjoying using this feature so far.
-
-                        When leaving an inline comment, the comment posts successfully
-                        and then a new comment is drafted with the same text.
-                    </TextBlock>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontWeight="SemiBold" Margin="0 8 0 4">3 files (9 comments total)</TextBlock>
+                    <Border BorderThickness="1" BorderBrush="{DynamicResource VsBrush.AccentPale}">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="4">
+                                <imaging:CrispImage Width="16" Height="16" 
+                                                Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
+                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="4">
+                                <imaging:CrispImage Width="16" Height="16" 
+                                                Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
+                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="4">
+                                <imaging:CrispImage Width="16" Height="16" 
+                                                Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
+                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
-            </StackPanel>    
-        </Border>
+            </StackPanel>
+        </StackPanel>
     </StackPanel>
 </UserControl>
