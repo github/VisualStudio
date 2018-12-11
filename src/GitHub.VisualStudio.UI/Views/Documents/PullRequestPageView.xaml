@@ -161,7 +161,7 @@
             </StackPanel>
 
             <StackPanel Margin="20 4 0 4">
-                <TextBlock TextWrapping="Wrap">
+                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource VsBrush.WindowText}">
                     This is looking great! Really enjoying using this feature so far.
 
                     When leaving an inline comment, the comment posts successfully
@@ -169,25 +169,27 @@
                 </TextBlock>
 
                 <StackPanel Orientation="Vertical">
-                    <TextBlock FontWeight="SemiBold" Margin="0 8 0 4">3 files (9 comments total)</TextBlock>
+                    <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" FontWeight="SemiBold" Margin="0 8 0 4">3 files (9 comments total)</TextBlock>
                     <Border BorderThickness="1" BorderBrush="{DynamicResource VsBrush.AccentPale}">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" Margin="4">
                                 <imaging:CrispImage Width="16" Height="16" 
                                                 Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
-                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Margin="4 0">path\to\file.cs</TextBlock>
                                 <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
                             </StackPanel>
+
                             <StackPanel Orientation="Horizontal" Margin="4">
                                 <imaging:CrispImage Width="16" Height="16" 
                                                 Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
-                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Margin="4 0">path\to\file.cs</TextBlock>
                                 <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
                             </StackPanel>
+
                             <StackPanel Orientation="Horizontal" Margin="4">
                                 <imaging:CrispImage Width="16" Height="16" 
                                                 Moniker="{x:Static catalog:KnownMonikers.CSFileNode}"  />
-                                <TextBlock Margin="4 0">path\to\file.cs</TextBlock>
+                                <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" Margin="4 0">path\to\file.cs</TextBlock>
                                 <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">| 3 comments</TextBlock>
                             </StackPanel>
                         </StackPanel>
