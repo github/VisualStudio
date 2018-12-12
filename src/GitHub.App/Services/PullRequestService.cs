@@ -78,7 +78,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.os = os;
             this.usageTracker = usageTracker;
-            this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>();
+            this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>(StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
@@ -1041,7 +1041,7 @@ namespace GitHub.Services
         static string CanonicalizeLocalFilePath(string localPath)
         {
             localPath = localPath.Replace("\\\\", "\\");
-            return Path.GetFullPath(localPath.ToUpperInvariant());
+            return Path.GetFullPath(localPath);
         }
 
         class ListItemAdapter : PullRequestListItemModel
