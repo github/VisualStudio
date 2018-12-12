@@ -38,7 +38,7 @@ namespace GitHub.SampleData.Dialog.Clone
         public IReadOnlyList<IRepositoryItemViewModel> Items { get; }
         public ICollectionView ItemsView { get; }
         public IRepositoryItemViewModel SelectedItem { get; set; }
-        public IRepositoryModel Repository { get; }
+        public RepositoryModel Repository { get; }
 
         public void Initialize(IConnection connection)
         {

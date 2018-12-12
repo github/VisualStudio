@@ -35,16 +35,19 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             target.EnterpriseTab.DidNotReceiveWithAnyArgs().Initialize(null);
         }
 
-        [TestCase("https://github.com", false, 0)]
-        [TestCase("https://enterprise.com", false, 1)]
-        [TestCase("https://github.com", true, 2, Description = "Show URL tab for GitHub connections")]
-        [TestCase("https://enterprise.com", true, 2, Description = "Show URL tab for Enterprise connections")]
-        public async Task Default_SelectedTabIndex_For_Group(string address, bool isGroupA, int expectTabIndex)
+        [TestCase("https://github.com", null, false, 0)]
+        [TestCase("https://enterprise.com", null, false, 1)]
+        [TestCase("https://github.com", null, true, 2, Description = "Show URL tab for GitHub connections")]
+        [TestCase("https://enterprise.com", null, true, 2, Description = "Show URL tab for Enterprise connections")]
+        [TestCase("https://github.com", "https://github.com/github/visualstudio", false, 2)]
+        [TestCase("https://enterprise.com", "https://enterprise.com/owner/repo", false, 2)]
+        public async Task Default_SelectedTabIndex_For_Group(string address, string clipboardUrl, bool isGroupA, int expectTabIndex)
         {
             var cm = CreateConnectionManager(address);
             var connection = cm.Connections[0];
             var usageService = CreateUsageService(isGroupA);
             var target = CreateTarget(connectionManager: cm, usageService: usageService);
+            target.UrlTab.Url = clipboardUrl;
 
             await target.InitializeAsync(connection);
 
@@ -343,7 +346,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.Open.CanExecute(null), Is.True);
         }
 
-        static void SetRepository(IRepositoryCloneTabViewModel vm, IRepositoryModel repository)
+        static void SetRepository(IRepositoryCloneTabViewModel vm, RepositoryModel repository)
         {
             vm.Repository.Returns(repository);
             vm.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(
@@ -376,7 +379,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositorySelectViewModel CreateSelectViewModel()
         {
             var result = Substitute.For<IRepositorySelectViewModel>();
-            result.Repository.Returns((IRepositoryModel)null);
+            result.Repository.Returns((RepositoryModel)null);
             result.WhenForAnyArgs(x => x.Initialize(null)).Do(_ => result.IsEnabled.Returns(true));
             return result;
         }
@@ -451,20 +454,17 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             return usageService;
         }
 
-        static IRepositoryModel CreateRepositoryModel(string repo = "owner/repo")
+        static RepositoryModel CreateRepositoryModel(string repo = "owner/repo")
         {
             var split = repo.Split('/');
             var (owner, name) = (split[0], split[1]);
             return CreateRepositoryModel(owner, name);
         }
 
-        static IRepositoryModel CreateRepositoryModel(string owner, string name)
+        static RepositoryModel CreateRepositoryModel(string owner, string name)
         {
-            var repository = Substitute.For<IRepositoryModel>();
-            repository.Owner.Returns(owner);
-            repository.Name.Returns(name);
-            repository.CloneUrl.Returns(CreateGitHubUrl(owner, name));
-            return repository;
+            var cloneUrl = CreateGitHubUrl(owner, name);
+            return new RepositoryModel(name, cloneUrl);
         }
 
         static UriString CreateGitHubUrl(string owner, string repo)
@@ -475,7 +475,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
         {
             var repositoryUrlViewModel = Substitute.For<IRepositoryUrlViewModel>();
-            repositoryUrlViewModel.Repository.Returns(null as IRepositoryModel);
+            repositoryUrlViewModel.Repository.Returns(null as RepositoryModel);
             repositoryUrlViewModel.Url.Returns(string.Empty);
             return repositoryUrlViewModel;
         }

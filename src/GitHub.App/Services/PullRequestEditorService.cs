@@ -285,7 +285,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(
+        public Task<IDifferenceViewer> OpenDiff(
             IPullRequestSession session,
             string relativePath,
             IInlineCommentThreadModel thread)
@@ -294,11 +294,17 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha, scrollToFirstDraftOrDiff: false);
+            return OpenDiff(session, relativePath, thread.CommitSha, thread.LineNumber - 1);
+        }
 
-            var param = (object)new InlineCommentNavigationParams
+        /// <inheritdoc/>
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine)
+        {
+            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false);
+
+            var param = (object) new InlineCommentNavigationParams
             {
-                FromLine = thread.LineNumber - 1,
+                FromLine = nextInlineTagFromLine,
             };
 
             // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.
@@ -472,7 +478,7 @@ namespace GitHub.Services
             return matchingLine;
         }
 
-        static string GetAbsolutePath(ILocalRepositoryModel localRepository, string relativePath)
+        static string GetAbsolutePath(LocalRepositoryModel localRepository, string relativePath)
         {
             var localPath = localRepository.LocalPath;
             relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Windows.Media.Imaging;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -37,9 +36,24 @@ namespace GitHub.ViewModels.GitHubPane
         string DurationStatus { get; }
 
         /// <summary>
-        /// A command that opens the DetailsUrl in a browser
+        /// A command that opens the DetailsUrl in a browser.
         /// </summary>
         ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }
+
+        /// <summary>
+        /// Gets the type of check run, Status/Check.
+        /// </summary>
+        PullRequestCheckType CheckType { get; }
+
+        /// <summary>
+        /// Gets the id of the check run.
+        /// </summary>
+        string CheckRunId { get; }
+
+        /// <summary>
+        /// Gets a flag to show this check run has annotations.
+        /// </summary>
+        bool HasAnnotations { get; }
     }
 
     public enum PullRequestCheckStatus

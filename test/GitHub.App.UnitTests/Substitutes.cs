@@ -112,12 +112,17 @@ namespace UnitTests
             var os = OperatingSystem;
             var vsgit = IVSGitServices;
             var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<ITeamExplorerServices>(),
-                Substitute.For<IGraphQLClientFactory>(), Substitute.For<IUsageTracker>());
+                Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
+                Substitute.For<IUsageTracker>(), ret);
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
-            //ret.GetService(typeof(IGitRepositoriesExt)).Returns(IGitRepositoriesExt);
             ret.GetService(typeof(IGitService)).Returns(gitservice);
             ret.GetService(typeof(IVSServices)).Returns(Substitute.For<IVSServices>());
+            ret.GetService(typeof(ITeamExplorerServices)).Returns(Substitute.For<ITeamExplorerServices>());
+            ret.GetService(typeof(IGraphQLClientFactory)).Returns(Substitute.For<IGraphQLClientFactory>());
+            ret.GetService(typeof(IGitHubContextService)).Returns(Substitute.For<IGitHubContextService>());
+            ret.GetService(typeof(IVSGitExt)).Returns(Substitute.For<IVSGitExt>());
+            ret.GetService(typeof(IUsageTracker)).Returns(Substitute.For<IUsageTracker>());
             ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
             ret.GetService(typeof(IOperatingSystem)).Returns(os);
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
@@ -132,14 +137,34 @@ namespace UnitTests
             return ret;
         }
 
-        //public static IGitRepositoriesExt GetGitExt(this IServiceProvider provider)
-        //{
-        //    return provider.GetService(typeof(IGitRepositoriesExt)) as IGitRepositoriesExt;
-        //}
-
         public static IVSServices GetVSServices(this IServiceProvider provider)
         {
             return provider.GetService(typeof(IVSServices)) as IVSServices;
+        }
+
+        public static ITeamExplorerServices GetTeamExplorerServices(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(ITeamExplorerServices)) as ITeamExplorerServices;
+        }
+
+        public static IGraphQLClientFactory GetGraphQLClientFactory(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IGraphQLClientFactory)) as IGraphQLClientFactory;
+        }
+
+        public static IGitHubContextService GetGitHubContextService(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IGitHubContextService)) as IGitHubContextService;
+        }
+
+        public static IVSGitExt GetVSGitExt(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IVSGitExt)) as IVSGitExt;
+        }
+
+        public static IUsageTracker GetUsageTracker(this IServiceProvider provider)
+        {
+            return provider.GetService(typeof(IUsageTracker)) as IUsageTracker;
         }
 
         public static IVSGitServices GetVSGitServices(this IServiceProvider provider)

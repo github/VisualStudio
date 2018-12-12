@@ -8,6 +8,6 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets or sets the repository to clone.
         /// </summary>
-        IRepositoryModel SelectedRepository { get; set; }
+        RepositoryModel SelectedRepository { get; set; }
     }
 }

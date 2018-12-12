@@ -38,10 +38,11 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IPullRequestService service;
         readonly IModelServiceFactory modelServiceFactory;
         readonly IMessageDraftStore draftStore;
+        readonly IGitService gitService;
         readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
-        ILocalRepositoryModel activeLocalRepo;
-        ObservableAsPropertyHelper<IRemoteRepositoryModel> githubRepository;
+        LocalRepositoryModel activeLocalRepo;
+        ObservableAsPropertyHelper<RemoteRepositoryModel> githubRepository;
         IModelService modelService;
 
         [ImportingConstructor]
@@ -49,8 +50,9 @@ namespace GitHub.ViewModels.GitHubPane
             IModelServiceFactory modelServiceFactory,
             IPullRequestService service,
             INotificationService notifications,
-            IMessageDraftStore draftStore)
-            : this(modelServiceFactory, service, notifications, draftStore, DefaultScheduler.Instance)
+            IMessageDraftStore draftStore,
+            IGitService gitService)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
         {
         }
 
@@ -59,17 +61,20 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
+            IGitService gitService,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(notifications, nameof(notifications));
             Guard.ArgumentNotNull(draftStore, nameof(draftStore));
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
             Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.service = service;
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
+            this.gitService = gitService;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -78,7 +83,9 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x =>
                 {
                     if (!x.Any(t => t.Equals(TargetBranch)))
+                    {
                         TargetBranch = GitHubRepository.IsFork ? GitHubRepository.Parent.DefaultBranch : GitHubRepository.DefaultBranch;
+                    }
                 });
 
             SetupValidators();
@@ -133,14 +140,14 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => IsBusy = x);
         }
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             modelService = await modelServiceFactory.CreateAsync(connection);
             activeLocalRepo = repository;
-            SourceBranch = repository.CurrentBranch;
+            SourceBranch = gitService.GetBranch(repository);
 
             var obs = modelService.ApiClient.GetRepository(repository.Owner, repository.Name)
-                .Select(r => new RemoteRepositoryModel(r))
+                .Select(r => CreateRemoteRepositoryModel(r))
                 .PublishLast();
             disposables.Add(obs.Connect());
             var githubObs = obs;
@@ -156,7 +163,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             githubObs.SelectMany(r =>
             {
-                var b = Observable.Empty<IBranch>();
+                var b = Observable.Empty<BranchModel>();
                 if (r.IsFork)
                 {
                     b = modelService.GetBranches(r.Parent).Select(x =>
@@ -187,6 +194,21 @@ namespace GitHub.ViewModels.GitHubPane
             Initialized = true;
         }
 
+        static RemoteRepositoryModel CreateRemoteRepositoryModel(Repository repository)
+        {
+            var ownerAccount = new Models.Account(repository.Owner);
+            var parent = repository.Parent != null ? CreateRemoteRepositoryModel(repository.Parent) : null;
+            var model = new RemoteRepositoryModel(repository.Id, repository.Name, repository.CloneUrl,
+                repository.Private, repository.Fork, ownerAccount, parent, repository.DefaultBranch);
+
+            if (parent != null)
+            {
+                parent.DefaultBranch.DisplayName = parent.DefaultBranch.Id;
+            }
+
+            return model;
+        }
+
         async Task LoadInitialState(string draftKey)
         {
             if (activeLocalRepo.CloneUrl == null)
@@ -207,7 +229,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         void LoadDescriptionFromCommits()
         {
-            SourceBranch = activeLocalRepo.CurrentBranch;
+            SourceBranch = gitService.GetBranch(activeLocalRepo);
 
             var uniqueCommits = this.WhenAnyValue(
                 x => x.SourceBranch,
@@ -312,7 +334,7 @@ namespace GitHub.ViewModels.GitHubPane
                 SourceBranch.Name);
         }
 
-        public IRemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
+        public RemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
         bool IsExecuting { get { return isExecuting.Value; } }
 
         bool initialized;
@@ -322,22 +344,22 @@ namespace GitHub.ViewModels.GitHubPane
             set { this.RaiseAndSetIfChanged(ref initialized, value); }
         }
 
-        IBranch sourceBranch;
-        public IBranch SourceBranch
+        BranchModel sourceBranch;
+        public BranchModel SourceBranch
         {
             get { return sourceBranch; }
             set { this.RaiseAndSetIfChanged(ref sourceBranch, value); }
         }
 
-        IBranch targetBranch;
-        public IBranch TargetBranch
+        BranchModel targetBranch;
+        public BranchModel TargetBranch
         {
             get { return targetBranch; }
             set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
         }
 
-        IReadOnlyList<IBranch> branches;
-        public IReadOnlyList<IBranch> Branches
+        IReadOnlyList<BranchModel> branches;
+        public IReadOnlyList<BranchModel> Branches
         {
             get { return branches; }
             set { this.RaiseAndSetIfChanged(ref branches, value); }

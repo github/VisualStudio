@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Services
             IPullRequestSessionService service,
             ActorModel user,
             PullRequestDetailModel pullRequest,
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string repositoryOwner,
             bool isCheckedOut)
         {
@@ -310,6 +310,7 @@ namespace GitHub.InlineReviews.Services
             file.CommitSha = file.IsTrackingHead ? PullRequest.HeadRefSha : file.CommitSha;
             file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
             file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff, file.CommitSha);
+            file.InlineAnnotations = service.BuildAnnotations(PullRequest, file.RelativePath);
         }
 
         void UpdatePendingReview()
@@ -402,7 +403,7 @@ namespace GitHub.InlineReviews.Services
         public IObservable<PullRequestDetailModel> PullRequestChanged => pullRequestChanged;
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; }
+        public LocalRepositoryModel LocalRepository { get; }
 
         /// <inheritdoc/>
         public string RepositoryOwner { get; }

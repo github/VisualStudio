@@ -55,6 +55,11 @@ namespace GitHub.Models
         IReadOnlyList<IInlineCommentThreadModel> InlineCommentThreads { get; }
 
         /// <summary>
+        /// Gets the inline annotations for the file.
+        /// </summary>
+        IReadOnlyList<InlineAnnotationModel> InlineAnnotations { get; }
+
+        /// <summary>
         /// Gets an observable that is raised with a collection of 0-based line numbers when the
         /// review comments on the file are changed.
         /// </summary>

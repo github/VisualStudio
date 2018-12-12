@@ -1,6 +1,8 @@
 ﻿using System;
-using GitHub.UI;
+using System.Reactive;
+using GitHub.Logging;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels
 {
@@ -13,5 +15,15 @@ namespace GitHub.ViewModels
     /// </remarks>
     public abstract class ViewModelBase : ReactiveObject, IViewModel
     {
+        static readonly ILogger logger = LogManager.ForContext<ViewModelBase>();
+
+        static ViewModelBase()
+        {
+            // We don't really have a better place to hook this up as we don't want to force-load
+            // rx on package load.
+            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
+                ex => logger.Error(ex, "Unhandled rxui error"),
+                ex => logger.Error(ex, "Unhandled rxui error"));
+        }
     }
 }

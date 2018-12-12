@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.VisualStudio.Helpers;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.PlatformUI;
-using GitHub.Models;
+using Serilog;
 
 namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerNavigationItemBase : TeamExplorerItemBase, ITeamExplorerNavigationItem2
     {
+        static readonly ILogger log = LogManager.ForContext<TeamExplorerNavigationItemBase>();
+
         readonly Octicon octicon;
 
         public TeamExplorerNavigationItemBase(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory, ITeamExplorerServiceHolder holder, Octicon octicon)
             : base(serviceProvider, apiFactory, holder)
         {
-            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
-            Guard.ArgumentNotNull(apiFactory, nameof(apiFactory));
-            Guard.ArgumentNotNull(holder, nameof(holder));
-
             this.octicon = octicon;
 
             IsVisible = false;
@@ -36,13 +36,27 @@ namespace GitHub.VisualStudio.Base
                 Invalidate();
             };
 
-            holder.Subscribe(this, UpdateRepo);
+            // Navigation items need to listen for repo change events before they're visible
+            SubscribeToRepoChanges();
         }
 
-        public override async void Invalidate()
+        public override void Invalidate()
         {
             IsVisible = false;
-            IsVisible = await IsAGitHubRepo();
+            InvalidateAsync().Forget(log);
+        }
+
+        async Task InvalidateAsync()
+        {
+            var uri = ActiveRepoUri;
+            var isVisible = await IsAGitHubRepo(uri);
+            if (ActiveRepoUri != uri)
+            {
+                log.Information("Not setting button visibility because repository changed from {BeforeUrl} to {AfterUrl}", uri, ActiveRepoUri);
+                return;
+            }
+
+            IsVisible = isVisible;
         }
 
         void OnThemeChanged()
@@ -50,14 +64,6 @@ namespace GitHub.VisualStudio.Base
             var theme = Colors.DetectTheme();
             var dark = theme == "Dark";
             Icon = SharedResources.GetDrawingForIcon(octicon, dark ? Colors.DarkThemeNavigationItem : Colors.LightThemeNavigationItem, theme);
-        }
-
-        void UpdateRepo(ILocalRepositoryModel repo)
-        {
-            var changed = ActiveRepo != repo;
-            ActiveRepo = repo;
-            RepoChanged(changed);
-            Invalidate();
         }
 
         protected void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, string endpoint)
@@ -71,25 +77,6 @@ namespace GitHub.VisualStudio.Base
             var browseUrl = uri.ToRepositoryUrl().Append(endpoint);
 
             OpenInBrowser(browser, browseUrl);
-        }
-
-        void Unsubscribe()
-        {
-            holder.Unsubscribe(this);
-        }
-
-        bool disposed;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (!disposed)
-                {
-                    Unsubscribe();
-                    disposed = true;
-                }
-            }
-            base.Dispose(disposing);
         }
 
         int argbColor;
@@ -109,7 +96,7 @@ namespace GitHub.VisualStudio.Base
         Image image;
         public Image Image
         {
-            get{ return image; }
+            get { return image; }
             set { image = value; this.RaisePropertyChange(); }
         }
     }

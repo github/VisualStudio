@@ -9,16 +9,21 @@
     <Grid>
         <Border Background="{DynamicResource GitHubGlyphMarginCommentableBackground}" BorderThickness="0,0,1,0" />
         <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0,1,0,0">
-            <Canvas Width="16" Height="15">
-                <Path Canvas.Top="1" Canvas.Left="0.85"
-                    Data="M1,0 C0.45,0 0,0.45 0,1 L0,9 C0,9.55 0.45,10 1,10 L3,10 L3,13.5 L6.5,10 L13,10 C13.55,10 14,9.55 14,9 L14,1 C14,0.45 13.55,0 13,0 L1,0 Z" />
-                <Path Canvas.Top="1" Canvas.Left="0.85" Opacity="0.163" Stroke="#313131" 
-                      Data="M3.5,12.2928932 L6.29289322,9.5 L13,9.5 C13.2738576,9.5 13.5,9.27385763 13.5,9 L13.5,1 C13.5,0.726142375 13.2738576,0.5 13,0.5 L1,0.5 C0.726142375,0.5 0.5,0.726142375 0.5,1 L0.5,9 C0.5,9.27385763 0.726142375,9.5 1,9.5 L3.5,9.5 L3.5,12.2928932 Z" />
+            <Canvas Width="16" Height="16">
                 <Canvas.Resources>
                     <Style TargetType="Path">
                         <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
+                        <Setter Property="Stroke" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                     </Style>
                 </Canvas.Resources>
+
+                <Ellipse Width="9"
+                         Height="9" 
+                         Canvas.Top="3.5"
+                         Canvas.Left="3.5"
+                         Fill="#959DA5"
+                         Stroke="White"
+                         StrokeThickness="1" />
             </Canvas>
         </Viewbox>
     </Grid>

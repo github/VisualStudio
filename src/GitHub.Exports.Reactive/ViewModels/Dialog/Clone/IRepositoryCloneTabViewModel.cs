@@ -20,7 +20,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         /// <summary>
         /// Gets the selected repository, or null if no repository has been selected.
         /// </summary>
-        IRepositoryModel Repository { get; }
+        RepositoryModel Repository { get; }
 
         /// <summary>
         /// Activates the tab.

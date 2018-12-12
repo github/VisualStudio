@@ -5,14 +5,11 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
-using System.Reactive.Linq;
-using System.Text;
-using System.Windows.Media.Imaging;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
-using GitHub.UI.Converters;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -22,15 +19,21 @@ namespace GitHub.ViewModels.GitHubPane
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestCheckViewModel: ViewModelBase, IPullRequestCheckViewModel
     {
-        private readonly IUsageTracker usageTracker;
         const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
 
+        private readonly IUsageTracker usageTracker;
+
+        /// <summary>
+        /// Factory method to create a <see cref="PullRequestCheckViewModel"/>.
+        /// </summary>
+        /// <param name="viewViewModelFactory">A viewviewmodel factory.</param>
+        /// <param name="pullRequest">The pull request.</param>
         public static IEnumerable<IPullRequestCheckViewModel> Build(IViewViewModelFactory viewViewModelFactory, PullRequestDetailModel pullRequest)
         {
-            var statuses = pullRequest.Statuses?.Select(model =>
+            var statuses = pullRequest.Statuses?.Select(statusModel =>
             {
                 PullRequestCheckStatus checkStatus;
-                switch (model.State)
+                switch (statusModel.State)
                 {
                     case StatusState.Expected:
                     case StatusState.Error:
@@ -49,19 +52,22 @@ namespace GitHub.ViewModels.GitHubPane
 
                 var pullRequestCheckViewModel = (PullRequestCheckViewModel) viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                 pullRequestCheckViewModel.CheckType = PullRequestCheckType.StatusApi;
-                pullRequestCheckViewModel.Title = model.Context;
-                pullRequestCheckViewModel.Description = model.Description;
+                pullRequestCheckViewModel.Title = statusModel.Context;
+                pullRequestCheckViewModel.Description = statusModel.Description;
                 pullRequestCheckViewModel.Status = checkStatus;
-                pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(model.TargetUrl) ? new Uri(model.TargetUrl) : null;
+                pullRequestCheckViewModel.DetailsUrl = !string.IsNullOrEmpty(statusModel.TargetUrl) ? new Uri(statusModel.TargetUrl) : null;
 
                 return pullRequestCheckViewModel;
             }) ?? Array.Empty<PullRequestCheckViewModel>();
 
-            var checks = pullRequest.CheckSuites?.SelectMany(model => model.CheckRuns)
-                .Select(model =>
+            var checks = 
+                pullRequest.CheckSuites?
+                    .SelectMany(checkSuite => checkSuite.CheckRuns
+                        .Select(checkRun => new { checkSuiteModel = checkSuite, checkRun}))
+                .Select(arg =>
                 {
                     PullRequestCheckStatus checkStatus;
-                    switch (model.Status)
+                    switch (arg.checkRun.Status)
                     {
                         case CheckStatusState.Requested:
                         case CheckStatusState.Queued:
@@ -70,7 +76,7 @@ namespace GitHub.ViewModels.GitHubPane
                             break;
 
                         case CheckStatusState.Completed:
-                            switch (model.Conclusion)
+                            switch (arg.checkRun.Conclusion)
                             {
                                 case CheckConclusionState.Success:
                                     checkStatus = PullRequestCheckStatus.Success;
@@ -95,7 +101,9 @@ namespace GitHub.ViewModels.GitHubPane
 
                     var pullRequestCheckViewModel = (PullRequestCheckViewModel)viewViewModelFactory.CreateViewModel<IPullRequestCheckViewModel>();
                     pullRequestCheckViewModel.CheckType = PullRequestCheckType.ChecksApi;
-                    pullRequestCheckViewModel.Title = model.Name;
+                    pullRequestCheckViewModel.CheckRunId = arg.checkRun.Id;
+                    pullRequestCheckViewModel.HasAnnotations = arg.checkRun.Annotations?.Any() ?? false;
+                    pullRequestCheckViewModel.Title = arg.checkRun.Name;
 
                     if (model.StartedAt.HasValue && model.CompletedAt.HasValue)
                     {
@@ -103,16 +111,19 @@ namespace GitHub.ViewModels.GitHubPane
                         pullRequestCheckViewModel.DurationStatus = $"{checkStatus} - {timeSpanString}";
                     }
 
-                    pullRequestCheckViewModel.Description = model.Title;
+                    pullRequestCheckViewModel.Description = arg.checkRun.Summary;
                     pullRequestCheckViewModel.Status = checkStatus;
-                    pullRequestCheckViewModel.DetailsUrl = new Uri(model.DetailsUrl);
-
+                    pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
                     return pullRequestCheckViewModel;
                 }) ?? Array.Empty<PullRequestCheckViewModel>();
 
             return statuses.Concat(checks).OrderBy(model => model.Title);
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="PullRequestCheckViewModel"/>.
+        /// </summary>
+        /// <param name="usageTracker">The usage tracker.</param>
         [ImportingConstructor]
         public PullRequestCheckViewModel(IUsageTracker usageTracker)
         {
@@ -144,7 +155,14 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <inheritdoc/>
         public PullRequestCheckType CheckType { get; private set; }
+
+        /// <inheritdoc/>
+        public string CheckRunId { get; private set; }
+
+        /// <inheritdoc/>
+        public bool HasAnnotations { get; private set; }
 
         /// <inheritdoc/>
         public PullRequestCheckStatus Status{ get; private set; }

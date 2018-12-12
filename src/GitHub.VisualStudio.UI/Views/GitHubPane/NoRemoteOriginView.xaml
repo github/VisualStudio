@@ -1,0 +1,57 @@
+﻿<local:GenericNoRemoteOriginView x:Class="GitHub.VisualStudio.Views.GitHubPane.NoRemoteOriginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ghfvs="https://github.com/github/VisualStudio"
+    xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding ViewModel}"
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <DockPanel>
+        <StackPanel Margin="10" Orientation="Vertical">
+            <ghfvs:OcticonImage Icon="mark_github"
+                Foreground="{DynamicResource GitHubVsWindowText}"
+                Margin="0,5"
+                Width="48"
+                Height="48" />
+            <Label
+                Foreground="{DynamicResource GitHubVsWindowText}"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Content="{x:Static ghfvs:Resources.CantFindGitHubUrlForRepository}" />
+
+            <TextBlock
+                Text="{x:Static ghfvs:Resources.RepositoriesMustHaveRemoteOrigin}"
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="4" />
+
+            <TextBlock                
+                Text="{x:Static ghfvs:Resources.RepositoriesMustHaveRemoteOriginHowToFix}"
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                HorizontalAlignment="Center" 
+                Margin="4" />
+
+            <Button HorizontalAlignment="Center"
+                Margin="0,15"
+                Style="{DynamicResource GitHubVsPrimaryActionButton}"
+                Command="{Binding EditRemotes}" >
+                <TextBlock Text="Edit Remotes" />
+            </Button>
+        </StackPanel>
+    </DockPanel>
+</local:GenericNoRemoteOriginView>
