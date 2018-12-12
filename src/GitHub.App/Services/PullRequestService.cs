@@ -174,12 +174,14 @@ namespace GitHub.Services
                                   LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                       new LastCommitSummaryAdapter
                                       {
-                                          Statuses = commit.Commit.Status
-                                                  .Select(context =>
-                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
-                                                      {
-                                                          State = statusContext.State.FromGraphQl(),
-                                                      }).ToList()
+                                          Statuses = commit.Commit.Status.Select(context =>
+                                                      context == null
+                                                          ? null
+                                                          : context.Contexts
+                                                              .Select(statusContext => new StatusSummaryModel
+                                                              {
+                                                                  State = statusContext.State.FromGraphQl()
+                                                              }).ToList()
                                                   ).SingleOrDefault()
                                       }).ToList().FirstOrDefault(),
                                   Author = new ActorModel

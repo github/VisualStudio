@@ -60,7 +60,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
-        IReadOnlyList<IPullRequestCheckViewModel> checks;
+        IReadOnlyList<IPullRequestCheckViewModel> checks = Array.Empty<IPullRequestCheckViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -357,7 +357,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
+                Checks = (IReadOnlyList<IPullRequestCheckViewModel>) PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
                 await Files.InitializeAsync(Session);
 

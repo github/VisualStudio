@@ -364,11 +364,19 @@ namespace GitHub.InlineReviews.Services
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
             var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
 
-            result.Statuses = lastCommitModel.Statuses;
-            result.CheckSuites = lastCommitModel.CheckSuites;
-            foreach (var checkSuite in result.CheckSuites)
+            result.Statuses = (IReadOnlyList<StatusModel>) lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
+
+            if (lastCommitModel.CheckSuites == null)
             {
-                checkSuite.HeadSha = lastCommitModel.HeadSha;
+                result.CheckSuites = Array.Empty<CheckSuiteModel>();
+            }
+            else
+            { 
+                result.CheckSuites = lastCommitModel.CheckSuites;
+                foreach (var checkSuite in result.CheckSuites)
+                {
+                    checkSuite.HeadSha = lastCommitModel.HeadSha;
+                }
             }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
@@ -829,16 +837,18 @@ namespace GitHub.InlineReviews.Services
                      .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
-                             Statuses = commit.Commit.Status
-                                 .Select(context =>
-                                     context.Contexts.Select(statusContext => new StatusModel
-                                     {
-                                         State = statusContext.State.FromGraphQl(),
-                                         Context = statusContext.Context,
-                                         TargetUrl = statusContext.TargetUrl,
-                                         Description = statusContext.Description,
-                                     }).ToList()
-                                 ).SingleOrDefault()
+                             Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
+                                 .Select(context => context == null 
+                                     ? null 
+                                     : context.Contexts
+                                         .Select(statusContext => new StatusModel
+                                         {
+                                             State = statusContext.State.FromGraphQl(),
+                                             Context = statusContext.Context,
+                                             TargetUrl = statusContext.TargetUrl,
+                                             Description = statusContext.Description,
+                                         }).ToList()
+                                     ).SingleOrDefault()
                          }
                      ).Compile();
                 }
