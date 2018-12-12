@@ -17,8 +17,8 @@ namespace GitHub.VisualStudio.Commands
     public class CopyLinkCommand : LinkCommandBase, ICopyLinkCommand
     {
         [ImportingConstructor]
-        protected CopyLinkCommand(IGitHubServiceProvider serviceProvider)
-            : base(CommandSet, CommandId, serviceProvider)
+        protected CopyLinkCommand(IGitHubServiceProvider serviceProvider, Lazy<IGitService> gitService)
+            : base(CommandSet, CommandId, serviceProvider, gitService)
         {
         }
 

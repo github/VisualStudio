@@ -254,7 +254,7 @@ namespace GitHub.SampleData
     [ExcludeFromCodeCoverage]
     public static class RepositoryModelDesigner
     {
-        public static IRemoteRepositoryModel Create(string name = null, string owner = null)
+        public static RemoteRepositoryModel Create(string name = null, string owner = null)
         {
             name = name ?? "octocat";
             owner = owner ?? "github";

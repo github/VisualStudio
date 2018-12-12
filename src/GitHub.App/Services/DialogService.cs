@@ -16,21 +16,31 @@ namespace GitHub.Services
     {
         readonly IViewViewModelFactory factory;
         readonly IShowDialogService showDialog;
+        readonly IGitHubContextService gitHubContextService;
 
         [ImportingConstructor]
         public DialogService(
             IViewViewModelFactory factory,
-            IShowDialogService showDialog)
+            IShowDialogService showDialog,
+            IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(showDialog, nameof(showDialog));
+            Guard.ArgumentNotNull(showDialog, nameof(gitHubContextService));
 
             this.factory = factory;
             this.showDialog = showDialog;
+            this.gitHubContextService = gitHubContextService;
         }
 
         public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                var clipboardContext = gitHubContextService.FindContextFromClipboard();
+                url = clipboardContext?.Url;
+            }
+
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
             if (url != null)
             {
@@ -52,7 +62,7 @@ namespace GitHub.Services
             }
         }
 
-        public async Task<string> ShowReCloneDialog(IRepositoryModel repository)
+        public async Task<string> ShowReCloneDialog(RepositoryModel repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
 
@@ -91,7 +101,7 @@ namespace GitHub.Services
             return (IConnection)await showDialog.Show(viewModel);
         }
 
-        public async Task ShowForkDialog(ILocalRepositoryModel repository, IConnection connection)
+        public async Task ShowForkDialog(LocalRepositoryModel repository, IConnection connection)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotNull(connection, nameof(connection));

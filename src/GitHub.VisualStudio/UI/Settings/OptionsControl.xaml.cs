@@ -31,12 +31,6 @@ namespace GitHub.VisualStudio.UI
             set { chkEditorComments.IsChecked = value; }
         }
 
-        public bool ForkButton
-        {
-            get { return chkForkButton.IsChecked ?? false; }
-            set { chkForkButton.IsChecked = value; }
-        }
-
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             var browser = VisualStudio.Services.DefaultExportProvider.GetExportedValue<IVisualStudioBrowser>();

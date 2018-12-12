@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         static readonly Regex pullUri = CreateRoute("/:owner/:repo/pull/:number");
         static readonly Regex pullNewReviewUri = CreateRoute("/:owner/:repo/pull/:number/review/new");
         static readonly Regex pullUserReviewsUri = CreateRoute("/:owner/:repo/pull/:number/reviews/:login");
+        static readonly Regex pullCheckRunsUri = CreateRoute("/:owner/:repo/pull/:number/checkruns/:id");
 
         readonly IViewViewModelFactory viewModelFactory;
         readonly ISimpleApiClientFactory apiClientFactory;
@@ -44,6 +45,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ILoggedOutViewModel loggedOut;
         readonly INotAGitHubRepositoryViewModel notAGitHubRepository;
         readonly INotAGitRepositoryViewModel notAGitRepository;
+        readonly INoRemoteOriginViewModel noRemoteOrigin;
         readonly ILoginFailedViewModel loginFailed;
         readonly SemaphoreSlim navigating = new SemaphoreSlim(1);
         readonly ObservableAsPropertyHelper<ContentOverride> contentOverride;
@@ -56,7 +58,7 @@ namespace GitHub.ViewModels.GitHubPane
         IDisposable connectionSubscription;
         Task initializeTask;
         IViewModel content;
-        ILocalRepositoryModel localRepository;
+        LocalRepositoryModel localRepository;
         string searchQuery;
 
         [ImportingConstructor]
@@ -71,6 +73,7 @@ namespace GitHub.ViewModels.GitHubPane
             ILoggedOutViewModel loggedOut,
             INotAGitHubRepositoryViewModel notAGitHubRepository,
             INotAGitRepositoryViewModel notAGitRepository,
+            INoRemoteOriginViewModel noRemoteOrigin,
             ILoginFailedViewModel loginFailed)
         {
             Guard.ArgumentNotNull(viewModelFactory, nameof(viewModelFactory));
@@ -83,6 +86,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(loggedOut, nameof(loggedOut));
             Guard.ArgumentNotNull(notAGitHubRepository, nameof(notAGitHubRepository));
             Guard.ArgumentNotNull(notAGitRepository, nameof(notAGitRepository));
+            Guard.ArgumentNotNull(noRemoteOrigin, nameof(noRemoteOrigin));
             Guard.ArgumentNotNull(loginFailed, nameof(loginFailed));
 
             this.viewModelFactory = viewModelFactory;
@@ -93,6 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.loggedOut = loggedOut;
             this.notAGitHubRepository = notAGitHubRepository;
             this.notAGitRepository = notAGitRepository;
+            this.noRemoteOrigin = noRemoteOrigin;
             this.loginFailed = loginFailed;
 
             var contentAndNavigatorContent = Observable.CombineLatest(
@@ -191,7 +196,7 @@ namespace GitHub.ViewModels.GitHubPane
         public bool IsSearchEnabled => isSearchEnabled.Value;
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository
+        public LocalRepositoryModel LocalRepository
         {
             get { return localRepository; }
             private set { this.RaiseAndSetIfChanged(ref localRepository, value); }
@@ -266,6 +271,15 @@ namespace GitHub.ViewModels.GitHubPane
                 var login = match.Groups["login"].Value;
                 await ShowPullRequestReviews(owner, repo, number, login);
             }
+            else if ((match = pullCheckRunsUri.Match(uri.AbsolutePath))?.Success == true)
+            {
+                var owner = match.Groups["owner"].Value;
+                var repo = match.Groups["repo"].Value;
+                var number = int.Parse(match.Groups["number"].Value);
+                var id = match.Groups["id"].Value;
+
+                await ShowPullRequestCheckRun(owner, repo, number, id);
+            }
             else
             {
                 throw new NotSupportedException("Unrecognised GitHub pane URL: " + uri.AbsolutePath);
@@ -317,6 +331,20 @@ namespace GitHub.ViewModels.GitHubPane
                      x.LocalRepository.Name == repo &&
                      x.PullRequestNumber == number &&
                      x.User.Login == login);
+        }
+
+        /// <inheritdoc/>
+        public Task ShowPullRequestCheckRun(string owner, string repo, int number, string checkRunId)
+        {
+            Guard.ArgumentNotNull(owner, nameof(owner));
+            Guard.ArgumentNotNull(repo, nameof(repo));
+
+            return NavigateTo<IPullRequestAnnotationsViewModel>(
+                x => x.InitializeAsync(LocalRepository, Connection, owner, repo, number, checkRunId),
+                x => x.RemoteRepositoryOwner == owner &&
+                     x.LocalRepository.Name == repo &&
+                     x.PullRequestNumber == number &&
+                     x.CheckRunId == checkRunId);
         }
 
         /// <inheritdoc/>
@@ -390,7 +418,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        async Task UpdateContent(ILocalRepositoryModel repository)
+        async Task UpdateContent(LocalRepositoryModel repository)
         {
             log.Debug("UpdateContent called with {CloneUrl}", repository?.CloneUrl);
 
@@ -409,8 +437,17 @@ namespace GitHub.ViewModels.GitHubPane
             }
             else if (string.IsNullOrWhiteSpace(repository.CloneUrl))
             {
-                log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
-                Content = notAGitHubRepository;
+                if (repository.HasRemotesButNoOrigin)
+                {
+                    log.Debug("No origin remote");
+                    Content = noRemoteOrigin;
+                }
+                else
+                {
+                    log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
+                    Content = notAGitHubRepository;
+                }
+
                 return;
             }
 
@@ -466,7 +503,7 @@ namespace GitHub.ViewModels.GitHubPane
                     Content = loggedOut;
                 }
             }
-            
+
             if (notGitHubRepo)
             {
                 log.Debug("Not a GitHub repository: {CloneUrl}", repository?.CloneUrl);
@@ -489,8 +526,8 @@ namespace GitHub.ViewModels.GitHubPane
 
         static Regex CreateRoute(string route)
         {
-            // Build RegEx from route (:foo to named group (?<foo>[\w_.-]+)).
-            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.-]+)") + "$";
+            // Build RegEx from route (:foo to named group (?<foo>[\w_.\-=]+)).
+            var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.\-=]+)") + "$";
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
     }

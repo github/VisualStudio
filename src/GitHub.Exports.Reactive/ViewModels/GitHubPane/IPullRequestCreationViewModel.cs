@@ -9,14 +9,14 @@ namespace GitHub.ViewModels.GitHubPane
 {
     public interface IPullRequestCreationViewModel : IPanePageViewModel
     {
-        IBranch SourceBranch { get; set; }
-        IBranch TargetBranch { get; set; }
-        IReadOnlyList<IBranch> Branches { get; }
+        BranchModel SourceBranch { get; set; }
+        BranchModel TargetBranch { get; set; }
+        IReadOnlyList<BranchModel> Branches { get; }
         ReactiveCommand<Unit, IPullRequestModel> CreatePullRequest { get; }
         ReactiveCommand<Unit, Unit> Cancel { get; }
         string PRTitle { get; set; }
         ReactivePropertyValidator TitleValidator { get; }
 
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

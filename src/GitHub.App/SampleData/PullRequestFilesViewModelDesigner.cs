@@ -36,6 +36,9 @@ namespace GitHub.SampleData
         public ReactiveCommand<IPullRequestFileNode, Unit> DiffFileWithWorkingDirectory { get; }
         public ReactiveCommand<IPullRequestFileNode, Unit> OpenFileInWorkingDirectory { get; }
         public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         public Task InitializeAsync(
             IPullRequestSession session,

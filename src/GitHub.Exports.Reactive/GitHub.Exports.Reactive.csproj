@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -27,6 +27,5 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="14.3.25407" />
   </ItemGroup>
 </Project>

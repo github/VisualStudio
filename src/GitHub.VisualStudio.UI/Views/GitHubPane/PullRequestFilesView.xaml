@@ -6,6 +6,7 @@
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              Name="root">
 
@@ -96,6 +97,60 @@
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationNoticeCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <imaging:CrispImage Width="10" Height="10" 
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Margin="-2 0" />
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationNotice, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationNoticeCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationWarningCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <imaging:CrispImage Width="10" Height="10" 
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Margin="-2 0"/>
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationWarning, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationWarningCount, Mode=OneWay}"/>
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock VerticalAlignment="Center" Margin="4 0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AnnotationFailureCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <imaging:CrispImage Width="10" Height="10" 
+                                            Moniker="{x:Static catalog:KnownMonikers.StatusError}" Margin="-2 0" />
+                        <Hyperlink Command="{Binding DataContext.OpenFirstAnnotationFailure, ElementName=root}"
+                                   CommandParameter="{Binding}">
+                            <Run Text="{Binding AnnotationFailureCount, Mode=OneWay}"/>
+                        </Hyperlink>
                     </TextBlock>
 
                     <TextBlock VerticalAlignment="Center" Margin="4 0">

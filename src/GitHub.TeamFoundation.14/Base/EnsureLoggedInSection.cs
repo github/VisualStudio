@@ -33,9 +33,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             CheckLogin().Forget();
         }
 
-        protected override void RepoChanged(bool changed)
+        protected override void RepoChanged()
         {
-            base.RepoChanged(changed);
+            base.RepoChanged();
             CheckLogin().Forget();
         }
 
@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             if (ActiveRepo == null || ActiveRepoUri == null)
                 return;
 
-            var isgithub = await IsAGitHubRepo();
+            var isgithub = await IsAGitHubRepo(ActiveRepoUri);
             if (!isgithub)
                 return;
 

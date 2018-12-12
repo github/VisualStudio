@@ -18,6 +18,7 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
 [![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
+[![Build Status](https://github-editor-tools.visualstudio.com/VisualStudio/_apis/build/status/github.VisualStudio?branchName=master)](https://github-editor-tools.visualstudio.com/VisualStudio/_build/latest?definitionId=4&branchName=master)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/github-visual-studio/localized.svg)](https://crowdin.com/project/github-visual-studio)
 [![codecov](https://codecov.io/gh/GitHub/VisualStudio/branch/master/graph/badge.svg)](https://codecov.io/gh/GitHub/VisualStudio)
 
@@ -96,7 +97,7 @@ Logs can be viewed at the following location:
 
 ## Contributing
 
-Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
+Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) for details on how to participate.
 
 ## Copyright
 

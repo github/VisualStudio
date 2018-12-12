@@ -24,7 +24,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         public async Task NotAGitRepositoryShownWhenNoRepositoryAsync()
         {
             var te = Substitute.For<ITeamExplorerContext>();
-            te.ActiveRepository.Returns(null as ILocalRepositoryModel);
+            te.ActiveRepository.Returns(null as LocalRepositoryModel);
             var target = CreateTarget(teamExplorerContext: te);
 
             await InitializeAsync(target);
@@ -190,6 +190,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         ILoggedOutViewModel loggedOut = null,
         INotAGitHubRepositoryViewModel notAGitHubRepository = null,
         INotAGitRepositoryViewModel notAGitRepository = null,
+        INoRemoteOriginViewModel noRemoteOriginViewModel = null,
         ILoginFailedViewModel loginFailed = null)
     {
         viewModelFactory = viewModelFactory ?? Substitute.For<IViewViewModelFactory>();
@@ -200,6 +201,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
         loggedOut = loggedOut ?? Substitute.For<ILoggedOutViewModel>();
         notAGitHubRepository = notAGitHubRepository ?? Substitute.For<INotAGitHubRepositoryViewModel>();
         notAGitRepository = notAGitRepository ?? Substitute.For<INotAGitRepositoryViewModel>();
+        noRemoteOriginViewModel = noRemoteOriginViewModel ?? Substitute.For<INoRemoteOriginViewModel>();
         loginFailed = loginFailed ?? Substitute.For<ILoginFailedViewModel>();
 
         if (navigator == null)
@@ -235,6 +237,7 @@ public class GitHubPaneViewModelTests : TestBaseClass
             loggedOut,
             notAGitHubRepository,
             notAGitRepository,
+            noRemoteOriginViewModel,
             loginFailed);
     }
 
@@ -282,8 +285,10 @@ public class GitHubPaneViewModelTests : TestBaseClass
 
     static ITeamExplorerContext CreateTeamExplorerContext(string repositoryCloneUrl)
     {
-        var repository = Substitute.For<ILocalRepositoryModel>();
-        repository.CloneUrl.Returns(new UriString(repositoryCloneUrl));
+        var repository = new LocalRepositoryModel
+        {
+            CloneUrl = new UriString(repositoryCloneUrl)
+        };
         var result = Substitute.For<ITeamExplorerContext>();
         result.ActiveRepository.Returns(repository);
         return result;

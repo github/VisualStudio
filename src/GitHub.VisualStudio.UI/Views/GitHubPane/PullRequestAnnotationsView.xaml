@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestAnnotationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"  
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
+
+    <d:DesignData.DataContext>
+        <ghfvs:PullRequestAnnotationsViewModelDesigner />
+    </d:DesignData.DataContext>
+
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Control.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                <StackPanel Margin="8 0 8 4">
+                    <TextBlock FontSize="16" VerticalAlignment="Center">
+                            <Run FontWeight="SemiBold" Text="{Binding CheckSuiteName, Mode=OneWay}"/>
+                            <Run Text="/"/>
+                            <Run FontWeight="SemiBold" Text="{Binding CheckRunName, Mode=OneWay}"/>
+
+                            <Run>for</Run>
+
+                            <Hyperlink Command="{Binding NavigateToPullRequest}">
+                                <Run>#</Run><Run Text="{Binding PullRequestNumber, Mode=OneWay}"/>
+                            </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock Foreground="{DynamicResource GitHubVsGrayText}"
+                               Margin="0"
+                               Text="{Binding PullRequestTitle}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+
+                <Expander Header="Body" Margin="0 4"
+                          FontWeight="SemiBold"
+                          Visibility="{Binding CheckRunSummary, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                    <markdig:MarkdownViewer Margin="21 0 8 0" FontWeight="Normal" Markdown="{Binding CheckRunSummary}" />
+                </Expander>
+
+                <Expander Margin="0 4"
+                          Visibility="{Binding CheckRunText, Converter={ghfvs:NullOrWhitespaceToVisibilityConverter}}">
+                    <Expander.Header>
+                        <TextBlock FontWeight="SemiBold" Text="Details" />
+                    </Expander.Header>
+                    <TextBlock Margin="21 0 8 0" FontFamily="Consolas" 
+                           Foreground="{DynamicResource VsBrush.GrayText}">
+                        <Run Text="{Binding CheckRunText, Mode=OneWay}"/>
+                    </TextBlock>
+                </Expander>
+
+                <Rectangle Fill="{DynamicResource GitHubHeaderSeparatorBrush}" Height="1" Margin="0 4"/>
+
+                <ItemsControl ItemsSource="{Binding AnnotationsDictionary}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0 4">
+                                <Expander>
+                                    <Expander.Header>
+                                        <TextBlock Margin="0 0 0 4" Foreground="{DynamicResource VsBrush.WindowText}" Text="{Binding Key}" FontWeight="SemiBold" />
+                                    </Expander.Header>
+
+                                    <ItemsControl ItemsSource="{Binding Value}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="22 0 0 8" >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="20" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                                                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusWarning}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Warning}}"/>
+                                                        <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusError}" Visibility="{Binding Annotation.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                                                    </StackPanel>
+
+                                                    <StackPanel Margin="8,0,0,0" Grid.Column="1">
+                                                        <TextBlock FontWeight="SemiBold" TextWrapping="Wrap">
+                                                            <Run Text="{Binding Annotation.Title, Mode=OneWay}"/>
+                                                        </TextBlock>
+
+                                                        <TextBlock FontFamily="Consolas"
+                                                                   Foreground="{DynamicResource VsBrush.GrayText}"
+                                                                   Visibility="{Binding IsFileInPullRequest, Converter={ghfvs:BooleanToVisibilityConverter}}">
+		                                                    <Hyperlink Command="{Binding OpenAnnotation}">
+                                                                <Run Text="Line" />
+                                                                <Run Text="{Binding LineDescription, Mode=OneWay}"/>
+		                                                    </Hyperlink>
+                                                        </TextBlock>
+
+                                                        <TextBlock FontFamily="Consolas"
+                                                                   Foreground="{DynamicResource VsBrush.GrayText}"
+                                                                   Visibility="{Binding IsFileInPullRequest, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
+                                                            <Run Text="Line" />
+                                                            <Run Text="{Binding LineDescription, Mode=OneWay}"/>
+                                                        </TextBlock>
+
+                                                        <markdig:MarkdownViewer FontFamily="Consolas" Markdown="{Binding Annotation.Message}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DockPanel>
+    </ScrollViewer>
+
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
+</UserControl>
+

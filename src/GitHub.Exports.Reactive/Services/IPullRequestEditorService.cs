@@ -37,14 +37,27 @@ namespace GitHub.Services
         Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha = null, bool scrollToFirstDiff = true);
 
         /// <summary>
-        /// Opens an diff viewer for a file in a pull request with the specified inline comment
-        /// thread open.
+        /// Opens an diff viewer for a file in a pull request with the specified inline review
+        /// comment thread open.
         /// </summary>
         /// <param name="session">The pull request session.</param>
         /// <param name="relativePath">The path to the file, relative to the repository.</param>
         /// <param name="thread">The thread to open</param>
         /// <returns>The opened diff viewer.</returns>
         Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, IInlineCommentThreadModel thread);
+
+        /// <summary>
+        /// Opens an diff viewer for a file in a pull request with the specified inline review line open.
+        /// </summary>
+        /// <param name="session">The pull request session.</param>
+        /// <param name="relativePath">The path to the file, relative to the repository.</param>
+        /// <param name="headSha">
+        /// The commit SHA of the right hand side of the diff. Pass null to compare with the
+        /// working directory, or "HEAD" to compare with the HEAD commit of the pull request.
+        /// </param>
+        /// <param name="nextInlineTagFromLine">The 0-based line number to execute NextInlineCommentCommand from</param>
+        /// <returns>The opened diff viewer.</returns>
+        Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine);
 
         /// <summary>
         /// Find the active text view.

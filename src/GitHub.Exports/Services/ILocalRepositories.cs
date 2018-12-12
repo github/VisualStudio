@@ -13,7 +13,7 @@ namespace GitHub.Services
         /// <summary>
         /// Gets the currently known local repositories.
         /// </summary>
-        IReadOnlyObservableCollection<ILocalRepositoryModel> Repositories { get; }
+        IReadOnlyObservableCollection<LocalRepositoryModel> Repositories { get; }
 
         /// <summary>
         /// Updates <see cref="Repositories"/>.

@@ -24,11 +24,10 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnZero" />
-            <!-- <ColumnDefinition Width="*" SharedSizeGroup="ColumnOne" /> -->
-            <ColumnDefinition Width="Auto" SharedSizeGroup="ColumnTwo" />
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition MinWidth="50" Width="Auto" SharedSizeGroup="ColumnFour" />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -38,16 +37,21 @@
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
         <ghfvs:OcticonImage Grid.Column="0" Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
-        <!-- 
-            <Image Grid.Column="1" Source="{Binding Avatar}" Height="16" Width="16" />
-        -->
-        <Label Grid.Column="1" Foreground="{DynamicResource VsBrush.WindowText}" Content="{Binding Title}"/>
-        <!--
-            <Label Grid.Column="3" HorizontalAlignment="Right" Content="{Binding Description}" ToolTip="{Binding Description}" />
-        -->
-        <Label Grid.Column="3" HorizontalAlignment="Right"
-               Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
-            <Hyperlink ToolTip="{Binding DetailsUrl}" Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
+
+        <Label Grid.Column="1" Foreground="{DynamicResource VsBrush.WindowText}">
+            <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Title}" />
+        </Label>
+
+        <Label Grid.Column="2" HorizontalContentAlignment="Stretch" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
+            <Hyperlink ToolTip="View checks"
+                           Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                           CommandParameter="{Binding}">
+                Checks
+            </Hyperlink>
+        </Label>
+        
+        <Label Grid.Column="3" HorizontalContentAlignment="Stretch" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+            <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>
     </Grid>
 </local:GenericPullRequestCheckView>

@@ -34,7 +34,11 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         void changesTree_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = (e.OriginalSource as FrameworkElement)?.DataContext as IPullRequestFileNode;
-            (DataContext as IPullRequestFilesViewModel)?.DiffFile.Execute(file);
+
+            if (file != null)
+            {
+                (DataContext as IPullRequestFilesViewModel)?.DiffFile.Execute(file);
+            }
         }
 
         void changesTree_MouseRightButtonDown(object sender, MouseButtonEventArgs e)

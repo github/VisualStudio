@@ -17,7 +17,7 @@ namespace GitHub.SampleData
         public ReactivePropertyValidator<string> BaseRepositoryPathValidator { get; }
         public ICommand BrowseForDirectory { get; }
         public ReactiveCommand<Unit, Unit> CloneCommand { get; }
-        public IRepositoryModel SelectedRepository { get; set; }
+        public RepositoryModel SelectedRepository { get; set; }
         public IObservable<object> Done { get; }
 
         public Task InitializeAsync(IConnection connection) => Task.CompletedTask;

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -20,6 +20,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
