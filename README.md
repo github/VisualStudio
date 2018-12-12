@@ -58,7 +58,7 @@ To be able to use the GitHub API, you'll need to:
 - [Register a new developer application](https://github.com/settings/developers) in your profile.
 - Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
 
-Build using Visual Studio 2017 or:
+Build using `cmd.exe`:
 
 ```txt
 build.cmd
