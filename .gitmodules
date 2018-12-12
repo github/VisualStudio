@@ -13,3 +13,6 @@
 [submodule "script"]
 	path = script
 	url = git@github.com:github/VisualStudioBuildScripts
+[submodule "submodules/octokit.graphql.net"]
+	path = submodules/octokit.graphql.net
+	url = https://github.com/octokit/octokit.graphql.net
