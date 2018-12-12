@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Commands;
@@ -17,6 +18,7 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using Serilog;
@@ -28,7 +30,7 @@ namespace GitHub.ViewModels.GitHubPane
     /// <inheritdoc cref="IPullRequestDetailViewModel"/>
     [Export(typeof(IPullRequestDetailViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IStaticReviewFileMap
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -40,6 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
         readonly IGitService gitService;
+
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -98,6 +101,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
+
             Files = files;
 
             Checkout = ReactiveCommand.CreateFromObservable(
@@ -136,6 +140,9 @@ namespace GitHub.ViewModels.GitHubPane
 
             ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
         }
+
+        [Import(AllowDefault = true)]
+        private IStaticReviewFileMapManager StaticReviewFileMapManager { get; set; }
 
         private void DoOpenDetailsUrl()
         {
@@ -482,6 +489,7 @@ namespace GitHub.ViewModels.GitHubPane
         public override void Activated()
         {
             active = true;
+            this.StaticReviewFileMapManager?.RegisterStaticReviewFileMap(this);
 
             if (refreshOnActivate)
             {
@@ -491,7 +499,43 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public override void Deactivated() => active = false;
+        public override void Deactivated()
+        {
+            this.StaticReviewFileMapManager?.UnregisterStaticReviewFileMap(this);
+            active = false;
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
+        {
+            if (this.pullRequestsService != null)
+            {
+                string commitId = objectish.Substring(0, objectish.IndexOf(':'));
+                string relativePath = objectish.Substring(objectish.IndexOf(':')+1).TrimStart('/');
+
+                return this.pullRequestsService.ExtractToTempFile(
+                    this.Session.LocalRepository,
+                    this.Session.PullRequest,
+                    relativePath,
+                    commitId,
+                    this.pullRequestsService.GetEncoding(this.Session.LocalRepository, relativePath));
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
+            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
+            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
+            {
+                return staticReviewFileMap.GetObjectishFromLocalPathAsync(localPath, cancellationToken);
+            }
+
+            return Task.FromResult<string>(null);
+        }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
