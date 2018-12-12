@@ -10,6 +10,7 @@ using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.UI.Converters;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -105,9 +106,9 @@ namespace GitHub.ViewModels.GitHubPane
                     pullRequestCheckViewModel.HasAnnotations = arg.checkRun.Annotations?.Any() ?? false;
                     pullRequestCheckViewModel.Title = arg.checkRun.Name;
 
-                    if (model.StartedAt.HasValue && model.CompletedAt.HasValue)
+                    if (arg.checkRun.StartedAt.HasValue && arg.checkRun.CompletedAt.HasValue)
                     {
-                        var timeSpanString = TimeSpanExtensions.Humanize(model.CompletedAt.Value - model.StartedAt.Value, CultureInfo.CurrentCulture, TimeSpanExtensions.OutputTense.Completed);
+                        var timeSpanString = TimeSpanExtensions.Humanize(arg.checkRun.CompletedAt.Value - arg.checkRun.StartedAt.Value, CultureInfo.CurrentCulture, TimeSpanExtensions.OutputTense.Completed);
                         pullRequestCheckViewModel.DurationStatus = $"{checkStatus} - {timeSpanString}";
                     }
 
