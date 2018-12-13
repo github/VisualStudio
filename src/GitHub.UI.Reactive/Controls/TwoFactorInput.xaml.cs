@@ -81,7 +81,7 @@ namespace GitHub.UI
             var digits = text.Where(Char.IsDigit).ToList();
             for (int i = 0; i < Math.Min(6, digits.Count); i++)
             {
-                TextBoxes[i].Text = digits[i].ToString();
+                TextBoxes[i].Text = digits[i].ToString(CultureInfo.InvariantCulture);
             }
             SetValue(TextProperty, String.Join("", digits));
         }

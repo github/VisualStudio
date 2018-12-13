@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Design;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -253,21 +254,21 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
-                var number = int.Parse(match.Groups["number"].Value);
+                var number = int.Parse(match.Groups["number"].Value, CultureInfo.InvariantCulture);
                 await ShowPullRequest(owner, repo, number);
             }
             else if ((match = pullNewReviewUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
-                var number = int.Parse(match.Groups["number"].Value);
+                var number = int.Parse(match.Groups["number"].Value, CultureInfo.InvariantCulture);
                 await ShowPullRequestReviewAuthoring(owner, repo, number);
             }
             else if ((match = pullUserReviewsUri.Match(uri.AbsolutePath))?.Success == true)
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
-                var number = int.Parse(match.Groups["number"].Value);
+                var number = int.Parse(match.Groups["number"].Value, CultureInfo.InvariantCulture);
                 var login = match.Groups["login"].Value;
                 await ShowPullRequestReviews(owner, repo, number, login);
             }
@@ -275,7 +276,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 var owner = match.Groups["owner"].Value;
                 var repo = match.Groups["repo"].Value;
-                var number = int.Parse(match.Groups["number"].Value);
+                var number = int.Parse(match.Groups["number"].Value, CultureInfo.InvariantCulture);
                 var id = match.Groups["id"].Value;
 
                 await ShowPullRequestCheckRun(owner, repo, number, id);

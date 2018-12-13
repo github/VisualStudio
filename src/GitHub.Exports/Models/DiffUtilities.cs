@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using GitHub.Extensions;
+using System.Globalization;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 
@@ -39,8 +40,8 @@ namespace GitHub.Models
 
                     chunk = new DiffChunk
                     {
-                        OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value),
-                        NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value),
+                        OldLineNumber = oldLine = int.Parse(headerMatch.Groups[1].Value, CultureInfo.InvariantCulture),
+                        NewLineNumber = newLine = int.Parse(headerMatch.Groups[2].Value, CultureInfo.InvariantCulture),
                         DiffLine = diffLine,
                     };
                 }
