@@ -33,6 +33,11 @@ namespace GitHub.ViewModels.GitHubPane
         Uri DetailsUrl { get; }
 
         /// <summary>
+        /// The amount of time this Status/Check took to run.
+        /// </summary>
+        string DurationStatus { get; }
+
+        /// <summary>
         /// A command that opens the DetailsUrl in a browser.
         /// </summary>
         ReactiveCommand<Unit, Unit> OpenDetailsUrl { get; }

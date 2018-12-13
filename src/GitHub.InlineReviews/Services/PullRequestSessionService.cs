@@ -803,8 +803,11 @@ namespace GitHub.InlineReviews.Services
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
-                                                  DetailsUrl = run.Permalink,
+                                                  Title = run.Title,
                                                   Summary = run.Summary,
+                                                  DetailsUrl = run.Permalink,
+                                                  StartedAt = run.StartedAt,
+                                                  CompletedAt = run.CompletedAt,
                                                   Text = run.Text,
                                                   Annotations = run.Annotations(null, null, null, null).AllPages()
                                                       .Select(annotation => new CheckRunAnnotationModel
