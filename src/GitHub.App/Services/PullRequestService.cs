@@ -26,7 +26,6 @@ using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
 using CheckConclusionState = GitHub.Models.CheckConclusionState;
 using CheckStatusState = GitHub.Models.CheckStatusState;
-using ProtectedBranch = GitHub.Models.ProtectedBranch;
 using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
@@ -56,7 +55,6 @@ namespace GitHub.Services
         readonly IGitService gitService;
         readonly IVSGitExt gitExt;
         readonly IGraphQLClientFactory graphqlFactory;
-        readonly IRepositoryService repositoryService;
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
@@ -66,7 +64,6 @@ namespace GitHub.Services
             IGitService gitService,
             IVSGitExt gitExt,
             IGraphQLClientFactory graphqlFactory,
-            IRepositoryService repositoryService,
             IOperatingSystem os,
             IUsageTracker usageTracker)
         {
@@ -74,7 +71,6 @@ namespace GitHub.Services
             this.gitService = gitService;
             this.gitExt = gitExt;
             this.graphqlFactory = graphqlFactory;
-            this.repositoryService = repositoryService;
             this.os = os;
             this.usageTracker = usageTracker;
         }
@@ -108,7 +104,6 @@ namespace GitHub.Services
                               Items = page.Nodes.Select(pr => new ListItemAdapter
                               {
                                   Id = pr.Id.Value,
-                                  BaseRefName = pr.BaseRefName,
                                   LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                       new LastCommitSummaryAdapter
                                       {
@@ -118,7 +113,6 @@ namespace GitHub.Services
                                                   CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                                       .Select(run => new CheckRunSummaryModel
                                                       {
-                                                          Name = run.Name,
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
                                                       }).ToList(),
@@ -127,7 +121,6 @@ namespace GitHub.Services
                                                   .Select(context =>
                                                       context.Contexts.Select(statusContext => new StatusSummaryModel
                                                       {
-                                                          Context = statusContext.Context,
                                                           State = statusContext.State.FromGraphQl(),
                                                       }).ToList()
                                                   ).SingleOrDefault()
@@ -172,7 +165,6 @@ namespace GitHub.Services
                               Items = page.Nodes.Select(pr => new ListItemAdapter
                               {
                                   Id = pr.Id.Value,
-                                  BaseRefName = pr.BaseRefName,
                                   LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                       new LastCommitSummaryAdapter
                                       {
@@ -208,11 +200,6 @@ namespace GitHub.Services
                 query = readPullRequestsEnterprise;
             }
 
-            var protectedBranches = await repositoryService.GetProtectedBranches(address, owner, name)
-                .ConfigureAwait(false);
-
-            var protectedBranchesContextsDictionary = protectedBranches.ToDictionary(branch => branch.Name, branch => new HashSet<string>(branch.RequiredStatusCheckContexts));
-
             var graphql = await graphqlFactory.CreateConnection(address);
             var vars = new Dictionary<string, object>
             {
@@ -226,101 +213,67 @@ namespace GitHub.Services
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
-                HashSet<string> protectedBranchContexts;
-                protectedBranchesContextsDictionary.TryGetValue(item.BaseRefName, out protectedBranchContexts);
-
                 item.CommentCount += item.Reviews.Sum(x => x.Count);
                 item.Reviews = null;
 
-                if (protectedBranchContexts != null)
+                var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+
+                var hasCheckRuns = checkRuns?.Any() ?? false;
+                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
+
+                if (!hasCheckRuns && !hasStatuses)
                 {
-                    var requiredCheckRuns = item.LastCommit?.CheckSuites?
-                        .SelectMany(checkSuite => checkSuite.CheckRuns)
-                        .Where(model => protectedBranchContexts.Contains(model.Name))
-                        .ToArray();
-
-                    var requiredStatues = item.LastCommit?.Statuses
-                        .Where(model => protectedBranchContexts.Contains(model.Context))
-                        .ToArray();
-
-                    item.RequiredChecks = CalculatePullRequestCheckState(requiredCheckRuns, requiredStatues);
+                    item.Checks = PullRequestChecksState.None;
                 }
                 else
                 {
-                    item.RequiredChecks = PullRequestChecksState.None;
-                }
+                    var checksHasFailure = false;
+                    var checksHasCompleteSuccess = true;
 
-                var checkRuns = item.LastCommit?.CheckSuites?
-                    .SelectMany(checkSuite => checkSuite.CheckRuns)
-                    .Where(model => protectedBranchContexts == null || !protectedBranchContexts.Contains(model.Name))
-                    .ToArray();
-
-                var statuses = item.LastCommit?.Statuses
-                    .Where(model => protectedBranchContexts == null || !protectedBranchContexts.Contains(model.Context))
-                    .ToArray();
-
-                item.OtherChecks = CalculatePullRequestCheckState(checkRuns, statuses);
-
-                switch (item.RequiredChecks)
-                {
-                    case PullRequestChecksState.None:
-                            item.Checks = PullRequestChecksSummaryState.None;
-                        break;
-                    case PullRequestChecksState.Pending:
-                            item.Checks = PullRequestChecksSummaryState.Pending;
-                        break;
-                    case PullRequestChecksState.Success:
-                            item.Checks = PullRequestChecksSummaryState.Success;
-                        break;
-                    case PullRequestChecksState.Failure:
-                            item.Checks = PullRequestChecksSummaryState.Failure;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                if (item.RequiredChecks != item.OtherChecks)
-                {
-                    switch (item.RequiredChecks)
+                    if (hasCheckRuns)
                     {
-                        case PullRequestChecksState.None:
-                            switch (item.OtherChecks)
-                            {
-                                case PullRequestChecksState.None:
-                                    item.Checks = PullRequestChecksSummaryState.None;
-                                    break;
-                                case PullRequestChecksState.Pending:
-                                    item.Checks = PullRequestChecksSummaryState.Pending;
-                                    break;
-                                case PullRequestChecksState.Success:
-                                    item.Checks = PullRequestChecksSummaryState.Success;
-                                    break;
-                                case PullRequestChecksState.Failure:
-                                    item.Checks = PullRequestChecksSummaryState.Failure;
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                            break;
-                        case PullRequestChecksState.Pending:
-                            item.Checks = PullRequestChecksSummaryState.Pending;
-                            break;
-                        case PullRequestChecksState.Success:
-                            switch (item.OtherChecks)
-                            {
-                                case PullRequestChecksState.Pending:
-                                    item.Checks = PullRequestChecksSummaryState.SuccessWithPending;
-                                    break;
-                                case PullRequestChecksState.Failure:
-                                    item.Checks = PullRequestChecksSummaryState.SuccessWithFailure;
-                                    break;
-                            }
-                            break;
-                        case PullRequestChecksState.Failure:
-                            item.Checks = PullRequestChecksSummaryState.Failure;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        checksHasFailure = checkRuns
+                            .Any(model => model.Conclusion.HasValue
+                                          && (model.Conclusion.Value == CheckConclusionState.Failure
+                                              || model.Conclusion.Value == CheckConclusionState.ActionRequired));
+
+                        if (!checksHasFailure)
+                        {
+                            checksHasCompleteSuccess = checkRuns
+                                .All(model => model.Conclusion.HasValue
+                                              && (model.Conclusion.Value == CheckConclusionState.Success
+                                                  || model.Conclusion.Value == CheckConclusionState.Neutral));
+                        }
+                    }
+
+                    var statusHasFailure = false;
+                    var statusHasCompleteSuccess = true;
+
+                    if (!checksHasFailure && hasStatuses)
+                    {
+                        statusHasFailure = item.LastCommit
+                            .Statuses
+                            .Any(status => status.State == StatusState.Failure
+                                           || status.State == StatusState.Error);
+
+                        if (!statusHasFailure)
+                        {
+                            statusHasCompleteSuccess =
+                                item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
+                        }
+                    }
+
+                    if (checksHasFailure || statusHasFailure)
+                    {
+                        item.Checks = PullRequestChecksState.Failure;
+                    }
+                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
+                    {
+                        item.Checks = PullRequestChecksState.Success;
+                    }
+                    else
+                    {
+                        item.Checks = PullRequestChecksState.Pending;
                     }
                 }
 
@@ -328,70 +281,6 @@ namespace GitHub.Services
             }
 
             return result;
-        }
-
-        static PullRequestChecksState CalculatePullRequestCheckState(IList<CheckRunSummaryModel> checkRuns, IList<StatusSummaryModel> statusSummaryModels)
-        {
-            var hasCheckRuns = checkRuns?.Any() ?? false;
-            var hasStatuses = statusSummaryModels?.Any() ?? false;
-
-            PullRequestChecksState resultState;
-            if (!hasCheckRuns && !hasStatuses)
-            {
-                resultState = PullRequestChecksState.None;
-            }
-            else
-            {
-                var checksHasFailure = false;
-                var checksHasCompleteSuccess = true;
-
-                if (hasCheckRuns)
-                {
-                    checksHasFailure = checkRuns
-                        .Any(model => model.Conclusion.HasValue
-                                      && (model.Conclusion.Value == CheckConclusionState.Failure
-                                          || model.Conclusion.Value == CheckConclusionState.ActionRequired));
-
-                    if (!checksHasFailure)
-                    {
-                        checksHasCompleteSuccess = checkRuns
-                            .All(model => model.Conclusion.HasValue
-                                          && (model.Conclusion.Value == CheckConclusionState.Success
-                                              || model.Conclusion.Value == CheckConclusionState.Neutral));
-                    }
-                }
-
-                var statusHasFailure = false;
-                var statusHasCompleteSuccess = true;
-
-                if (!checksHasFailure && hasStatuses)
-                {
-                    statusHasFailure = statusSummaryModels
-                        .Any(status => status.State == StatusState.Failure
-                                       || status.State == StatusState.Error);
-
-                    if (!statusHasFailure)
-                    {
-                        statusHasCompleteSuccess =
-                            statusSummaryModels.All(status => status.State == StatusState.Success);
-                    }
-                }
-
-                if (checksHasFailure || statusHasFailure)
-                {
-                    resultState = PullRequestChecksState.Failure;
-                }
-                else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
-                {
-                    resultState = PullRequestChecksState.Success;
-                }
-                else
-                {
-                    resultState = PullRequestChecksState.Pending;
-                }
-            }
-
-            return resultState;
         }
 
         public async Task<Page<ActorModel>> ReadAssignableUsers(
@@ -1122,8 +1011,6 @@ namespace GitHub.Services
             public IList<ReviewAdapter> Reviews { get; set; }
 
             public LastCommitSummaryAdapter LastCommit { get; set; }
-
-            public string BaseRefName { get; set; }
         }
 
         class ReviewAdapter
@@ -1147,7 +1034,6 @@ namespace GitHub.Services
 
         class CheckRunSummaryModel
         {
-            public string Name { get; set; }
             public CheckConclusionState? Conclusion { get; set; }
             public CheckStatusState Status { get; set; }
         }
@@ -1155,7 +1041,6 @@ namespace GitHub.Services
         class StatusSummaryModel
         {
             public StatusState State { get; set; }
-            public string Context { get; set; }
         }
     }
 }
