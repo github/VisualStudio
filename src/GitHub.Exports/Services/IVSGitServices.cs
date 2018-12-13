@@ -30,7 +30,7 @@ namespace GitHub.Services
 
         string GetActiveRepoPath();
         LibGit2Sharp.IRepository GetActiveRepo();
-        IEnumerable<ILocalRepositoryModel> GetKnownRepositories();
+        IEnumerable<LocalRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
     }
 }

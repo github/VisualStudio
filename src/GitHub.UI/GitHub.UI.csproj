@@ -1,6 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
     <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj" />
   </ItemGroup>

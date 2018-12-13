@@ -8,7 +8,14 @@ namespace GitHub.Models
     /// </summary>
     public class CheckRunModel
     {
-        /// <summary>The conclusion of the check run.</summary>
+        /// <summary>
+        /// The id of a Check Run.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// The conclusion of the check run.
+        /// </summary>
         public CheckConclusionState? Conclusion { get; set; }
 
         /// <summary>
@@ -21,7 +28,14 @@ namespace GitHub.Models
         /// </summary>
         public DateTimeOffset? CompletedAt { get; set; }
 
-        /// <summary>The name of the check for this check run.</summary>
+        /// <summary>
+        /// The check run's annotations.
+        /// </summary>
+        public List<CheckRunAnnotationModel> Annotations { get; set; }
+        
+        /// <summary>
+        /// The name of the check for this check run.
+        /// </summary>
         public string Name { get; set; }
 
         /// <summary>
@@ -34,6 +48,14 @@ namespace GitHub.Models
         /// </summary>
         public string Summary { get; set; }
 
+        /// <summary>
+        /// The flag that denotes if this check is required for the pull request.
+        /// </summary>
         public bool IsRequired { get; set; }
+
+        /// <summary>
+        /// The detail of a Check Run.
+        /// </summary>
+        public string Text { get; set; }
     }
 }

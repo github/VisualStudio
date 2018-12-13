@@ -30,7 +30,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         bool loadingStarted;
         IReadOnlyList<IRepositoryItemViewModel> items;
         ICollectionView itemsView;
-        ObservableAsPropertyHelper<IRepositoryModel> repository;
+        ObservableAsPropertyHelper<RepositoryModel> repository;
         IRepositoryItemViewModel selectedItem;
 
         [ImportingConstructor]
@@ -88,7 +88,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedItem, value);
         }
 
-        public IRepositoryModel Repository => repository.Value;
+        public RepositoryModel Repository => repository.Value;
 
         public void Initialize(IConnection connection)
         {
@@ -117,7 +117,7 @@ namespace GitHub.ViewModels.Dialog.Clone
                     .Where(r => r.Owner != results.Owner)
                     .OrderBy(r => r.Owner)
                     .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
-                var orgRepositories = results.OrganizationRepositories
+                var orgRepositories = results.Organizations
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, x.Key)));
                 Items = yourRepositories.Concat(collaboratorRepositories).Concat(orgRepositories).ToList();
@@ -152,7 +152,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             return true;
         }
 
-        IRepositoryModel CreateRepository(IRepositoryItemViewModel item)
+        RepositoryModel CreateRepository(IRepositoryItemViewModel item)
         {
             return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :

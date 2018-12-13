@@ -4,7 +4,6 @@ using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -13,11 +12,10 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromClipboardCommand))]
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
-      
-
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IVSServices> vsServices;
+        readonly Lazy<IGitService> gitService;
         readonly Lazy<UIContext> uiContext;
 
         /// <summary>
@@ -34,12 +32,14 @@ namespace GitHub.VisualStudio.Commands
         public OpenFromClipboardCommand(
             Lazy<IGitHubContextService> gitHubContextService,
             Lazy<ITeamExplorerContext> teamExplorerContext,
-            Lazy<IVSServices> vsServices)
+            Lazy<IVSServices> vsServices,
+            Lazy<IGitService> gitService)
             : base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.teamExplorerContext = teamExplorerContext;
             this.vsServices = vsServices;
+            this.gitService = gitService;
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
             ParametersDescription = "u";    // accept a single url
@@ -96,9 +96,11 @@ namespace GitHub.VisualStudio.Commands
             var hasChanges = gitHubContextService.Value.HasChangesInWorkingDirectory(repositoryDir, commitish, path);
             if (hasChanges)
             {
-                // AnnotateFile expects a branch name so we use the current branch
-                var branchName = activeRepository.CurrentBranch.Name;
+                // TODO: What if this returns null because we're not on a branch?
+                var currentBranch = gitService.Value.GetBranch(activeRepository);
+                var branchName = currentBranch.Name;
 
+                // AnnotateFile expects a branch name so we use the current branch
                 if (await gitHubContextService.Value.TryAnnotateFile(repositoryDir, branchName, context))
                 {
                     return;

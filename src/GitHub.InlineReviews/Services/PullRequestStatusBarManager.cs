@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Primitives;
+using GitHub.VisualStudio;
 using GitHub.InlineReviews.Views;
 using GitHub.InlineReviews.ViewModels;
 using GitHub.Services;
@@ -36,6 +37,7 @@ namespace GitHub.InlineReviews.Services
         readonly Lazy<IPullRequestSessionManager> pullRequestSessionManager;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IConnectionManager> connectionManager;
+        readonly Lazy<ITippingService> tippingService;
 
         [ImportingConstructor]
         public PullRequestStatusBarManager(
@@ -44,7 +46,8 @@ namespace GitHub.InlineReviews.Services
             IShowCurrentPullRequestCommand showCurrentPullRequestCommand,
             Lazy<IPullRequestSessionManager> pullRequestSessionManager,
             Lazy<ITeamExplorerContext> teamExplorerContext,
-            Lazy<IConnectionManager> connectionManager)
+            Lazy<IConnectionManager> connectionManager,
+            Lazy<ITippingService> tippingService)
         {
             this.openPullRequestsCommand = new UsageTrackingCommand(usageTracker,
                 x => x.NumberOfStatusBarOpenPullRequestList, openPullRequestsCommand);
@@ -54,6 +57,7 @@ namespace GitHub.InlineReviews.Services
             this.pullRequestSessionManager = pullRequestSessionManager;
             this.teamExplorerContext = teamExplorerContext;
             this.connectionManager = connectionManager;
+            this.tippingService = tippingService;
         }
 
         /// <summary>
@@ -80,8 +84,13 @@ namespace GitHub.InlineReviews.Services
             }
         }
 
-        async Task RefreshCurrentSession(ILocalRepositoryModel repository, IPullRequestSession session)
+        async Task RefreshCurrentSession(LocalRepositoryModel repository, IPullRequestSession session)
         {
+            if (repository != null && repository.HasRemotesButNoOrigin)
+            {
+                NoRemoteOriginCallout();
+            }
+
             var showStatus = await IsDotComOrEnterpriseRepository(repository);
             if (!showStatus)
             {
@@ -93,7 +102,34 @@ namespace GitHub.InlineReviews.Services
             ShowStatus(viewModel);
         }
 
-        async Task<bool> IsDotComOrEnterpriseRepository(ILocalRepositoryModel repository)
+        [STAThread]
+        void NoRemoteOriginCallout()
+        {
+            try
+            {
+                var view = FindSccStatusBar(Application.Current.MainWindow);
+                if (view == null)
+                {
+                    log.Warning("Couldn't find SccStatusBar");
+                    return;
+                }
+
+                tippingService.Value.RequestCalloutDisplay(
+                    calloutId: Guids.NoRemoteOriginCalloutId,
+                    title: Resources.CantFindGitHubUrlForRepository,
+                    message: Resources.RepositoriesMustHaveRemoteOrigin,
+                    isPermanentlyDismissible: true,
+                    targetElement: view,
+                    vsCommandGroupId: Guids.guidGitHubCmdSet,
+                    vsCommandId: PkgCmdIDList.showGitHubPaneCommand);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, nameof(NoRemoteOriginCallout));
+            }
+        }
+
+        async Task<bool> IsDotComOrEnterpriseRepository(LocalRepositoryModel repository)
         {
             var cloneUrl = repository?.CloneUrl;
             if (cloneUrl == null)
@@ -128,7 +164,7 @@ namespace GitHub.InlineReviews.Services
             return pullRequestStatusViewModel;
         }
 
-        void ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
+        PullRequestStatusView ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
         {
             var statusBar = FindSccStatusBar(Application.Current.MainWindow);
             if (statusBar != null)
@@ -144,8 +180,11 @@ namespace GitHub.InlineReviews.Services
                 {
                     githubStatusBar = new PullRequestStatusView { DataContext = pullRequestStatusViewModel };
                     statusBar.Items.Insert(0, githubStatusBar);
+                    return githubStatusBar;
                 }
             }
+
+            return null;
         }
 
         static T Find<T>(StatusBar statusBar)

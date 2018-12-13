@@ -8,7 +8,6 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.App.Services;
 using GitHub.Factories;
 using GitHub.InlineReviews.Models;
 using GitHub.Models;
@@ -18,22 +17,15 @@ using GitHub.Services;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
-using Octokit;
 using Octokit.GraphQL;
-using Octokit.GraphQL.Core;
 using Octokit.GraphQL.Model;
 using ReactiveUI;
 using Serilog;
 using PullRequestReviewEvent = Octokit.PullRequestReviewEvent;
 using static Octokit.GraphQL.Variable;
-using CheckAnnotationLevel = GitHub.Models.CheckAnnotationLevel;
-using CheckConclusionState = GitHub.Models.CheckConclusionState;
-using CheckStatusState = GitHub.Models.CheckStatusState;
 using DraftPullRequestReviewComment = Octokit.GraphQL.Model.DraftPullRequestReviewComment;
 using FileMode = System.IO.FileMode;
 using NotFoundException = LibGit2Sharp.NotFoundException;
-using PullRequestReviewState = Octokit.GraphQL.Model.PullRequestReviewState;
-using StatusState = GitHub.Models.StatusState;
 
 // GraphQL DatabaseId field are marked as deprecated, but we need them for interop with REST.
 #pragma warning disable CS0618 
@@ -83,7 +75,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -92,12 +84,29 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(ILocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
+        public virtual async Task<IReadOnlyList<DiffChunk>> Diff(LocalRepositoryModel repository, string baseSha, string headSha, string relativePath, byte[] contents)
         {
             using (var repo = await GetRepository(repository))
             {
                 return await diffService.Diff(repo, baseSha, headSha, relativePath, contents);
             }
+        }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<InlineAnnotationModel> BuildAnnotations(
+            PullRequestDetailModel pullRequest,
+            string relativePath)
+        {
+            relativePath = relativePath.Replace("\\", "/");
+
+            return pullRequest.CheckSuites
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                .SelectMany(arg =>
+                    arg.checkRun.Annotations
+                        .Where(annotation => annotation.Path == relativePath)
+                        .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
+                .OrderBy(tuple => tuple.StartLine)
+                .ToArray();
         }
 
         /// <inheritdoc/>
@@ -220,7 +229,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> GetTipSha(ILocalRepositoryModel repository)
+        public virtual async Task<string> GetTipSha(LocalRepositoryModel repository)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -229,7 +238,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsUnmodifiedAndPushed(ILocalRepositoryModel repository, string relativePath, byte[] contents)
+        public async Task<bool> IsUnmodifiedAndPushed(LocalRepositoryModel repository, string relativePath, byte[] contents)
         {
             using (var repo = await GetRepository(repository))
             {
@@ -241,7 +250,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<byte[]> ExtractFileFromGit(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             int pullRequestNumber,
             string sha,
             string relativePath)
@@ -286,7 +295,7 @@ namespace GitHub.InlineReviews.Services
             if (readPullRequest == null)
             {
                 readPullRequest = new Query()
-                    .Repository(Var(nameof(name)), Var(nameof(owner)))
+                    .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                     .PullRequest(Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
@@ -361,8 +370,20 @@ namespace GitHub.InlineReviews.Services
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
             var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number, protectedContexts);
 
-            result.Statuses = lastCommitModel.Statuses;
-            result.CheckSuites = lastCommitModel.CheckSuites;
+            result.Statuses = (IReadOnlyList<StatusModel>) lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
+
+            if (lastCommitModel.CheckSuites == null)
+            {
+                result.CheckSuites = Array.Empty<CheckSuiteModel>();
+            }
+            else
+            { 
+                result.CheckSuites = lastCommitModel.CheckSuites;
+                foreach (var checkSuite in result.CheckSuites)
+                {
+                    checkSuite.HeadSha = lastCommitModel.HeadSha;
+                }
+            }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
             {
@@ -393,7 +414,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<string> GetGraphQLPullRequestId(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string repositoryOwner,
             int number)
         {
@@ -401,7 +422,7 @@ namespace GitHub.InlineReviews.Services
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var query = new Query()
-                .Repository(localRepository.Name, repositoryOwner)
+                .Repository(owner: repositoryOwner, name: localRepository.Name)
                 .PullRequest(number)
                 .Select(x => x.Id);
 
@@ -409,7 +430,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> GetPullRequestMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public virtual async Task<string> GetPullRequestMergeBase(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             var baseSha = pullRequest.BaseRefSha;
             var headSha = pullRequest.HeadRefSha;
@@ -453,7 +474,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> CreatePendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
@@ -468,7 +489,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> CancelPendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string reviewId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
@@ -493,7 +514,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string commitId,
             string body,
@@ -524,7 +545,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         public async Task<PullRequestDetailModel> SubmitPendingReview(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             PullRequestReviewEvent e)
@@ -554,7 +575,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostPendingReviewComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             string commitId,
@@ -588,7 +609,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostPendingReviewCommentReply(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pendingReviewId,
             string body,
             string inReplyTo)
@@ -618,7 +639,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostStandaloneReviewComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
             string commitId,
@@ -660,7 +681,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> PostStandaloneReviewCommentReply(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string pullRequestId,
             string body,
             string inReplyTo)
@@ -672,7 +693,7 @@ namespace GitHub.InlineReviews.Services
 
         /// <inheritdoc/>
         public async Task<PullRequestDetailModel> DeleteComment(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             int pullRequestId,
             int commentDatabaseId)
@@ -690,7 +711,7 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public async Task<PullRequestDetailModel> EditComment(ILocalRepositoryModel localRepository,
+        public async Task<PullRequestDetailModel> EditComment(LocalRepositoryModel localRepository,
             string remoteRepositoryOwner,
             string commentNodeId,
             string body)
@@ -716,7 +737,7 @@ namespace GitHub.InlineReviews.Services
             return await ReadPullRequestDetail(address, result.Login, localRepository.Name, result.Number);
         }
 
-        async Task<(string id, string owner, int number)> CreatePendingReviewCore(ILocalRepositoryModel localRepository, string pullRequestId)
+        async Task<(string id, string owner, int number)> CreatePendingReviewCore(LocalRepositoryModel localRepository, string pullRequestId)
         {
             var address = HostAddress.Create(localRepository.CloneUrl.Host);
             var graphql = await graphqlFactory.CreateConnection(address);
@@ -753,7 +774,7 @@ namespace GitHub.InlineReviews.Services
             return -1;
         }
 
-        Task<IRepository> GetRepository(ILocalRepositoryModel repository)
+        Task<IRepository> GetRepository(LocalRepositoryModel repository)
         {
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
@@ -767,22 +788,36 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                          .Repository(Var(nameof(name)), Var(nameof(owner)))
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
+                                  HeadSha = commit.Commit.Oid,
                                   CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
                                       .Select(suite => new CheckSuiteModel
                                       {
                                           CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
                                               .Select(run => new CheckRunModel
                                               {
+                                                  Id = run.Id.Value,
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
                                                   DetailsUrl = run.Permalink,
                                                   Summary = run.Summary,
-                                              }).ToList()
+                                                  Text = run.Text,
+                                                  Annotations = run.Annotations(null, null, null, null).AllPages()
+                                                      .Select(annotation => new CheckRunAnnotationModel
+                                                      {
+                                                          Title = annotation.Title,
+                                                          Message = annotation.Message,
+                                                          Path = annotation.Path,
+                                                          AnnotationLevel = annotation.AnnotationLevel.Value.FromGraphQl(),
+                                                          StartLine = annotation.Location.Start.Line,
+                                                          EndLine = annotation.Location.End.Line,
+                                                      }).ToList()
+                                              }).ToList(),
+                                          ApplicationName = suite.App != null ? suite.App.Name : "Private App"
                                       }).ToList(),
                                   Statuses = commit.Commit.Status
                                       .Select(context =>
@@ -791,7 +826,7 @@ namespace GitHub.InlineReviews.Services
                                               State = statusContext.State.FromGraphQl(),
                                               Context = statusContext.Context,
                                               TargetUrl = statusContext.TargetUrl,
-                                              Description = statusContext.Description,
+                                              Description = statusContext.Description
                                           }).ToList()
                                       ).SingleOrDefault()
                               }
@@ -805,20 +840,22 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatusesEnterprise == null)
                 {
                     readCommitStatusesEnterprise = new Query()
-                     .Repository(Var(nameof(name)), Var(nameof(owner)))
+                     .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                      .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
-                             Statuses = commit.Commit.Status
-                                 .Select(context =>
-                                     context.Contexts.Select(statusContext => new StatusModel
-                                     {
-                                         State = statusContext.State.FromGraphQl(),
-                                         Context = statusContext.Context,
-                                         TargetUrl = statusContext.TargetUrl,
-                                         Description = statusContext.Description,
-                                     }).ToList()
-                                 ).SingleOrDefault()
+                             Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
+                                 .Select(context => context == null 
+                                     ? null 
+                                     : context.Contexts
+                                         .Select(statusContext => new StatusModel
+                                         {
+                                             State = statusContext.State.FromGraphQl(),
+                                             Context = statusContext.Context,
+                                             TargetUrl = statusContext.TargetUrl,
+                                             Description = statusContext.Description,
+                                         }).ToList()
+                                     ).SingleOrDefault()
                          }
                      ).Compile();
                 }
@@ -943,6 +980,8 @@ namespace GitHub.InlineReviews.Services
             public List<CheckSuiteModel> CheckSuites { get; set; }
 
             public List<StatusModel> Statuses { get; set; }
+
+            public string HeadSha { get; set; }
         }
     }   
 }

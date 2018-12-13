@@ -18,7 +18,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// No message should be displayed; the items should be displayed.
         /// </summary>
         None,
-        
+
         /// <summary>
         /// A "No Open Items" message should be displayed.
         /// </summary>
@@ -47,7 +47,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <remarks>
         /// Returns null if the current repository is not a fork.
         /// </remarks>
-        IReadOnlyList<IRepositoryModel> Forks { get; }
+        IReadOnlyList<RepositoryModel> Forks { get; }
 
         /// <summary>
         /// Gets the list of issues or pull requests.
@@ -63,7 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets an enum indicating a message that should be displayed in place of a list of items.
@@ -77,7 +77,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// This may differ from <see cref="LocalRepository"/> if <see cref="LocalRepository"/> is
         /// a fork.
         /// </remarks>
-        IRepositoryModel RemoteRepository { get; set; }
+        RepositoryModel RemoteRepository { get; set; }
 
         /// <summary>
         /// Gets the currently selected item in <see cref="States"/>.
@@ -105,6 +105,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repository">The local repository.</param>
         /// <param name="connection">The connection/</param>
         /// <returns>A task tracking the operation.</returns>
-        Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection);
+        Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
 }

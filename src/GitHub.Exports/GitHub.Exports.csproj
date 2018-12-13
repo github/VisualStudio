@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -23,18 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnvDTE" Version="8.0.1" />
-    <PackageReference Include="EnvDTE80" Version="8.0.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.23.1" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
-    <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="14.0.25424" />
-    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.15.103" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61030" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.12.0" Version="12.0.30110" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />

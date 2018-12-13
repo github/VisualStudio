@@ -86,7 +86,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             RaisePropertyChanged(file, nameof(file.InlineCommentThreads));
             Assert.That(((IPullRequestFileNode)target.Items[0]).CommentCount, Is.EqualTo(2));
 
-            file.Received(1).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
+            file.Received(2).PropertyChanged += Arg.Any<PropertyChangedEventHandler>();
         }
 
         static PullRequestFilesViewModel CreateTarget()
@@ -100,8 +100,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             var author = Substitute.For<IAccount>();
 
-            var repository = Substitute.For<ILocalRepositoryModel>();
-            repository.LocalPath.Returns(@"C:\Foo");
+            var repository = new LocalRepositoryModel { LocalPath = @"C:\Foo" };
 
             var result = Substitute.For<IPullRequestSession>();
             result.LocalRepository.Returns(repository);

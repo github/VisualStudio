@@ -95,8 +95,8 @@
                    Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
                    HorizontalAlignment="Left" />
         <StackPanel Margin="0 8" Orientation="Horizontal" HorizontalAlignment="Right">
-          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Click="backButton_OnClick" Content="{x:Static ghfvs:Resources.Back}"/>
-          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Click="repoForkButton_OnClick" Content="{x:Static ghfvs:Resources.ForkRepository}"/>
+                <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Command="{Binding BackCommand}" Content="{x:Static ghfvs:Resources.Back}"/>
+          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Command="{Binding CreateFork}" Content="{x:Static ghfvs:Resources.ForkRepository}"/>
         </StackPanel>
     </StackPanel>
   </StackPanel>
