@@ -28,6 +28,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
         }
 
+        /// <inheritdoc/>
         public async Task<(string owner, string name)?> FindParent(HostAddress address, string owner, string name)
         {
             Guard.ArgumentNotNull(address, nameof(address));
@@ -53,6 +54,7 @@ namespace GitHub.Services
             return result != null ? (result.Item1, result.Item2) : ((string, string)?)null;
         }
 
+        /// <inheritdoc/>
         public async Task<IList<ProtectedBranch>> GetProtectedBranches(HostAddress address, string owner, string name)
         {
             Guard.ArgumentNotNull(address, nameof(address));
@@ -84,6 +86,7 @@ namespace GitHub.Services
             return await graphql.Run(queryProtectedBranches, vars).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<ProtectedBranch> GetProtectedBranch(HostAddress address, string owner, string name, string branchName)
         {
             Guard.ArgumentNotNull(branchName, nameof(branchName));
