@@ -9,6 +9,8 @@ namespace GitHub.SampleData
 {
     public sealed class PullRequestCheckViewModelDesigner : ViewModelBase, IPullRequestCheckViewModel
     {
+        public bool IsRequired { get; } = true;
+
         public string Title { get; set; } = "continuous-integration/appveyor/pr";
 
         public string Description { get; set; } = "AppVeyor build failed";

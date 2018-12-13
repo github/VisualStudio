@@ -49,6 +49,7 @@ namespace GitHub.InlineReviews.Services
         readonly IDiffService diffService;
         readonly IApiClientFactory apiClientFactory;
         readonly IGraphQLClientFactory graphqlFactory;
+        readonly IRepositoryService repositoryService;
         readonly IUsageTracker usageTracker;
         readonly IDictionary<Tuple<string, string>, string> mergeBaseCache;
 
@@ -59,6 +60,7 @@ namespace GitHub.InlineReviews.Services
             IDiffService diffService,
             IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
+            IRepositoryService repositoryService,
             IUsageTracker usageTracker)
         {
             this.gitService = gitService;
@@ -66,6 +68,7 @@ namespace GitHub.InlineReviews.Services
             this.diffService = diffService;
             this.apiClientFactory = apiClientFactory;
             this.graphqlFactory = graphqlFactory;
+            this.repositoryService = repositoryService;
             this.usageTracker = usageTracker;
 
             mergeBaseCache = new Dictionary<Tuple<string, string>, string>();
@@ -360,9 +363,12 @@ namespace GitHub.InlineReviews.Services
             var connection = await graphqlFactory.CreateConnection(address);
             var result = await connection.Run(readPullRequest, vars);
 
+            var protectedBranches = await repositoryService.GetProtectedBranch(address, owner, name, result.BaseRefName);
+            var protectedContexts = protectedBranches != null ? new HashSet<string>(protectedBranches.RequiredStatusCheckContexts) : null;
+
             var apiClient = await apiClientFactory.Create(address);
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
-            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
+            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number, protectedContexts);
 
             result.Statuses = (IReadOnlyList<StatusModel>) lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
 
@@ -773,7 +779,8 @@ namespace GitHub.InlineReviews.Services
             return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
         }
 
-        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
+        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name,
+            int number, HashSet<string> protectedContexts)
         {
             ICompiledQuery<IEnumerable<LastCommitAdapter>> query;
             if (address.IsGitHubDotCom())
@@ -867,8 +874,23 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(query, vars);
-            return result.First();
+            var results = await connection.Run(query, vars);
+            var result = results.First();
+
+            foreach (var resultCheckSuite in result.CheckSuites)
+            {
+                foreach (var checkRunModel in resultCheckSuite.CheckRuns)
+                {
+                    checkRunModel.IsRequired = protectedContexts?.Contains(checkRunModel.Name) ?? false;
+                }
+            }
+
+            foreach (var resultStatus in result.Statuses)
+            {
+                resultStatus.IsRequired = protectedContexts?.Contains(resultStatus.Context) ?? false;
+            }
+
+            return result;
         }
 
         static void BuildPullRequestThreads(PullRequestDetailModel model)
