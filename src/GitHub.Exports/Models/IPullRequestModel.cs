@@ -21,16 +21,6 @@ namespace GitHub.Models
         Failure
     }
 
-    public enum PullRequestChecksSummaryState
-    {
-        None,
-        Pending,
-        Success,
-        SuccessWithFailure,
-        SuccessWithPending,
-        Failure
-    }
-
     public interface IPullRequestModel : ICopyable<IPullRequestModel>,
         IEquatable<IPullRequestModel>, IComparable<IPullRequestModel>
     {
