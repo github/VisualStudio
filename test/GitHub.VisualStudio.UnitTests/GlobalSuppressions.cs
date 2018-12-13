@@ -8,3 +8,6 @@
     Justification = "It's okay for nested unit test types to be visible")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores",
     Justification = "It's okay for unit test names to contain underscores")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "VSSDK006:Check services exist",
+    Justification = "We're mocking the services")]
+

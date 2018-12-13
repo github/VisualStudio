@@ -9,9 +9,11 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
@@ -99,6 +101,8 @@ namespace GitHub.InlineReviews.Commands
         /// </remarks>
         protected IEnumerable<ITextView> GetCurrentTextViews()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var result = new List<ITextView>();
 
             try
@@ -164,6 +168,8 @@ namespace GitHub.InlineReviews.Commands
                     }
 
                     var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                    Assumes.Present(model);
+
                     var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
                     var wpfTextView = adapterFactory.GetWpfTextView(textView);
                     result.Add(wpfTextView);

@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using Microsoft;
 
 namespace GitHub.InlineReviews
 {
@@ -27,8 +28,9 @@ namespace GitHub.InlineReviews
             CancellationToken cancellationToken,
             IProgress<ServiceProgressData> progress)
         {
-            var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            Assumes.Present(componentModel);
+
             var exports = componentModel.DefaultExportProvider;
 
             // Avoid delays when there is ongoing UI activity.
@@ -45,6 +47,8 @@ namespace GitHub.InlineReviews
             }
 
             var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+            Assumes.Present(componentModel);
+
             var exports = componentModel.DefaultExportProvider;
             var commands = new IVsCommandBase[]
             {
@@ -55,6 +59,8 @@ namespace GitHub.InlineReviews
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            Assumes.Present(componentModel);
+
             menuService.AddCommands(commands);
         }
     }
