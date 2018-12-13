@@ -28,7 +28,6 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -48,13 +47,13 @@
             <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Description}" ToolTip="{Binding DurationStatus}"/>
         </Label>
 
-        <StackPanel Grid.Column="2" Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+        <StackPanel Grid.Column="3" Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
             <Label Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
                 Required
             </Label>
         </StackPanel>
 
-        <Label Grid.Column="3" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
+        <Label Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
             <Hyperlink ToolTip="View checks"
                            Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                            CommandParameter="{Binding}">
@@ -62,7 +61,7 @@
             </Hyperlink>
         </Label>
 
-        <Label Grid.Column="4" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+        <Label Grid.Column="3" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
             <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>      
 	
