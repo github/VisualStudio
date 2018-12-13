@@ -796,6 +796,8 @@ namespace GitHub.InlineReviews.Services
                                                   Conclusion = run.Conclusion.FromGraphQl(),
                                                   Status = run.Status.FromGraphQl(),
                                                   Name = run.Name,
+                                                  Title = run.Title,
+                                                  Summary = run.Summary,
                                                   DetailsUrl = run.Permalink,
                                                   StartedAt = run.StartedAt,
                                                   CompletedAt = run.CompletedAt,

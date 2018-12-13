@@ -112,7 +112,7 @@ namespace GitHub.ViewModels.GitHubPane
                         pullRequestCheckViewModel.DurationStatus = $"{checkStatus} - {timeSpanString}";
                     }
 
-                    pullRequestCheckViewModel.Description = arg.checkRun.Summary;
+                    pullRequestCheckViewModel.Description = arg.checkRun.Title;
                     pullRequestCheckViewModel.Status = checkStatus;
                     pullRequestCheckViewModel.DetailsUrl = new Uri(arg.checkRun.DetailsUrl);
                     return pullRequestCheckViewModel;

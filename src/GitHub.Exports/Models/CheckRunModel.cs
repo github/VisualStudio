@@ -49,6 +49,11 @@ namespace GitHub.Models
         public string DetailsUrl { get; set; }
 
         /// <summary>
+        /// The title of a Check Run.
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
         /// The summary of a Check Run.
         /// </summary>
         public string Summary { get; set; }
