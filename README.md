@@ -94,9 +94,15 @@ Logs can be viewed at the following location:
 
 ## Troubleshooting
 
-*"The type or namespace name does not exist..." or "Unable to find project... Check that the project reference is valid and that the project file exists."*
+If you have issues building with failures similar to:
 
-If you run into namespace or submodule issues, running the following command might help get your environment in a clean state:
+> "The type or namespace name does not exist..."
+
+or
+
+> "Unable to find project... Check that the project reference is valid and that the project file exists."*
+
+Running the following command might help:
 
 ```txt
 clean.cmd
