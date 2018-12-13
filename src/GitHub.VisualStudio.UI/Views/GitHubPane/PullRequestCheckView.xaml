@@ -22,7 +22,7 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid>
+    <Grid Margin="0 0 0 8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
@@ -31,8 +31,8 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition MaxHeight="32"/>
-            <RowDefinition MaxHeight="32"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <ghfvs:OcticonImage Grid.Column="0" Grid.Row="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
@@ -53,7 +53,7 @@
             </Label>
         </StackPanel>
 
-        <Label Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
+        <Label Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Right" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
             <Hyperlink ToolTip="View checks"
                            Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
                            CommandParameter="{Binding}">
@@ -61,11 +61,9 @@
             </Hyperlink>
         </Label>
 
-        <Label Grid.Column="3" Grid.Row="1" HorizontalContentAlignment="Stretch" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+        <Label Grid.Column="3" Grid.Row="1" HorizontalContentAlignment="Right" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
             <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
         </Label>      
-	
-
     </Grid>
 </local:GenericPullRequestCheckView>
 
