@@ -292,7 +292,7 @@ namespace GitHub.InlineReviews.Services
             if (readPullRequest == null)
             {
                 readPullRequest = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                     .PullRequest(Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
@@ -364,11 +364,19 @@ namespace GitHub.InlineReviews.Services
             var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
             var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number).ConfigureAwait(false);
 
-            result.Statuses = lastCommitModel.Statuses;
-            result.CheckSuites = lastCommitModel.CheckSuites;
-            foreach (var checkSuite in result.CheckSuites)
+            result.Statuses = (IReadOnlyList<StatusModel>) lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
+
+            if (lastCommitModel.CheckSuites == null)
             {
-                checkSuite.HeadSha = lastCommitModel.HeadSha;
+                result.CheckSuites = Array.Empty<CheckSuiteModel>();
+            }
+            else
+            { 
+                result.CheckSuites = lastCommitModel.CheckSuites;
+                foreach (var checkSuite in result.CheckSuites)
+                {
+                    checkSuite.HeadSha = lastCommitModel.HeadSha;
+                }
             }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
@@ -408,7 +416,7 @@ namespace GitHub.InlineReviews.Services
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
 
             var query = new Query()
-                .Repository(repositoryOwner, localRepository.Name)
+                .Repository(owner: repositoryOwner, name: localRepository.Name)
                 .PullRequest(number)
                 .Select(x => x.Id);
 
@@ -774,7 +782,7 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
@@ -826,20 +834,22 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatusesEnterprise == null)
                 {
                     readCommitStatusesEnterprise = new Query()
-                     .Repository(Var(nameof(owner)), Var(nameof(name)))
+                     .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                      .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
-                             Statuses = commit.Commit.Status
-                                 .Select(context =>
-                                     context.Contexts.Select(statusContext => new StatusModel
-                                     {
-                                         State = statusContext.State.FromGraphQl(),
-                                         Context = statusContext.Context,
-                                         TargetUrl = statusContext.TargetUrl,
-                                         Description = statusContext.Description,
-                                     }).ToList()
-                                 ).SingleOrDefault()
+                             Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
+                                 .Select(context => context == null 
+                                     ? null 
+                                     : context.Contexts
+                                         .Select(statusContext => new StatusModel
+                                         {
+                                             State = statusContext.State.FromGraphQl(),
+                                             Context = statusContext.Context,
+                                             TargetUrl = statusContext.TargetUrl,
+                                             Description = statusContext.Description,
+                                         }).ToList()
+                                     ).SingleOrDefault()
                          }
                      ).Compile();
                 }
