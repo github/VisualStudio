@@ -48,7 +48,7 @@ namespace GitHub.Services
             object progress = null);
 
         /// <summary>
-        /// OtherChecks whether the specified destination directory already exists.
+        /// Checks whether the specified destination directory already exists.
         /// </summary>
         /// <param name="path">The destination path.</param>
         /// <returns>
@@ -57,7 +57,7 @@ namespace GitHub.Services
         bool DestinationDirectoryExists(string path);
 
         /// <summary>
-        /// OtherChecks whether the specified destination file already exists.
+        /// Checks whether the specified destination file already exists.
         /// </summary>
         /// <param name="path">The destination file.</param>
         /// <returns>
