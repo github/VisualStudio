@@ -59,7 +59,7 @@ namespace GitHub.Models
         public string Summary { get; set; }
 
         /// <summary>
-        /// The flag that denotes if this check is required for the pull request.
+        /// The flag to shows this Check Run is required.
         /// </summary>
         public bool IsRequired { get; set; }
 
