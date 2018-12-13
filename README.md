@@ -102,7 +102,7 @@ or
 
 > "Unable to find project... Check that the project reference is valid and that the project file exists."*
 
-Running the following command might help:
+Close Visual Studio and run the following command to update submodules and clean your environment.
 
 ```txt
 clean.cmd
