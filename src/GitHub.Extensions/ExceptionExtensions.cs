@@ -14,7 +14,7 @@ namespace GitHub.Extensions
         {
             if (exception == null)
             {
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException(nameof(exception));
             }
 
             return exception.IsFatalException()
@@ -36,7 +36,7 @@ namespace GitHub.Extensions
         {
             if (exception == null)
             {
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException(nameof(exception));
             }
 
             return exception is StackOverflowException

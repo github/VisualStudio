@@ -1,4 +1,6 @@
-﻿namespace GitHub.VisualStudio.UI
+﻿#pragma warning disable CA1707 // Identifiers should not contain underscores
+
+namespace GitHub.VisualStudio.UI
 {
     public static class Constants
     {

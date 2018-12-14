@@ -77,6 +77,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GitHub.TeamFoundation.14\GlobalSuppressions.cs">
+      <Link>GlobalSuppressions.cs</Link>
+    </Compile>
     <Compile Include="..\GitHub.TeamFoundation.14\Home\ForkNavigationItem.cs">
       <Link>Home\ForkNavigationItem.cs</Link>
     </Compile>

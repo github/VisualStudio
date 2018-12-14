@@ -12,7 +12,7 @@ namespace GitHub.InlineReviews
 {
     [Guid(Guids.PullRequestStatusPackageId)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
     public class PullRequestStatusBarPackage : AsyncPackage
     {
         /// <summary>

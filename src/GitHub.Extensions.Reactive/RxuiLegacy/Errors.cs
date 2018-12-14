@@ -337,11 +337,13 @@ namespace ReactiveUI.Legacy
     }
 
 #pragma warning disable 618
+#pragma warning disable CA1032 // Implement standard exception constructors
+#pragma warning disable CA2237 // Mark ISerializable types with serializable
     /// <summary>
     /// This Exception will be thrown when a UserError is not handled by any
     /// of the registered handlers.
     /// </summary>
-    public class UnhandledUserErrorException : Exception 
+    public class UnhandledUserErrorException : Exception
     {
         public UnhandledUserErrorException(UserError error) : base(error.ErrorMessage, error.InnerException)
         {
@@ -350,6 +352,8 @@ namespace ReactiveUI.Legacy
 
         public UserError ReportedError { get; protected set; }
     }
+#pragma warning restore CA2237 // Mark ISerializable types with serializable
+#pragma warning restore CA1032 // Implement standard exception constructors
 #pragma warning restore 618
 
     /// <summary>

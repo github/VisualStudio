@@ -18,7 +18,7 @@ namespace GitHub.InlineReviews
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(Guids.InlineReviewsPackageId)]
-    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     public class InlineReviewsPackage : AsyncPackage
     {
@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            Assumes.Present(componentModel);
+            Assumes.Present(menuService);
 
             menuService.AddCommands(commands);
         }

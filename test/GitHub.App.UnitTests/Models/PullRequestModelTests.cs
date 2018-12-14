@@ -18,7 +18,7 @@ using UnitTests;
 
 public class PullRequestModelTests : TestBaseClass
 {
-    protected DateTimeOffset Now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
+    protected static readonly DateTimeOffset Now = new DateTimeOffset(0, TimeSpan.FromTicks(0));
 
     [Test]
     public void ComparisonNullEqualsNull()
