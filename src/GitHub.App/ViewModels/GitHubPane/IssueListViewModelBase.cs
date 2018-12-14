@@ -253,7 +253,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (numberFilter == 0)
                 {
-                    stringFilter = SearchQuery.ToUpper(CultureInfo.CurrentCulture);
+                    stringFilter = SearchQuery.ToUpperInvariant();
                 }
             }
             else
@@ -281,7 +281,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                     else
                     {
-                        result = item.Title.ToUpper(CultureInfo.InvariantCulture).Contains(stringFilter);
+                        result = item.Title.ToUpperInvariant().Contains(stringFilter);
                     }
                 }
             }

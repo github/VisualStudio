@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using GitHub.Extensions;
-using System.Globalization;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 

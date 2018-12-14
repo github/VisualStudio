@@ -131,7 +131,7 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
-        
+
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
 
             ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
@@ -350,7 +350,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = (IReadOnlyList<IPullRequestCheckViewModel>) PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
+                Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
                 await Files.InitializeAsync(Session);
 

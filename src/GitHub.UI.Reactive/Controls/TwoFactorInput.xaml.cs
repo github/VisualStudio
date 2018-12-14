@@ -42,7 +42,7 @@ namespace GitHub.UI
                 six
             };
 
-            foreach(var textBox in TextBoxes)
+            foreach (var textBox in TextBoxes)
             {
                 SetupTextBox(textBox);
             }
@@ -151,7 +151,7 @@ namespace GitHub.UI
                     textBox.SelectAll();
                 }
             };
-            
+
             textBox.TextChanged += (sender, args) =>
             {
                 SetValue(TextProperty, String.Join("", GetTwoFactorCode()));
