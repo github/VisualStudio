@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
 using Serilog;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace GitHub.InlineReviews.Services
 {
     /// <summary>

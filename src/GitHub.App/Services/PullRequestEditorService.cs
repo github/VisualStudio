@@ -232,12 +232,12 @@ namespace GitHub.Services
 
                 var leftText = diffViewer.LeftView.TextBuffer.CurrentSnapshot.GetText();
                 var rightText = diffViewer.RightView.TextBuffer.CurrentSnapshot.GetText();
-                if (leftText == string.Empty)
+                if (leftText.Length == 0)
                 {
                     // Don't show LeftView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
                 }
-                else if (rightText == string.Empty)
+                else if (rightText.Length == 0)
                 {
                     // Don't show RightView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.LeftViewOnly;
