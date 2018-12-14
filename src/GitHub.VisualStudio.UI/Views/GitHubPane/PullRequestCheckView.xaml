@@ -44,10 +44,8 @@
                         <Border HorizontalAlignment="Right" CornerRadius="3" Background="{DynamicResource GitHubRequiredCheckBackgroundBrush}"  Padding="3 1" >
                             <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" HorizontalAlignment="Right"
                                        FontWeight="Medium"
-                                       FontSize="11">
-                                       <!--
                                        Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
-                                        -->
+                                       FontSize="11">
                                 Required
                             </TextBlock>
                         </Border>
