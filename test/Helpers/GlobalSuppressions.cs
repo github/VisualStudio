@@ -10,3 +10,4 @@
 [assembly: SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates")]
 [assembly: SuppressMessage("Usage", "VSTHRD110:Observe result of async calls")]
 [assembly: SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]
+[assembly: SuppressMessage("Reliability", "VSSDK006:Check services exist")]
