@@ -3,6 +3,10 @@ using System.Windows;
 using System.Collections.Generic;
 using System.Globalization;
 
+#pragma warning disable CA1010 // Collections should implement generic interface
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1710 // Identifiers should have correct suffix
+
 namespace GitHub.UI.Helpers
 {
     public class SharedDictionaryManager : ResourceDictionary

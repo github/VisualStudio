@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
+#pragma warning disable CA1720 // Identifier contains type name
+
 namespace GitHub.UI
 {
     public class ImageButton : DependencyObject

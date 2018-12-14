@@ -75,6 +75,8 @@ namespace GitHub.Services.Vssdk.Services
         }
     }
 
+#pragma warning disable CA1715 // Identifiers should have correct prefix
+#pragma warning disable CA1040 // Avoid empty interfaces
     [Guid("DCCC6A2B-F300-4DA1-92E1-8BF4A5BCA795")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [TypeIdentifier]
@@ -82,4 +84,6 @@ namespace GitHub.Services.Vssdk.Services
     public interface SVsTippingService
     {
     }
+#pragma warning restore CA1040 // Avoid empty interfaces
+#pragma warning restore CA1715 // Identifiers should have correct prefix
 }

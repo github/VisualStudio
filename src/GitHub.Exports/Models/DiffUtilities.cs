@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
 using GitHub.Extensions;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace GitHub.Models
 {
     public static class DiffUtilities

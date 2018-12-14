@@ -79,6 +79,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Services\VSGitExt.cs" />
     <Compile Include="Home\ForkNavigationItem.cs" />
     <Compile Include="RegistryHelper.cs" />

@@ -16,6 +16,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Splat;
 
+#pragma warning disable CA1030 // Use events where appropriate
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+#pragma warning disable CA2214 // Do not call overridable methods in constructors
+
 namespace ReactiveUI.Legacy
 {
     [Obsolete("This type is obsolete and will be removed in a future version of ReactiveUI. Please switch to using ReactiveUI.ReactiveCommand instead.")]

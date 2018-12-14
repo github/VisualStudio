@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
+#pragma warning disable CA1030 // Use events where appropriate
+
 namespace GitHub.VisualStudio.Helpers
 {
     public static class PropertyNotifierExtensions

@@ -22,6 +22,8 @@ using Octokit.GraphQL;
 using Serilog;
 using static Octokit.GraphQL.Variable;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace GitHub.Services
 {
     [Export(typeof(IModelService))]
