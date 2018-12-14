@@ -16,3 +16,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Microsoft.Naming", "CA1703:ResourceStringsShouldBeSpelledCorrectly", MessageId = "Git", Scope = "resource", Target = "GitHub.App.Resources.resources")]
 [assembly: SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)", Scope = "member", Target = "GitHub.Services.PullRequestService.#CreateTempFile(System.String,System.String,System.String)")]
 [assembly: SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)", Scope = "member", Target = "GitHub.Services.PullRequestService.#CreateTempFile(System.String,System.String,System.String,System.Text.Encoding)")]
+[assembly: SuppressMessage("Design", "CA1056:Uri properties should not be strings")]
+[assembly: SuppressMessage("Design", "CA1054:Uri parameters should not be strings")]
+
