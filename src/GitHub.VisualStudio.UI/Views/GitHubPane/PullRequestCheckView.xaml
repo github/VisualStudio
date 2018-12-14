@@ -22,48 +22,51 @@
         </ResourceDictionary>
     </Control.Resources>
 
-    <Grid Margin="0 0 0 8">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <DockPanel Margin="0 0 0 8">
+        <StackPanel DockPanel.Dock="Left" VerticalAlignment="Top">
+            <ghfvs:OcticonImage Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+            <ghfvs:OcticonImage Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+            <ghfvs:OcticonImage Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Left" Orientation="Vertical" VerticalAlignment="Center">
+            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}">
+                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Title}" />
+            </TextBlock>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <ghfvs:OcticonImage Grid.Column="0" Grid.Row="0" Margin="0 0 4 0" Icon="check" Foreground="#2cbe4e" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
-        <ghfvs:OcticonImage Grid.Column="0" Grid.Row="0" Margin="0 0 4 0" Icon="x" Foreground="#cb2431" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-        <ghfvs:OcticonImage Grid.Column="0" Grid.Row="0" Margin="0 0 4 0" Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Status, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
-
-        <Label Grid.Column="1" Grid.Row="0" Foreground="{DynamicResource VsBrush.WindowText}">
-            <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Title}" />
-        </Label>
-
-        <Label Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource VsBrush.GrayText}">
-            <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Description}" ToolTip="{Binding DurationStatus}"/>
-        </Label>
-
-        <StackPanel Grid.Column="3" Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
-            <Label Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
-                Required
-            </Label>
+            <TextBlock Foreground="{DynamicResource VsBrush.GrayText}">
+                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Description}" ToolTip="{Binding DurationStatus}"/>
+            </TextBlock>
         </StackPanel>
 
-        <Label Grid.Column="2" Grid.Row="1" HorizontalContentAlignment="Right" Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
-            <Hyperlink ToolTip="View checks"
-                           Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
-                           CommandParameter="{Binding}">
-                Checks
-            </Hyperlink>
-        </Label>
+        <StackPanel DockPanel.Dock="Right" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Border HorizontalAlignment="Right" CornerRadius="3" Background="{DynamicResource VsBrush.ButtonShadow}"  Padding="3 1" >
+                            <TextBlock Foreground="{DynamicResource VsBrush.ButtonText}" HorizontalAlignment="Right"
+                                       FontSize="11" FontWeight="DemiBold">
+                                       <!--
+                                       Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                                        -->
+                                Required
+                            </TextBlock>
+                        </Border>
 
-        <Label Grid.Column="3" Grid.Row="1" HorizontalContentAlignment="Right" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
-            <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
-        </Label>      
-    </Grid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Visibility="{Binding HasAnnotations, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                            <Hyperlink ToolTip="View checks"
+                                           Command="{Binding Path=DataContext.ShowAnnotations, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:PullRequestDetailView}}}"
+                                           CommandParameter="{Binding}">
+                                Checks
+                            </Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock Margin="8 0 0 0" Visibility="{Binding DetailsUrl, Converter={ghfvs:NullToVisibilityConverter}}">
+                            <Hyperlink ToolTip="{Binding DetailsUrl}"  Command="{Binding OpenDetailsUrl}">Details</Hyperlink>
+                        </TextBlock>      
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
 </local:GenericPullRequestCheckView>
 
