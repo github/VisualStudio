@@ -70,7 +70,7 @@ namespace GitHub.UI
             if (name == "lock")
                 name = "_lock";
 
-            var pathData = OcticonPaths.ResourceManager.GetString(name);
+            var pathData = OcticonPaths.ResourceManager.GetString(name, CultureInfo.InvariantCulture);
 
             if (pathData == null)
             {
