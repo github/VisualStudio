@@ -6,3 +6,6 @@
 [assembly: SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores")]
 [assembly: SuppressMessage("Performance", "CA1826:Do not use Enumerable methods on indexable collections. Instead use the collection directly")]
 [assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task")]
+[assembly: SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates")]
+[assembly: SuppressMessage("Usage", "VSTHRD110:Observe result of async calls")]
+[assembly: SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]

@@ -85,11 +85,13 @@ namespace GitHub.Services
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
         {
             return new Timer(
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
                 async _ =>
                 {
                     try { await callback(); }
                     catch (Exception ex) { log.Warning(ex, "Failed submitting usage data"); }
                 },
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
                 null,
                 dueTime,
                 period);

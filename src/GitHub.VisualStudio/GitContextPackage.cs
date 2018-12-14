@@ -6,6 +6,7 @@ using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using static Microsoft.VisualStudio.VSConstants;
+using Microsoft;
 
 namespace GitHub.VisualStudio
 {
@@ -28,6 +29,8 @@ namespace GitHub.VisualStudio
             }
 
             var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt));
+            Assumes.Present(gitExt);
+
             var context = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
             RefreshContext(context, gitExt);
             gitExt.ActiveRepositoriesChanged += () =>

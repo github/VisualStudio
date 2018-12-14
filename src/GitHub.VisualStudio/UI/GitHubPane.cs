@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
+using Microsoft;
 
 namespace GitHub.VisualStudio.UI
 {
@@ -94,6 +95,7 @@ namespace GitHub.VisualStudio.UI
 
                 // Allow MEF to initialize its cache asynchronously
                 var provider = (IGitHubServiceProvider)await asyncPackage.GetServiceAsync(typeof(IGitHubServiceProvider));
+                Assumes.Present(provider);
 
                 var teServiceHolder = provider.GetService<ITeamExplorerServiceHolder>();
                 teServiceHolder.ServiceProvider = this;
@@ -139,6 +141,8 @@ namespace GitHub.VisualStudio.UI
 
         public override void OnToolWindowCreated()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             base.OnToolWindowCreated();
 
             Marshal.ThrowExceptionForHR(((IVsWindowFrame)Frame)?.SetProperty(
@@ -165,6 +169,8 @@ namespace GitHub.VisualStudio.UI
 
         void UpdateSearchHost(bool enabled, string query)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             if (SearchHost != null)
             {
                 SearchHost.IsEnabled = enabled;
@@ -197,6 +203,8 @@ namespace GitHub.VisualStudio.UI
 
             protected override void OnStartSearch()
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
+
                 viewModel.SearchQuery = SearchQuery.SearchString;
                 base.OnStartSearch();
             }
