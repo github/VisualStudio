@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
-            Assumes.Present(componentModel);
+            Assumes.Present(menuService);
 
             menuService.AddCommands(commands);
         }
