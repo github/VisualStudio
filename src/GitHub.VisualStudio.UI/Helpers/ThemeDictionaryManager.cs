@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.PlatformUI;
 using GitHub.VisualStudio.Helpers;
 using GitHub.UI.Helpers;
 
+#pragma warning disable CA1010 // Collections should implement generic interface
+
 namespace GitHub.VisualStudio.UI.Helpers
 {
     public class ThemeDictionaryManager : SharedDictionaryManager, IDisposable

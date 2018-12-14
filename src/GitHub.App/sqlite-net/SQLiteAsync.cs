@@ -28,6 +28,10 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+#pragma warning disable CA1200 // Avoid using cref tags with a prefix
+#pragma warning disable CA1720 // Identifier contains type name
+
 namespace SQLite
 {
     /// <summary>
