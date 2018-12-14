@@ -41,9 +41,10 @@
         <StackPanel DockPanel.Dock="Right" Orientation="Vertical">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Border HorizontalAlignment="Right" CornerRadius="3" Background="{DynamicResource VsBrush.ButtonShadow}"  Padding="3 1" >
-                            <TextBlock Foreground="{DynamicResource VsBrush.ButtonText}" HorizontalAlignment="Right"
-                                       FontSize="11" FontWeight="DemiBold">
+                        <Border HorizontalAlignment="Right" CornerRadius="3" Background="{DynamicResource GitHubRequiredCheckBackgroundBrush}"  Padding="3 1" >
+                            <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" HorizontalAlignment="Right"
+                                       FontWeight="Medium"
+                                       FontSize="11">
                                        <!--
                                        Visibility="{Binding IsRequired, Converter={ghfvs:BooleanToVisibilityConverter}}">
                                         -->
