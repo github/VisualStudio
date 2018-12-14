@@ -12,6 +12,10 @@ using System.Windows.Threading;
 using GitHub.Logging;
 using Serilog;
 
+#pragma warning disable CA1010 // Collections should implement generic interface
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+#pragma warning disable CA1710 // Identifiers should have correct suffix
+
 namespace GitHub.Collections
 {
     /// <summary>
