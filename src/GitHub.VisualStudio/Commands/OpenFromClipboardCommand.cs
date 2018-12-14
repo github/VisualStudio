@@ -45,7 +45,7 @@ namespace GitHub.VisualStudio.Commands
             ParametersDescription = "u";    // accept a single url
 
             // This command is only visible when in the context of a Git repository
-            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git)));
+            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString)));
         }
 
         public override async Task Execute(string url)

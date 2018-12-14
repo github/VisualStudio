@@ -37,7 +37,7 @@ public class TestBaseClass
     }
 
     protected static PullRequest CreatePullRequest(User user, int id, ItemState state, string title,
-        DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount = 0, int reviewCommentCount = 0)
+        DateTimeOffset createdAt, DateTimeOffset updatedAt, int commentCount = 0)
     {
         var uri = new Uri("https://url");
         var uris = uri.ToString();

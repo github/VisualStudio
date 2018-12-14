@@ -436,7 +436,7 @@ namespace GitHub.Services
         /// <param name="line">The 0-based line we're navigating from.</param>
         /// <param name="matchedLines">The number of similar matched lines in <see cref="toLines"/></param>
         /// <returns>Find the nearest matching line in <see cref="toLines"/>.</returns>
-        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
+        public static int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];

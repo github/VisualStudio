@@ -55,7 +55,7 @@ namespace GitHub.Services
             }
         }
 
-        private async Task<EnterpriseMeta> GetMetadata(IConnection connection)
+        private static async Task<EnterpriseMeta> GetMetadata(IConnection connection)
         {
             var endpoint = new Uri("meta", UriKind.Relative);
             var response = await connection.Get<EnterpriseMeta>(endpoint, null, null).ConfigureAwait(false);

@@ -12,7 +12,7 @@ namespace GitHub.VisualStudio.Base
 {
     public class TeamExplorerSectionBase : TeamExplorerItemBase, ITeamExplorerSection, IServiceProviderAware
     {
-        protected IConnectionManager connectionManager;
+        protected IConnectionManager ConnectionManager { get; set; }
 
         bool isBusy;
         public bool IsBusy
@@ -78,7 +78,7 @@ namespace GitHub.VisualStudio.Base
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(cm, nameof(cm));
 
-            connectionManager = cm;
+            ConnectionManager = cm;
         }
 
         public TeamExplorerSectionBase(IGitHubServiceProvider serviceProvider,
@@ -90,7 +90,7 @@ namespace GitHub.VisualStudio.Base
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(cm, nameof(cm));
 
-            connectionManager = cm;
+            ConnectionManager = cm;
         }
 
         void ITeamExplorerSection.Cancel()

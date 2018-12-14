@@ -85,7 +85,7 @@ namespace GitHub.ViewModels
                 x => x.EditState,
                 x => x.Body,
                 (state, body) => (state, body))
-                .Subscribe(x => PlaceholderChanged(placeholder, x.state, x.body));
+                .Subscribe(x => PlaceholderChanged(placeholder, x.state));
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace GitHub.ViewModels
 
         protected abstract (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment);
 
-        void PlaceholderChanged(ICommentViewModel placeholder, CommentEditState state, string body)
+        void PlaceholderChanged(ICommentViewModel placeholder, CommentEditState state)
         {
             if (state == CommentEditState.Editing)
             {

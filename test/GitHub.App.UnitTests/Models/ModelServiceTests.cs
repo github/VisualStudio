@@ -23,7 +23,6 @@ using static GitHub.Services.ModelService;
 
 public class ModelServiceTests
 {
-    const int Timeout = 2000;
     public class TheGetCurrentUserMethod : TestBaseClass
     {
         [Test]
