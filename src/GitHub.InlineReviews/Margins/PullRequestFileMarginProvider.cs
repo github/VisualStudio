@@ -42,7 +42,7 @@ namespace GitHub.InlineReviews.Margins
             this.packageSettings = packageSettings;
             this.usageTracker = usageTracker;
 
-            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
+            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString));
         }
 
         /// <summary>

@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Margins;
 using GitHub.Services.Vssdk.Commands;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
-using GitHub.Extensions;
 
 namespace GitHub.InlineReviews.Commands
 {

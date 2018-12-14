@@ -11,11 +11,11 @@ using Microsoft;
 namespace GitHub.VisualStudio
 {
     /// <summary>
-    /// This package creates a custom UIContext <see cref="Guids.UIContext_Git"/> that is activated when a
+    /// This package creates a custom UIContext <see cref="Guids.GitContextPkgString"/> that is activated when a
     /// repository is active in <see cref="IVSGitExt"/> and the current process is Visual Studio (not Blend).
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(Guids.UIContext_Git)]
+    [Guid(Guids.GitContextPkgString)]
     // Initialize when we enter the context of a Git repository
     [ProvideAutoLoad(UICONTEXT.RepositoryOpen_string, PackageAutoLoadFlags.BackgroundLoad)]
     public class GitContextPackage : AsyncPackage
@@ -24,14 +24,14 @@ namespace GitHub.VisualStudio
         {
             if (!ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
-                // Don't activate 'UIContext_Git' for non-Visual Studio process
+                // Don't activate 'GitContextPkgString' for non-Visual Studio process
                 return;
             }
 
             var gitExt = (IVSGitExt)await GetServiceAsync(typeof(IVSGitExt));
             Assumes.Present(gitExt);
 
-            var context = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
+            var context = UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString));
             RefreshContext(context, gitExt);
             gitExt.ActiveRepositoriesChanged += () =>
             {

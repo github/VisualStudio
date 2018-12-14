@@ -37,7 +37,7 @@ namespace GitHub.InlineReviews.Margins
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
 
-            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git));
+            uiContext = UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString));
         }
 
         public IWpfTextViewMargin CreateMargin(IWpfTextViewHost wpfTextViewHost, IWpfTextViewMargin parent)

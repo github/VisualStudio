@@ -8,6 +8,8 @@ using System.Globalization;
 
 #pragma warning disable CA1034 // Nested types should not be visible
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace GitHub.Models
 {
     public static class DiffUtilities

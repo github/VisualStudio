@@ -25,7 +25,7 @@ namespace GitHub.VisualStudio
 
 
         // UIContexts
-        public const string UIContext_Git = "565515AD-F4C1-4D59-BC14-AE77396DDDD7";
+        public const string GitContextPkgString = "565515AD-F4C1-4D59-BC14-AE77396DDDD7";
 
         // Guids defined in GitHub.VisualStudio.vsct
         public const string guidGitHubPkgString = "c3d3dc68-c977-411f-b3e8-03b0dccf7dfc";

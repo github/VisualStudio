@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Design", "CA1054:Uri parameters should not be strings")]
 [assembly: SuppressMessage("Design", "CA1056:Uri properties should not be strings")]
+[assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task", Justification = "Discouraged for VSSDK projects.")]
