@@ -16,7 +16,7 @@ namespace GitHub.UI
             base.OnApplyTemplate();
         }
 
-        public CustomPopupPlacement[] PlacePopup(Size popupSize, Size targetSize, Point offset)
+        public static CustomPopupPlacement[] PlacePopup(Size popupSize, Size targetSize, Point offset)
         {
             return new[] { new CustomPopupPlacement(new Point(0, targetSize.Height), PopupPrimaryAxis.Vertical) };
         }

@@ -1,5 +1,7 @@
 ﻿using System;
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 namespace GitHub.VisualStudio
 {
     public static class Guids

@@ -81,6 +81,6 @@ namespace GitHub.InlineReviews.Margins
                 usageTracker);
         }
 
-        bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");
+        static bool IsDiffView(ITextView textView) => textView.Roles.Contains("DIFF");
     }
 }

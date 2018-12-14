@@ -367,7 +367,7 @@ namespace GitHub.Services
             };
         }
 
-        GitReferenceModel Create(GitReferenceCacheItem item)
+        static GitReferenceModel Create(GitReferenceCacheItem item)
         {
             return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }

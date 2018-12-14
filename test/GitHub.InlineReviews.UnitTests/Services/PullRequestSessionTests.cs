@@ -644,9 +644,7 @@ Line 4";
             return new ActorModel { Login = login ?? "Viewer" };
         }
 
-        static PullRequestReviewCommentModel CreateComment(
-            string id = "comment1",
-            string body = "body")
+        static PullRequestReviewCommentModel CreateComment(string body = "body")
         {
             return new PullRequestReviewCommentModel
             {

@@ -11,13 +11,8 @@ namespace GitHub.VisualStudio.UI.Helpers
 {
     public class ThemeDictionaryManager : SharedDictionaryManager, IDisposable
     {
-        static bool isInDesignMode;
+        static bool isInDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
         Uri baseThemeUri;
-
-        static ThemeDictionaryManager()
-        {
-            isInDesignMode = DesignerProperties.GetIsInDesignMode(new DependencyObject());
-        }
 
         public override Uri Source
         {

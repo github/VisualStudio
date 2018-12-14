@@ -73,7 +73,7 @@ namespace UnitTests.GitHub.App.Services
             context.Response.Received(1).Close();
         }
 
-        IHttpListener CreateHttpListener(string id)
+        static IHttpListener CreateHttpListener(string id)
         {
             var result = Substitute.For<IHttpListener>();
             result.When(x => x.Start()).Do(_ => result.IsListening.Returns(true));

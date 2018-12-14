@@ -108,7 +108,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             return result;
         }
 
-        IInlineCommentThreadModel CreateThread(int lineNumber)
+        static IInlineCommentThreadModel CreateThread(int lineNumber)
         {
             var result = Substitute.For<IInlineCommentThreadModel>();
             result.LineNumber.Returns(lineNumber);

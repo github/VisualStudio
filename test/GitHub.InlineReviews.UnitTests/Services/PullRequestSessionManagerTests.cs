@@ -677,7 +677,7 @@ Line 4";
                 return thread;
             }
 
-            IPullRequestSessionService CreateRealSessionService(
+            static IPullRequestSessionService CreateRealSessionService(
                 IDiffService diff,
                 PullRequestDetailModel pullRequest)
             {
