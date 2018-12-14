@@ -170,7 +170,7 @@ namespace GitHub.UI
             return MoveFocus(FocusNavigationDirection.Previous);
         }
 
-        bool MoveFocus(FocusNavigationDirection navigationDirection)
+        static bool MoveFocus(FocusNavigationDirection navigationDirection)
         {
             var traversalRequest = new TraversalRequest(navigationDirection);
             var keyboardFocus = Keyboard.FocusedElement as UIElement;

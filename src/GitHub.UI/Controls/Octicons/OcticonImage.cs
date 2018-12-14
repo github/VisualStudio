@@ -11,7 +11,7 @@ namespace GitHub.UI
             set { SetValue(OcticonPath.IconProperty, value); }
         }
 
-        public static DependencyProperty IconProperty =
+        public static readonly DependencyProperty IconProperty =
             OcticonPath.IconProperty.AddOwner(typeof(OcticonImage));
     }
 }
