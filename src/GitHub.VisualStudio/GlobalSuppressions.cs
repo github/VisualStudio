@@ -8,4 +8,8 @@
 // Suppression File". You do not need to add suppressions to this
 // file manually.
 
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1701:ResourceStringCompoundWordsShouldBeCasedCorrectly", MessageId = "GitHub", Scope = "resource", Target = "VSPackage.resources")]
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Microsoft.Naming", "CA1701:ResourceStringCompoundWordsShouldBeCasedCorrectly", MessageId = "GitHub", Scope = "resource", Target = "VSPackage.resources")]
+[assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task", Justification = "Discouraged for VSSDK projects.")]
+[assembly: SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods")]

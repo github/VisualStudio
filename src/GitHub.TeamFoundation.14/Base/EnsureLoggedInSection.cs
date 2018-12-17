@@ -51,10 +51,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
 
             teServices.ClearNotifications();
             var add = HostAddress.Create(ActiveRepoUri);
-            bool loggedIn = await connectionManager.IsLoggedIn(add);
+            bool loggedIn = await ConnectionManager.IsLoggedIn(add);
             if (!loggedIn)
             {
-                var msg = string.Format(CultureInfo.CurrentUICulture, Resources.NotLoggedInMessage, add.Title, add.Title);
+                var msg = string.Format(CultureInfo.CurrentCulture, Resources.NotLoggedInMessage, add.Title, add.Title);
                 teServices.ShowMessage(
                     msg,
                     new Primitives.RelayCommand(_ => dialogService.ShowLoginDialog())

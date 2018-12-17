@@ -232,12 +232,12 @@ namespace GitHub.Services
 
                 var leftText = diffViewer.LeftView.TextBuffer.CurrentSnapshot.GetText();
                 var rightText = diffViewer.RightView.TextBuffer.CurrentSnapshot.GetText();
-                if (leftText == string.Empty)
+                if (leftText.Length == 0)
                 {
                     // Don't show LeftView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
                 }
-                else if (rightText == string.Empty)
+                else if (rightText.Length == 0)
                 {
                     // Don't show RightView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.LeftViewOnly;
@@ -436,7 +436,7 @@ namespace GitHub.Services
         /// <param name="line">The 0-based line we're navigating from.</param>
         /// <param name="matchedLines">The number of similar matched lines in <see cref="toLines"/></param>
         /// <returns>Find the nearest matching line in <see cref="toLines"/>.</returns>
-        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
+        public static int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];

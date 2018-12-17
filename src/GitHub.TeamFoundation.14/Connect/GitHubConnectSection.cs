@@ -136,7 +136,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
             Clone = ReactiveCommand.CreateFromTask(DoClone);
 
-            connectionManager.Connections.CollectionChanged += RefreshConnections;
+            ConnectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
             UpdateConnection();
         }
@@ -169,13 +169,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (connectionManager.Connections.Count > sectionIndex)
-                        Refresh(connectionManager.Connections[sectionIndex]);
+                    if (ConnectionManager.Connections.Count > sectionIndex)
+                        Refresh(ConnectionManager.Connections[sectionIndex]);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    Refresh(connectionManager.Connections.Count <= sectionIndex
+                    Refresh(ConnectionManager.Connections.Count <= sectionIndex
                         ? null
-                        : connectionManager.Connections[sectionIndex]);
+                        : ConnectionManager.Connections[sectionIndex]);
                     break;
             }
         }
@@ -276,8 +276,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void UpdateConnection()
         {
-            Refresh(connectionManager.Connections.Count > sectionIndex
-                ? connectionManager.Connections[sectionIndex]
+            Refresh(ConnectionManager.Connections.Count > sectionIndex
+                ? ConnectionManager.Connections[sectionIndex]
                 : SectionConnection);
         }
 
@@ -431,7 +431,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // TODO: This is wasteful as we can be calling it multiple times for a single changed
             // signal, once from each section. Needs refactoring.
             await localRepositories.Refresh();
-            RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
+            RaisePropertyChanged(nameof(Repositories)); // trigger a re-check of the visibility of the listview based on item count
         }
 
         public void DoCreate()
@@ -443,7 +443,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void SignOut()
         {
-            connectionManager.LogOut(SectionConnection.HostAddress);
+            ConnectionManager.LogOut(SectionConnection.HostAddress);
         }
 
         public void Login()
@@ -454,7 +454,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void Retry()
         {
-            connectionManager.Retry(SectionConnection);
+            ConnectionManager.Retry(SectionConnection);
         }
 
         public bool OpenRepository()
@@ -498,7 +498,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 if (!disposed)
                 {
-                    connectionManager.Connections.CollectionChanged -= RefreshConnections;
+                    ConnectionManager.Connections.CollectionChanged -= RefreshConnections;
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;

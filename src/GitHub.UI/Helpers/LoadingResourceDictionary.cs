@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+#pragma warning disable CA1010 // Collections should implement generic interface
+
 namespace GitHub
 {
     public class LoadingResourceDictionary : ResourceDictionary

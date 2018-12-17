@@ -160,10 +160,10 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             fileSubscription?.Dispose();
-            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(LinesChanged);
+            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LinesChanged(x).Forget());
         }
 
-        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        async Task LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
         {
             try
             {

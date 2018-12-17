@@ -10,7 +10,7 @@ namespace GitHub.Primitives
     [Serializable]
     public abstract class StringEquivalent<T> : ISerializable, IXmlSerializable where T : StringEquivalent<T>
     {
-        protected string Value;
+        protected string Value { get; set; }
 
         protected StringEquivalent(string value)
         {

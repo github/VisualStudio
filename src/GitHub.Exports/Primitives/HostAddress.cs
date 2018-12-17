@@ -6,7 +6,7 @@ namespace GitHub.Primitives
 {
     public class HostAddress
     {
-        public static HostAddress GitHubDotComHostAddress = new HostAddress();
+        public static readonly HostAddress GitHubDotComHostAddress = new HostAddress();
         static readonly Uri gistUri = new Uri("https://gist.github.com");
 
         /// <summary>

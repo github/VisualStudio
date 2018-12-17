@@ -135,7 +135,7 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
-        
+
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
 
             ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
@@ -357,7 +357,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = (IReadOnlyList<IPullRequestCheckViewModel>) PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
+                Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
                 await Files.InitializeAsync(Session);
 
@@ -377,6 +377,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pullEnabled)
                     {
                         pullToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPullToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -389,6 +390,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pushEnabled)
                     {
                         pushToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPushToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -403,7 +405,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
 
                     var submodulesToSync = await pullRequestsService.CountSubmodulesToSync(LocalRepository);
-                    var syncSubmodulesToolTip = string.Format(Resources.SyncSubmodules, submodulesToSync);
+                    var syncSubmodulesToolTip = string.Format(CultureInfo.InvariantCulture, Resources.SyncSubmodules, submodulesToSync);
 
                     UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesToolTip, submodulesToSync);
                     CheckoutState = null;
@@ -411,8 +413,14 @@ namespace GitHub.ViewModels.GitHubPane
                 else
                 {
                     var caption = localBranches.Count > 0 ?
-                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckout,
+                            localBranches.First().DisplayName) :
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckoutTo,
+                            await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
                     var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
