@@ -42,7 +42,7 @@ namespace GitHub.UI
                 six
             };
 
-            foreach(var textBox in TextBoxes)
+            foreach (var textBox in TextBoxes)
             {
                 SetupTextBox(textBox);
             }
@@ -81,7 +81,7 @@ namespace GitHub.UI
             var digits = text.Where(Char.IsDigit).ToList();
             for (int i = 0; i < Math.Min(6, digits.Count); i++)
             {
-                TextBoxes[i].Text = digits[i].ToString();
+                TextBoxes[i].Text = digits[i].ToString(CultureInfo.InvariantCulture);
             }
             SetValue(TextProperty, String.Join("", digits));
         }
@@ -151,7 +151,7 @@ namespace GitHub.UI
                     textBox.SelectAll();
                 }
             };
-            
+
             textBox.TextChanged += (sender, args) =>
             {
                 SetValue(TextProperty, String.Join("", GetTwoFactorCode()));
@@ -170,7 +170,7 @@ namespace GitHub.UI
             return MoveFocus(FocusNavigationDirection.Previous);
         }
 
-        bool MoveFocus(FocusNavigationDirection navigationDirection)
+        static bool MoveFocus(FocusNavigationDirection navigationDirection)
         {
             var traversalRequest = new TraversalRequest(navigationDirection);
             var keyboardFocus = Keyboard.FocusedElement as UIElement;

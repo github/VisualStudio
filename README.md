@@ -92,6 +92,22 @@ Logs can be viewed at the following location:
 
 `%LOCALAPPDATA%\GitHubVisualStudio\extension.log`
 
+## Troubleshooting
+
+If you have issues building with failures similar to:
+
+> "The type or namespace name does not exist..."
+
+or
+
+> "Unable to find project... Check that the project reference is valid and that the project file exists."*
+
+Close Visual Studio and run the following command to update submodules and clean your environment.
+
+```txt
+clean.cmd
+```
+
 ## More information
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
 
@@ -104,4 +120,3 @@ Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contri
 Copyright 2015 - 2018 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
-

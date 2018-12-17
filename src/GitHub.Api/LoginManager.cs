@@ -289,7 +289,7 @@ namespace GitHub.Api
             }
         }
 
-        ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
+        static ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
         {
             // If a mock IGitHubClient is not set up correctly, it can return null from
             // IGutHubClient.Authorization.Create - this will cause an infinite loop in Login()

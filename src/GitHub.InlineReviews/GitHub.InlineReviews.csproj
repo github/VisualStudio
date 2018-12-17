@@ -59,6 +59,7 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Margins\InlineCommentTextViewOptions.cs" />
     <Compile Include="Margins\PullRequestFileMargin.cs" />
     <Compile Include="Margins\PullRequestFileMarginProvider.cs" />
@@ -289,10 +290,10 @@
       <Version>0.2.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
-      <Version>15.8.33</Version>
+      <Version>15.8.36</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
-      <Version>15.8.122</Version>
+      <Version>15.8.192</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>

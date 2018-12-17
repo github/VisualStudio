@@ -54,6 +54,23 @@ using Sqlite3Statement = System.IntPtr;
 #endif
 
 #pragma warning disable 1591 // XML Doc Comments
+#pragma warning disable CA1018 // Mark attributes with AttributeUsageAttribute
+#pragma warning disable CA1032 // Implement standard exception constructors
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable CA1052 // Static holder types should be Static or NotInheritable
+#pragma warning disable CA1060 // Move pinvokes to native methods class
+#pragma warning disable CA1304 // Specify CultureInfo
+#pragma warning disable CA1305 // Specify IFormatProvider
+#pragma warning disable CA1401 // P/Invokes should not be visible
+#pragma warning disable CA1710 // Identifiers should have correct suffix
+#pragma warning disable CA1720 // Identifier contains type name
+#pragma warning disable CA1806 // Do not ignore method results
+#pragma warning disable CA1819 // Properties should not return arrays
+#pragma warning disable CA2101 // Specify marshaling for P/Invoke string arguments
+#pragma warning disable CA2200 // Rethrow to preserve stack details.
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+#pragma warning disable CA2237 // Mark ISerializable types with serializable
 
 namespace SQLite
 {

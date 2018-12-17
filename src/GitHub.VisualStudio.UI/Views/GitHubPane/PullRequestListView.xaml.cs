@@ -120,7 +120,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
-        Visual GetVisual(object element)
+        static Visual GetVisual(object element)
         {
             if (element is Visual v)
             {

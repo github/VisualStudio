@@ -770,7 +770,7 @@ namespace GitHub.InlineReviews.Services
 
         Task<IRepository> GetRepository(LocalRepositoryModel repository)
         {
-            return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
+            return Task.Run(() => gitService.GetRepository(repository.LocalPath));
         }
 
         async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
