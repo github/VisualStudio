@@ -43,6 +43,21 @@ namespace GitHub.Models
         public PullRequestChecksState Checks { get; set; }
 
         /// <summary>
+        /// Gets the number of pending checks and statuses
+        /// </summary>
+        public int ChecksPendingCount { get; set; }
+
+        /// <summary>
+        /// Gets the number of successful checks and statuses
+        /// </summary>
+        public int ChecksSuccessCount { get; set; }
+
+        /// <summary>
+        /// Gets the number of erroneous checks and statuses
+        /// </summary>
+        public int ChecksErrorCount { get; set; }
+
+        /// <summary>
         /// Gets or sets the date/time at which the pull request was last updated.
         /// </summary>
         public DateTimeOffset UpdatedAt { get; set; }

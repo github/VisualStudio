@@ -18,5 +18,8 @@ namespace GitHub.SampleData
         public string Title { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public PullRequestChecksState Checks { get; set; }
+        public int ChecksPendingCount { get; set; }
+        public int ChecksSuccessCount { get; set; }
+        public int ChecksErrorCount { get; set; }
     }
 }

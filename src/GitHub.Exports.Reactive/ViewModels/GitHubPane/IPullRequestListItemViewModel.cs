@@ -33,5 +33,20 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets the pull request checks and statuses summary
         /// </summary>
         PullRequestChecksState Checks { get; }
+
+        /// <summary>
+        /// Gets the number of pending checks and statuses
+        /// </summary>
+        int ChecksPendingCount { get; }
+
+        /// <summary>
+        /// Gets the number of successful checks and statuses
+        /// </summary>
+        int ChecksSuccessCount { get; }
+
+        /// <summary>
+        /// Gets the number of erroneous checks and statuses
+        /// </summary>
+        int ChecksErrorCount { get; }
     }
 }

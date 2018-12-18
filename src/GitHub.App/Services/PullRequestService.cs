@@ -217,9 +217,10 @@ namespace GitHub.Services
                 item.Reviews = null;
 
                 var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+                var statuses = item.LastCommit?.Statuses;
 
                 var hasCheckRuns = checkRuns?.Any() ?? false;
-                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
+                var hasStatuses = statuses?.Any() ?? false;
 
                 if (!hasCheckRuns && !hasStatuses)
                 {
@@ -276,6 +277,39 @@ namespace GitHub.Services
                         item.Checks = PullRequestChecksState.Pending;
                     }
                 }
+
+                var pendingCount = 0;
+                var successCount = 0;
+                var errorCount = 0;
+
+                if (checkRuns != null)
+                {
+                    pendingCount += checkRuns.Count(model => model.Status != CheckStatusState.Completed);
+
+                    successCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        (model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                    errorCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        !(model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                }
+
+                if (statuses != null)
+                {
+                    pendingCount += statuses.Count(model =>
+                        model.State == StatusState.Pending || model.State == StatusState.Expected);
+
+                    successCount += statuses.Count(model => model.State == StatusState.Success);
+
+                    errorCount += statuses.Count(model =>
+                        model.State == StatusState.Error || model.State == StatusState.Failure);
+                }
+
+                item.ChecksPendingCount = pendingCount;
+                item.ChecksSuccessCount = successCount;
+                item.ChecksErrorCount = errorCount;
 
                 item.LastCommit = null;
             }
