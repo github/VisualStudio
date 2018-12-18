@@ -39,9 +39,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var directory = Path.GetDirectoryName(fullPath);
             Directory.CreateDirectory(directory);
             File.WriteAllText(fullPath, contents);
-#pragma warning disable 618 // Type or member is obsolete
-            repository.Stage(path);
-#pragma warning restore 618 // Type or member is obsolete
+            LibGit2Sharp.Commands.Stage(repository, path);
             repository.Commit("Added " + path, signature, signature);
             return repository.Head.Tip.Sha;
         }
@@ -108,9 +106,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var signature = new Signature("user", "user@user", DateTimeOffset.Now);
 
             File.WriteAllText(Path.Combine(tempPath, ".gitattributes"), "* text=auto");
-#pragma warning disable 618 // Type or member is obsolete
-            result.Stage("*");
-#pragma warning restore 618 // Type or member is obsolete
+            LibGit2Sharp.Commands.Stage(result, "*");
             result.Commit("Initial commit", signature, signature);
 
             return result;
