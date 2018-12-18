@@ -218,12 +218,7 @@
     <PackageReference Include="EnvDTE">
       <Version>8.0.2</Version>
     </PackageReference>
-    <PackageReference Include="LibGit2Sharp">
-      <Version>0.23.1</Version>
-    </PackageReference>
-    <PackageReference Include="LibGit2Sharp.NativeBinaries">
-      <Version>1.0.164</Version>
-    </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0080" />
     <PackageReference Include="Serilog">
       <Version>2.5.0</Version>
     </PackageReference>

@@ -280,12 +280,7 @@
     <Folder Include="SampleData\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp">
-      <Version>0.23.1</Version>
-    </PackageReference>
-    <PackageReference Include="LibGit2Sharp.NativeBinaries">
-      <Version>1.0.164</Version>
-    </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0080" />
     <PackageReference Include="Markdig.Wpf.Signed">
       <Version>0.2.1</Version>
     </PackageReference>
