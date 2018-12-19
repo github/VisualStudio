@@ -22,33 +22,43 @@ namespace GitHub.VisualStudio.UI.UI.Controls
     public partial class PullRequestStatusCircle : UserControl
     {
         public static readonly DependencyProperty ErrorCountProperty = DependencyProperty.Register(
-            "ErrorCount", typeof(int), typeof(PullRequestStatusCircle), new PropertyMetadata(0));
+            "ErrorCount", typeof(int), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(0, (d, args) => ((PullRequestStatusCircle)d).ErrorCount = (int)args.NewValue));
 
         public static readonly DependencyProperty SuccessCountProperty = DependencyProperty.Register(
-            "SuccessCount", typeof(int), typeof(PullRequestStatusCircle), new PropertyMetadata(0));
+            "SuccessCount", typeof(int), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(0, (d, args) => ((PullRequestStatusCircle)d).SuccessCount = (int)args.NewValue));
 
         public static readonly DependencyProperty PendingCountProperty = DependencyProperty.Register(
-            "PendingCount", typeof(int), typeof(PullRequestStatusCircle), new PropertyMetadata(0));
+            "PendingCount", typeof(int), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(0, (d, args) => ((PullRequestStatusCircle)d).PendingCount = (int)args.NewValue));
 
         public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(
-            "Radius", typeof(double), typeof(PullRequestStatusCircle), new PropertyMetadata((double)250));
+            "Radius", typeof(double), typeof(PullRequestStatusCircle),
+            new PropertyMetadata((double)250, (d, args) => ((PullRequestStatusCircle)d).Radius = (double)args.NewValue));
 
         public static readonly DependencyProperty InnerRadiusProperty = DependencyProperty.Register(
-            "InnerRadius", typeof(double), typeof(PullRequestStatusCircle), new PropertyMetadata((double)200));
+            "InnerRadius", typeof(double), typeof(PullRequestStatusCircle),
+            new PropertyMetadata((double)200, (d, args) => ((PullRequestStatusCircle)d).InnerRadius = (double)args.NewValue));
 
-        public static IEnumerable<Point> GeneratePoints(double size, float percentage)
+        public static IEnumerable<Point> GeneratePoints(double diameter, float percentage)
         {
-            if (percentage < 0 || percentage > 1)
+            if (float.IsNaN(percentage))
             {
-                throw new ArgumentException();
+                return Array.Empty<Point>();
             }
 
-            var halfSize = size / 2;
-            var origin = new Point(halfSize, halfSize);
-            var topMiddle = new Point(halfSize, 0);
-            var topRight = new Point(size, 0);
-            var bottomRight = new Point(size, size);
-            var bottomLeft = new Point(0, size);
+            if (percentage < 0 || percentage > 1)
+            {
+                throw new ArgumentException($@"`{nameof(percentage)}` must be >=0 and <=1", nameof(percentage));
+            }
+
+            var radius = diameter / 2;
+            var origin = new Point(radius, radius);
+            var topMiddle = new Point(radius, 0);
+            var topRight = new Point(diameter, 0);
+            var bottomRight = new Point(diameter, diameter);
+            var bottomLeft = new Point(0, diameter);
             var topLeft = new Point(0, 0);
 
             if (percentage == 1)
@@ -64,8 +74,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 90;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, new Point(halfSize + oppositeEdge, 0) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, new Point(radius + oppositeEdge, 0) };
             }
 
             if (adjustedDegrees >= 135 && adjustedDegrees < 180)
@@ -73,8 +83,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 135;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, new Point(size, oppositeEdge) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, new Point(diameter, oppositeEdge) };
             }
 
             if (adjustedDegrees >= 180 && adjustedDegrees < 225)
@@ -82,8 +92,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 180;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, new Point(size, halfSize + oppositeEdge) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, new Point(diameter, radius + oppositeEdge) };
             }
 
             if (adjustedDegrees >= 225 && adjustedDegrees < 270)
@@ -91,8 +101,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 225;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, bottomRight, new Point(size - oppositeEdge, size) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, bottomRight, new Point(diameter - oppositeEdge, diameter) };
             }
 
             if (adjustedDegrees >= 270 && adjustedDegrees < 315)
@@ -100,8 +110,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 270;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, bottomRight, new Point(halfSize - oppositeEdge, size) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, bottomRight, new Point(radius - oppositeEdge, diameter) };
             }
 
             if (adjustedDegrees >= 315 && adjustedDegrees < 360)
@@ -109,8 +119,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 315;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, bottomRight, bottomLeft, new Point(0, size - oppositeEdge) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, bottomRight, bottomLeft, new Point(0, diameter - oppositeEdge) };
             }
 
             if (adjustedDegrees >= 0 && adjustedDegrees < 45)
@@ -118,8 +128,8 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
-                return new[] { origin, topMiddle, topRight, bottomRight, bottomLeft, new Point(0, halfSize - oppositeEdge) };
+                var oppositeEdge = tan * radius;
+                return new[] { origin, topMiddle, topRight, bottomRight, bottomLeft, new Point(0, radius - oppositeEdge) };
             }
 
             if (adjustedDegrees >= 45 && adjustedDegrees < 90)
@@ -127,11 +137,11 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 var angleDegrees = adjustedDegrees - 45;
                 var angleRadians = ToRadians(angleDegrees);
                 var tan = Math.Tan(angleRadians);
-                var oppositeEdge = tan * halfSize;
+                var oppositeEdge = tan * radius;
                 return new[] { origin, topMiddle, topRight, bottomRight, bottomLeft, topLeft, new Point(oppositeEdge, 0) };
             }
 
-            return new Point[0];
+            throw new InvalidOperationException();
         }
 
         public static double ToRadians(float val)
