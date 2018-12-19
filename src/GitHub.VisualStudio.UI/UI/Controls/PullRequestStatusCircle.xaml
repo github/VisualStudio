@@ -8,8 +8,6 @@
              d:DesignHeight="250" d:DesignWidth="250">
     <Grid>
         <Polygon Grid.Row="0" Grid.Column="0" Name="PendingPolygon" 
-                     Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
-                     Height="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
                      StrokeThickness="0" Fill="Yellow" 
                      Points="0,0 250,0 250,250 0,250">
             <Polygon.Clip>
@@ -24,8 +22,6 @@
             </Polygon.Clip>
         </Polygon>
         <Polygon Grid.Row="0" Grid.Column="0" Name="SuccessPolygon"
-                     Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
-                     Height="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
                      StrokeThickness="0" Fill="Green"
                      Points="125,125 125,0 250,0 250,250 0,250 0,216.50635094611">
             <Polygon.Clip>
@@ -40,8 +36,6 @@
             </Polygon.Clip>
         </Polygon>
         <Polygon Grid.Row="0" Grid.Column="0" Name="ErrorPolygon"
-                     Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
-                     Height="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}}"
                      StrokeThickness="0" Fill="Red" 
                      Points="125,125 125,0 250,0 250,197.168783648703">
             <Polygon.Clip>

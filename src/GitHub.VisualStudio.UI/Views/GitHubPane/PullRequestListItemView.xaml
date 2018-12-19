@@ -100,8 +100,8 @@
                     <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
                 </TextBlock>
                 <controls:PullRequestStatusCircle 
-                    Height="16" Width="16"
-                    Radius="16" InnerRadius="10"
+                    Height="18" Width="18"
+                    Radius="8" InnerRadius="3"
                     PendingCount="{Binding ChecksPendingCount}"
                     ErrorCount="{Binding ChecksErrorCount}"
                     SuccessCount="{Binding ChecksSuccessCount}"
