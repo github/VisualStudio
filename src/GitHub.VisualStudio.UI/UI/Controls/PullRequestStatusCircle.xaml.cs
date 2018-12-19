@@ -41,6 +41,18 @@ namespace GitHub.VisualStudio.UI.UI.Controls
             "InnerRadius", typeof(double), typeof(PullRequestStatusCircle),
             new PropertyMetadata((double)200, (d, args) => ((PullRequestStatusCircle)d).InnerRadius = (double)args.NewValue));
 
+        public static readonly DependencyProperty PendingColorProperty = DependencyProperty.Register(
+            "PendingColor", typeof(Brush), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(Brushes.Yellow, (d, args) => ((PullRequestStatusCircle)d).PendingColor = (Brush)args.NewValue));
+
+        public static readonly DependencyProperty ErrorColorProperty = DependencyProperty.Register(
+            "ErrorColor", typeof(Brush), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(Brushes.Red, (d, args) => ((PullRequestStatusCircle)d).ErrorColor = (Brush)args.NewValue));
+
+        public static readonly DependencyProperty SuccessColorProperty = DependencyProperty.Register(
+            "SuccessColor", typeof(Brush), typeof(PullRequestStatusCircle),
+            new PropertyMetadata(Brushes.Green, (d, args) => ((PullRequestStatusCircle)d).SuccessColor = (Brush)args.NewValue));
+
         public IEnumerable<Point> GeneratePoints(float percentage)
         {
             double ToRadians(float val)
@@ -239,6 +251,36 @@ namespace GitHub.VisualStudio.UI.UI.Controls
                 SetValue(InnerRadiusProperty, value);
                 GenerateMask();
                 GeneratePolygons();
+            }
+        }
+
+        public Brush PendingColor
+        {
+            get => (Brush)GetValue(PendingColorProperty);
+            set
+            {
+                SetValue(PendingColorProperty, value);
+                PendingPolygon.Fill = value;
+            }
+        }
+
+        public Brush ErrorColor
+        {
+            get => (Brush)GetValue(ErrorColorProperty);
+            set
+            {
+                SetValue(ErrorColorProperty, value);
+                ErrorPolygon.Fill = value;
+            }
+        }
+
+        public Brush SuccessColor
+        {
+            get => (Brush)GetValue(SuccessColorProperty);
+            set
+            {
+                SetValue(SuccessColorProperty, value);
+                SuccessPolygon.Fill = value;
             }
         }
 

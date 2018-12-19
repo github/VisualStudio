@@ -40,7 +40,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets the pull request checks and statuses summary
         /// </summary>
-        public PullRequestChecksState Checks { get; set; }
+        public PullRequestChecksSummaryState ChecksSummary { get; set; }
 
         /// <summary>
         /// Gets the number of pending checks and statuses
