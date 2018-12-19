@@ -68,7 +68,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
+        Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
@@ -78,7 +78,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
+        internal Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
         {
             return Diff(path, repository.Head.Tip.Sha, Encoding.UTF8.GetBytes(contents));
         }
