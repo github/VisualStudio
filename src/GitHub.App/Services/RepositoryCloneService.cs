@@ -75,7 +75,7 @@ namespace GitHub.Services
 
                 var affiliation = new RepositoryAffiliation?[]
                 {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
+                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator, RepositoryAffiliation.OrganizationMember
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -97,13 +97,6 @@ namespace GitHub.Services
                         Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, affiliation, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
-                        Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
-                        {
-                            org.Login,
-                            Repositories = org.Repositories(null, null, null, null, null, null, null, order, null, null)
-                                .AllPages()
-                                .Select(repositorySelection).ToList()
-                        }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
             }
 
