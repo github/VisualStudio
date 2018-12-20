@@ -73,6 +73,8 @@ namespace GitHub.Services
                     Direction = OrderDirection.Asc
                 };
 
+                // Pass this for affiliations and ownerAffiliations. See:
+                // https://platform.github.community/t/unable-to-fetch-users-repositories-by-organization-membership/7557/6
                 var affiliation = new RepositoryAffiliation?[]
                 {
                     RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator, RepositoryAffiliation.OrganizationMember
@@ -94,7 +96,7 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, affiliation, null)
+                        Repositories = viewer.Repositories(null, null, null, null, affiliation, null, null, order, affiliation, RepositoryPrivacy.Private)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
                     }).Compile();
