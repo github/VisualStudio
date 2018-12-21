@@ -33,14 +33,14 @@ namespace GitHub.Logging
         {
             var startTime = DateTime.Now;
             method();
-            logger.Information("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
+            logger.Verbose("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
         }
 
         public static T Time<T>(this ILogger logger, string name, Func<T> method)
         {
             var startTime = DateTime.Now;
             var value = method();
-            logger.Information("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
+            logger.Verbose("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
             return value;
         }
 
@@ -48,14 +48,14 @@ namespace GitHub.Logging
         {
             var startTime = DateTime.Now;
             await methodAsync().ConfigureAwait(false);
-            logger.Information("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
+            logger.Verbose("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
         }
 
         public static async Task<T> TimeAsync<T>(this ILogger logger, string name, Func<Task<T>> methodAsync)
         {
             var startTime = DateTime.Now;
             var value = await methodAsync().ConfigureAwait(false);
-            logger.Information("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
+            logger.Verbose("{Name} took {Seconds} seconds", name, FormatSeconds(DateTime.Now - startTime));
             return value;
         }
 
