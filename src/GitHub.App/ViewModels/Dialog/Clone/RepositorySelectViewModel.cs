@@ -119,10 +119,16 @@ namespace GitHub.ViewModels.Dialog.Clone
                     .Where(r => r.Owner != results.Owner)
                     .OrderBy(r => r.Owner)
                     .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
+                var repositoriesContributedTo = results.ContributedToRepositories
+                    .Select(x => new RepositoryItemViewModel(x, "Contributed to repositories"));
                 var orgRepositories = results.Organizations
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, GroupName(x, 100))));
-                Items = yourRepositories.Concat(collaboratorRepositories).Concat(orgRepositories).ToList();
+                Items = yourRepositories
+                    .Concat(collaboratorRepositories)
+                    .Concat(repositoriesContributedTo)
+                    .Concat(orgRepositories)
+                    .ToList();
                 log.Information("Read {Total} viewer repositories", Items.Count);
                 ItemsView = CollectionViewSource.GetDefaultView(Items);
                 ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
