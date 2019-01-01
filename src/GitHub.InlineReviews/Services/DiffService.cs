@@ -39,7 +39,7 @@ namespace GitHub.InlineReviews.Services
             }
             else
             {
-                return new DiffChunk[0];
+                return Array.Empty<DiffChunk>();
             }
         }
 
@@ -59,7 +59,7 @@ namespace GitHub.InlineReviews.Services
             }
             else
             {
-                return new DiffChunk[0];
+                return Array.Empty<DiffChunk>();
             }
         }
     }
