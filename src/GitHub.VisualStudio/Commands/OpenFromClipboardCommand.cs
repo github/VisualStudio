@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Services;
@@ -45,7 +46,7 @@ namespace GitHub.VisualStudio.Commands
             ParametersDescription = "u";    // accept a single url
 
             // This command is only visible when in the context of a Git repository
-            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git)));
+            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString)));
         }
 
         public override async Task Execute(string url)
@@ -59,7 +60,7 @@ namespace GitHub.VisualStudio.Commands
 
             if (context.LinkType != LinkType.Blob)
             {
-                var message = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.UnknownLinkTypeMessage, context.Url);
                 vsServices.Value.ShowMessageBoxInfo(message);
                 return;
             }
@@ -74,7 +75,11 @@ namespace GitHub.VisualStudio.Commands
 
             if (!string.Equals(activeRepository.Name, context.RepositoryName, StringComparison.OrdinalIgnoreCase))
             {
-                vsServices.Value.ShowMessageBoxInfo(string.Format(Resources.DifferentRepositoryMessage, context.RepositoryName));
+                vsServices.Value.ShowMessageBoxInfo(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.DifferentRepositoryMessage,
+                        context.RepositoryName));
                 return;
             }
 

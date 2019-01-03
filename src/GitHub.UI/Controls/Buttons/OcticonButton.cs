@@ -21,7 +21,7 @@ namespace GitHub.UI
             set { SetValue(IconRotationAngleProperty, value); }
         }
 
-        public static DependencyProperty DataProperty =
+        public static readonly DependencyProperty DataProperty =
             Path.DataProperty.AddOwner(typeof(OcticonButton));
 
         public Geometry Data
@@ -30,7 +30,7 @@ namespace GitHub.UI
             set { SetValue(DataProperty, value); }
         }
 
-        public static DependencyProperty IconProperty =
+        public static readonly DependencyProperty IconProperty =
             OcticonPath.IconProperty.AddOwner(
                 typeof(OcticonButton),
                 new FrameworkPropertyMetadata(defaultValue: Octicon.mark_github, flags:

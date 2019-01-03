@@ -1,8 +1,10 @@
 using System;
 using System.Windows.Input;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.Services
 {
+    [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
     public struct Notification
     {
         public enum NotificationType

@@ -1,5 +1,7 @@
 ﻿using System;
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 namespace GitHub.VisualStudio
 {
     public static class Guids
@@ -22,7 +24,7 @@ namespace GitHub.VisualStudio
         public const string TeamExplorerInstall3rdPartyGitTools = "DF785C7C-8454-4836-9686-D1C4A01D0BB9";
 
         // UIContexts
-        public const string UIContext_Git = "565515AD-F4C1-4D59-BC14-AE77396DDDD7";
+        public const string GitContextPkgString = "565515AD-F4C1-4D59-BC14-AE77396DDDD7";
 
         // Guids defined in GitHub.VisualStudio.vsct
         public const string guidGitHubPkgString = "c3d3dc68-c977-411f-b3e8-03b0dccf7dfc";

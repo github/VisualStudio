@@ -20,6 +20,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
@@ -30,6 +32,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
   </ItemGroup>
 </Project>

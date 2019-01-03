@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using Microsoft;
 
 namespace GitHub.VisualStudio
 {
@@ -31,7 +32,7 @@ namespace GitHub.VisualStudio
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
@@ -80,6 +81,8 @@ namespace GitHub.VisualStudio
             if (ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
                 var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+                Assumes.Present(componentModel);
+
                 var exports = componentModel.DefaultExportProvider;
                 commands = new IVsCommandBase[]
                 {
@@ -111,11 +114,15 @@ namespace GitHub.VisualStudio
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            Assumes.Present(menuService);
+
             menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
         {
+            await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
+
             var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
             if (shell != null)
             {
@@ -233,6 +240,8 @@ namespace GitHub.VisualStudio
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()
         {
+            await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
+
             var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
             if (pane == null)
                 return null;
@@ -248,6 +257,8 @@ namespace GitHub.VisualStudio
 
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             IVsWindowFrame frame;
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
@@ -290,6 +301,8 @@ namespace GitHub.VisualStudio
                 // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
                 // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(serviceProvider);
+
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
 
@@ -319,6 +332,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IUsageService))
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(sp);
+
                 var environment = new Rothko.Environment();
                 return new UsageService(sp, environment);
             }
@@ -327,6 +342,11 @@ namespace GitHub.VisualStudio
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var settings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+
+                Assumes.Present(usageService);
+                Assumes.Present(serviceProvider);
+                Assumes.Present(settings);
+
                 return new UsageTracker(serviceProvider, usageService, settings);
             }
             else if (serviceType == typeof(IVSGitExt))
@@ -352,6 +372,8 @@ namespace GitHub.VisualStudio
             else
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(sp);
+
                 return sp.TryGetService(serviceType);
             }
         }

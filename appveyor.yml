@@ -1,5 +1,5 @@
 os: Visual Studio 2017
-version: '2.6.0.{build}'
+version: '2.7.0.{build}'
 skip_tags: true
 install:
 - ps: |
