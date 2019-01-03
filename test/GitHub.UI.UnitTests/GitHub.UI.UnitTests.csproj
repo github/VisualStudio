@@ -6,6 +6,10 @@
     <Compile Remove="Controls\AutoCompleteBoxTests.cs" />
     <Compile Remove="Controls\AutoCompleteSuggestionTests.cs" />
     <Compile Remove="Controls\AutoCompleteTextInputExtensionsTests.cs" />
+    <Compile Remove="Helpers\AutoCompleteAdvisorTests.cs" />
+    <Compile Remove="Helpers\AutoCompleteSourceTests.cs" />
+    <Compile Remove="Helpers\IssuesAutoCompleteSourceTests.cs" />
+    <Compile Remove="Helpers\MentionsAutoCompleteSourceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,9 +33,16 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="Controls\AutoCompleteBoxTests.cs" />
-    <Content Include="Controls\AutoCompleteSuggestionTests.cs" />
-    <Content Include="Controls\AutoCompleteTextInputExtensionsTests.cs" />
+    <None Include="Controls\AutoCompleteBoxTests.cs" />
+    <None Include="Controls\AutoCompleteSuggestionTests.cs" />
+    <None Include="Controls\AutoCompleteTextInputExtensionsTests.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="Helpers\AutoCompleteAdvisorTests.cs" />
+    <None Include="Helpers\AutoCompleteSourceTests.cs" />
+    <None Include="Helpers\IssuesAutoCompleteSourceTests.cs" />
+    <None Include="Helpers\MentionsAutoCompleteSourceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
