@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GitHub.UI
+namespace GitHub.Models
 {
     public class AutoCompleteResult
     {

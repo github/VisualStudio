@@ -4,7 +4,10 @@ using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
 using GitHub.Cache;
+using GitHub.Caches;
+using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 
@@ -20,19 +23,18 @@ namespace GitHub.Helpers
         readonly Lazy<IMentionsCache> mentionsCache;
         readonly Lazy<ISourceListViewModel> currentRepositoryState;
         readonly Lazy<IImageCache> imageCache;
-        readonly IHostAvatarProvider hostAvatarProvider;
+        readonly IAvatarProvider hostAvatarProvider;
 
         [ImportingConstructor]
         public MentionsAutoCompleteSource(
             Lazy<IMentionsCache> mentionsCache,
-            Lazy<ISourceListViewModel> currentRepositoryState,
             Lazy<IImageCache> imageCache,
-            IHostAvatarProvider hostAvatarProvider)
+            IAvatarProvider hostAvatarProvider)
         {
-            Ensure.ArgumentNotNull(mentionsCache, "mentionsCache");
-            Ensure.ArgumentNotNull(currentRepositoryState, "currentRepositoryState");
-            Ensure.ArgumentNotNull(imageCache, "imageCache");
-            Ensure.ArgumentNotNull(hostAvatarProvider, "hostAvatarProvider");
+            Guard.ArgumentNotNull(mentionsCache, "mentionsCache");
+            Guard.ArgumentNotNull(currentRepositoryState, "currentRepositoryState");
+            Guard.ArgumentNotNull(imageCache, "imageCache");
+            Guard.ArgumentNotNull(hostAvatarProvider, "hostAvatarProvider");
 
             this.mentionsCache = mentionsCache;
             this.currentRepositoryState = currentRepositoryState;
@@ -70,6 +72,6 @@ namespace GitHub.Helpers
 
         IMentionsCache MentionsCache { get { return mentionsCache.Value; } }
 
-        IRepositoryModel CurrentRepository { get { return currentRepositoryState.Value.SelectedRepository; } }
+        RepositoryModel CurrentRepository { get { return currentRepositoryState.Value.SelectedRepository; } }
     }
 }

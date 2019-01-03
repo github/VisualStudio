@@ -1,6 +1,7 @@
 ﻿using System;
+using GitHub.Models;
 
-namespace GitHub.UI
+namespace GitHub.Services
 {
     public interface IAutoCompleteAdvisor
     {

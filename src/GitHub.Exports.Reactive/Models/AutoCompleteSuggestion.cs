@@ -7,7 +7,7 @@ using GitHub.Extensions;
 using GitHub.Helpers;
 using ReactiveUI;
 
-namespace GitHub.UI
+namespace GitHub.Models
 {
     public class AutoCompleteSuggestion
     {

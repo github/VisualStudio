@@ -25,6 +25,8 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using GitHub.Extensions;
 using GitHub.Helpers;
+using GitHub.Models;
+using GitHub.Services;
 using GitHub.UI.Controls;
 using GitHub.UI.Controls.AutoCompleteBox;
 using GitHub.UI.Helpers;
