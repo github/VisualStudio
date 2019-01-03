@@ -108,7 +108,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             try
             {
-                var results = await service.ReadViewerRepositories(connection.HostAddress).ConfigureAwait(true);
+                var results = await log.TimeAsync(nameof(service.ReadViewerRepositories),
+                    () => service.ReadViewerRepositories(connection.HostAddress));
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
@@ -121,6 +122,7 @@ namespace GitHub.ViewModels.Dialog.Clone
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, x.Key)));
                 Items = yourRepositories.Concat(collaboratorRepositories).Concat(orgRepositories).ToList();
+                log.Information("Read {Total} viewer repositories", Items.Count);
                 ItemsView = CollectionViewSource.GetDefaultView(Items);
                 ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
                 ItemsView.Filter = FilterItem;
