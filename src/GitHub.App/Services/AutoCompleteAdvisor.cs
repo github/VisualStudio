@@ -10,7 +10,7 @@ using System.Reactive.Linq;
 using GitHub.UI;
 using NLog;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     [Export(typeof(IAutoCompleteAdvisor))]
     [PartCreationPolicy(CreationPolicy.Shared)]
