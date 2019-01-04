@@ -339,8 +339,8 @@ namespace GitHub.ViewModels.GitHubPane
                 SourceBranch.Name);
         }
 
-        public RemoteRepositoryModel GitHubRepository => githubRepository?.Value;
-        bool IsExecuting => isExecuting.Value;
+        public RemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
+        bool IsExecuting { get { return isExecuting.Value; } }
         public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         bool initialized;
