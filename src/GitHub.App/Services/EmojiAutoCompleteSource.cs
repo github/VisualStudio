@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
 using GitHub.UI;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     [Export(typeof(IAutoCompleteSource))]
     [PartCreationPolicy(CreationPolicy.Shared)]

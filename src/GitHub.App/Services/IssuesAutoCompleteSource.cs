@@ -8,7 +8,7 @@ using GitHub.Models;
 using GitHub.UI;
 using GitHub.ViewModels;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     [Export(typeof(IAutoCompleteSource))]
     [PartCreationPolicy(CreationPolicy.Shared)]

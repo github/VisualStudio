@@ -1,7 +1,8 @@
 ﻿using System;
+using GitHub.Models;
 using GitHub.UI;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     public interface IAutoCompleteSource
     {

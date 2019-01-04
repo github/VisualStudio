@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
-using GitHub.Cache;
 using GitHub.Caches;
 using GitHub.Extensions;
+using GitHub.Helpers;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     /// <summary>
     /// Supplies @mentions auto complete suggestions.
