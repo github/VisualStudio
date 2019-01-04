@@ -250,8 +250,7 @@ namespace GitHub.App.UnitTests.ViewModels
             };
         }
 
-        static ICommentThreadViewModel CreateThread(
-            bool canPost = true)
+        static ICommentThreadViewModel CreateThread()
         {
             var result = Substitute.For<ICommentThreadViewModel>();
             return result;
