@@ -2,6 +2,7 @@
 using System.Windows;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
+using GitHub.Models;
 using GitHub.UI;
 using ReactiveUI;
 

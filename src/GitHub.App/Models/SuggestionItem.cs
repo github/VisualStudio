@@ -1,4 +1,5 @@
 ﻿using System;
+using GitHub.Extensions;
 using GitHub.Helpers;
 
 namespace GitHub.Models
@@ -15,8 +16,8 @@ namespace GitHub.Models
 
         public SuggestionItem(string name, Uri iconCacheKey)
         {
-            Ensure.ArgumentNotNullOrEmptyString(name, "name");
-            Ensure.ArgumentNotNull(iconCacheKey, "iconCacheKey");
+            Guard.ArgumentNotEmptyString(name, "name");
+            Guard.ArgumentNotNull(iconCacheKey, "iconCacheKey");
             
             Name = name;
             IconKey = iconCacheKey;
@@ -24,8 +25,8 @@ namespace GitHub.Models
 
         public SuggestionItem(string name, string description)
         {
-            Ensure.ArgumentNotNullOrEmptyString(name, "name");
-            Ensure.ArgumentNotNullOrEmptyString(description, "description");
+            Guard.ArgumentNotEmptyString(name, "name");
+            Guard.ArgumentNotEmptyString(description, "description");
 
             Name = name;
             Description = description;
@@ -33,8 +34,8 @@ namespace GitHub.Models
 
         public SuggestionItem(string name, string description, Uri iconCacheKey)
         {
-            Ensure.ArgumentNotNullOrEmptyString(name, "name");
-            Ensure.ArgumentNotNull(iconCacheKey, "iconCacheKey");
+            Guard.ArgumentNotEmptyString(name, "name");
+            Guard.ArgumentNotNull(iconCacheKey, "iconCacheKey");
 
             Name = name;
             Description = description;

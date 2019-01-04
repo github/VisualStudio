@@ -3,54 +3,53 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using GitHub.Cache;
+using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.UI;
-using GitHub.ViewModels;
+using GitHub.Primitives;
+using Octokit.GraphQL;
 
-namespace GitHub.Helpers
+namespace GitHub.Services
 {
     [Export(typeof(IAutoCompleteSource))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class IssuesAutoCompleteSource : IAutoCompleteSource
     {
-        readonly Lazy<IIssuesCache> issuesCache;
-        readonly Lazy<ISourceListViewModel> currentRepositoryState;
+        readonly LocalRepositoryModel localRepositoryModel;
+        readonly IGraphQLClientFactory graphqlFactory;
 
         [ImportingConstructor]
-        public IssuesAutoCompleteSource(
-            Lazy<IIssuesCache> issuesCache,
-            Lazy<ISourceListViewModel> currentRepositoryState)
+        public IssuesAutoCompleteSource(LocalRepositoryModel localRepositoryModel, IGraphQLClientFactory graphqlFactory)
         {
-            Ensure.ArgumentNotNull(issuesCache, "issuesCache");
-            Ensure.ArgumentNotNull(currentRepositoryState, "currentRepositoryState");
+            Guard.ArgumentNotNull(localRepositoryModel, nameof(localRepositoryModel));
+            Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
 
-            this.issuesCache = issuesCache;
-            this.currentRepositoryState = currentRepositoryState;
+            this.localRepositoryModel = localRepositoryModel;
+            this.graphqlFactory = graphqlFactory;
         }
 
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
-            if (CurrentRepository.RepositoryHost == null)
-            {
-                return Observable.Empty<AutoCompleteSuggestion>();
-            }
+            var query = new Query().Repository(owner: localRepositoryModel.Owner, name: localRepositoryModel.Name)
+                .Select(repository =>
+                    repository.Issues(null, null, null, null, null, null, null)
+                        .AllPages()
+                        .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title))
+                        .ToList());
 
-            return IssuesCache.RetrieveSuggestions(CurrentRepository)
-                .Catch<IReadOnlyList<SuggestionItem>, Exception>(_ => Observable.Empty<IReadOnlyList<SuggestionItem>>())
-                .SelectMany(x => x.ToObservable())
-                .Where(suggestion => !String.IsNullOrEmpty(suggestion.Name)) // Just being extra cautious
-                .Select(suggestion => new IssueAutoCompleteSuggestion(suggestion, Prefix));
+            return Observable.FromAsync(async () =>
+                {
+                    var connection = await graphqlFactory.CreateConnection(HostAddress.Create(localRepositoryModel.CloneUrl.Host));
+                    var suggestions = await connection.Run(query);
+                    return suggestions.Select(suggestion => new IssueAutoCompleteSuggestion(suggestion, Prefix));
+                }).SelectMany(enumerable => enumerable);
         }
 
         public string Prefix
         {
             get { return "#"; }
         }
-
-        IIssuesCache IssuesCache { get { return issuesCache.Value; } }
-
-        IRepositoryModel CurrentRepository { get { return currentRepositoryState.Value.SelectedRepository; } }
 
         class IssueAutoCompleteSuggestion : AutoCompleteSuggestion
         {
