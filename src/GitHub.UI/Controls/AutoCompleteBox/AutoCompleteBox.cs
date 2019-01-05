@@ -169,11 +169,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MinimumPopulateDelay" />
+        /// <see cref="MinimumPopulateDelay" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MinimumPopulateDelay" />
+        /// <see cref="MinimumPopulateDelay" />
         /// dependency property.</value>
         public static readonly DependencyProperty MinimumPopulateDelayProperty =
             DependencyProperty.Register(
@@ -221,10 +221,10 @@ namespace GitHub.UI
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="T:System.Windows.DataTemplate" /> used
+        /// Gets or sets the <see cref="DataTemplate" /> used
         /// to display each item in the drop-down portion of the control.
         /// </summary>
-        /// <value>The <see cref="T:System.Windows.DataTemplate" /> used to
+        /// <value>The <see cref="DataTemplate" /> used to
         /// display each item in the drop-down. The default is null.</value>
         /// <remarks>
         /// You use the ItemTemplate property to specify the visualization 
@@ -242,11 +242,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemTemplate" />
+        /// <see cref="AutoCompleteBox.ItemTemplate" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemTemplate" />
+        /// <see cref="AutoCompleteBox.ItemTemplate" />
         /// dependency property.</value>
         public static readonly DependencyProperty ItemTemplateProperty =
             DependencyProperty.Register(
@@ -277,11 +277,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemContainerStyle" />
+        /// <see cref="AutoCompleteBox.ItemContainerStyle" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemContainerStyle" />
+        /// <see cref="AutoCompleteBox.ItemContainerStyle" />
         /// dependency property.</value>
         public static readonly DependencyProperty ItemContainerStyleProperty =
             DependencyProperty.Register(
@@ -307,11 +307,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.TextBoxStyle" />
+        /// <see cref="AutoCompleteBox.TextBoxStyle" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.TextBoxStyle" />
+        /// <see cref="AutoCompleteBox.TextBoxStyle" />
         /// dependency property.</value>
         public static readonly DependencyProperty TextBoxStyleProperty =
             DependencyProperty.Register(
@@ -336,11 +336,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MaxDropDownHeight" />
+        /// <see cref="AutoCompleteBox.MaxDropDownHeight" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MaxDropDownHeight" />
+        /// <see cref="AutoCompleteBox.MaxDropDownHeight" />
         /// dependency property.</value>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
             DependencyProperty.Register(
@@ -415,11 +415,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.IsDropDownOpen" />
+        /// <see cref="AutoCompleteBox.IsDropDownOpen" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.IsDropDownOpen" />
+        /// <see cref="AutoCompleteBox.IsDropDownOpen" />
         /// dependency property.</value>
         public static readonly DependencyProperty IsDropDownOpenProperty =
             DependencyProperty.Register(
@@ -473,11 +473,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemsSource" />
+        /// <see cref="AutoCompleteBox.ItemsSource" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemsSource" />
+        /// <see cref="AutoCompleteBox.ItemsSource" />
         /// dependency property.</value>
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(
@@ -516,11 +516,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.SelectedItem" />
+        /// <see cref="AutoCompleteBox.SelectedItem" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.SelectedItem" />
+        /// <see cref="AutoCompleteBox.SelectedItem" />
         /// dependency property.</value>
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(
@@ -575,11 +575,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.Text" />
+        /// <see cref="AutoCompleteBox.Text" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.Text" />
+        /// <see cref="AutoCompleteBox.Text" />
         /// dependency property.</value>
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register(
@@ -742,11 +742,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.IAutoCompleteAdvisor" />
+        /// <see cref="IAutoCompleteAdvisor" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.IAutoCompleteAdvisor" />
+        /// <see cref="IAutoCompleteAdvisor" />
         /// dependency property.</value>
         public static readonly DependencyProperty AdvisorProperty =
             DependencyProperty.Register(
@@ -1079,10 +1079,10 @@ namespace GitHub.UI
 
         /// <summary>
         /// Converts the specified object to a string by using the
-        /// <see cref="P:System.Windows.Data.Binding.Converter" /> and
-        /// <see cref="P:System.Windows.Data.Binding.ConverterCulture" /> values
+        /// <see cref="System.Windows.Data.Binding.Converter" /> and
+        /// <see cref="System.Windows.Data.Binding.ConverterCulture" /> values
         /// of the binding object specified by the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ValueMemberBinding" />
+        /// <see cref="AutoCompleteBox.ValueMemberBinding" />
         /// property.
         /// </summary>
         /// <param name="value">The object to format as a string.</param>
@@ -1149,7 +1149,7 @@ namespace GitHub.UI
         /// <summary>
         /// Notifies the
         /// <see cref="GitHub.UI.AutoCompleteBox" /> that the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.ItemsSource" />
+        /// <see cref="AutoCompleteBox.ItemsSource" />
         /// property has been set and the data can be filtered to provide
         /// possible matches in the drop-down.
         /// </summary>
@@ -1601,11 +1601,11 @@ namespace GitHub.UI
 
         /// <summary>
         /// Identifies the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MinimumPopulateDelay" />
+        /// <see cref="MinimumPopulateDelay" />
         /// dependency property.
         /// </summary>
         /// <value>The identifier for the
-        /// <see cref="P:GitHub.UI.AutoCompleteBox.MinimumPopulateDelay" />
+        /// <see cref="MinimumPopulateDelay" />
         /// dependency property.</value>
         public static readonly DependencyProperty InputElementProperty =
             DependencyProperty.Register(

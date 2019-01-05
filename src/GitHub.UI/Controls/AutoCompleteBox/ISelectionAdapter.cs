@@ -27,7 +27,7 @@ namespace GitHub.UI
 
         /// <summary>
         /// Occurs when the
-        /// <see cref="P:Chat.ISelectionAdapter.SelectedItem" />
+        /// <see cref="ISelectionAdapter.SelectedItem" />
         /// property value changes.
         /// </summary>
         event SelectionChangedEventHandler SelectionChanged;
