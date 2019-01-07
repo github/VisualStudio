@@ -674,9 +674,6 @@ https://git-scm.com/download/win</value>
   <data name="BlendDialogText" xml:space="preserve">
     <value>The GitHub extension is not available inside Blend</value>
   </data>
-  <data name="Options_ForkButtonLabel" xml:space="preserve">
-    <value>Show Fork button in Team Explorer</value>
-  </data>
   <data name="UpdateComment" xml:space="preserve">
     <value>Update comment</value>
   </data>
@@ -847,5 +844,8 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Couldn't find file corresponding to '{0}' in the repository. Please do a 'git fetch' or checkout the target pull request.</value>
+  </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>{0} most recently pushed</value>
   </data>
 </root>

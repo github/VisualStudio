@@ -18,7 +18,6 @@ namespace GitHub.Api
 {
     public partial class ApiClient : IApiClient
     {
-        const string ScopesHeader = "X-OAuth-Scopes";
         const string ProductName = Info.ApplicationInfo.ApplicationDescription;
         static readonly ILogger log = LogManager.ForContext<ApiClient>();
 

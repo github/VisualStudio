@@ -23,26 +23,18 @@
     <sampleData:ForkRepositorySelectViewModelDesigner IsLoading="True"/>
   </d:DesignProperties.DataContext>
 
-  <Grid Margin="0 8">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-
-    <TextBlock Grid.Row="0" FontSize="16" Margin="8">
+  <DockPanel Margin="0 8">
+    <TextBlock FontSize="16" Margin="8" DockPanel.Dock="Top">
       Where should we fork this repository?
     </TextBlock>
 
-    <ui:GitHubProgressBar Grid.Row="1"
+    <ui:GitHubProgressBar DockPanel.Dock="Top"
                           Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
 
     <ListBox Name="accountsListBox"
-             Grid.Row="2"
              BorderThickness="0"
              ItemsSource="{Binding Accounts}"
              VerticalContentAlignment="Top"
@@ -76,8 +68,8 @@
       </ListBox.ItemTemplate>
     </ListBox>
 
-    <DockPanel Grid.Row="3" 
-               Margin="0 16 0 0"
+    <DockPanel Margin="0 16 0 0"
+               DockPanel.Dock="Bottom"
                Visibility="{Binding ExistingForks, Converter={ui:HasItemsVisibilityConverter}}">
       <TextBlock DockPanel.Dock="Top" Margin="8 0">
             <Run FontWeight="SemiBold">Can't find what you're looking for?</Run>
@@ -98,5 +90,5 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
     </DockPanel>
-  </Grid>
+  </DockPanel>
 </UserControl>

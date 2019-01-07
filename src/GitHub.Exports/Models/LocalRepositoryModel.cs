@@ -55,9 +55,9 @@ namespace GitHub.Models
             if (ReferenceEquals(this, other))
                 return true;
             return other != null &&
-                string.Equals(Name, other.Name) &&
-                string.Equals(Owner, other.Owner) &&
-                string.Equals(CloneUrl, other.CloneUrl) &&
+                string.Equals(Name, other.Name, StringComparison.Ordinal) &&
+                string.Equals(Owner, other.Owner, StringComparison.Ordinal) &&
+                string.Equals(CloneUrl, other.CloneUrl, StringComparison.Ordinal) &&
                 string.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 

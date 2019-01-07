@@ -263,6 +263,18 @@
       <Project>{a003b735-6f6c-4df8-a663-78651a1b6ce0}</Project>
       <Name>Akavache.Sqlite3</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
+      <Project>{3321ce72-26ed-4d1e-a8f5-6901fb783007}</Project>
+      <Name>Octokit.GraphQL.Core</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj">
+      <Project>{791b408c-0abc-465b-9eb1-a2422d67f418}</Project>
+      <Name>Octokit.GraphQL</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
       <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
       <Name>Octokit.Reactive</Name>
@@ -428,11 +440,19 @@
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Include a reference to this package so that x86|x64\e_sqlite3.dll are copied to the output directory -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3">
+      <Version>1.1.11</Version>
+    </PackageReference>
+  </ItemGroup>
   <!-- Include required NuGet dependencies-->
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.ValueTuple'" />
       <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Newtonsoft.Json'" />
+      <VSIXSourceItem VSIXSubPath="x86" Include="@(Content)" Condition="'%(Content.Link)' == 'x86\e_sqlite3.dll'" />
+      <VSIXSourceItem VSIXSubPath="x64" Include="@(Content)" Condition="'%(Content.Link)' == 'x64\e_sqlite3.dll'" />
     </ItemGroup>
   </Target>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

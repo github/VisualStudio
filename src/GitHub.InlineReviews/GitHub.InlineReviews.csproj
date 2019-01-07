@@ -59,6 +59,7 @@
     <Compile Include="Commands\InlineCommentNavigationCommand.cs" />
     <Compile Include="Commands\PreviousInlineCommentCommand.cs" />
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Margins\InlineCommentTextViewOptions.cs" />
     <Compile Include="Margins\PullRequestFileMargin.cs" />
     <Compile Include="Margins\PullRequestFileMarginProvider.cs" />
@@ -128,6 +129,14 @@
     <Compile Include="VisualStudioExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
+      <Project>{3321ce72-26ed-4d1e-a8f5-6901fb783007}</Project>
+      <Name>Octokit.GraphQL.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj">
+      <Project>{791b408c-0abc-465b-9eb1-a2422d67f418}</Project>
+      <Name>Octokit.GraphQL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
@@ -222,6 +231,13 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -274,18 +290,15 @@
       <Version>0.2.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
-      <Version>15.8.33</Version>
+      <Version>15.8.36</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
-      <Version>15.8.122</Version>
+      <Version>15.8.192</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Octokit.GraphQL">
-      <Version>0.1.2-beta</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.5.0</Version>

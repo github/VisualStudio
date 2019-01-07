@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
@@ -17,6 +18,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         readonly IPullRequestSessionManager sessionManager;
         readonly IPullRequestEditorService pullRequestEditorService;
+        readonly IUsageTracker usageTracker;
 
         IPullRequestSession session;
         string title;
@@ -32,10 +34,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="sessionManager">The pull request session manager.</param>
         /// <param name="pullRequestEditorService">The pull request editor service.</param>
         [ImportingConstructor]
-        public PullRequestAnnotationsViewModel(IPullRequestSessionManager sessionManager, IPullRequestEditorService pullRequestEditorService)
+        public PullRequestAnnotationsViewModel(
+            IPullRequestSessionManager sessionManager,
+            IPullRequestEditorService pullRequestEditorService,
+            IUsageTracker usageTracker)
         {
             this.sessionManager = sessionManager;
             this.pullRequestEditorService = pullRequestEditorService;
+            this.usageTracker = usageTracker;
+
             NavigateToPullRequest = ReactiveCommand.Create(() => {
                     NavigateTo(FormattableString.Invariant(
                         $"{LocalRepository.Owner}/{LocalRepository.Name}/pull/{PullRequestNumber}"));
@@ -158,6 +165,8 @@ namespace GitHub.ViewModels.GitHubPane
                             .Cast<IPullRequestAnnotationItemViewModel>()
                             .ToArray()
                         );
+
+                usageTracker.IncrementCounter(x => x.NumberOfPullRequestOpenAnnotationsList).Forget();
             }
             finally
             {

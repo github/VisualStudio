@@ -25,6 +25,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Sqlite3\Akavache.Sqlite3.csproj" />
     <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Core\Akavache.Core.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj" />
+    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj" />
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj" />
     <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj" />
@@ -44,11 +46,18 @@
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="1.0.164" />
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
+    <PackageReference Include="Microsoft.VisualStudio.StaticReviews.Embeddable" Version="0.1.14-alpha" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Octokit.GraphQL" Version="0.1.2-beta" />
     <PackageReference Include="Rothko" Version="0.0.3-ghfvs" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="SerilogAnalyzer" Version="0.12.0.0" />
     <PackageReference Include="Stateless" Version="2.5.56.0" targetFramework="net45" />
   </ItemGroup>
+  <Target Name="LinkStaticReviewsEmbeddableAssemblies" AfterTargets="ResolveReferences" BeforeTargets="FindReferenceAssembliesForReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(FileName)' == 'Microsoft.VisualStudio.StaticReviews.Embeddable'">
+        <EmbedInteropTypes>true</EmbedInteropTypes>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
 </Project>

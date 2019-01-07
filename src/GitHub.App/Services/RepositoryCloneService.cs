@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -69,8 +70,8 @@ namespace GitHub.Services
             {
                 var order = new RepositoryOrder
                 {
-                    Field = RepositoryOrderField.Name,
-                    Direction = OrderDirection.Asc
+                    Field = RepositoryOrderField.PushedAt,
+                    Direction = OrderDirection.Desc
                 };
 
                 var affiliation = new RepositoryAffiliation?[]
@@ -94,14 +95,17 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
+                        Repositories = viewer.Repositories(null, null, null, null, affiliation, null, null, order, affiliation, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
-                        OrganizationRepositories = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
+                        ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
+                            .Nodes
+                            .Select(repositorySelection).ToList(),
+                        Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
-                            Repositories = org.Repositories(null, null, null, null, null, order, null, null, null)
-                                .AllPages()
+                            Repositories = org.Repositories(100, null, null, null, null, null, null, order, null, null)
+                                .Nodes
                                 .Select(repositorySelection).ToList()
                         }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();

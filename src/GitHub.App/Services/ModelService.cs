@@ -22,6 +22,8 @@ using Octokit.GraphQL;
 using Serilog;
 using static Octokit.GraphQL.Variable;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace GitHub.Services
 {
     [Export(typeof(IModelService))]
@@ -365,7 +367,7 @@ namespace GitHub.Services
             };
         }
 
-        GitReferenceModel Create(GitReferenceCacheItem item)
+        static GitReferenceModel Create(GitReferenceCacheItem item)
         {
             return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }

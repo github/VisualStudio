@@ -30,7 +30,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
 
-                await target.Load(CreatePullRequestModel(body: string.Empty));
+                await target.Load(CreatePullRequestModel());
 
                 Assert.That("*No description provided.*", Is.EqualTo(target.Body));
             }
@@ -620,7 +620,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static PullRequestDetailModel CreatePullRequestModel(
             int number = 1,
-            string body = "PR Body",
             IEnumerable<PullRequestReviewModel> reviews = null)
         {
             var author = Substitute.For<IAccount>();

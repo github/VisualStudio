@@ -97,7 +97,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             return pullRequest.CheckSuites
-                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun }))
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
                         .Where(annotation => annotation.Path == relativePath)
@@ -292,7 +292,7 @@ namespace GitHub.InlineReviews.Services
             if (readPullRequest == null)
             {
                 readPullRequest = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                     .PullRequest(Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
@@ -361,14 +361,26 @@ namespace GitHub.InlineReviews.Services
             var result = await connection.Run(readPullRequest, vars);
 
             var apiClient = await apiClientFactory.Create(address);
-            var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
-            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
 
-            result.Statuses = lastCommitModel.Statuses;
-            result.CheckSuites = lastCommitModel.CheckSuites;
-            foreach (var checkSuite in result.CheckSuites)
+            var files = await log.TimeAsync(nameof(apiClient.GetPullRequestFiles),
+                async () => await apiClient.GetPullRequestFiles(owner, name, number).ToList());
+
+            var lastCommitModel = await log.TimeAsync(nameof(GetPullRequestLastCommitAdapter),
+                () => GetPullRequestLastCommitAdapter(address, owner, name, number));
+
+            result.Statuses = (IReadOnlyList<StatusModel>)lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
+
+            if (lastCommitModel.CheckSuites == null)
             {
-                checkSuite.HeadSha = lastCommitModel.HeadSha;
+                result.CheckSuites = Array.Empty<CheckSuiteModel>();
+            }
+            else
+            {
+                result.CheckSuites = lastCommitModel.CheckSuites;
+                foreach (var checkSuite in result.CheckSuites)
+                {
+                    checkSuite.HeadSha = lastCommitModel.HeadSha;
+                }
             }
 
             result.ChangedFiles = files.Select(file => new PullRequestFileModel
@@ -408,7 +420,7 @@ namespace GitHub.InlineReviews.Services
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var query = new Query()
-                .Repository(repositoryOwner, localRepository.Name)
+                .Repository(owner: repositoryOwner, name: localRepository.Name)
                 .PullRequest(number)
                 .Select(x => x.Id);
 
@@ -762,7 +774,7 @@ namespace GitHub.InlineReviews.Services
 
         Task<IRepository> GetRepository(LocalRepositoryModel repository)
         {
-            return Task.Factory.StartNew(() => gitService.GetRepository(repository.LocalPath));
+            return Task.Run(() => gitService.GetRepository(repository.LocalPath));
         }
 
         async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
@@ -773,7 +785,7 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatuses == null)
                 {
                     readCommitStatuses = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
@@ -825,20 +837,22 @@ namespace GitHub.InlineReviews.Services
                 if (readCommitStatusesEnterprise == null)
                 {
                     readCommitStatusesEnterprise = new Query()
-                     .Repository(Var(nameof(owner)), Var(nameof(name)))
+                     .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                      .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
-                             Statuses = commit.Commit.Status
-                                 .Select(context =>
-                                     context.Contexts.Select(statusContext => new StatusModel
-                                     {
-                                         State = statusContext.State.FromGraphQl(),
-                                         Context = statusContext.Context,
-                                         TargetUrl = statusContext.TargetUrl,
-                                         Description = statusContext.Description,
-                                     }).ToList()
-                                 ).SingleOrDefault()
+                             Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
+                                 .Select(context => context == null
+                                     ? null
+                                     : context.Contexts
+                                         .Select(statusContext => new StatusModel
+                                         {
+                                             State = statusContext.State.FromGraphQl(),
+                                             Context = statusContext.Context,
+                                             TargetUrl = statusContext.TargetUrl,
+                                             Description = statusContext.Description,
+                                         }).ToList()
+                                     ).SingleOrDefault()
                          }
                      ).Compile();
                 }
@@ -861,7 +875,7 @@ namespace GitHub.InlineReviews.Services
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
             var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
-           
+
             // Get all comments that are not replies.
             foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
             {
@@ -951,5 +965,5 @@ namespace GitHub.InlineReviews.Services
 
             public string HeadSha { get; set; }
         }
-    }   
+    }
 }

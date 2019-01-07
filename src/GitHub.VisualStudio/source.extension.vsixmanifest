@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="c3d3dc68-c977-411f-b3e8-03b0dccf7dfc" Version="2.6.0.0" Language="en-US" Publisher="GitHub, Inc" />
+    <Identity Id="c3d3dc68-c977-411f-b3e8-03b0dccf7dfc" Version="2.7.0.0" Language="en-US" Publisher="GitHub, Inc" />
     <DisplayName>GitHub Extension for Visual Studio</DisplayName>
     <Description xml:space="preserve">A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</Description>
     <PackageId>GitHub.VisualStudio</PackageId>

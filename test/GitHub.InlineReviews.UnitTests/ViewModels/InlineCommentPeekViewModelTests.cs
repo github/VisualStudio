@@ -244,7 +244,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.That(placeholder.Body, Is.EqualTo(null));
         }
 
-        void AddCommentToExistingThread(IPullRequestSessionFile file)
+        static void AddCommentToExistingThread(IPullRequestSessionFile file)
         {
             var newThreads = file.InlineCommentThreads.ToList();
             var thread = file.InlineCommentThreads.Single();
