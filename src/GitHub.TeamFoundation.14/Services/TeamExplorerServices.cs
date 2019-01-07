@@ -6,14 +6,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using EnvDTE;
-using GitHub.VisualStudio;
 using GitHub.VisualStudio.TeamExplorer.Sync;
-using Microsoft.TeamFoundation.Controls;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
 using ReactiveUI;
+using Microsoft.TeamFoundation.Controls;
+using Microsoft.TeamFoundation.Git.Controls;
+using Microsoft.TeamFoundation.Git.Provider;
 
 namespace GitHub.Services
 {
@@ -42,8 +40,9 @@ namespace GitHub.Services
 
         public void OpenRepository(string repositoryPath)
         {
+#if TEAMEXPLORER14
             SetActiveRepository(repositoryPath);
-#if !TEAMEXPLORER14
+#else
             OpenFolder(repositoryPath);
 #endif
         }
@@ -125,23 +124,9 @@ namespace GitHub.Services
 
         public void SetActiveRepository(string repositoryPath, bool silent = false)
         {
-            var sccUIService = FindSccUIService();
-            var method = sccUIService.GetType().GetMethod("SetActiveRepository", new[] { typeof(string), typeof(bool) });
-            method.Invoke(sccUIService, new object[] { repositoryPath, silent });
-        }
-
-        object FindSccUIService()
-        {
-            var sccServiceProvider = FindSccServiceProvider();
-            var sccUIServiceType = typeof(IGitRepositoriesExt).Assembly.GetType("Microsoft.TeamFoundation.Git.Controls.ISccUIService", false);
-            return sccServiceProvider.GetService(sccUIServiceType);
-        }
-
-        IServiceProvider FindSccServiceProvider()
-        {
-            var shell = (IVsShell)serviceProvider.GetService(typeof(SVsShell));
-            ErrorHandler.ThrowOnFailure(shell.LoadPackage(Guids.SccProviderPackageGuid, out var sccProviderPackage));
-            return sccProviderPackage as IServiceProvider;
+            var sccService = serviceProvider.GetService(typeof(SccService)) as SccService;
+            var sccUIService = sccService?.GetService(typeof(SccUIService)) as SccUIService;
+            sccUIService?.SetActiveRepository(repositoryPath, silent);
         }
 
         void OpenFolder(string repositoryPath)

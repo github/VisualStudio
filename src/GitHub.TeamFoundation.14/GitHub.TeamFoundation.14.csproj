@@ -40,6 +40,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
+  <PropertyGroup>
+    <!-- Used by IgnoresAccessChecksToGenerator package -->
+    <InternalsAssemblyNames>Microsoft.TeamFoundation.Git.Provider;Microsoft.TeamFoundation.Git.Controls</InternalsAssemblyNames>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.TeamFoundation.Common">
       <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Common.dll</HintPath>
@@ -56,6 +60,9 @@
     <Reference Include="Microsoft.TeamFoundation.Git.Controls">
       <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Controls.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Git.CoreServices">
+      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.CoreServices.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Git.Provider">
       <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Git.Provider.dll</HintPath>
@@ -162,6 +169,9 @@
   <ItemGroup>
     <PackageReference Include="EnvDTE">
       <Version>8.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="IgnoresAccessChecksToGenerator">
+      <Version>0.4.0</Version>
     </PackageReference>
     <PackageReference Include="LibGit2Sharp">
       <Version>0.23.1</Version>
