@@ -1,13 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Globalization;
-using System.IO;
 using GitHub.Logging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Rothko;
 using Serilog;
 
 namespace GitHub.Services
@@ -42,24 +40,6 @@ namespace GitHub.Services
         {
             return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
                 OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-        }
-
-        void TryCleanupSolutionUserFiles(IOperatingSystem os, string repoPath, string slnName)
-        {
-            var vsTempPath = Path.Combine(repoPath, ".vs", slnName);
-            try
-            {
-                // Clean up the dummy solution's subdirectory inside `.vs`.
-                var vsTempDir = os.Directory.GetDirectory(vsTempPath);
-                if (vsTempDir.Exists)
-                {
-                    vsTempDir.Delete(true);
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
-            }
         }
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
