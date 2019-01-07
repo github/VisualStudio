@@ -17,7 +17,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
-        const string defaultOriginName = "origin";
         static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly IGitService gitService;
         readonly PullOptions pullOptions;
