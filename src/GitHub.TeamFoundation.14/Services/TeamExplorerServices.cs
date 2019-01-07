@@ -11,7 +11,7 @@ using EnvDTE;
 using ReactiveUI;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.TeamFoundation.Git.Controls;
-using Microsoft.TeamFoundation.Git.Provider;
+using Microsoft.TeamFoundation.Git.CoreServices;
 
 namespace GitHub.Services
 {
@@ -41,7 +41,8 @@ namespace GitHub.Services
         public void OpenRepository(string repositoryPath)
         {
 #if TEAMEXPLORER14
-            SetActiveRepository(repositoryPath);
+            var sccUIService = serviceProvider.GetSccService<SccUIService>();
+            sccUIService?.SetActiveRepository(repositoryPath);
 #else
             OpenFolder(repositoryPath);
 #endif
@@ -120,13 +121,6 @@ namespace GitHub.Services
         {
             manager = serviceProvider.GetService<ITeamExplorer, ITeamExplorerNotificationManager>();
             return manager?.IsNotificationVisible(guid) ?? false;
-        }
-
-        public void SetActiveRepository(string repositoryPath, bool silent = false)
-        {
-            var sccService = serviceProvider.GetService(typeof(SccService)) as SccService;
-            var sccUIService = sccService?.GetService(typeof(SccUIService)) as SccUIService;
-            sccUIService?.SetActiveRepository(repositoryPath, silent);
         }
 
         void OpenFolder(string repositoryPath)

@@ -42,7 +42,7 @@
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <PropertyGroup>
     <!-- Used by IgnoresAccessChecksToGenerator package -->
-    <InternalsAssemblyNames>Microsoft.TeamFoundation.Git.Provider;Microsoft.TeamFoundation.Git.Controls</InternalsAssemblyNames>
+    <InternalsAssemblyNames>Microsoft.TeamFoundation.Git.Provider;Microsoft.TeamFoundation.Git.Controls;Microsoft.TeamFoundation.Git.CoreServices</InternalsAssemblyNames>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.TeamFoundation.Common">

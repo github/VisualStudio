@@ -10,6 +10,5 @@ namespace GitHub.Services
         Task ShowRepositorySettingsRemotesAsync();
         void ClearNotifications();
         void OpenRepository(string repositoryPath);
-        void SetActiveRepository(string repositoryPath, bool silent = false);
     }
 }
