@@ -82,7 +82,7 @@ public class GitClientTests
             var changes = Substitute.For<ContentChanges>();
             changes.LinesAdded.Returns(linesAdded);
             changes.LinesDeleted.Returns(linesDeleted);
-            repo.Diff.Compare(null as Blob, null as Blob, null as CompareOptions).ReturnsForAnyArgs(changes);
+            repo.Diff.Compare(null as Blob, null as Blob).ReturnsForAnyArgs(changes);
             var gitClient = CreateGitClient();
 
             var modified = await gitClient.IsModified(repo, path, null);

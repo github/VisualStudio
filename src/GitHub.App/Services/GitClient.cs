@@ -22,7 +22,6 @@ namespace GitHub.Services
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
-        readonly CompareOptions compareOptions;
 
         [ImportingConstructor]
         public GitClient(IGitHubCredentialProvider credentialProvider, IGitService gitService)
@@ -38,11 +37,6 @@ namespace GitHub.Services
             {
                 FetchOptions = fetchOptions,
                 MergeOptions = new MergeOptions(),
-            };
-
-            compareOptions = new CompareOptions
-            {
-                IndentHeuristic = true
             };
         }
 
@@ -199,38 +193,6 @@ namespace GitHub.Services
             });
         }
 
-        public Task<TreeChanges> Compare(
-            IRepository repository,
-            string sha1,
-            string sha2,
-            bool detectRenames)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
-            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
-
-            return Task.Run(() =>
-            {
-                var options = new CompareOptions
-                {
-                    Similarity = detectRenames ? SimilarityOptions.Renames : SimilarityOptions.None,
-                    IndentHeuristic = compareOptions.IndentHeuristic
-                };
-
-                var commit1 = repository.Lookup<Commit>(sha1);
-                var commit2 = repository.Lookup<Commit>(sha2);
-
-                if (commit1 != null && commit2 != null)
-                {
-                    return repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, options);
-                }
-                else
-                {
-                    return null;
-                }
-            });
-        }
-
         public Task<T> GetConfig<T>(IRepository repository, string key)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
@@ -381,7 +343,7 @@ namespace GitHub.Services
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
                         var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
-                        var diff = repository.Diff.Compare(blob1, blob2, compareOptions);
+                        var diff = repository.Diff.Compare(blob1, blob2);
                         return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
                     }
                 }

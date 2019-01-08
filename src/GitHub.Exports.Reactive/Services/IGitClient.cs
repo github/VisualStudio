@@ -73,19 +73,6 @@ namespace GitHub.Services
         Task CreateBranch(IRepository repository, string branchName);
 
         /// <summary>
-        /// Compares two commits.
-        /// </summary>
-        /// <param name="repository">The repository</param>
-        /// <param name="sha1">The SHA of the first commit.</param>
-        /// <param name="sha2">The SHA of the second commit.</param>
-        /// <param name="detectRenames">Whether to detect renames</param>
-        /// <returns>
-        /// A <see cref="TreeChanges"/> object or null if one of the commits could not be found in the repository,
-        /// (e.g. it is from a fork).
-        /// </returns>
-        Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false);
-
-        /// <summary>
         /// Gets the value of a configuration key.
         /// </summary>
         /// <param name="repository">The repository.</param>
