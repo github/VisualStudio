@@ -22,7 +22,7 @@ namespace GitHub.Services
         public GitService(IRepositoryFacade repositoryFacade)
         {
             this.repositoryFacade = repositoryFacade;
-            defaultCompareOptions = new CompareOptions();
+            defaultCompareOptions = new CompareOptions { IndentHeuristic = true };
         }
 
         /// <summary>
