@@ -62,7 +62,7 @@ namespace GitHub.Services
         readonly IUsageTracker usageTracker;
 
         readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
-   
+
         [ImportingConstructor]
         public PullRequestService(
             IGitClient gitClient,
@@ -738,9 +738,62 @@ namespace GitHub.Services
                         repo.Head.FriendlyName,
                         SettingGHfVSPullRequest);
                     var value = await gitClient.GetConfig<string>(repo, configKey);
-                    return Observable.Return(ParseGHfVSConfigKeyValue(value));
+                    var pr = ParseGHfVSConfigKeyValue(value);
+                    if (pr != default((string, int)))
+                    {
+                        return Observable.Return(pr);
+                    }
+
+                    pr = await FindPullRequestForBranchAsync(repo, repo.Head, "origin");
+                    return Observable.Return(pr);
                 }
             });
+        }
+
+        async Task<(string owner, int number)> FindPullRequestForBranchAsync(
+            IRepository repo, Branch branch, string upstreamRemoteName = "origin")
+        {
+            if (!branch.IsTracking)
+            {
+                return default((string, int));
+            }
+
+            var remoteReferences = await gitClient.ListReferences(repo, branch.RemoteName);
+            if (!remoteReferences.TryGetValue(branch.UpstreamBranchCanonicalName, out var sha))
+            {
+                return default((string, int));
+            }
+
+            if (branch.RemoteName != upstreamRemoteName)
+            {
+                remoteReferences = await gitClient.ListReferences(repo, upstreamRemoteName);
+            }
+
+            var prs = remoteReferences
+                    .Where(kv => kv.Value == sha)
+                    .Select(kv => FindPullRequestForCanonicalName(kv.Key))
+                    .Where(p => p != -1)
+                    .ToList();
+            if (prs.Count == 0)
+            {
+                return default((string, int));
+            }
+
+            var owner = gitService.GetRemoteUri(repo, upstreamRemoteName).Owner;
+            var number = prs[0];
+
+            return (owner, number);
+        }
+
+        static int FindPullRequestForCanonicalName(string canonicalName)
+        {
+            var match = Regex.Match(canonicalName, "^refs/pull/([0-9]+)/head$");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var number))
+            {
+                return number;
+            }
+
+            return -1;
         }
 
         public async Task<string> ExtractToTempFile(

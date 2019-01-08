@@ -56,6 +56,9 @@ namespace GitHub.Services
         /// <returns></returns>
         Task Fetch(IRepository repository, UriString remoteUri, params string[] refspecs);
 
+        // blar!
+        Task<IDictionary<string, string>> ListReferences(IRepository repo, string remoteName);
+
         /// <summary>
         /// Checks out a branch.
         /// </summary>
