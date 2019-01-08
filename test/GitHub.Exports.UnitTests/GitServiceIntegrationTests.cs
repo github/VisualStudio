@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GitHub.Services;
@@ -39,6 +40,22 @@ public class GitServiceIntegrationTests
                 var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
 
                 Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("foo", "bar")]
+        public async Task One_File_Is_Modified(string content1, string content2)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var treeChanges = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, false);
+
+                Assert.That(treeChanges.Modified.FirstOrDefault()?.Path, Is.EqualTo(path));
             }
         }
     }
