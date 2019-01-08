@@ -74,11 +74,6 @@ namespace GitHub.Services
                     Direction = OrderDirection.Desc
                 };
 
-                var affiliation = new RepositoryAffiliation?[]
-                {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
-                };
-
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
                     "repository",
                     repo => new RepositoryListItemModel
@@ -95,7 +90,10 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, affiliation, null, null, order, affiliation, null)
+                        // We should pass affiliations and ownerAffiliations the same RepositoryAffiliation?[], but
+                        // ownerAffiliations doesn't currently exist on GitHub Enterprise. Luckily the default is
+                        // Owner and Collaborator, which is what we need in this case (we can simply pass null).
+                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
                         ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
