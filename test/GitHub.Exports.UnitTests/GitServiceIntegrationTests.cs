@@ -7,6 +7,41 @@ using NUnit.Framework;
 
 public class GitServiceIntegrationTests
 {
+    public class TheCompareMethod
+    {
+        [TestCase("1.2.", "1.2.3.4.", "+3.+4.", Description = "Two lines added")]
+        public async Task Simple_Diff(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
+
+                Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("1.2.a..b.3.4", "1.2.a..b.a..b.3.4", "+b.+a.+.")] // This would be "+a.+.+b." without Indent-heuristic
+        public async Task Indent_Heuristic_Is_Enabled(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
+
+                Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+    }
+
     public class TheCreateLocalRepositoryModelMethod
     {
         [Test]
@@ -296,19 +331,6 @@ public class GitServiceIntegrationTests
             }
         }
 
-        static Commit AddCommit(Repository repo)
-        {
-            var dir = repo.Info.WorkingDirectory;
-            var path = "file.txt";
-            var file = Path.Combine(dir, path);
-            var guidString = Guid.NewGuid().ToString();
-            File.WriteAllText(file, guidString);
-            Commands.Stage(repo, path);
-            var signature = new Signature("foobar", "foobar@github.com", DateTime.Now);
-            var commit = repo.Commit("message", signature, signature);
-            return commit;
-        }
-
         static void AddTrackedBranch(Repository repo, Branch branch, Commit commit,
             string trackedBranchName = null, string remoteName = "origin")
         {
@@ -322,6 +344,19 @@ public class GitServiceIntegrationTests
             repo.Refs.Add(canonicalName, commit.Id);
             repo.Branches.Update(branch, b => b.TrackedBranch = canonicalName);
         }
+    }
+
+    static Commit AddCommit(Repository repo, string path = "file.txt", string content = null)
+    {
+        content = content ?? Guid.NewGuid().ToString();
+
+        var dir = repo.Info.WorkingDirectory;
+        var file = Path.Combine(dir, path);
+        File.WriteAllText(file, content);
+        Commands.Stage(repo, path);
+        var signature = new Signature("foobar", "foobar@github.com", DateTime.Now);
+        var commit = repo.Commit("message", signature, signature);
+        return commit;
     }
 
     protected class TempRepository : TempDirectory
