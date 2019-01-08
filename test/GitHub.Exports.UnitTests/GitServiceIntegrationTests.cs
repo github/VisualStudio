@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Services;
 using LibGit2Sharp;
@@ -38,6 +39,43 @@ public class GitServiceIntegrationTests
                 var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
 
                 Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+    }
+
+    public class TheCompareWithMethod
+    {
+        [TestCase("1.2.", "1.2.3.4.", "+3.+4.", Description = "Two lines added")]
+        public async Task Simple_Diff(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes);
+
+                Assert.That(changes.Patch.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("1.2.a..b.3.4", "1.2.a..b.a..b.3.4", "+b.+a.+.")] // This would be "+a.+.+b." without Indent-heuristic
+        public async Task Indent_Heuristic_Is_Enabled(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes);
+
+                Assert.That(changes.Patch.Replace('\n', '.'), Contains.Substring(expectPatch));
             }
         }
     }
