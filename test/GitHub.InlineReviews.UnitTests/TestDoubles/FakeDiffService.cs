@@ -22,13 +22,13 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         public FakeDiffService()
         {
             this.repository = CreateRepository();
-            this.inner = new DiffService(Substitute.For<IGitClient>());
+            this.inner = new DiffService(Substitute.For<IGitService>());
         }
 
         public FakeDiffService(string path, string contents)
         {
             this.repository = CreateRepository();
-            this.inner = new DiffService(Substitute.For<IGitClient>());
+            this.inner = new DiffService(Substitute.For<IGitService>());
             AddFile(path, contents);
         }
 

@@ -17,7 +17,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public void ShouldParsePr960()
             {
-                var target = new DiffService(Substitute.For<IGitClient>());
+                var target = new DiffService(Substitute.For<IGitService>());
                 var result = DiffUtilities.ParseFragment(Properties.Resources.pr_960_diff).ToList();
 
                 Assert.That(4, Is.EqualTo(result.Count));

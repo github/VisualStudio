@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using GitHub.UI;
 using GitHub.Models;
@@ -17,11 +16,13 @@ namespace GitHub.Services
     public class GitService : IGitService
     {
         readonly IRepositoryFacade repositoryFacade;
+        readonly CompareOptions defaultCompareOptions;
 
         [ImportingConstructor]
         public GitService(IRepositoryFacade repositoryFacade)
         {
             this.repositoryFacade = repositoryFacade;
+            defaultCompareOptions = new CompareOptions();
         }
 
         /// <summary>
@@ -226,6 +227,66 @@ namespace GitHub.Services
 
                     return null;
                 }
+            });
+        }
+
+        public Task<Patch> Compare(
+            IRepository repository,
+            string sha1,
+            string sha2,
+            string path)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
+            return Task.Run(() =>
+            {
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
+
+                if (commit1 != null && commit2 != null)
+                {
+                    return repository.Diff.Compare<Patch>(
+                        commit1.Tree,
+                        commit2.Tree,
+                        new[] { path },
+                        defaultCompareOptions);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
+            Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
+            Guard.ArgumentNotEmptyString(path, nameof(path));
+
+            return Task.Run(() =>
+            {
+                var commit1 = repository.Lookup<Commit>(sha1);
+                var commit2 = repository.Lookup<Commit>(sha2);
+
+                var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, defaultCompareOptions);
+                var normalizedPath = path.Replace("/", "\\");
+                var renamed = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
+                var oldPath = renamed?.OldPath ?? path;
+
+                if (commit1 != null)
+                {
+                    var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
+                    var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
+                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
+                    return repository.Diff.Compare(blob1, blob2, defaultCompareOptions);
+                }
+
+                return null;
             });
         }
     }
