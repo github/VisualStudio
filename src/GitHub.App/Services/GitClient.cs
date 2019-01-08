@@ -22,6 +22,7 @@ namespace GitHub.Services
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
+        readonly CompareOptions compareOptions;
 
         [ImportingConstructor]
         public GitClient(IGitHubCredentialProvider credentialProvider, IGitService gitService)
@@ -37,6 +38,11 @@ namespace GitHub.Services
             {
                 FetchOptions = fetchOptions,
                 MergeOptions = new MergeOptions(),
+            };
+
+            compareOptions = new CompareOptions
+            {
+                IndentHeuristic = true
             };
         }
 
@@ -207,7 +213,8 @@ namespace GitHub.Services
             {
                 var options = new CompareOptions
                 {
-                    Similarity = detectRenames ? SimilarityOptions.Renames : SimilarityOptions.None
+                    Similarity = detectRenames ? SimilarityOptions.Renames : SimilarityOptions.None,
+                    IndentHeuristic = compareOptions.IndentHeuristic
                 };
 
                 var commit1 = repository.Lookup<Commit>(sha1);
@@ -245,7 +252,8 @@ namespace GitHub.Services
                     return repository.Diff.Compare<Patch>(
                         commit1.Tree,
                         commit2.Tree,
-                        new[] { path });
+                        new[] { path },
+                        compareOptions);
                 }
                 else
                 {
@@ -266,7 +274,7 @@ namespace GitHub.Services
                 var commit1 = repository.Lookup<Commit>(sha1);
                 var commit2 = repository.Lookup<Commit>(sha2);
 
-                var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree);
+                var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, compareOptions);
                 var normalizedPath = path.Replace("/", "\\");
                 var renamed = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
                 var oldPath = renamed?.OldPath ?? path;
@@ -276,7 +284,7 @@ namespace GitHub.Services
                     var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
                     var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
                     var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
-                    return repository.Diff.Compare(blob1, blob2);
+                    return repository.Diff.Compare(blob1, blob2, compareOptions);
                 }
 
                 return null;
@@ -433,7 +441,7 @@ namespace GitHub.Services
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
                         var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
-                        var diff = repository.Diff.Compare(blob1, blob2);
+                        var diff = repository.Diff.Compare(blob1, blob2, compareOptions);
                         return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
                     }
                 }

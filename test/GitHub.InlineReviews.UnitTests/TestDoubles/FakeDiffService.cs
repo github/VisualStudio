@@ -64,7 +64,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         {
             var blob1 = GetBlob(path, baseSha);
             var blob2 = GetBlob(path, headSha);
-            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            var patch = repository.Diff.Compare(blob1, blob2, new CompareOptions { IndentHeuristic = true }).Patch;
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
@@ -74,7 +74,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
             var blob1 = GetBlob(path, baseSha);
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
-            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            var patch = repository.Diff.Compare(blob1, blob2, new CompareOptions { IndentHeuristic = true }).Patch;
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
