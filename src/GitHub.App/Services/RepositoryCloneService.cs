@@ -90,10 +90,6 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        // We should pass affiliations and ownerAffiliations the same RepositoryAffiliation?[], but
-                        // ownerAffiliations doesn't currently exist on GitHub Enterprise. Luckily the default is
-                        // Owner and Collaborator, which is what we need in this case (we can simply pass null).
-                        // See https://platform.github.community/t/unable-to-fetch-users-repositories-by-organization-membership/7557/6
                         Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
