@@ -274,11 +274,11 @@ namespace GitHub.Services
                 var commit2 = repository.Lookup<Commit>(sha2);
 
                 var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, defaultCompareOptions);
-                var normalizedPath = path.Replace("/", "\\");
-                var renamed = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
-                var oldPath = renamed?.OldPath ?? path;
+                var normalizedPath = path.Replace("\\", "/");
+                var change = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
+                var oldPath = change?.OldPath;
 
-                if (commit1 != null)
+                if (commit1 != null && oldPath != null)
                 {
                     var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
                     var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
