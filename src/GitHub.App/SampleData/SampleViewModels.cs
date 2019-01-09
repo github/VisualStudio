@@ -29,7 +29,6 @@ namespace GitHub.SampleData
             RepositoryName = "Hello-World";
             Description = "A description";
             KeepPrivate = true;
-            CanKeepPrivate = true;
             Accounts = new ReactiveList<IAccount>
             {
                 new AccountDesigner { Login = "shana" },
@@ -75,12 +74,6 @@ namespace GitHub.SampleData
         }
 
         public ReactiveCommand<Unit, Unit> BrowseForDirectory
-        {
-            get;
-            private set;
-        }
-
-        public bool CanKeepPrivate
         {
             get;
             private set;
@@ -144,24 +137,6 @@ namespace GitHub.SampleData
         {
             get;
             set;
-        }
-
-        public bool ShowUpgradePlanWarning
-        {
-            get;
-            private set;
-        }
-
-        public bool ShowUpgradeToMicroPlanWarning
-        {
-            get;
-            private set;
-        }
-
-        public ICommand UpgradeAccountPlan
-        {
-            get;
-            private set;
         }
 
         public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
