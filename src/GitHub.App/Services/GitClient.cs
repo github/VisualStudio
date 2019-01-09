@@ -279,7 +279,7 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
 
             return Task.Run(() =>
             {
@@ -298,7 +298,7 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
 
             return Task.Run(() =>
             {
@@ -327,7 +327,7 @@ namespace GitHub.Services
         public Task<bool> IsModified(IRepository repository, string path, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentIsGitPath(path, nameof(path));
 
             return Task.Run(() =>
             {
