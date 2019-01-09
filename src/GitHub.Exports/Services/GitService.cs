@@ -267,6 +267,10 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
             Guard.ArgumentNotEmptyString(path, nameof(path));
+            if (path.Contains('\\'))
+            {
+                throw new ArgumentException($"The value for '{nameof(path)}' must use '/' not '\\' as directory separator", nameof(path));
+            }
 
             return Task.Run(() =>
             {
@@ -274,8 +278,7 @@ namespace GitHub.Services
                 var commit2 = repository.Lookup<Commit>(sha2);
 
                 var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, defaultCompareOptions);
-                var normalizedPath = path.Replace("\\", "/");
-                var change = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
+                var change = treeChanges.FirstOrDefault(x => x.Path == path);
                 var oldPath = change?.OldPath;
 
                 if (commit1 != null && oldPath != null)

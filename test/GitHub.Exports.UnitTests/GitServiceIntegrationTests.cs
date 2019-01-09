@@ -97,10 +97,10 @@ public class GitServiceIntegrationTests
         }
 
         [TestCase("foo.txt", "a.b.", "bar.txt", "a.b.c.d.", 2)]
-        [TestCase(@"dir\foo.txt", "a.b.", @"dir\bar.txt", "a.b.c.d.", 2)]
-        [TestCase(@"dir\foo.txt", "a.b.", @"dir\foo.txt", "a.b.c.d.", 2)]
-        [TestCase(@"dir\unrelated.txt", "x.x.x.x.", @"dir\foo.txt", "a.b.c.d.", 4)]
-        public async Task Rename(string oldPath, string oldContent, string newPath, string newContent, int expectLinesAdded)
+        [TestCase(@"dir/foo.txt", "a.b.", @"dir/bar.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir/foo.txt", "a.b.", @"dir/foo.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir/unrelated.txt", "x.x.x.x.", @"dir/foo.txt", "a.b.c.d.", 4)]
+        public async Task Can_Handle_Renames(string oldPath, string oldContent, string newPath, string newContent, int expectLinesAdded)
         {
             using (var temp = new TempRepository())
             {
@@ -112,6 +112,24 @@ public class GitServiceIntegrationTests
                 var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, newPath, contentBytes);
 
                 Assert.That(changes?.LinesAdded, Is.EqualTo(expectLinesAdded));
+            }
+        }
+
+        [Test]
+        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = @"dir\foo.txt";
+                var oldContent = "oldContent";
+                var newContent = "newContent";
+                var commit1 = AddCommit(temp.Repository, path, oldContent);
+                var commit2 = AddCommit(temp.Repository, path, newContent);
+                var contentBytes = new UTF8Encoding(false).GetBytes(newContent);
+                var target = new GitService(new RepositoryFacade());
+
+                Assert.ThrowsAsync<ArgumentException>(() =>
+                    target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes));
             }
         }
     }
