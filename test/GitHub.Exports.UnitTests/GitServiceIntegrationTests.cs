@@ -95,6 +95,25 @@ public class GitServiceIntegrationTests
                 Assert.That(changes.Patch.Replace('\n', '.'), Contains.Substring(expectPatch));
             }
         }
+
+        [TestCase("foo.txt", "a.b.", "bar.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir\foo.txt", "a.b.", @"dir\bar.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir\foo.txt", "a.b.", @"dir\foo.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir\unrelated.txt", "x.x.x.x.", @"dir\foo.txt", "a.b.c.d.", 4)]
+        public async Task Rename(string oldPath, string oldContent, string newPath, string newContent, int expectLinesAdded)
+        {
+            using (var temp = new TempRepository())
+            {
+                var commit1 = AddCommit(temp.Repository, oldPath, oldContent.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, newPath, newContent.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(newContent.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, newPath, contentBytes);
+
+                Assert.That(changes?.LinesAdded, Is.EqualTo(expectLinesAdded));
+            }
+        }
     }
 
     public class TheCreateLocalRepositoryModelMethod
@@ -406,12 +425,23 @@ public class GitServiceIntegrationTests
         content = content ?? Guid.NewGuid().ToString();
 
         var dir = repo.Info.WorkingDirectory;
+        DeleteFilesNotInGit(dir);
         var file = Path.Combine(dir, path);
+        Directory.CreateDirectory(Path.GetDirectoryName(file));
         File.WriteAllText(file, content);
-        Commands.Stage(repo, path);
+        Commands.Stage(repo, "*");
         var signature = new Signature("foobar", "foobar@github.com", DateTime.Now);
         var commit = repo.Commit("message", signature, signature);
         return commit;
+    }
+
+    static void DeleteFilesNotInGit(string dir)
+    {
+        var gitDir = Path.Combine(dir, @".git\");
+        Directory.GetFiles(dir, "*", SearchOption.AllDirectories)
+            .Where(f => !f.StartsWith(gitDir, StringComparison.OrdinalIgnoreCase))
+            .ToList()
+            .ForEach(File.Delete);
     }
 
     protected class TempRepository : TempDirectory
