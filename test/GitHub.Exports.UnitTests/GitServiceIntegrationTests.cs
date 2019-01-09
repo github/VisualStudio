@@ -58,6 +58,24 @@ public class GitServiceIntegrationTests
                 Assert.That(treeChanges.Modified.FirstOrDefault()?.Path, Is.EqualTo(path));
             }
         }
+
+
+        [Test]
+        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = @"dir\foo.txt";
+                var oldContent = "oldContent";
+                var newContent = "newContent";
+                var commit1 = AddCommit(temp.Repository, path, oldContent);
+                var commit2 = AddCommit(temp.Repository, path, newContent);
+                var target = new GitService(new RepositoryFacade());
+
+                Assert.ThrowsAsync<ArgumentException>(() =>
+                    target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path));
+            }
+        }
     }
 
     public class TheCompareWithMethod

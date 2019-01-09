@@ -239,7 +239,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentIsGitPath(path, nameof(path));
 
             return Task.Run(() =>
             {
@@ -266,11 +266,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
-            if (path.Contains('\\'))
-            {
-                throw new ArgumentException($"The value for '{nameof(path)}' must use '/' not '\\' as directory separator", nameof(path));
-            }
+            Guard.ArgumentIsGitPath(path, nameof(path));
 
             return Task.Run(() =>
             {
