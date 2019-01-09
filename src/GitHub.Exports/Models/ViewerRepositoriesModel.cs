@@ -7,6 +7,7 @@ namespace GitHub.Models
     {
         public string Owner { get; set; }
         public IReadOnlyList<RepositoryListItemModel> Repositories { get; set; }
+        public IReadOnlyList<RepositoryListItemModel> ContributedToRepositories { get; set; }
         public IDictionary<string, IReadOnlyList<RepositoryListItemModel>> Organizations { get; set; }
     }
 }
