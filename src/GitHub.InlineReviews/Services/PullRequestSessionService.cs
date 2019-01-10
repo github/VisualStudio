@@ -649,7 +649,6 @@ namespace GitHub.InlineReviews.Services
 
             var addReview = new AddPullRequestReviewInput
             {
-                Body = body,
                 CommitOID = commitId,
                 Event = Octokit.GraphQL.Model.PullRequestReviewEvent.Comment,
                 PullRequestId = new ID(pullRequestId),
