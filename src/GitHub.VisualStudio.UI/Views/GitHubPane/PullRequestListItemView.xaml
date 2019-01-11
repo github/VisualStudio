@@ -104,7 +104,7 @@
                 <ghfvs:OcticonImage Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
                 <controls:PullRequestStatusCircle 
                     Height="18" Width="18"
-                    Radius="8" InnerRadius="3"
+                    Radius="8" InnerRadius="5"
                     Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Mixed}}"
                     PendingCount="{Binding ChecksPendingCount}"
                     PendingColor="#f1c647"
