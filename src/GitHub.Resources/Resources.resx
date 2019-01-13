@@ -845,4 +845,7 @@ https://git-scm.com/download/win</value>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Couldn't find file corresponding to '{0}' in the repository. Please do a 'git fetch' or checkout the target pull request.</value>
   </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>{0} most recently pushed</value>
+  </data>
 </root>

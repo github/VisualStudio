@@ -43,6 +43,7 @@
     <uic:InfoPanel x:Name="infoPanel"
                    DockPanel.Dock="Top"
                    Message="{Binding Message}"
+                   ShowCloseButton="True"
                    VerticalAlignment="Top"/>
     <StackPanel DockPanel.Dock="Top"
                 Margin="6,9,9,5"

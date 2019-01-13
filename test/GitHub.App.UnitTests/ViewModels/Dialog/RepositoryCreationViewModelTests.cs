@@ -603,28 +603,4 @@ public class RepositoryCreationViewModelTests
             Assert.That(expected, Is.EqualTo(result));
         }
     }
-
-    public class TheCanKeepPrivateProperty : TestBaseClass
-    {
-        [TestCase(true, false, false, false)]
-        [TestCase(true, false, true, false)]
-        [TestCase(false, false, true, false)]
-        [TestCase(true, true, true, true)]
-        [TestCase(false, false, false, true)]
-        public void IsOnlyTrueWhenUserIsEntepriseOrNotOnFreeAccountThatIsNotMaxedOut(
-            bool isFreeAccount,
-            bool isEnterprise,
-            bool isMaxedOut,
-            bool expected)
-        {
-            var selectedAccount = Substitute.For<IAccount>();
-            selectedAccount.IsOnFreePlan.Returns(isFreeAccount);
-            selectedAccount.IsEnterprise.Returns(isEnterprise);
-            selectedAccount.HasMaximumPrivateRepositories.Returns(isMaxedOut);
-            var vm = GetMeAViewModel();
-            vm.SelectedAccount = selectedAccount;
-
-            Assert.That(expected, Is.EqualTo(vm.CanKeepPrivate));
-        }
-    }
 }

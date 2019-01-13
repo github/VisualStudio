@@ -1027,6 +1027,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} most recently pushed.
+        /// </summary>
+        public static string MostRecentlyPushed {
+            get {
+                return ResourceManager.GetString("MostRecentlyPushed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must pull before you can push.
         /// </summary>
         public static string MustPullBeforePush {
