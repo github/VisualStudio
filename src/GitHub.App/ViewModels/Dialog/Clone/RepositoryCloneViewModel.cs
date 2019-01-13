@@ -137,8 +137,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
 
-            // When a clipboard URL has been set or a user is in group A, show the URL tab by default
-            if (!string.IsNullOrEmpty(UrlTab.Url) || await IsGroupA().ConfigureAwait(false))
+            // When a clipboard URL has been set, show the URL tab by default
+            if (!string.IsNullOrEmpty(UrlTab.Url))
             {
                 SelectedTabIndex = 2;
             }
@@ -155,14 +155,6 @@ namespace GitHub.ViewModels.Dialog.Clone
                     usageTracker.IncrementCounter(model => model.NumberOfCloneViewUrlTab).Forget();
                     break;
             }
-        }
-
-        // Put 50% of users in group A
-        async Task<bool> IsGroupA()
-        {
-            var userGuid = await usageService.GetUserGuid().ConfigureAwait(false);
-            var lastByte = userGuid.ToByteArray().Last();
-            return lastByte % 2 == 0;
         }
 
         void BrowseForDirectory()

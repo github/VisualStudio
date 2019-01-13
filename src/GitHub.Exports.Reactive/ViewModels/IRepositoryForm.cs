@@ -41,18 +41,5 @@ namespace GitHub.ViewModels
         /// Indicates whether the created repository should be private or not.
         /// </summary>
         bool KeepPrivate { get; set; }
-
-        /// <summary>
-        /// Indicates whether the user can create a private repository. This is false if the user is not a paid
-        /// account or if the user has run out of repositories for their current plan.
-        /// </summary>
-        bool CanKeepPrivate { get; }
-        bool ShowUpgradeToMicroPlanWarning { get; }
-        bool ShowUpgradePlanWarning { get; }
-
-        /// <summary>
-        /// Command that opens a browser to a page for upgrading the user's plan.
-        /// </summary>
-        ICommand UpgradeAccountPlan { get; }
     }
 }
