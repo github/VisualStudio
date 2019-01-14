@@ -133,6 +133,9 @@ public class GitHubContextServiceTests
             Assert.That(context.Url?.ToString(), Is.EqualTo(expectUrl));
         }
 
+        [TestCase("https://github.com/github/VisualStudio", LinkType.Repository)]
+        [TestCase("https://github.com/github/VisualStudio.git", LinkType.Repository)]
+        [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", LinkType.Blob)]
         [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         public void LinkType_EqualTo(string url, LinkType expectLinkType)
