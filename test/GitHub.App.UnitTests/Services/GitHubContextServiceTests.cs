@@ -137,6 +137,8 @@ public class GitHubContextServiceTests
         [TestCase("https://github.com/github/VisualStudio.git", LinkType.Repository)]
         [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", LinkType.Blob)]
+        [TestCase("https://github.com", LinkType.Unknown)]
+        [TestCase("https://github.com/github", LinkType.Unknown)]
         [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         public void LinkType_EqualTo(string url, LinkType expectLinkType)
         {

@@ -124,6 +124,18 @@ namespace GitHub.Services
                 Url = uri
             };
 
+            if (uri.Owner == null)
+            {
+                context.LinkType = LinkType.Unknown;
+                return context;
+            }
+
+            if (uri.RepositoryName == null)
+            {
+                context.LinkType = LinkType.Unknown;
+                return context;
+            }
+
             var repositoryUrl = uri.ToRepositoryUrl().ToString();
             if (string.Equals(url, repositoryUrl, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(url, repositoryUrl + ".git", StringComparison.OrdinalIgnoreCase))
