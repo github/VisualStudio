@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -68,8 +67,16 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
 
         /// <inheritdoc/>
-        protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
+        protected override async Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh)
         {
+            if (refresh)
+            {
+                await service.ClearPullRequestsCache(
+                    HostAddress.Create(RemoteRepository.CloneUrl),
+                    RemoteRepository.Owner,
+                    RemoteRepository.Name);
+            }
+
             return new ItemSource(this);
         }
 

@@ -9,11 +9,14 @@ namespace GitHub.Api
 {
     public interface IGraphQLClient
     {
+        Task ClearCache(string regionName);
+
         Task<T> Run<T>(
             IQueryableValue<T> query,
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default);
 
         Task<IEnumerable<T>> Run<T>(
@@ -21,6 +24,7 @@ namespace GitHub.Api
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default);
 
         Task<T> Run<T>(
@@ -28,6 +32,7 @@ namespace GitHub.Api
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default);
     }
 }

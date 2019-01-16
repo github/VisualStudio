@@ -34,7 +34,7 @@ namespace GitHub.Api
             this.program = program;
 
             var cachePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 ApplicationInfo.ApplicationName,
                 "GraphQLCache");
             cache = new FileCache(cachePath);

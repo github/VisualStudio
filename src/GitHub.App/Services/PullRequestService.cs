@@ -215,7 +215,8 @@ namespace GitHub.Services
                 { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
             };
 
-            var result = await graphql.Run(query, vars);
+            var region = owner + '/' + name + "/pr-list";
+            var result = await graphql.Run(query, vars, regionName: region);
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
@@ -287,6 +288,14 @@ namespace GitHub.Services
             }
 
             return result;
+        }
+
+        public async Task ClearPullRequestsCache(HostAddress address, string owner, string name)
+        {
+            var region = owner + '/' + name + "/pr-list";
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            await graphql.ClearCache(region);
         }
 
         public async Task<Page<ActorModel>> ReadAssignableUsers(

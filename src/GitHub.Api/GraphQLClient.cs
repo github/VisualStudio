@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Runtime.Caching;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Core;
@@ -16,14 +18,22 @@ namespace GitHub.Api
     {
         public static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromHours(8);
         readonly IConnection connection;
-        readonly ObjectCache cache;
+        readonly FileCache cache;
 
         public GraphQLClient(
             IConnection connection,
-            ObjectCache cache)
+            FileCache cache)
         {
             this.connection = connection;
             this.cache = cache;
+        }
+
+        public async Task ClearCache(string regionName)
+        {
+            // Switch to background thread because FileCache does not provide an async API.
+            await TaskScheduler.Default;
+
+            cache.ClearRegion(GetFullRegionName(regionName));
         }
 
         public Task<T> Run<T>(
@@ -31,9 +41,10 @@ namespace GitHub.Api
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default)
         {
-            return Run(query.Compile(), variables, refresh, cacheDuration, cancellationToken);
+            return Run(query.Compile(), variables, refresh, cacheDuration, regionName, cancellationToken);
         }
 
         public Task<IEnumerable<T>> Run<T>(
@@ -41,9 +52,10 @@ namespace GitHub.Api
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default)
         {
-            return Run(query.Compile(), variables, refresh, cacheDuration, cancellationToken);
+            return Run(query.Compile(), variables, refresh, cacheDuration, regionName, cancellationToken);
         }
 
         public async Task<T> Run<T>(
@@ -51,17 +63,34 @@ namespace GitHub.Api
             Dictionary<string, object> variables = null,
             bool refresh = false,
             TimeSpan? cacheDuration = null,
+            string regionName = null,
             CancellationToken cancellationToken = default)
         {
             if (!query.IsMutation)
             {
-                var wrapper = new CachingWrapper(this, cacheDuration ?? DefaultCacheDuration, refresh);
+                var wrapper = new CachingWrapper(
+                    this,
+                    refresh,
+                    cacheDuration ?? DefaultCacheDuration,
+                    GetFullRegionName(regionName));
                 return await wrapper.Run(query, variables, cancellationToken);
             }
             else
             {
                 return await connection.Run(query, variables, cancellationToken);
             }
+        }
+
+        string GetFullRegionName(string regionName)
+        {
+            var result = connection.Uri.Host;
+
+            if (!string.IsNullOrWhiteSpace(regionName))
+            {
+                result += Path.DirectorySeparatorChar + regionName;
+            }
+
+            return result.EnsureValidPath();
         }
 
         static string GetHash(string input)
@@ -84,34 +113,37 @@ namespace GitHub.Api
         class CachingWrapper : IConnection
         {
             readonly GraphQLClient owner;
-            readonly TimeSpan cacheDuration;
             readonly bool refresh;
+            readonly TimeSpan cacheDuration;
+            readonly string regionName;
 
             public CachingWrapper(
                 GraphQLClient owner,
+                bool refresh,
                 TimeSpan cacheDuration,
-                bool refresh)
+                string regionName)
             {
                 this.owner = owner;
-                this.cacheDuration = cacheDuration;
                 this.refresh = refresh;
+                this.cacheDuration = cacheDuration;
+                this.regionName = regionName;
             }
 
             public Uri Uri => owner.connection.Uri;
 
             public async Task<string> Run(string query, CancellationToken cancellationToken = default)
             {
-                // Switch to background thread because ObjectCache does not provide an async API.
+                // Switch to background thread because FileCache does not provide an async API.
                 await TaskScheduler.Default;
 
                 var hash = GetHash(query);
 
                 if (refresh)
                 {
-                    owner.cache.Remove(hash, Uri.Host);
+                    owner.cache.Remove(hash, regionName);
                 }
 
-                var data = (string)owner.cache.Get(hash, Uri.Host);
+                var data = (string)owner.cache.Get(hash, regionName);
 
                 if (data != null)
                 {
@@ -119,7 +151,7 @@ namespace GitHub.Api
                 }
 
                 var result = await owner.connection.Run(query, cancellationToken);
-                owner.cache.Add(hash, result, DateTimeOffset.Now + cacheDuration, Uri.Host);
+                owner.cache.Add(hash, result, DateTimeOffset.Now + cacheDuration, regionName);
                 return result;
             }
         }
