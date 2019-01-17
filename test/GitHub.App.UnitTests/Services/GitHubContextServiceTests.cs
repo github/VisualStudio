@@ -133,7 +133,12 @@ public class GitHubContextServiceTests
             Assert.That(context.Url?.ToString(), Is.EqualTo(expectUrl));
         }
 
+        [TestCase("https://github.com/github/VisualStudio", LinkType.Repository)]
+        [TestCase("https://github.com/github/VisualStudio.git", LinkType.Repository)]
+        [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", LinkType.Blob)]
+        [TestCase("https://github.com", LinkType.Unknown)]
+        [TestCase("https://github.com/github", LinkType.Unknown)]
         [TestCase("https://github.com/github/VisualStudio/unknown/master/README.md", LinkType.Unknown)]
         public void LinkType_EqualTo(string url, LinkType expectLinkType)
         {
@@ -498,8 +503,9 @@ public class GitHubContextServiceTests
     {
         var sp = Substitute.For<IGitHubServiceProvider>();
         var gitService = Substitute.For<IGitService>();
+        var vsServices = Substitute.For<IVSServices>();
         gitService.GetRepository(repositoryDir).Returns(repository);
 
-        return new GitHubContextService(sp, gitService);
+        return new GitHubContextService(sp, gitService, vsServices);
     }
 }

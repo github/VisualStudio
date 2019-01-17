@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Services;
+using GitHub.Extensions;
 using GitHub.VisualStudio;
 using GitHub.InlineReviews.Margins;
 using GitHub.Services.Vssdk.Commands;
@@ -42,7 +43,7 @@ namespace GitHub.InlineReviews.Commands
 
         public override Task Execute()
         {
-            usageTracker.Value.IncrementCounter(x => x.ExecuteToggleInlineCommentMarginCommand);
+            usageTracker.Value.IncrementCounter(x => x.ExecuteToggleInlineCommentMarginCommand).Forget();
 
             IVsTextView activeView = null;
             if (textManager.Value.GetActiveView(1, null, out activeView) == VSConstants.S_OK)

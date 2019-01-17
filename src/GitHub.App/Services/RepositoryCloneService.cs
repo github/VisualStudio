@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -36,7 +37,9 @@ namespace GitHub.Services
         readonly IVSGitServices vsGitServices;
         readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
+        readonly IGitHubContextService gitHubContextService;
         readonly IUsageTracker usageTracker;
+        readonly Lazy<EnvDTE.DTE> dte;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
         [ImportingConstructor]
@@ -45,13 +48,17 @@ namespace GitHub.Services
             IVSGitServices vsGitServices,
             ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
-            IUsageTracker usageTracker)
+            IGitHubContextService gitHubContextService,
+            IUsageTracker usageTracker,
+            IGitHubServiceProvider sp)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
             this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
+            this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
+            dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -63,13 +70,8 @@ namespace GitHub.Services
             {
                 var order = new RepositoryOrder
                 {
-                    Field = RepositoryOrderField.Name,
-                    Direction = OrderDirection.Asc
-                };
-
-                var affiliation = new RepositoryAffiliation?[]
-                {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
+                    Field = RepositoryOrderField.PushedAt,
+                    Direction = OrderDirection.Desc
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -88,10 +90,13 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, affiliation, null, null, order, null, null)
+                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
-                        OrganizationRepositories = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
+                        ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
+                            .Nodes
+                            .Select(repositorySelection).ToList(),
+                        Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
                             Repositories = org.Repositories(null, null, null, null, null, null, null, order, null, null)
@@ -125,7 +130,10 @@ namespace GitHub.Services
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
             if (DestinationDirectoryExists(repositoryPath))
             {
-                teamExplorerServices.OpenRepository(repositoryPath);
+                if (!IsSolutionInRepository(repositoryPath))
+                {
+                    teamExplorerServices.OpenRepository(repositoryPath);
+                }
 
                 if (isDotCom)
                 {
@@ -153,6 +161,36 @@ namespace GitHub.Services
 
             // Give user a chance to choose a solution
             teamExplorerServices.ShowHomePage();
+
+            // Navigate to context for supported URL types (e.g. /blob/ URLs)
+            var context = gitHubContextService.FindContextFromUrl(url);
+            if (context != null)
+            {
+                gitHubContextService.TryNavigateToContext(repositoryPath, context);
+            }
+        }
+
+        bool IsSolutionInRepository(string repositoryPath)
+        {
+            var solutionPath = dte.Value.Solution.FileName;
+            if (string.IsNullOrEmpty(solutionPath))
+            {
+                return false;
+            }
+
+            var isFolder = operatingSystem.Directory.DirectoryExists(solutionPath);
+            var solutionDir = isFolder ? solutionPath : Path.GetDirectoryName(solutionPath);
+            if (string.Equals(repositoryPath, solutionDir, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (solutionDir.StartsWith(repositoryPath + '\\', StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>

@@ -11,7 +11,7 @@
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              mc:Ignorable="d" d:DesignWidth="300">
     <d:DesignProperties.DataContext>
-        <ghfvs:CommentViewModelDesigner EditState="Editing">
+        <ghfvs:CommentViewModelDesigner EditState="None">
             <ghfvs:CommentViewModelDesigner.Body>
                 You can use a `CompositeDisposable` type here, it's designed to handle disposables in an optimal way (you can just call `Dispose()` on it and it will handle disposing everything it holds).
             </ghfvs:CommentViewModelDesigner.Body>
@@ -35,91 +35,100 @@
         <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </FrameworkElement.CommandBindings>
 
-    <Grid IsEnabled="{Binding IsSubmitting, Converter={ui:InverseBooleanConverter}}">
+    <Grid>
         <!-- Displays an existing comment-->
-        <StackPanel Orientation="Vertical" Margin="0 4 0 0">
-            <StackPanel.Style>
-                <Style TargetType="FrameworkElement">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding EditState}" Value="None">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </StackPanel.Style>
+        <Border BorderBrush="{DynamicResource VsBrush.ScrollBarThumbBackground}" HorizontalAlignment="Stretch">
+            <Grid Background="{DynamicResource VsBrush.ToolWindowBackground}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <DockPanel Margin="4">
-              <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
-                <views:ActorAvatarView Width="16" 
-                                       Height="16" 
-                                       ViewModel="{Binding Author}"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4 0">
-                    <Run FontWeight="Bold" Text="{Binding Author.Login}" />
-                    <Run Text="commented" />
-                </TextBlock>
-                <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
-                                 Command="{Binding OpenOnGitHub}"
-                                 Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                 Opacity="0.75" />
-                <Border Background="{DynamicResource VsBrush.InfoBackground}"
-                        BorderBrush="{DynamicResource VsBrush.AccentPale}"
-                        BorderThickness="1"
-                        CornerRadius="3"
-                        Padding="2 1"
-                        Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                  <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
-                </Border>
-              </StackPanel>
-
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
-                          Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
-                <ui:OcticonButton Command="{Binding BeginEdit}"
-                                  Height="16"
-                                  Width="20"
-                                  Margin="0 0 4 0"
-                                  Background="Transparent"
-                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                  Icon="pencil"/>
-                <ui:OcticonButton Command="{Binding Delete}"
-                                  Width="16"
-                                  Height="16"
-                                  Margin="0"
-                                  Background="Transparent"
-                                  Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                  Icon="x"/>
-              </StackPanel>
-            </DockPanel>
-
-            <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1"
-                                    Name="bodyMarkdown"
-                                    Margin="24 4 0 0"
-                                    Foreground="{DynamicResource VsBrush.WindowText}"
-                                    Markdown="{Binding Body}"/>
-
-            <DockPanel Grid.Column="1" Grid.Row="2"
-                       Margin="0 4"
-                       HorizontalAlignment="Left" 
-                       TextBlock.Foreground="Red">
-                <DockPanel.Style>
+                <Grid.Style>
                     <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
+                            <DataTrigger Binding="{Binding EditState}" Value="None">
+                                <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </DockPanel.Style>
+                </Grid.Style>
 
-                <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
-                <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
-            </DockPanel>
+                <StackPanel Background="#82909e" Grid.Row="0" Grid.Column="0" Grid.RowSpan="5" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}" />
 
-            <Border BorderThickness="0,1,0,0"
-                    BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}"
-                    Margin="0,8,0,0" />
-        </StackPanel>
+                <Border Grid.Column="1" Padding="8">
+                    <StackPanel>
+                        <DockPanel>
+                          <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
+                            <controls:AccountAvatar Width="16" 
+                                                    Height="16" 
+                                                    Account="{Binding Author}"/>
+
+                            <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" FontWeight="SemiBold" Text="{Binding Author.Login}" Margin="4 0"/>
+                            <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
+                                                 Command="{Binding OpenOnGitHub}"
+                                                 Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                                 Opacity="0.75" />
+                            <Border Background="{DynamicResource VsBrush.InfoBackground}"
+                                    BorderBrush="{DynamicResource VsBrush.AccentPale}"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
+                                    Padding="2 1"
+                                    Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                              <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
+                            </Border>
+                          </StackPanel>
+
+                          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right"
+                                      Visibility="{Binding CanDelete, Converter={ui:BooleanToVisibilityConverter}}">
+                            <ui:OcticonButton Command="{Binding BeginEdit}"
+                                              Height="16"
+                                              Width="20"
+                                              Margin="0 0 4 0"
+                                              Background="Transparent"
+                                              Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                              Icon="pencil"/>
+                            <ui:OcticonButton Command="{Binding Delete}"
+                                              Width="16"
+                                              Height="16"
+                                              Margin="0"
+                                              Background="Transparent"
+                                              Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                              Icon="x"/>
+                          </StackPanel>
+                        </DockPanel>
+
+                        <markdig:MarkdownViewer Grid.Column="1" Grid.Row="1" 
+                                                Name="bodyMarkdown"
+                                                Margin="20 2 0 0"
+                                                Foreground="{DynamicResource VsBrush.WindowText}"
+                                                Markdown="{Binding Body}"/>
+
+                        <DockPanel Grid.Column="1" Grid.Row="2"
+                                   Margin="0 4"
+                                   HorizontalAlignment="Left" 
+                                   TextBlock.Foreground="Red">
+                            <DockPanel.Style>
+                                <Style TargetType="FrameworkElement">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ErrorMessage}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DockPanel.Style>
+                            <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 4 0"/>
+                            <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
 
         <!-- Displays edit view or a reply placeholder-->
         <Grid>
@@ -149,13 +158,16 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+            <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
+                       Background="{DynamicResource GitHubButtonBorderBrush}"/>
+
             <ui:PromptTextBox Name="body"
                               Grid.Column="1"
                               Grid.Row="1"
                               AcceptsReturn="True"
                               AcceptsTab="True"
                               IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 8"
+                              Margin="4 0 4 4"
                               Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
                               TextWrapping="Wrap"
                               VerticalAlignment="Center"
@@ -205,7 +217,7 @@
 
             <StackPanel Name="buttonPanel"
                         Grid.Column="1" Grid.Row="3" 
-                        Margin="4 4 4 8" 
+                        Margin="4 8" 
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
                         IsVisibleChanged="buttonPanel_IsVisibleChanged">
@@ -219,20 +231,12 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <Button Command="{Binding CommitEdit}"
-                        Content="{Binding CommitCaption}"/>
+                <Button Command="{Binding CommitEdit}" Content="{Binding CommitCaption}"/>
                 <Button Margin="4 0 0 0"
                         Command="{Binding StartReview}"
                         Content="{x:Static ghfvs:Resources.StartAReview}"
-                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
-                <Button Margin="4 0 0 0"
-                        Command="{Binding CloseOrReopen}"
-                        Content="{Binding CloseOrReopenCaption}"
-                        Visibility="{Binding CanCloseOrReopen, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
-                <Button Margin="4 0 0 0"
-                        Command="{Binding CancelEdit}"
-                        Content="{x:Static ghfvs:Resources.Cancel}"
-                        Visibility="{Binding CanCancel, Converter={ui:BooleanToVisibilityConverter}}"/>
+                        Visibility="{Binding CanStartReview, Converter={ui:BooleanToVisibilityConverter}}"/>
+                <Button Margin="4 0 0 0" Command="{Binding CancelEdit}" Content="{x:Static ghfvs:Resources.Cancel}"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -252,7 +253,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (numberFilter == 0)
                 {
-                    stringFilter = SearchQuery.ToUpper();
+                    stringFilter = SearchQuery.ToUpperInvariant();
                 }
             }
             else
@@ -280,7 +281,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                     else
                     {
-                        result = item.Title.ToUpper().Contains(stringFilter);
+                        result = item.Title.ToUpperInvariant().Contains(stringFilter);
                     }
                 }
             }

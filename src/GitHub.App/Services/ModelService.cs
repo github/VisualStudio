@@ -22,6 +22,8 @@ using Octokit.GraphQL;
 using Serilog;
 using static Octokit.GraphQL.Variable;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+
 namespace GitHub.Services
 {
     [Export(typeof(IModelService))]
@@ -184,47 +186,6 @@ namespace GitHub.Services
             return Observable.Defer(() => hostCache.GetObject<AccountCacheItem>("user"));
         }
 
-        /// <summary>
-        /// Gets a collection of Pull Requests. If you want to refresh existing data, pass a collection in
-        /// </summary>
-        /// <param name="repo"></param>
-        /// <param name="collection"></param>
-        /// <returns></returns>
-        public ITrackingCollection<IPullRequestModel> GetPullRequests(RepositoryModel repo,
-            ITrackingCollection<IPullRequestModel> collection)
-        {
-            // Since the api to list pull requests returns all the data for each pr, cache each pr in its own entry
-            // and also cache an index that contains all the keys for each pr. This way we can fetch prs in bulk
-            // but also individually without duplicating information. We store things in a custom observable collection
-            // that checks whether an item is being updated (coming from the live stream after being retrieved from cache)
-            // and replaces it instead of appending, so items get refreshed in-place as they come in.
-
-            var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}:{2}", CacheIndex.PRPrefix, repo.Owner, repo.Name));
-
-            var source = Observable.Defer(() => keyobs
-                .SelectMany(key =>
-                    hostCache.GetAndFetchLatestFromIndex(key, () =>
-                        ApiClient.GetPullRequestsForRepository(repo.CloneUrl.Owner, repo.CloneUrl.RepositoryName)
-                                 .Select(PullRequestCacheItem.Create),
-                        item =>
-                        {
-                            if (collection.Disposed) return;
-
-                            // this could blow up due to the collection being disposed somewhere else
-                            try { collection.RemoveItem(Create(item)); }
-                            catch (ObjectDisposedException) { }
-                        },
-                        TimeSpan.Zero,
-                        TimeSpan.FromDays(7))
-                )
-                .Select(Create)
-            );
-
-            collection.Listen(source);
-            return collection;
-        }
-
         public IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number)
         {
             throw new NotImplementedException();
@@ -241,34 +202,6 @@ namespace GitHub.Services
                         key,
                         () => ApiClient.GetRepository(owner, repo).Select(RepositoryCacheItem.Create))
                     .Select(Create)));
-        }
-
-        public ITrackingCollection<RemoteRepositoryModel> GetRepositories(ITrackingCollection<RemoteRepositoryModel> collection)
-        {
-            var keyobs = GetUserFromCache()
-                .Select(user => string.Format(CultureInfo.InvariantCulture, "{0}|{1}", CacheIndex.RepoPrefix, user.Login));
-
-            var source = Observable.Defer(() => keyobs
-                .SelectMany(key =>
-                    hostCache.GetAndFetchLatestFromIndex(key, () =>
-                        ApiClient.GetRepositories()
-                                 .Select(RepositoryCacheItem.Create),
-                        item =>
-                        {
-                            if (collection.Disposed) return;
-
-                            // this could blow up due to the collection being disposed somewhere else
-                            try { collection.RemoveItem(Create(item)); }
-                            catch (ObjectDisposedException) { }
-                        },
-                        TimeSpan.FromMinutes(5),
-                        TimeSpan.FromDays(1))
-                )
-                .Select(Create)
-            );
-
-            collection.Listen(source);
-            return collection;
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
@@ -434,7 +367,7 @@ namespace GitHub.Services
             };
         }
 
-        GitReferenceModel Create(GitReferenceCacheItem item)
+        static GitReferenceModel Create(GitReferenceCacheItem item)
         {
             return new GitReferenceModel(item.Ref, item.Label, item.Sha, item.RepositoryCloneUrl);
         }

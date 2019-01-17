@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
@@ -16,21 +17,37 @@ namespace GitHub.Services
     {
         readonly IViewViewModelFactory factory;
         readonly IShowDialogService showDialog;
+        readonly IGitHubContextService gitHubContextService;
 
         [ImportingConstructor]
         public DialogService(
             IViewViewModelFactory factory,
-            IShowDialogService showDialog)
+            IShowDialogService showDialog,
+            IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(showDialog, nameof(showDialog));
+            Guard.ArgumentNotNull(showDialog, nameof(gitHubContextService));
 
             this.factory = factory;
             this.showDialog = showDialog;
+            this.gitHubContextService = gitHubContextService;
         }
 
         public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                var clipboardContext = gitHubContextService.FindContextFromClipboard();
+                switch (clipboardContext?.LinkType)
+                {
+                    case LinkType.Blob:
+                    case LinkType.Repository:
+                        url = clipboardContext?.Url;
+                        break;
+                }
+            }
+
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
             if (url != null)
             {

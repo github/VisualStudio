@@ -277,6 +277,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find GitHub URL for repository.
+        /// </summary>
+        public static string CantFindGitHubUrlForRepository {
+            get {
+                return ResourceManager.GetString("CantFindGitHubUrlForRepository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changes ({0}).
         /// </summary>
         public static string ChangesCountFormat {
@@ -286,7 +295,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This file has changed since the permalink was created.
+        ///   Looks up a localized string similar to The working file is different to the file at &apos;{0}&apos;. Please checkout the corresponding branch, pull request or commit..
         /// </summary>
         public static string ChangesInWorkingDirectoryMessage {
             get {
@@ -435,6 +444,15 @@ namespace GitHub {
         public static string couldNotConnectToTheServerText {
             get {
                 return ResourceManager.GetString("couldNotConnectToTheServerText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t find file corresponding to &apos;{0}&apos; in the repository. Please do a &apos;git fetch&apos; or checkout the target pull request..
+        /// </summary>
+        public static string CouldntFindCorrespondingFile {
+            get {
+                return ResourceManager.GetString("CouldntFindCorrespondingFile", resourceCulture);
             }
         }
         
@@ -1072,6 +1090,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} most recently pushed.
+        /// </summary>
+        public static string MostRecentlyPushed {
+            get {
+                return ResourceManager.GetString("MostRecentlyPushed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You must pull before you can push.
         /// </summary>
         public static string MustPullBeforePush {
@@ -1374,15 +1401,6 @@ namespace GitHub {
         public static string Options_ExperimentalTitle {
             get {
                 return ResourceManager.GetString("Options_ExperimentalTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show Fork button in Team Explorer.
-        /// </summary>
-        public static string Options_ForkButtonLabel {
-            get {
-                return ResourceManager.GetString("Options_ForkButtonLabel", resourceCulture);
             }
         }
         
@@ -1707,6 +1725,24 @@ namespace GitHub {
         public static string RepoNameText {
             get {
                 return ResourceManager.GetString("RepoNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repositories must have a remote called &quot;origin&quot; defined in order to locate their GitHub URL..
+        /// </summary>
+        public static string RepositoriesMustHaveRemoteOrigin {
+            get {
+                return ResourceManager.GetString("RepositoriesMustHaveRemoteOrigin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please rename one of your existing remotes to &apos;origin&apos; or add a new remote named &apos;origin&apos; and fetch. This can be done from the command line or by clicking the button below..
+        /// </summary>
+        public static string RepositoriesMustHaveRemoteOriginHowToFix {
+            get {
+                return ResourceManager.GetString("RepositoriesMustHaveRemoteOriginHowToFix", resourceCulture);
             }
         }
         

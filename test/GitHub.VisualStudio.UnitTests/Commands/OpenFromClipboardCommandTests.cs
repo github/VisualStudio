@@ -169,7 +169,7 @@ public class OpenFromClipboardCommandTests
         {
             uri = uri ?? new UriString($"https://github.com/{owner}/{repositoryName}/blob/{branch}/README.md");
 
-            return new GitHubContextService(null, null).FindContextFromUrl(uri);
+            return new GitHubContextService(null, null, null).FindContextFromUrl(uri);
         }
 
         static OpenFromClipboardCommand CreateOpenFromClipboardCommand(

@@ -8,8 +8,10 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitHub.Api;
@@ -20,6 +22,7 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using Rothko;
@@ -33,7 +36,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestService : IssueishService, IPullRequestService
+    public class PullRequestService : IssueishService, IPullRequestService, IStaticReviewFileMap
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
@@ -59,6 +62,8 @@ namespace GitHub.Services
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
+        readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
+   
         [ImportingConstructor]
         public PullRequestService(
             IGitClient gitClient,
@@ -76,6 +81,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.os = os;
             this.usageTracker = usageTracker;
+            this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>(StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
@@ -118,7 +124,7 @@ namespace GitHub.Services
                                                       {
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
-                                                      }).ToList()
+                                                      }).ToList(),
                                               }).ToList(),
                                           Statuses = commit.Commit.Status
                                                   .Select(context =>
@@ -171,12 +177,14 @@ namespace GitHub.Services
                                   LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                       new LastCommitSummaryAdapter
                                       {
-                                          Statuses = commit.Commit.Status
-                                                  .Select(context =>
-                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
-                                                      {
-                                                          State = statusContext.State.FromGraphQl(),
-                                                      }).ToList()
+                                          Statuses = commit.Commit.Status.Select(context =>
+                                                      context == null
+                                                          ? null
+                                                          : context.Contexts
+                                                              .Select(statusContext => new StatusSummaryModel
+                                                              {
+                                                                  State = statusContext.State.FromGraphQl()
+                                                              }).ToList()
                                                   ).SingleOrDefault()
                                       }).ToList().FirstOrDefault(),
                                   Author = new ActorModel
@@ -771,6 +779,12 @@ namespace GitHub.Services
                 }
             }
 
+            lock (this.tempFileMappings)
+            {
+                string gitRelativePath = relativePath.TrimStart('/').Replace('\\', '/');
+                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitRelativePath);
+            }
+
             return tempFilePath;
         }
 
@@ -842,6 +856,28 @@ namespace GitHub.Services
                        MessageBoxButtons.YesNo,
                        MessageBoxIcon.Question) == DialogResult.Yes;
         }
+
+        /// <inheritdoc />
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            lock (this.tempFileMappings)
+            {
+                var canonicalizedPath = CanonicalizeLocalFilePath(localPath);
+                if (this.tempFileMappings.TryGetValue(canonicalizedPath, out (string commitId, string repoPath) result))
+                {
+                    return Task.FromResult($"{result.commitId}:{result.repoPath}");
+                }
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc />
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
 
         async Task<string> CreateRemote(IRepository repo, UriString cloneUri)
         {
@@ -1020,6 +1056,12 @@ namespace GitHub.Services
             }
 
             return default;
+        }
+
+        static string CanonicalizeLocalFilePath(string localPath)
+        {
+            localPath = localPath.Replace("\\\\", "\\");
+            return Path.GetFullPath(localPath);
         }
 
         class ListItemAdapter : PullRequestListItemModel

@@ -4,6 +4,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1051 // Do not declare visible instance fields
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 namespace GitHub.Authentication.CredentialManagement
 {
     public static class NativeMethods

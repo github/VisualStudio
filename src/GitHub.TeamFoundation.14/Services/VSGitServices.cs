@@ -1,11 +1,4 @@
-﻿#if TEAMEXPLORER15
-// Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
-extern alias SF15;
-using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
-#endif
-
-using System;
-using System.Threading;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
@@ -90,22 +83,14 @@ namespace GitHub.Services
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
-#elif TEAMEXPLORER15
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
-            typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
-            var cloneTask = gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
-
-            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
-            await cloneTask;
-#elif TEAMEXPLORER16
+#elif TEAMEXPLORER15 || TEAMEXPLORER16
             // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
             // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
             // Progress won't be displayed on the status bar, but it appears prominently on the Team Explorer Home view.
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
             Assumes.NotNull(cloneAsyncMethod);
-            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), null };
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, null, null };
             var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home

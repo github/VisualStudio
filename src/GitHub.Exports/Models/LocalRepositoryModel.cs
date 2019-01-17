@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.ComponentModel;
+using System.Collections.Generic;
+using GitHub.Primitives;
 
 namespace GitHub.Models
 {
@@ -18,6 +20,14 @@ namespace GitHub.Models
         /// Gets the local path of the repository.
         /// </summary>
         public string LocalPath
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// True if repository has remotes but none are named "origin".
+        /// </summary>
+        public bool HasRemotesButNoOrigin
         {
             get; set;
         }
@@ -45,9 +55,9 @@ namespace GitHub.Models
             if (ReferenceEquals(this, other))
                 return true;
             return other != null &&
-                string.Equals(Name, other.Name) &&
-                string.Equals(Owner, other.Owner) &&
-                string.Equals(CloneUrl, other.CloneUrl) &&
+                string.Equals(Name, other.Name, StringComparison.Ordinal) &&
+                string.Equals(Owner, other.Owner, StringComparison.Ordinal) &&
+                string.Equals(CloneUrl, other.CloneUrl, StringComparison.Ordinal) &&
                 string.Equals(LocalPath?.TrimEnd('\\'), other.LocalPath?.TrimEnd('\\'), StringComparison.CurrentCultureIgnoreCase);
         }
 

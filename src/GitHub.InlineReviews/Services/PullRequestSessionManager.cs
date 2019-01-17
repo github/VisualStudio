@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
 using Serilog;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace GitHub.InlineReviews.Services
 {
     /// <summary>
@@ -227,6 +229,13 @@ namespace GitHub.InlineReviews.Services
 
         async Task<PullRequestSession> GetSessionInternal(string owner, string name, int number)
         {
+            var cloneUrl = repository.CloneUrl;
+            if (cloneUrl == null)
+            {
+                // Can't create a session from a repository with no origin
+                return null;
+            }
+
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
             var key = Tuple.Create(owner.ToLowerInvariant(), number);
@@ -238,7 +247,7 @@ namespace GitHub.InlineReviews.Services
 
             if (session == null)
             {
-                var address = HostAddress.Create(repository.CloneUrl);
+                var address = HostAddress.Create(cloneUrl);
                 var pullRequest = await sessionService.ReadPullRequestDetail(address, owner, name, number);
 
                 session = new PullRequestSession(

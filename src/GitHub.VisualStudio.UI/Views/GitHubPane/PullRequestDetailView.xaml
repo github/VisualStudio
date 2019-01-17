@@ -229,11 +229,12 @@
                                       HeaderText="Checks"
                                       IsExpanded="True"
                                       Margin="0 8 0 0"
-                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
+                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true"
+                                      Visibility="{Binding Checks.Count, Converter={ghfvs:CountToVisibilityConverter}}">
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="0 4 12 4">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Grid.IsSharedSizeScope="True" />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>

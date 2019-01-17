@@ -41,7 +41,12 @@ namespace GitHub.VisualStudio.Helpers
             {
                 __VSCREATEWEBBROWSER createFlags = __VSCREATEWEBBROWSER.VSCWB_AutoShow;
                 VSPREVIEWRESOLUTION resolution = VSPREVIEWRESOLUTION.PR_Default;
-                int result = ErrorHandler.CallWithCOMConvention(() => service.CreateExternalWebBrowser((uint)createFlags, resolution, uri.AbsoluteUri));
+                int result = ErrorHandler.CallWithCOMConvention(() =>
+                {
+                    ThreadHelper.ThrowIfNotOnUIThread();
+                    return service.CreateExternalWebBrowser((uint)createFlags, resolution, uri.AbsoluteUri);
+                });
+
                 if (ErrorHandler.Succeeded(result))
                     return;
             }

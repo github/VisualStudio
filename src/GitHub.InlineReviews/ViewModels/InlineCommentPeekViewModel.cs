@@ -33,12 +33,14 @@ namespace GitHub.InlineReviews.ViewModels
         IPullRequestSession session;
         IPullRequestSessionFile file;
         IPullRequestReviewCommentThreadViewModel thread;
+        IReadOnlyList<IInlineAnnotationViewModel> annotations;
         IDisposable fileSubscription;
         IDisposable sessionSubscription;
         IDisposable threadSubscription;
         ITrackingPoint triggerPoint;
         string relativePath;
         DiffSide side;
+        bool availableForComment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentPeekViewModel"/> class.
@@ -84,6 +86,21 @@ namespace GitHub.InlineReviews.ViewModels
                     FromLine = peekService.GetLineNumber(peekSession, triggerPoint).Item1,
                 }),
                 Observable.Return(previousCommentCommand.Enabled));
+        }
+
+        public bool AvailableForComment
+        {
+            get { return availableForComment; }
+            private set { this.RaiseAndSetIfChanged(ref availableForComment, value); }
+        }
+
+        /// <summary>
+        /// Gets the annotations displayed.
+        /// </summary>
+        public IReadOnlyList<IInlineAnnotationViewModel> Annotations
+        {
+            get { return annotations; }
+            private set { this.RaiseAndSetIfChanged(ref annotations, value); }
         }
 
         /// <summary>
@@ -143,10 +160,10 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             fileSubscription?.Dispose();
-            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(LinesChanged);
+            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LinesChanged(x).Forget());
         }
 
-        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        async Task LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
         {
             try
             {
@@ -168,27 +185,41 @@ namespace GitHub.InlineReviews.ViewModels
             Thread = null;
             threadSubscription?.Dispose();
 
+            Annotations = null;
+
             if (file == null)
                 return;
 
             var lineAndLeftBuffer = peekService.GetLineNumber(peekSession, triggerPoint);
             var lineNumber = lineAndLeftBuffer.Item1;
             var leftBuffer = lineAndLeftBuffer.Item2;
+
+            AvailableForComment =
+                file.Diff.Any(chunk => chunk.Lines
+                    .Any(line => leftBuffer ?
+                        line.OldLineNumber - 1 == lineNumber :
+                        line.NewLineNumber - 1 == lineNumber));
+
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&
                 ((leftBuffer && x.DiffLineType == DiffChangeType.Delete) || (!leftBuffer && x.DiffLineType != DiffChangeType.Delete)));
-            var vm = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
+
+            Annotations = file.InlineAnnotations?.Where(model => model.EndLine - 1 == lineNumber)
+                .Select(model => new InlineAnnotationViewModel(model))
+                .ToArray();
+
+            var threadModel = factory.CreateViewModel<IPullRequestReviewCommentThreadViewModel>();
 
             if (thread?.Comments.Count > 0)
             {
-                await vm.InitializeAsync(session, file, thread, true);
+                await threadModel.InitializeAsync(session, file, thread, true);
             }
             else
             {
-                await vm.InitializeNewAsync(session, file, lineNumber, side, true);
+                await threadModel.InitializeNewAsync(session, file, lineNumber, side, true);
             }
 
-            Thread = vm;
+            Thread = threadModel;
         }
 
         async Task SessionChanged(IPullRequestSession pullRequestSession)

@@ -12,12 +12,13 @@ If you have an existing clone, make sure to run `git submodule sync` to update y
 
 ## About
 
-The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015.
+The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015 and newer.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
 
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
 [![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
+[![Build Status](https://github-editor-tools.visualstudio.com/VisualStudio/_apis/build/status/github.VisualStudio?branchName=master)](https://github-editor-tools.visualstudio.com/VisualStudio/_build/latest?definitionId=4&branchName=master)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/github-visual-studio/localized.svg)](https://crowdin.com/project/github-visual-studio)
 [![codecov](https://codecov.io/gh/GitHub/VisualStudio/branch/master/graph/badge.svg)](https://codecov.io/gh/GitHub/VisualStudio)
 
@@ -91,16 +92,31 @@ Logs can be viewed at the following location:
 
 `%LOCALAPPDATA%\GitHubVisualStudio\extension.log`
 
+## Troubleshooting
+
+If you have issues building with failures similar to:
+
+> "The type or namespace name does not exist..."
+
+or
+
+> "Unable to find project... Check that the project reference is valid and that the project file exists."*
+
+Close Visual Studio and run the following command to update submodules and clean your environment.
+
+```txt
+clean.cmd
+```
+
 ## More information
 - Andreia Gaita's [presentation](https://www.youtube.com/watch?v=hz2hCO8e_8w) at Codemania 2016 about this extension.
 
 ## Contributing
 
-Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Open Code of Conduct](http://todogroup.org/opencodeofconduct/#VisualStudio/opensource@github.com) for details on how to participate.
+Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contribute as well as the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) for details on how to participate.
 
 ## Copyright
 
 Copyright 2015 - 2018 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
-

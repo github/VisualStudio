@@ -29,7 +29,7 @@ namespace GitHub.VisualStudio.Views
             });
         }
 
-        IVisualStudioBrowser GetBrowser()
+        static IVisualStudioBrowser GetBrowser()
         {
             var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
             return serviceProvider.GetService<IVisualStudioBrowser>();
