@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using GitHub.Api;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Models;
@@ -38,7 +39,13 @@ namespace GitHub.Services
             if (string.IsNullOrEmpty(url))
             {
                 var clipboardContext = gitHubContextService.FindContextFromClipboard();
-                url = clipboardContext?.Url;
+                switch (clipboardContext?.LinkType)
+                {
+                    case LinkType.Blob:
+                    case LinkType.Repository:
+                        url = clipboardContext?.Url;
+                        break;
+                }
             }
 
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
