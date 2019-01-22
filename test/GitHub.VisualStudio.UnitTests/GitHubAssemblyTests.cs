@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using NCrunch.Framework;
 using NUnit.Framework;
 
 public class GitHubAssemblyTests
@@ -30,7 +32,20 @@ public class GitHubAssemblyTests
     }
 
     [DatapointSource]
-    string[] GitHubAssemblies => Directory.GetFiles(AssemblyDirectory, "GitHub.*.dll");
+    string[] GetGitHubAssemblies()
+    {
+        var prefix = "GitHub.";
+        if (NCrunchEnvironment.NCrunchIsResident())
+        {
+            return NCrunchEnvironment.GetAllAssemblyLocations()
+                .Where(p => Path.GetFileName(p).StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+        }
+        else
+        {
+            var dir = Path.GetDirectoryName(GetType().Assembly.Location);
+            return Directory.GetFiles(dir, $"{prefix}*.dll");
+        }
+    }
 
-    string AssemblyDirectory => Path.GetDirectoryName(GetType().Assembly.Location);
 }
