@@ -42,8 +42,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IUsageService usageService,
             IUsageTracker usageTracker,
             IRepositorySelectViewModel gitHubTab,
-            IRepositorySelectViewModel enterpriseTab,
-            IRepositoryUrlViewModel urlTab)
+            IRepositorySelectViewModel enterpriseTab)
         {
             this.os = os;
             this.connectionManager = connectionManager;
@@ -54,8 +53,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             GitHubTab = gitHubTab;
             EnterpriseTab = enterpriseTab;
-            UrlTab = urlTab;
-            tabs = new IRepositoryCloneTabViewModel[] { GitHubTab, EnterpriseTab, UrlTab };
+            tabs = new IRepositoryCloneTabViewModel[] { GitHubTab, EnterpriseTab };
 
             var repository = this.WhenAnyValue(x => x.SelectedTabIndex)
                 .SelectMany(x => tabs[x].WhenAnyValue(tab => tab.Repository));
@@ -88,7 +86,6 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public IRepositorySelectViewModel GitHubTab { get; }
         public IRepositorySelectViewModel EnterpriseTab { get; }
-        public IRepositoryUrlViewModel UrlTab { get; }
 
         public string Path
         {
@@ -136,12 +133,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
-
-            // When a clipboard URL has been set, show the URL tab by default
-            if (!string.IsNullOrEmpty(UrlTab.Url))
-            {
-                SelectedTabIndex = 2;
-            }
 
             switch (SelectedTabIndex)
             {

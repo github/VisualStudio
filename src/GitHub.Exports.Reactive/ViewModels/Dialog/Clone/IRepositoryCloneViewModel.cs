@@ -21,11 +21,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         IRepositorySelectViewModel EnterpriseTab { get; }
 
         /// <summary>
-        /// Gets the view model for the URL tab.
-        /// </summary>
-        IRepositoryUrlViewModel UrlTab { get; }
-
-        /// <summary>
         /// Gets the path to clone the repository to.
         /// </summary>
         string Path { get; set; }

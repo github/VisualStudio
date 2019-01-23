@@ -39,15 +39,14 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         [TestCase("https://enterprise.com", null, false, 1)]
         [TestCase("https://github.com", null, true, 0, Description = "Show URL tab for GitHub connections")]
         [TestCase("https://enterprise.com", null, true, 1, Description = "Show URL tab for Enterprise connections")]
-        [TestCase("https://github.com", "https://github.com/github/visualstudio", false, 2)]
-        [TestCase("https://enterprise.com", "https://enterprise.com/owner/repo", false, 2)]
+        [TestCase("https://github.com", "https://github.com/github/visualstudio", false, 0)]
+        [TestCase("https://enterprise.com", "https://enterprise.com/owner/repo", false, 1)]
         public async Task Default_SelectedTabIndex_For_Group(string address, string clipboardUrl, bool isGroupA, int expectTabIndex)
         {
             var cm = CreateConnectionManager(address);
             var connection = cm.Connections[0];
             var usageService = CreateUsageService(isGroupA);
             var target = CreateTarget(connectionManager: cm, usageService: usageService);
-            target.UrlTab.Url = clipboardUrl;
 
             await target.InitializeAsync(connection);
 
@@ -404,7 +403,6 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
             IGitService gitService = null,
-            IRepositoryUrlViewModel urlTab = null,
             string defaultClonePath = defaultPath)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
@@ -415,7 +413,6 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             gitService = gitService ?? CreateGitService(true, "https://github.com/owner/repo");
-            urlTab = urlTab ?? CreateRepositoryUrlViewModel();
 
             return new RepositoryCloneViewModel(
                 os,
@@ -425,8 +422,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 usageService,
                 usageTracker,
                 gitHubTab,
-                enterpriseTab,
-                urlTab);
+                enterpriseTab);
         }
 
         private static IGitService CreateGitService(bool repositoryExists, UriString remoteUrl)
@@ -470,14 +466,6 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static UriString CreateGitHubUrl(string owner, string repo)
         {
             return new UriString($"https://github.com/{owner}/{repo}");
-        }
-
-        static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
-        {
-            var repositoryUrlViewModel = Substitute.For<IRepositoryUrlViewModel>();
-            repositoryUrlViewModel.Repository.Returns(null as RepositoryModel);
-            repositoryUrlViewModel.Url.Returns(string.Empty);
-            return repositoryUrlViewModel;
         }
     }
 }
