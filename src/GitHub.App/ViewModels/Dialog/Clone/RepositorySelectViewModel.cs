@@ -166,7 +166,9 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
             {
-                return item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                return
+                    item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase) ||
+                    item.Url.ToString().Equals(Filter, StringComparison.OrdinalIgnoreCase);
             }
 
             return true;
