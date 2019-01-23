@@ -22,6 +22,8 @@ public class RepositorySelectViewModelTests
         [TestCase("OWNER/NAME", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("https://github.com/owner/name", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("HTTPS://GITHUB.COM/OWNER/NAME", "owner", "name", "https://github.com/owner/name", 1)]
+        [TestCase("https://github.com/owner", "owner", "name", "https://github.com/owner/name", 1)]
+        [TestCase("https://github.com/jcansdale/TestDriven.Net", "owner", "name", "https://github.com/jcansdale/TestDriven.Net-issues", 1)]
         public async Task Filter(string filter, string owner, string name, string url, int expectCount)
         {
             var contributedToRepositories = new[]

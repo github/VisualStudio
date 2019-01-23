@@ -181,7 +181,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             {
                 return
                     item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.Url.ToString().Equals(Filter, StringComparison.OrdinalIgnoreCase);
+                    item.Url.ToString().Contains(Filter, StringComparison.OrdinalIgnoreCase);
             }
 
             return true;
