@@ -632,7 +632,7 @@ namespace GitHub.UI
             if (textInput != null)
             {
                 UnsubscribeToEvent("SelectionChanged");
-                UnsubscribeToEvent("OnTextBoxTextChanged");
+//                UnsubscribeToEvent("OnTextBoxTextChanged");
             }
 
             textInput = value;
@@ -646,18 +646,18 @@ namespace GitHub.UI
                     supportsShortcutOriginalValue = shortcutContainer.SupportsKeyboardShortcuts;
                 }
 
-                SubscribeToEvent("OnTextBoxTextChanged", ObserveTextBoxChanges()
-                    .Subscribe(shouldPopulate =>
-                    {
-                        if (shouldPopulate)
-                        {
-                            PopulateDropDown();
-                        }
-                        else
-                        {
-                            DismissDropDown();
-                        }
-                    }));
+//                SubscribeToEvent("OnTextBoxTextChanged", ObserveTextBoxChanges()
+//                    .Subscribe(shouldPopulate =>
+//                    {
+//                        if (shouldPopulate)
+//                        {
+//                            PopulateDropDown();
+//                        }
+//                        else
+//                        {
+//                            DismissDropDown();
+//                        }
+//                    }));
 
                 if (Text != null)
                 {
@@ -777,7 +777,7 @@ namespace GitHub.UI
         {
             if (TextBox != null)
             {
-                UnsubscribeToEvent("PreviewKeyDown");
+//                UnsubscribeToEvent("PreviewKeyDown");
             }
 
             if (DropDownPopup != null)
@@ -811,7 +811,7 @@ namespace GitHub.UI
 
             if (TextBox != null)
             {
-                SubscribeToEvent("PreviewKeyDown", TextBox.PreviewKeyDown.Subscribe(OnTextBoxPreviewKeyDown));
+//                SubscribeToEvent("PreviewKeyDown", TextBox.PreviewKeyDown.Subscribe(OnTextBoxPreviewKeyDown));
             }
 
             Interaction.OnApplyTemplateBase();
