@@ -6,6 +6,7 @@
                     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Controls/AutoCompleteBox.xaml" />
         <ResourceDictionary Source="Controls/RoundedCheckBox.xaml" />
         <ResourceDictionary Source="Controls/FilterTextBox.xaml" />
         <ResourceDictionary Source="Controls/GitHubLinkButton.xaml" />
