@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <ExtrasEnableDefaultResourceItems>false</ExtrasEnableDefaultResourceItems>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>

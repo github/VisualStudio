@@ -44,7 +44,7 @@ namespace GitHub.VisualStudio.Helpers
                 int result = ErrorHandler.CallWithCOMConvention(() =>
                 {
                     ThreadHelper.ThrowIfNotOnUIThread();
-                    service.CreateExternalWebBrowser((uint)createFlags, resolution, uri.AbsoluteUri);
+                    return service.CreateExternalWebBrowser((uint)createFlags, resolution, uri.AbsoluteUri);
                 });
 
                 if (ErrorHandler.Succeeded(result))

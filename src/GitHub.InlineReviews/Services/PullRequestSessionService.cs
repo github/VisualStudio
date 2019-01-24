@@ -97,7 +97,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             return pullRequest.CheckSuites
-                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun}))
+                ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun }))
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
                         .Where(annotation => annotation.Path == relativePath)
@@ -361,17 +361,21 @@ namespace GitHub.InlineReviews.Services
             var result = await connection.Run(readPullRequest, vars);
 
             var apiClient = await apiClientFactory.Create(address);
-            var files = await apiClient.GetPullRequestFiles(owner, name, number).ToList();
-            var lastCommitModel = await GetPullRequestLastCommitAdapter(address, owner, name, number);
 
-            result.Statuses = (IReadOnlyList<StatusModel>) lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
+            var files = await log.TimeAsync(nameof(apiClient.GetPullRequestFiles),
+                async () => await apiClient.GetPullRequestFiles(owner, name, number).ToList());
+
+            var lastCommitModel = await log.TimeAsync(nameof(GetPullRequestLastCommitAdapter),
+                () => GetPullRequestLastCommitAdapter(address, owner, name, number));
+
+            result.Statuses = (IReadOnlyList<StatusModel>)lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
 
             if (lastCommitModel.CheckSuites == null)
             {
                 result.CheckSuites = Array.Empty<CheckSuiteModel>();
             }
             else
-            { 
+            {
                 result.CheckSuites = lastCommitModel.CheckSuites;
                 foreach (var checkSuite in result.CheckSuites)
                 {
@@ -645,7 +649,6 @@ namespace GitHub.InlineReviews.Services
 
             var addReview = new AddPullRequestReviewInput
             {
-                Body = body,
                 CommitOID = commitId,
                 Event = Octokit.GraphQL.Model.PullRequestReviewEvent.Comment,
                 PullRequestId = new ID(pullRequestId),
@@ -838,8 +841,8 @@ namespace GitHub.InlineReviews.Services
                          commit => new LastCommitAdapter
                          {
                              Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
-                                 .Select(context => context == null 
-                                     ? null 
+                                 .Select(context => context == null
+                                     ? null
                                      : context.Contexts
                                          .Select(statusContext => new StatusModel
                                          {
@@ -871,7 +874,7 @@ namespace GitHub.InlineReviews.Services
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
             var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
-           
+
             // Get all comments that are not replies.
             foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
             {
@@ -961,5 +964,5 @@ namespace GitHub.InlineReviews.Services
 
             public string HeadSha { get; set; }
         }
-    }   
+    }
 }

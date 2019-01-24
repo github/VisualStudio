@@ -129,26 +129,9 @@
         <CheckBox x:Name="makePrivate"
               Margin="0,8,0,0"
               IsChecked="{Binding KeepPrivate}"
-              IsEnabled="{Binding CanKeepPrivate}"
               Style="{StaticResource VSStyledCheckBox}"
-              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPrivateRepositoryCheckBox}" >
-            <TextBlock Background="{DynamicResource GitHubVsToolWindowBackground}"
-                 Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 TextWrapping="Wrap">
-                <TextBlock.Resources>
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Resources>
-                <TextBlock.Inlines>
-                    <Run Text="{x:Static ghfvs:Resources.makePrivateContent}" />
-                </TextBlock.Inlines>
-            </TextBlock>
-        </CheckBox>
+              Content="{x:Static ghfvs:Resources.makePrivateContent}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPrivateRepositoryCheckBox}" />
 
         <Button x:Name="publishRepositoryButton"
             Margin="0,8,0,0"
