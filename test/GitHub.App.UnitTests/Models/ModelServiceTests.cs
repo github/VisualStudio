@@ -374,9 +374,7 @@ public class ModelServiceTests
 
     static ModelService CreateTarget(
         IApiClient apiClient = null,
-        Octokit.IConnection graphql = null,
-        IBlobCache hostCache = null,
-        IAvatarProvider avatarProvider = null)
+        IBlobCache hostCache = null)
     {
         return new ModelService(
             apiClient ?? Substitute.For<IApiClient>(),

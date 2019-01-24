@@ -741,6 +741,34 @@ namespace GitHub.UI
         }
 
         /// <summary>
+        /// Identifies the
+        /// <see cref="P:GitHub.UI.AutoCompleteBox.IAutoCompleteAdvisor" />
+        /// dependency property.
+        /// </summary>
+        /// <value>The identifier for the
+        /// <see cref="P:GitHub.UI.AutoCompleteBox.IAutoCompleteAdvisor" />
+        /// dependency property.</value>
+        public static readonly DependencyProperty AdvisorProperty =
+            DependencyProperty.Register(
+                "Advisor",
+                typeof(IAutoCompleteAdvisor),
+                typeof(AutoCompleteBox),
+                new PropertyMetadata(null, OnAdvisorPropertyChanged));
+
+        /// <summary>
+        /// AdvisorProperty property changed handler.
+        /// </summary>
+        /// <param name="d">AutoCompleteBox that changed its Advisor.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnAdvisorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var source = d as AutoCompleteBox;
+            if (source == null) return;
+
+            source.Advisor = (IAutoCompleteAdvisor)e.NewValue;
+        }
+
+        /// <summary>
         /// Builds the visual tree for the
         /// <see cref="GitHub.UI.AutoCompleteBox" /> control
         /// when a new template is applied.
