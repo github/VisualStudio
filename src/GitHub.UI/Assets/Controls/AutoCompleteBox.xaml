@@ -65,11 +65,11 @@
         <Setter Property="Padding" Value="5,0,10,0"/>
         <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
         <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-        <Setter Property="Background" Value="{StaticResource GHBoxBackgroundBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource GHBoxTextBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource GHBoxBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource GHBoxTextBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="FocusVisualStyle" Value="{StaticResource NoMarginFocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource NoMarginFocusVisual}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -81,23 +81,23 @@
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource GHBoxHoverBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource GHBoxHoverBackgroundBrush}"/>
                         </MultiTrigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="Selector.IsSelectionActive" Value="False"/>
                                 <Condition Property="IsSelected" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{StaticResource GHBoxSelectedBackgroundBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource GHBoxSelectedTextBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource GHBoxSelectedBackgroundBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource GHBoxSelectedTextBrush}"/>
                         </MultiTrigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="Selector.IsSelectionActive" Value="True"/>
                                 <Condition Property="IsSelected" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{StaticResource GHBoxActiveSelectionBackgroundBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource GHBoxActiveSelectionTextBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource GHBoxActiveSelectionBackgroundBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource GHBoxActiveSelectionTextBrush}"/>
                         </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" TargetName="Bd" Value="0.3"/>
@@ -113,8 +113,8 @@
     <Style TargetType="ui:AutoCompleteBox">
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Padding" Value="2" />
-        <Setter Property="Background" Value="{StaticResource DefaultBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DefaultBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
         <Setter Property="MinWidth" Value="45" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource AutoCompleteListItemContainerStyle}" />
 
