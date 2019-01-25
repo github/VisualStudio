@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
-             xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.UI.Controls"
+             xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="300"
              Padding="0 4">
     <d:DesignData.DataContext>

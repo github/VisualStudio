@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ReactiveUI;
 
-namespace GitHub.VisualStudio.UI.UI.Controls
+namespace GitHub.VisualStudio.UI.Controls
 {
     /// <summary>
     /// Interaction logic for PullRequestStatusCircle.xaml
