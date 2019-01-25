@@ -80,7 +80,7 @@
             </StackPanel>
         </Grid>
 
-        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0 16 0 8"/>
+        <Rectangle DockPanel.Dock="Top" Style="{StaticResource Separator}" Height="2" Margin="0 24 0 16"/>
 
         <Grid>
             <Grid.ColumnDefinitions>
