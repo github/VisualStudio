@@ -94,6 +94,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseUsernamePasswordPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.UsernameAndPassword) != 0) ? Visibility.Visible : Visibility.Collapsed));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseTokenPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.Token) != 0) ? Visibility.Visible : Visibility.Collapsed));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseSsoPanel.Visibility, x => x.HasValue && ((x & EnterpriseLoginMethods.OAuth) != 0) ? Visibility.Visible : Visibility.Collapsed));
+            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.SupportedLoginMethods, x => x.enterpriseLogInButton.Visibility, x => x.HasValue && ((x & (EnterpriseLoginMethods.UsernameAndPassword | EnterpriseLoginMethods.Token)) != 0) ? Visibility.Visible : Visibility.Collapsed));
 
             d(this.Bind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmail, x => x.enterpriseUserNameOrEmail.Text));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.UsernameOrEmailValidator, v => v.enterpriseUserNameOrEmailValidationMessage.ReactiveValidator));
