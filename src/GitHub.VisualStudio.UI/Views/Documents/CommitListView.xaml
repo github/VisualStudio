@@ -57,7 +57,7 @@
             <ItemsControl ItemsSource="{Binding Commits}">
                 <Control.Resources>
                     <DataTemplate DataType="{x:Type ghfvs:CommitSummaryViewModel}">
-                        <Border Padding="30 0 8 0">
+                        <Border Padding="32 0 8 0">
                             <DockPanel>
                                 <ghfvs:OcticonImage DockPanel.Dock="Left"
                                                 Foreground="{DynamicResource VsBrush.GrayText}"
