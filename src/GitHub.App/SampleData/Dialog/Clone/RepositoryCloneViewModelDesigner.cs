@@ -2,6 +2,7 @@
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog.Clone;
 using ReactiveUI;
@@ -17,6 +18,7 @@ namespace GitHub.SampleData.Dialog.Clone
         }
 
         public string Path { get; set; }
+        public UriString Url { get; set; }
         public string PathWarning { get; set; }
         public int SelectedTabIndex { get; set; }
         public string Title => null;

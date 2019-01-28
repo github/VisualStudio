@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using GitHub.Models;
+using GitHub.Primitives;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog.Clone
@@ -19,6 +20,11 @@ namespace GitHub.ViewModels.Dialog.Clone
         /// Gets the view model for the enterprise tab.
         /// </summary>
         IRepositorySelectViewModel EnterpriseTab { get; }
+
+        /// <summary>
+        /// Initial URL for the dialog.
+        /// </summary>
+        UriString Url { get; set; }
 
         /// <summary>
         /// Gets the path to clone the repository to.

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 using Rothko;
@@ -29,6 +30,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
+        UriString url;
         RepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
@@ -93,6 +95,12 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref path, value);
         }
 
+        public UriString Url
+        {
+            get => url;
+            set => this.RaiseAndSetIfChanged(ref url, value);
+        }
+
         public string PathWarning => pathWarning.Value;
 
         public int SelectedTabIndex
@@ -130,6 +138,20 @@ namespace GitHub.ViewModels.Dialog.Clone
             if (connection == enterpriseConnection)
             {
                 SelectedTabIndex = 1;
+            }
+
+            if (Url?.Host is string host && HostAddress.Create(host) is HostAddress hostAddress)
+            {
+                if (hostAddress == gitHubConnection?.HostAddress)
+                {
+                    GitHubTab.Filter = Url;
+                    SelectedTabIndex = 0;
+                }
+                else if (hostAddress == enterpriseConnection?.HostAddress)
+                {
+                    EnterpriseTab.Filter = Url;
+                    SelectedTabIndex = 1;
+                }
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());

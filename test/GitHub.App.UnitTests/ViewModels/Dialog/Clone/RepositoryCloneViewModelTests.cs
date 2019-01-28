@@ -23,6 +23,40 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         const string fileExists = "d:\\exists\\file";
         const string defaultPath = "d:\\default\\path";
 
+        public class TheUrlProperty
+        {
+            [TestCase("https://github.com;https://enterprise.com", null, 0)]
+            [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", 0)]
+            [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", 1)]
+            [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", 0)]
+            public async Task Select_Tab_For_Url(string addresses, string url, int expectTabIndex)
+            {
+                var cm = CreateConnectionManager(addresses.Split(';'));
+                var target = CreateTarget(connectionManager: cm);
+                target.Url = url;
+
+                await target.InitializeAsync(null);
+
+                Assert.That(target.SelectedTabIndex, Is.EqualTo(expectTabIndex));
+            }
+
+            [TestCase("https://github.com;https://enterprise.com", null, "", "")]
+            [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", "https://github.com/foo/bar", "")]
+            [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", "", "https://enterprise.com/foo/bar")]
+            [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", "", "")]
+            public async Task Set_Filter_For_Url(string addresses, string url, string expectGitHubFilter, string expectEnterpriseFilter)
+            {
+                var cm = CreateConnectionManager(addresses.Split(';'));
+                var target = CreateTarget(connectionManager: cm);
+                target.Url = url;
+
+                await target.InitializeAsync(null);
+
+                Assert.That(target.GitHubTab.Filter, Is.EqualTo(expectGitHubFilter));
+                Assert.That(target.EnterpriseTab.Filter, Is.EqualTo(expectEnterpriseFilter));
+            }
+        }
+
         [Test]
         public async Task GitHubPage_Is_Initialized()
         {
