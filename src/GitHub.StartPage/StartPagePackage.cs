@@ -80,7 +80,7 @@ namespace GitHub.StartPage
                 lastAccessed: DateTimeOffset.UtcNow);
         }
 
-        async Task<CloneDialogResult> ShowCloneDialog(
+        static async Task<CloneDialogResult> ShowCloneDialog(
             IGitHubServiceProvider gitHubServiceProvider,
             IProgress<ServiceProgressData> progress,
             CancellationToken cancellationToken,
