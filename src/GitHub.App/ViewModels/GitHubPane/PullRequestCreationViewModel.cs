@@ -24,6 +24,8 @@ using ReactiveUI;
 using Serilog;
 using IConnection = GitHub.Models.IConnection;
 using static System.FormattableString;
+using Microsoft.VisualStudio.RichReview.Contracts;
+using System.Threading;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -44,6 +46,7 @@ namespace GitHub.ViewModels.GitHubPane
         LocalRepositoryModel activeLocalRepo;
         ObservableAsPropertyHelper<RemoteRepositoryModel> githubRepository;
         IModelService modelService;
+        readonly IDiffBaseService diffBaseService;
 
         [ImportingConstructor]
         public PullRequestCreationViewModel(
@@ -51,8 +54,9 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
-            IGitService gitService)
-            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
+            IGitService gitService,
+            IDiffBaseService diffBaseService)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, diffBaseService, DefaultScheduler.Instance)
         {
         }
 
@@ -62,6 +66,7 @@ namespace GitHub.ViewModels.GitHubPane
             INotificationService notifications,
             IMessageDraftStore draftStore,
             IGitService gitService,
+            IDiffBaseService diffBaseService,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
@@ -75,6 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
             this.gitService = gitService;
+            this.diffBaseService = diffBaseService;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -355,7 +361,19 @@ namespace GitHub.ViewModels.GitHubPane
         public BranchModel TargetBranch
         {
             get { return targetBranch; }
-            set { this.RaiseAndSetIfChanged(ref targetBranch, value); }
+            set
+            {
+                if (targetBranch == value)
+                {
+                    return;
+                }
+
+                this.RaiseAndSetIfChanged(ref targetBranch, value);
+
+                // TODO should not call make this call synchronous - need to learn patterns for async/await usage that are common in this project
+                string mergeBase = diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(activeLocalRepo.LocalPath, targetBranch.Name, CancellationToken.None).Result;
+                diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = targetBranch.Name, LongDescription = targetBranch.Name };
+            }
         }
 
         IReadOnlyList<BranchModel> branches;
