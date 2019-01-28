@@ -57,7 +57,7 @@ namespace GitHub.StartPage
             try
             {
                 var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
+                request = await ShowCloneDialog(uiProvider, downloadProgress, cancellationToken, repository);
             }
             catch (Exception e)
             {
@@ -81,9 +81,10 @@ namespace GitHub.StartPage
                 lastAccessed: DateTimeOffset.UtcNow);
         }
 
-        async Task<CloneDialogResult> ShowCloneDialog(
+        static async Task<CloneDialogResult> ShowCloneDialog(
             IGitHubServiceProvider gitHubServiceProvider,
             IProgress<ServiceProgressData> progress,
+            CancellationToken cancellationToken,
             RepositoryModel repository = null)
         {
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
@@ -110,7 +111,7 @@ namespace GitHub.StartPage
             {
                 try
                 {
-                    await cloneService.CloneOrOpenRepository(result, progress);
+                    await cloneService.CloneOrOpenRepository(result, progress, cancellationToken);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
                 }
                 catch
