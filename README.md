@@ -39,6 +39,7 @@ Beta releases will have `(beta)` in their title in the gallery, following the ve
 
 * Visual Studio 2017 (15.7.4)+
 * Visual Studio SDK
+* The built VSIX will work with Visual Studio 2015 or newer
 
 ## Build
 
