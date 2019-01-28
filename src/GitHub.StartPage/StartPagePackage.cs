@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -90,39 +89,24 @@ namespace GitHub.StartPage
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
             var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
             var usageTracker = gitHubServiceProvider.GetService<IUsageTracker>();
-            CloneDialogResult result = null;
 
-            if (repository == null)
-            {
-                result = await dialogService.ShowCloneDialog(null);
-            }
-            else
-            {
-                var basePath = await dialogService.ShowReCloneDialog(repository);
-
-                if (basePath != null)
-                {
-                    var path = Path.Combine(basePath, repository.Name);
-                    result = new CloneDialogResult(path, repository.CloneUrl);
-                }
-            }
-
-            if (result != null)
+            var cloneUrl = repository?.CloneUrl;
+            if (await dialogService.ShowCloneDialog(null, cloneUrl) is CloneDialogResult result)
             {
                 try
                 {
                     await cloneService.CloneOrOpenRepository(result, progress, cancellationToken);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
+                    return result;
                 }
                 catch
                 {
                     var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
                     teServices.ShowError($"Failed to clone the repository '{result.Url.RepositoryName}'");
-                    result = null;
                 }
             }
 
-            return result;
+            return null;
         }
     }
 }
