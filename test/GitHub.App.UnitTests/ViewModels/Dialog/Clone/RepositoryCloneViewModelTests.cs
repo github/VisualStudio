@@ -28,6 +28,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             [TestCase("https://github.com;https://enterprise.com", null, 0)]
             [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", 0)]
             [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", 1)]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://ENTERPRISE.COM/FOO/BAR", 1)]
             [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", 0)]
             public async Task Select_Tab_For_Url(string addresses, string url, int expectTabIndex)
             {
@@ -43,6 +44,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             [TestCase("https://github.com;https://enterprise.com", null, "", "")]
             [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", "https://github.com/foo/bar", "")]
             [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", "", "https://enterprise.com/foo/bar")]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://GITHUB.COM/FOO/BAR", "HTTPS://GITHUB.COM/FOO/BAR", "")]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://ENTERPRISE.COM/FOO/BAR", "", "HTTPS://ENTERPRISE.COM/FOO/BAR")]
             [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", "", "")]
             public async Task Set_Filter_For_Url(string addresses, string url, string expectGitHubFilter, string expectEnterpriseFilter)
             {
