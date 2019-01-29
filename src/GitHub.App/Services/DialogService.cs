@@ -69,15 +69,6 @@ namespace GitHub.Services
             }
         }
 
-        public async Task<string> ShowReCloneDialog(RepositoryModel repository)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-
-            var viewModel = factory.CreateViewModel<IRepositoryRecloneViewModel>();
-            viewModel.SelectedRepository = repository;
-            return (string)await showDialog.ShowWithFirstConnection(viewModel);
-        }
-
         public async Task ShowCreateGist(IConnection connection)
         {
             var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
