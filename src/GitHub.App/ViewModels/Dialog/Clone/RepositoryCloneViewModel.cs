@@ -21,7 +21,6 @@ namespace GitHub.ViewModels.Dialog.Clone
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneViewModel : ViewModelBase, IRepositoryCloneViewModel
     {
-        static readonly ILogger log = LogManager.ForContext<RepositoryCloneViewModel>();
         readonly IOperatingSystem os;
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
