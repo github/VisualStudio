@@ -26,6 +26,7 @@ using IConnection = GitHub.Models.IConnection;
 using static System.FormattableString;
 using Microsoft.VisualStudio.RichReview.Contracts;
 using System.Threading;
+using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -46,7 +47,6 @@ namespace GitHub.ViewModels.GitHubPane
         LocalRepositoryModel activeLocalRepo;
         ObservableAsPropertyHelper<RemoteRepositoryModel> githubRepository;
         IModelService modelService;
-        readonly IDiffBaseService diffBaseService;
 
         [ImportingConstructor]
         public PullRequestCreationViewModel(
@@ -54,9 +54,8 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
-            IGitService gitService,
-            IDiffBaseService diffBaseService)
-            : this(modelServiceFactory, service, notifications, draftStore, gitService, diffBaseService, DefaultScheduler.Instance)
+            IGitService gitService)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
         {
         }
 
@@ -66,7 +65,6 @@ namespace GitHub.ViewModels.GitHubPane
             INotificationService notifications,
             IMessageDraftStore draftStore,
             IGitService gitService,
-            IDiffBaseService diffBaseService,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
@@ -80,7 +78,6 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
             this.gitService = gitService;
-            this.diffBaseService = diffBaseService;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -322,6 +319,8 @@ namespace GitHub.ViewModels.GitHubPane
                 if (disposed) return;
                 disposed = true;
 
+                TargetBranch = null;
+
                 disposables.Dispose();
             }
         }
@@ -370,9 +369,28 @@ namespace GitHub.ViewModels.GitHubPane
 
                 this.RaiseAndSetIfChanged(ref targetBranch, value);
 
-                // TODO should not call make this call synchronous - need to learn patterns for async/await usage that are common in this project
-                string mergeBase = diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(activeLocalRepo.LocalPath, targetBranch.Name, CancellationToken.None).Result;
-                diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = targetBranch.Name, LongDescription = targetBranch.Name };
+                // Note: Asking for this up front in the constructor causes MEF cardinality issues much of the time.
+                // Delaying when I ask for it seems to have better results.
+                var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
+                var diffBaseService = componentModel.GetService<IDiffBaseService>();
+
+                try
+                {
+                    // TODO should not call make this call synchronous - need to learn patterns for async/await usage that are common in this project
+                    if (targetBranch != null)
+                    {
+                        string mergeBase = diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(activeLocalRepo.LocalPath, targetBranch.Name, CancellationToken.None).Result;
+                        diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = targetBranch.Name, LongDescription = targetBranch.Name };
+                        return;
+                    }
+                }
+                catch
+                {
+                    // currently hitting errors if the target branch does not exist - will have to fetch from the proper remote. How to be sure what remote?
+                    // for prototyping, let's just eat all exceptions and clear the DiffBase if we can't figure it out.
+                }
+
+                diffBaseService.DiffBaseInfo = null;
             }
         }
 
