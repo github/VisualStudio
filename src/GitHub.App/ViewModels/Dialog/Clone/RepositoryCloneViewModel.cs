@@ -26,7 +26,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IConnectionManager connectionManager;
         readonly IRepositoryCloneService service;
         readonly IGitService gitService;
-        readonly IUsageService usageService;
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
@@ -41,7 +40,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             IConnectionManager connectionManager,
             IRepositoryCloneService service,
             IGitService gitService,
-            IUsageService usageService,
             IUsageTracker usageTracker,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab)
@@ -50,7 +48,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.connectionManager = connectionManager;
             this.service = service;
             this.gitService = gitService;
-            this.usageService = usageService;
             this.usageTracker = usageTracker;
 
             GitHubTab = gitHubTab;
@@ -155,19 +152,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
-
-            switch (SelectedTabIndex)
-            {
-                case 0:
-                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewGitHubTab).Forget();
-                    break;
-                case 1:
-                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewEnterpriseTab).Forget();
-                    break;
-                case 2:
-                    usageTracker.IncrementCounter(model => model.NumberOfCloneViewUrlTab).Forget();
-                    break;
-            }
         }
 
         void BrowseForDirectory()
