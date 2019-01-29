@@ -31,6 +31,7 @@ Visit the [documentation](https://github.com/github/VisualStudio/tree/master/doc
 
 * Visual Studio 2017 (15.7.4)+
 * Visual Studio SDK
+* The built VSIX will work with Visual Studio 2015 or newer
 
 ## Build
 
