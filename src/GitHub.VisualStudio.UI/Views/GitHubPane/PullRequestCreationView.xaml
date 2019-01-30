@@ -81,6 +81,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
@@ -184,5 +185,7 @@
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationCancelButton}"/>
 
         </DockPanel>
+
+        <ContentPresenter Grid.Row="5" Margin="10,10,10,20" Content="{Binding ChangesUserControl}"/>
     </Grid>
 </local:GenericPullRequestCreationView>
