@@ -381,6 +381,8 @@ namespace GitHub.ViewModels.GitHubPane
                     {
                         string mergeBase = diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(activeLocalRepo.LocalPath, targetBranch.Name, CancellationToken.None).Result;
                         diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = targetBranch.Name, LongDescription = targetBranch.Name };
+
+                        this.RaisePropertyChanged(nameof(ChangesUserControl));
                         return;
                     }
                 }
@@ -391,6 +393,18 @@ namespace GitHub.ViewModels.GitHubPane
                 }
 
                 diffBaseService.DiffBaseInfo = null;
+                this.RaisePropertyChanged(nameof(ChangesUserControl));
+            }
+        }
+
+        public object ChangesUserControl
+        {
+            get
+            {
+                var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
+                var diffBaseService = componentModel.GetService<IDiffBaseService>();
+
+                return diffBaseService.DiffBaseInformationProvider.GitHubChangesUserControl;
             }
         }
 
