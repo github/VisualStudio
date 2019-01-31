@@ -27,18 +27,11 @@ Official builds of this extension are available at [the official website](https:
 ## Documentation
 Visit the [documentation](https://github.com/github/VisualStudio/tree/master/docs) for details on how to use the features in the GitHub Extension for Visual Studio.
 
-## Installing beta versions
-
-Older and pre-release/beta/untested versions are available at [the releases page](https://github.com/github/VisualStudio/releases), and also via a custom gallery feed for Visual Studio.
-
-You can configure the gallery by going to `Tools / Options / Extensions and Updates` and adding a new gallery with the url https://visualstudio.github.com/releases/feed.rss. The gallery will now be available from `Tools / Extensions and Updates`.
-
-Beta releases will have `(beta)` in their title in the gallery, following the version number. You can view the release notes in the gallery by hovering over the description, or by clicking the `Release Notes` link on the right side.
-
 ## Build requirements
 
 * Visual Studio 2017 (15.7.4)+
 * Visual Studio SDK
+* The built VSIX will work with Visual Studio 2015 or newer
 
 ## Build
 
