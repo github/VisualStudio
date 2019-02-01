@@ -28,7 +28,6 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnErrorCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle)dependencyObject);
-            pullRequestStatusCircle.ErrorCount = (int)eventArgs.NewValue;
             pullRequestStatusCircle.GeneratePolygons();
         }
 
@@ -39,7 +38,6 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnSuccessCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle)dependencyObject);
-            pullRequestStatusCircle.SuccessCount = (int)eventArgs.NewValue;
             pullRequestStatusCircle.GeneratePolygons();
         }
 
@@ -50,7 +48,6 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnPendingCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            pullRequestStatusCircle.PendingCount = (int) eventArgs.NewValue;
             pullRequestStatusCircle.GeneratePolygons();
         }
 
@@ -61,7 +58,6 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnRadiusChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            pullRequestStatusCircle.Radius = (double) eventArgs.NewValue;
             pullRequestStatusCircle.GenerateMask();
             pullRequestStatusCircle.GeneratePolygons();
         }
@@ -73,7 +69,6 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnInnerRadiusChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            pullRequestStatusCircle.InnerRadius = (double) eventArgs.NewValue;
             pullRequestStatusCircle.GenerateMask();
             pullRequestStatusCircle.GeneratePolygons();
         }
@@ -86,7 +81,6 @@ namespace GitHub.VisualStudio.UI.Controls
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
             var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.PendingColor = brush;
             pullRequestStatusCircle.PendingPolygon.Fill = brush;
         }
 
@@ -98,7 +92,6 @@ namespace GitHub.VisualStudio.UI.Controls
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
             var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.ErrorColor = brush;
             pullRequestStatusCircle.ErrorPolygon.Fill = brush;
         }
 
@@ -110,7 +103,6 @@ namespace GitHub.VisualStudio.UI.Controls
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
             var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.SuccessColor = brush;
             pullRequestStatusCircle.SuccessPolygon.Fill = brush;
         }
 
