@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <RootNamespace>GitHub</RootNamespace>
-    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <UseWpf>true</UseWpf>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
