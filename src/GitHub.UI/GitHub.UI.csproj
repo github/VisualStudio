@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
-    <UseWpf>true</UseWpf>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <ExtrasEnableDefaultResourceItems>false</ExtrasEnableDefaultResourceItems>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
