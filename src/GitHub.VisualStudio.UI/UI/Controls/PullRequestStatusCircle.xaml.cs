@@ -23,50 +23,31 @@ namespace GitHub.VisualStudio.UI.Controls
     {
         public static readonly DependencyProperty ErrorCountProperty = DependencyProperty.Register(
             "ErrorCount", typeof(int), typeof(PullRequestStatusCircle),
-            new PropertyMetadata(0, OnErrorCountChanged));
-
-        private static void OnErrorCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-            var pullRequestStatusCircle = ((PullRequestStatusCircle)dependencyObject);
-            pullRequestStatusCircle.GeneratePolygons();
-        }
+            new PropertyMetadata(0, GeneratePolygons));
 
         public static readonly DependencyProperty SuccessCountProperty = DependencyProperty.Register(
             "SuccessCount", typeof(int), typeof(PullRequestStatusCircle),
-            new PropertyMetadata(0, OnSuccessCountChanged));
-
-        private static void OnSuccessCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-            var pullRequestStatusCircle = ((PullRequestStatusCircle)dependencyObject);
-            pullRequestStatusCircle.GeneratePolygons();
-        }
+            new PropertyMetadata(0, GeneratePolygons));
 
         public static readonly DependencyProperty PendingCountProperty = DependencyProperty.Register(
             "PendingCount", typeof(int), typeof(PullRequestStatusCircle),
-            new PropertyMetadata(0, OnPendingCountChanged));
+            new PropertyMetadata(0, GeneratePolygons));
 
-        private static void OnPendingCountChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        private static void GeneratePolygons(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
-            var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
+            var pullRequestStatusCircle = ((PullRequestStatusCircle)dependencyObject);
             pullRequestStatusCircle.GeneratePolygons();
         }
 
         public static readonly DependencyProperty RadiusProperty = DependencyProperty.Register(
             "Radius", typeof(double), typeof(PullRequestStatusCircle),
-            new PropertyMetadata((double)250, OnRadiusChanged));
-
-        private static void OnRadiusChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-            var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            pullRequestStatusCircle.GenerateMask();
-            pullRequestStatusCircle.GeneratePolygons();
-        }
+            new PropertyMetadata((double)250, GenerateMaskAndPolygons));
 
         public static readonly DependencyProperty InnerRadiusProperty = DependencyProperty.Register(
             "InnerRadius", typeof(double), typeof(PullRequestStatusCircle),
-            new PropertyMetadata((double)200, OnInnerRadiusChanged));
+            new PropertyMetadata((double)200, GenerateMaskAndPolygons));
 
-        private static void OnInnerRadiusChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        private static void GenerateMaskAndPolygons(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
             pullRequestStatusCircle.GenerateMask();
@@ -80,8 +61,7 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnPendingColorChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.PendingPolygon.Fill = brush;
+            pullRequestStatusCircle.PendingPolygon.Fill = (Brush) eventArgs.NewValue;
         }
 
         public static readonly DependencyProperty ErrorColorProperty = DependencyProperty.Register(
@@ -91,8 +71,7 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnErrorColorChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.ErrorPolygon.Fill = brush;
+            pullRequestStatusCircle.ErrorPolygon.Fill = (Brush) eventArgs.NewValue;
         }
 
         public static readonly DependencyProperty SuccessColorProperty = DependencyProperty.Register(
@@ -102,8 +81,7 @@ namespace GitHub.VisualStudio.UI.Controls
         private static void OnSuccessColorChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
         {
             var pullRequestStatusCircle = ((PullRequestStatusCircle) dependencyObject);
-            var brush = (Brush) eventArgs.NewValue;
-            pullRequestStatusCircle.SuccessPolygon.Fill = brush;
+            pullRequestStatusCircle.SuccessPolygon.Fill = (Brush) eventArgs.NewValue;
         }
 
         public IEnumerable<Point> GeneratePoints(float percentage)
