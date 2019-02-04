@@ -52,6 +52,24 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
 
         /// <summary>
+        /// Gets a command that opens the first annotation notice for a <see cref="IPullRequestFileNode"/> in
+        /// the diff viewer.
+        /// </summary>
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
+
+        /// <summary>
+        /// Gets a command that opens the first annotation warning for a <see cref="IPullRequestFileNode"/> in
+        /// the diff viewer.
+        /// </summary>
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
+
+        /// <summary>
+        /// Gets a command that opens the first annotation failure for a <see cref="IPullRequestFileNode"/> in
+        /// the diff viewer.
+        /// </summary>
+        ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
+
+        /// <summary>
         /// Initializes the view model.
         /// </summary>
         /// <param name="session">The pull request session.</param>

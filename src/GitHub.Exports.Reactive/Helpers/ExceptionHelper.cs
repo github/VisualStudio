@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reactive.Linq;
 
+#pragma warning disable CA1720 // Identifier contains type name
+
 namespace GitHub.Helpers
 {
     public static class ExceptionHelper

@@ -11,11 +11,6 @@
       "default": "false"
     },
     {
-      "name": "ForkButton",
-      "type": "bool",
-      "default": "false"
-    },
-    {
       "name": "UIState",
       "type": "object",
       "typename": "UIState",

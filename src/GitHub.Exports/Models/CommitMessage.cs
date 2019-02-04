@@ -39,8 +39,8 @@ namespace GitHub.Models
                 return false;
             }
 
-            return string.Equals(Summary, other.Summary)
-                && string.Equals(Details, other.Details);
+            return string.Equals(Summary, other.Summary, StringComparison.Ordinal)
+                && string.Equals(Details, other.Details, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)

@@ -30,7 +30,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
 
-                await target.Load(CreatePullRequestModel(body: string.Empty));
+                await target.Load(CreatePullRequestModel());
 
                 Assert.That("*No description provided.*", Is.EqualTo(target.Body));
             }
@@ -550,12 +550,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = new LocalRepositoryModel
+            {
+                CloneUrl = new UriString(Uri.ToString()),
+                LocalPath = @"C:\projects\ThisRepo",
+                Name = "repo"
+            };
+
             var currentBranchModel = new BranchModel(currentBranch, repository);
-            repository.CurrentBranch.Returns(currentBranchModel);
-            repository.CloneUrl.Returns(new UriString(Uri.ToString()));
-            repository.LocalPath.Returns(@"C:\projects\ThisRepo");
-            repository.Name.Returns("repo");
+            var gitService = Substitute.For<IGitService>();
+            gitService.GetBranch(repository).Returns(currentBranchModel);
 
             var pullRequestService = Substitute.For<IPullRequestService>();
 
@@ -568,7 +572,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             else
             {
                 pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequestDetailModel>())
-                    .Returns(Observable.Empty<IBranch>());
+                    .Returns(Observable.Empty<BranchModel>());
             }
 
             pullRequestService.Checkout(repository, Arg.Any<PullRequestDetailModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
@@ -607,7 +611,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<ITeamExplorerContext>(),
                 Substitute.For<IPullRequestFilesViewModel>(),
                 Substitute.For<ISyncSubmodulesCommand>(),
-                Substitute.For<IViewViewModelFactory>());
+                Substitute.For<IViewViewModelFactory>(),
+                gitService);
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
@@ -615,7 +620,6 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static PullRequestDetailModel CreatePullRequestModel(
             int number = 1,
-            string body = "PR Body",
             IEnumerable<PullRequestReviewModel> reviews = null)
         {
             var author = Substitute.For<IAccount>();

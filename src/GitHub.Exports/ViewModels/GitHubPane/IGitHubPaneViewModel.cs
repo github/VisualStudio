@@ -55,7 +55,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets or sets the search query for the current page.
@@ -90,6 +90,15 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The repository name.</param>
         /// <param name="number">The pull rqeuest number.</param>
         Task ShowPullRequest(string owner, string repo, int number);
+
+        /// <summary>
+        /// Shows the details for a pull request's check run in the GitHub pane.
+        /// </summary>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="repo">The repository name.</param>
+        /// <param name="number">The pull rqeuest number.</param>
+        /// <param name="checkRunId">The check run id.</param>
+        Task ShowPullRequestCheckRun(string owner, string repo, int number, string checkRunId);
 
         /// <summary>
         /// Shows the pull requests reviews authored by a user.

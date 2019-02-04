@@ -244,7 +244,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             Assert.That(placeholder.Body, Is.EqualTo(null));
         }
 
-        void AddCommentToExistingThread(IPullRequestSessionFile file)
+        static void AddCommentToExistingThread(IPullRequestSessionFile file)
         {
             var newThreads = file.InlineCommentThreads.ToList();
             var thread = file.InlineCommentThreads.Single();
@@ -314,7 +314,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var result = Substitute.For<IPullRequestSession>();
             result.PullRequest.Returns(new PullRequestDetailModel());
             result.User.Returns(new ActorModel { Login = "CurrentUser" });
-            result.LocalRepository.CloneUrl.Returns(new UriString("https://foo.bar"));
+            result.LocalRepository.Returns(new LocalRepositoryModel { CloneUrl = new UriString("https://foo.bar") });
             return result;
         }
 

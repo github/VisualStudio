@@ -1,6 +1,7 @@
 ﻿using System;
 using GitHub.Primitives;
 using GitHub.Models;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.Services
 {
@@ -17,6 +18,7 @@ namespace GitHub.Services
         /// changes in the source control context.
         /// </summary>
         IServiceProvider ServiceProvider { get; set; }
+
         /// <summary>
         /// Clears the current ServiceProvider if it matches the one that is passed in.
         /// This is usually called on Dispose, which might happen after another section
@@ -25,28 +27,23 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="provider">If the current ServiceProvider matches this, clear it</param>
         void ClearServiceProvider(IServiceProvider provider);
+
         /// <summary>
-        /// A IGitRepositoryInfo representing the currently active repository
+        /// A service that can be used for repository changed events.
         /// </summary>
-        ILocalRepositoryModel ActiveRepo { get; }
+        ITeamExplorerContext TeamExplorerContext { get; }
+
         /// <summary>
-        /// Subscribe to be notified when the active repository is set and Notify is called.
+        /// A service for avoiding deadlocks and marshaling tasks onto the UI thread.
         /// </summary>
-        /// <param name="who">The instance that is interested in being called (or a unique key/object for that instance)</param>
-        /// <param name="handler">The handler to call when ActiveRepo is set</param>
-        void Subscribe(object who, Action<ILocalRepositoryModel> handler);
-        /// <summary>
-        /// Unsubscribe from notifications
-        /// </summary>
-        /// <param name="who">The instance/key that previously subscribed to notifications</param>
-        void Unsubscribe(object who);
+        JoinableTaskFactory JoinableTaskFactory { get; }
 
         IGitAwareItem HomeSection { get; }
     }
 
     public interface IGitAwareItem
     {
-        ILocalRepositoryModel ActiveRepo { get; }
+        LocalRepositoryModel ActiveRepo { get; }
 
         /// <summary>
         /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.

@@ -8,8 +8,10 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitHub.Api;
@@ -19,6 +21,7 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using Rothko;
@@ -32,7 +35,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestService : IPullRequestService
+    public class PullRequestService : IPullRequestService, IStaticReviewFileMap
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
@@ -58,6 +61,8 @@ namespace GitHub.Services
         readonly IOperatingSystem os;
         readonly IUsageTracker usageTracker;
 
+        readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
+   
         [ImportingConstructor]
         public PullRequestService(
             IGitClient gitClient,
@@ -73,6 +78,7 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.os = os;
             this.usageTracker = usageTracker;
+            this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>(StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
@@ -90,7 +96,7 @@ namespace GitHub.Services
                 if (readPullRequests == null)
                 {
                     readPullRequests = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequests(
                               first: 100,
                               after: Var(nameof(after)),
@@ -115,7 +121,7 @@ namespace GitHub.Services
                                                       {
                                                           Conclusion = run.Conclusion.FromGraphQl(),
                                                           Status = run.Status.FromGraphQl()
-                                                      }).ToList()
+                                                      }).ToList(),
                                               }).ToList(),
                                           Statuses = commit.Commit.Status
                                                   .Select(context =>
@@ -151,7 +157,7 @@ namespace GitHub.Services
                 if (readPullRequestsEnterprise == null)
                 {
                     readPullRequestsEnterprise = new Query()
-                          .Repository(Var(nameof(owner)), Var(nameof(name)))
+                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequests(
                               first: 100,
                               after: Var(nameof(after)),
@@ -168,12 +174,14 @@ namespace GitHub.Services
                                   LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
                                       new LastCommitSummaryAdapter
                                       {
-                                          Statuses = commit.Commit.Status
-                                                  .Select(context =>
-                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
-                                                      {
-                                                          State = statusContext.State.FromGraphQl(),
-                                                      }).ToList()
+                                          Statuses = commit.Commit.Status.Select(context =>
+                                                      context == null
+                                                          ? null
+                                                          : context.Contexts
+                                                              .Select(statusContext => new StatusSummaryModel
+                                                              {
+                                                                  State = statusContext.State.FromGraphQl()
+                                                              }).ToList()
                                                   ).SingleOrDefault()
                                       }).ToList().FirstOrDefault(),
                                   Author = new ActorModel
@@ -215,64 +223,65 @@ namespace GitHub.Services
                 item.Reviews = null;
 
                 var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+                var statuses = item.LastCommit?.Statuses;
 
-                var hasCheckRuns = checkRuns?.Any() ?? false;
-                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
+                var totalCount = 0;
+                var pendingCount = 0;
+                var successCount = 0;
+                var errorCount = 0;
 
-                if (!hasCheckRuns && !hasStatuses)
+                if (checkRuns != null)
                 {
-                    item.Checks = PullRequestChecksState.None;
+                    totalCount += checkRuns.Length;
+
+                    pendingCount += checkRuns.Count(model => model.Status != CheckStatusState.Completed);
+
+                    successCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        (model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                    errorCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        !(model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                }
+
+                if (statuses != null)
+                {
+                    totalCount += statuses.Count;
+
+                    pendingCount += statuses.Count(model =>
+                        model.State == StatusState.Pending || model.State == StatusState.Expected);
+
+                    successCount += statuses.Count(model => model.State == StatusState.Success);
+
+                    errorCount += statuses.Count(model =>
+                        model.State == StatusState.Error || model.State == StatusState.Failure);
+                }
+
+                item.ChecksPendingCount = pendingCount;
+                item.ChecksSuccessCount = successCount;
+                item.ChecksErrorCount = errorCount;
+
+                if (totalCount == 0)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.None;
+                }
+                else if (totalCount == pendingCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Pending;
+                }
+                else if (totalCount == successCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Success;
+                }
+                else if (totalCount == errorCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Failure;
                 }
                 else
                 {
-                    var checksHasFailure = false;
-                    var checksHasCompleteSuccess = true;
-
-                    if (hasCheckRuns)
-                    {
-                        checksHasFailure = checkRuns
-                            .Any(model => model.Conclusion.HasValue 
-                                          && (model.Conclusion.Value == CheckConclusionState.Failure 
-                                              || model.Conclusion.Value == CheckConclusionState.ActionRequired));
-
-                        if (!checksHasFailure)
-                        {
-                            checksHasCompleteSuccess = checkRuns
-                                .All(model => model.Conclusion.HasValue
-                                              && (model.Conclusion.Value == CheckConclusionState.Success
-                                                  || model.Conclusion.Value == CheckConclusionState.Neutral));
-                        }
-                    }
-
-                    var statusHasFailure = false;
-                    var statusHasCompleteSuccess = true;
-
-                    if (!checksHasFailure && hasStatuses)
-                    {
-                        statusHasFailure = item.LastCommit
-                            .Statuses
-                            .Any(status => status.State == StatusState.Failure
-                                           || status.State == StatusState.Error);
-
-                        if (!statusHasFailure)
-                        {
-                            statusHasCompleteSuccess =
-                                item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
-                        }
-                    }
-
-                    if (checksHasFailure || statusHasFailure)
-                    {
-                        item.Checks = PullRequestChecksState.Failure;
-                    }
-                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
-                    {
-                        item.Checks = PullRequestChecksState.Success;
-                    }
-                    else
-                    {
-                        item.Checks = PullRequestChecksState.Pending;
-                    }
+                    item.ChecksSummary = PullRequestChecksSummaryState.Mixed;
                 }
 
                 item.LastCommit = null;
@@ -290,7 +299,7 @@ namespace GitHub.Services
             if (readAssignableUsers == null)
             {
                 readAssignableUsers = new Query()
-                    .Repository(Var(nameof(owner)), Var(nameof(name)))
+                    .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                     .AssignableUsers(first: 100, after: Var(nameof(after)))
                     .Select(connection => new Page<ActorModel>
                     {
@@ -317,8 +326,8 @@ namespace GitHub.Services
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
-            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body
         )
         {
@@ -333,7 +342,7 @@ namespace GitHub.Services
             return PushAndCreatePR(modelService, sourceRepository, targetRepository, sourceBranch, targetBranch, title, body).ToObservable();
         }
 
-        public IObservable<string> GetPullRequestTemplate(ILocalRepositoryModel repository)
+        public IObservable<string> GetPullRequestTemplate(LocalRepositoryModel repository)
         {
             Extensions.Guard.ArgumentNotNull(repository, nameof(repository));
 
@@ -353,7 +362,7 @@ namespace GitHub.Services
         }
 
         public IObservable<IReadOnlyList<CommitMessage>> GetMessagesForUniqueCommits(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             string baseBranch,
             string compareBranch,
             int maxCommits)
@@ -369,7 +378,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<int> CountSubmodulesToSync(ILocalRepositoryModel repository)
+        public IObservable<int> CountSubmodulesToSync(LocalRepositoryModel repository)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
@@ -399,7 +408,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<bool> IsWorkingDirectoryClean(ILocalRepositoryModel repository)
+        public IObservable<bool> IsWorkingDirectoryClean(LocalRepositoryModel repository)
         {
             // The `using` appears to resolve this issue:
             // https://github.com/github/VisualStudio/issues/1306
@@ -440,7 +449,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> Pull(ILocalRepositoryModel repository)
+        public IObservable<Unit> Pull(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -452,7 +461,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Unit> Push(ILocalRepositoryModel repository)
+        public IObservable<Unit> Push(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -466,7 +475,7 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<bool> SyncSubmodules(ILocalRepositoryModel repository, Action<string> progress)
+        public async Task<bool> SyncSubmodules(LocalRepositoryModel repository, Action<string> progress)
         {
             var exitCode = await Where("git");
             if (exitCode != 0)
@@ -529,7 +538,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<Unit> Checkout(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName)
+        public IObservable<Unit> Checkout(LocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName)
         {
             return Observable.Defer(async () =>
             {
@@ -567,7 +576,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<string> GetDefaultLocalBranchName(ILocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
+        public IObservable<string> GetDefaultLocalBranchName(LocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
             return Observable.Defer(() =>
             {
@@ -587,7 +596,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(ILocalRepositoryModel repository, int pullRequestNumber)
+        public IObservable<BranchTrackingDetails> CalculateHistoryDivergence(LocalRepositoryModel repository, int pullRequestNumber)
         {
             return Observable.Defer(async () =>
             {
@@ -606,7 +615,7 @@ namespace GitHub.Services
             });
         }
 
-        public async Task<string> GetMergeBase(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public async Task<string> GetMergeBase(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             using (var repo = gitService.GetRepository(repository.LocalPath))
             {
@@ -620,7 +629,7 @@ namespace GitHub.Services
             }
         }
 
-        public IObservable<TreeChanges> GetTreeChanges(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<TreeChanges> GetTreeChanges(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -635,7 +644,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<IBranch> GetLocalBranches(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<BranchModel> GetLocalBranches(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(() =>
             {
@@ -648,7 +657,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<bool> EnsureLocalBranchesAreMarkedAsPullRequests(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -671,12 +680,12 @@ namespace GitHub.Services
             });
         }
 
-        public bool IsPullRequestFromRepository(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public bool IsPullRequestFromRepository(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return string.Equals(repository.CloneUrl?.Owner, pullRequest.HeadRepositoryOwner, StringComparison.OrdinalIgnoreCase);
         }
 
-        public IObservable<Unit> SwitchToBranch(ILocalRepositoryModel repository, PullRequestDetailModel pullRequest)
+        public IObservable<Unit> SwitchToBranch(LocalRepositoryModel repository, PullRequestDetailModel pullRequest)
         {
             return Observable.Defer(async () =>
             {
@@ -718,7 +727,7 @@ namespace GitHub.Services
             });
         }
 
-        public IObservable<Tuple<string, int>> GetPullRequestForCurrentBranch(ILocalRepositoryModel repository)
+        public IObservable<(string owner, int number)> GetPullRequestForCurrentBranch(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -736,7 +745,7 @@ namespace GitHub.Services
         }
 
         public async Task<string> ExtractToTempFile(
-            ILocalRepositoryModel repository,
+            LocalRepositoryModel repository,
             PullRequestDetailModel pullRequest,
             string relativePath,
             string commitSha,
@@ -753,10 +762,16 @@ namespace GitHub.Services
                 }
             }
 
+            lock (this.tempFileMappings)
+            {
+                string gitRelativePath = relativePath.TrimStart('/').Replace('\\', '/');
+                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitRelativePath);
+            }
+
             return tempFilePath;
         }
 
-        public Encoding GetEncoding(ILocalRepositoryModel repository, string relativePath)
+        public Encoding GetEncoding(LocalRepositoryModel repository, string relativePath)
         {
             var fullPath = Path.Combine(repository.LocalPath, relativePath);
 
@@ -769,7 +784,7 @@ namespace GitHub.Services
                 }
             }
 
-            return Encoding.Default;
+            return null;
         }
 
         static bool HasPreamble(string file, Encoding encoding)
@@ -788,7 +803,7 @@ namespace GitHub.Services
             return true;
         }
 
-        public IObservable<Unit> RemoveUnusedRemotes(ILocalRepositoryModel repository)
+        public IObservable<Unit> RemoveUnusedRemotes(LocalRepositoryModel repository)
         {
             return Observable.Defer(async () =>
             {
@@ -824,6 +839,28 @@ namespace GitHub.Services
                        MessageBoxButtons.YesNo,
                        MessageBoxIcon.Question) == DialogResult.Yes;
         }
+
+        /// <inheritdoc />
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            lock (this.tempFileMappings)
+            {
+                var canonicalizedPath = CanonicalizeLocalFilePath(localPath);
+                if (this.tempFileMappings.TryGetValue(canonicalizedPath, out (string commitId, string repoPath) result))
+                {
+                    return Task.FromResult($"{result.commitId}:{result.repoPath}");
+                }
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc />
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
 
         async Task<string> CreateRemote(IRepository repo, UriString cloneUri)
         {
@@ -877,11 +914,19 @@ namespace GitHub.Services
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));
-            File.WriteAllText(tempFilePath, contents, encoding);
+
+            if (encoding != null)
+            {
+                File.WriteAllText(tempFilePath, contents, encoding);
+            }
+            else
+            {
+                File.WriteAllText(tempFilePath, contents);
+            }
         }
 
         IEnumerable<string> GetLocalBranchesInternal(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IRepository repository,
             PullRequestDetailModel pullRequest)
         {
@@ -904,7 +949,7 @@ namespace GitHub.Services
         {
             var prConfigKey = $"branch.{branchName}.{SettingGHfVSPullRequest}";
             var value = ParseGHfVSConfigKeyValue(await gitClient.GetConfig<string>(repo, prConfigKey));
-            return value != null &&
+            return value != default &&
                 value.Item1 == pullRequest.BaseRepositoryOwner &&
                 value.Item2 == pullRequest.Number;
         }
@@ -917,8 +962,8 @@ namespace GitHub.Services
         }
 
         async Task<IPullRequestModel> PushAndCreatePR(IModelService modelService,
-            ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+            LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body)
         {
             // PullRequestModel doesn't keep a reference to repo
@@ -963,7 +1008,7 @@ namespace GitHub.Services
         {
             // The combination of relative path, commit SHA and encoding should be sufficient to uniquely identify a file.
             var relativeDir = Path.GetDirectoryName(relativePath) ?? string.Empty;
-            var key = relativeDir + '|' + encoding.WebName;
+            var key = relativeDir + '|' + (encoding?.WebName ?? "unknown");
             var relativePathHash = key.GetSha256Hash();
             var tempDir = Path.Combine(Path.GetTempPath(), "GitHubVisualStudio", "FileContents", relativePathHash);
             var tempFileName = Invariant($"{Path.GetFileNameWithoutExtension(relativePath)}@{commitSha}{Path.GetExtension(relativePath)}");
@@ -975,7 +1020,7 @@ namespace GitHub.Services
             return owner + '#' + number.ToString(CultureInfo.InvariantCulture);
         }
 
-        static Tuple<string, int> ParseGHfVSConfigKeyValue(string value)
+        static (string owner, int number) ParseGHfVSConfigKeyValue(string value)
         {
             if (value != null)
             {
@@ -988,12 +1033,18 @@ namespace GitHub.Services
 
                     if (int.TryParse(value.Substring(separator + 1), NumberStyles.None, CultureInfo.InvariantCulture, out number))
                     {
-                        return Tuple.Create(owner, number);
+                        return (owner, number);
                     }
                 }
             }
 
-            return null;
+            return default;
+        }
+
+        static string CanonicalizeLocalFilePath(string localPath)
+        {
+            localPath = localPath.Replace("\\\\", "\\");
+            return Path.GetFullPath(localPath);
         }
 
         class ListItemAdapter : PullRequestListItemModel

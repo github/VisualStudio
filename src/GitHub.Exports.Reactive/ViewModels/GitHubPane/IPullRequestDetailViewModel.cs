@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -62,7 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
     }
 
     /// <summary>
-    /// Represents a view model for displaying details of a pull request.
+    /// A view model which displays the details of a pull request.
     /// </summary>
     public interface IPullRequestDetailViewModel : IPanePageViewModel, IOpenInBrowser
     {
@@ -79,7 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -166,6 +167,11 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> Push { get; }
 
         /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
+
+        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
@@ -176,7 +182,12 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <summary>
-        /// Gets the latest pull request Checks & Statuses
+        /// Gets a command that navigates to a pull request's check run annotation list.
+        /// </summary>
+        ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
+
+        /// <summary>
+        /// Gets the latest pull request checks & statuses.
         /// </summary>
         IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
@@ -189,7 +200,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="number">The pull request number.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

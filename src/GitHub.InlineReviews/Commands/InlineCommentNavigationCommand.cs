@@ -9,9 +9,11 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
@@ -79,7 +81,7 @@ namespace GitHub.InlineReviews.Commands
         /// <param name="textView">The text view containing the buffer</param>
         /// <param name="lineNumber">The 0-based line number.</param>
         /// <returns></returns>
-        protected int GetCursorPoint(ITextView textView, int lineNumber)
+        protected static int GetCursorPoint(ITextView textView, int lineNumber)
         {
             lineNumber = Math.Max(0, Math.Min(lineNumber, textView.TextSnapshot.LineCount - 1));
             return textView.TextSnapshot.GetLineFromLineNumber(lineNumber).Start.Position;
@@ -99,6 +101,8 @@ namespace GitHub.InlineReviews.Commands
         /// </remarks>
         protected IEnumerable<ITextView> GetCurrentTextViews()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var result = new List<ITextView>();
 
             try
@@ -164,6 +168,8 @@ namespace GitHub.InlineReviews.Commands
                     }
 
                     var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                    Assumes.Present(model);
+
                     var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
                     var wpfTextView = adapterFactory.GetWpfTextView(textView);
                     result.Add(wpfTextView);
@@ -256,7 +262,7 @@ namespace GitHub.InlineReviews.Commands
             }
         }
 
-        SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)
+        static SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)
         {
             return p.GetPoint(textSnapshot.TextBuffer, PositionAffinity.Predecessor);
         }

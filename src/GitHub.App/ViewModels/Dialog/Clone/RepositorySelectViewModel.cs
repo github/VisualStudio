@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         bool loadingStarted;
         IReadOnlyList<IRepositoryItemViewModel> items;
         ICollectionView itemsView;
-        ObservableAsPropertyHelper<IRepositoryModel> repository;
+        ObservableAsPropertyHelper<RepositoryModel> repository;
         IRepositoryItemViewModel selectedItem;
 
         [ImportingConstructor]
@@ -88,7 +89,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedItem, value);
         }
 
-        public IRepositoryModel Repository => repository.Value;
+        public RepositoryModel Repository => repository.Value;
 
         public void Initialize(IConnection connection)
         {
@@ -108,7 +109,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             try
             {
-                var results = await service.ReadViewerRepositories(connection.HostAddress).ConfigureAwait(true);
+                var results = await log.TimeAsync(nameof(service.ReadViewerRepositories),
+                    () => service.ReadViewerRepositories(connection.HostAddress));
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
@@ -117,10 +119,17 @@ namespace GitHub.ViewModels.Dialog.Clone
                     .Where(r => r.Owner != results.Owner)
                     .OrderBy(r => r.Owner)
                     .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
-                var orgRepositories = results.OrganizationRepositories
+                var repositoriesContributedTo = results.ContributedToRepositories
+                    .Select(x => new RepositoryItemViewModel(x, "Contributed to repositories"));
+                var orgRepositories = results.Organizations
                     .OrderBy(x => x.Key)
-                    .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, x.Key)));
-                Items = yourRepositories.Concat(collaboratorRepositories).Concat(orgRepositories).ToList();
+                    .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, GroupName(x, 100))));
+                Items = yourRepositories
+                    .Concat(collaboratorRepositories)
+                    .Concat(repositoriesContributedTo)
+                    .Concat(orgRepositories)
+                    .ToList();
+                log.Information("Read {Total} viewer repositories", Items.Count);
                 ItemsView = CollectionViewSource.GetDefaultView(Items);
                 ItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RepositoryItemViewModel.Group)));
                 ItemsView.Filter = FilterItem;
@@ -142,6 +151,17 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
+        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
+        {
+            var name = group.Key;
+            if (group.Value.Count == max)
+            {
+                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
+            }
+
+            return name;
+        }
+
         bool FilterItem(object obj)
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
@@ -152,7 +172,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             return true;
         }
 
-        IRepositoryModel CreateRepository(IRepositoryItemViewModel item)
+        RepositoryModel CreateRepository(IRepositoryItemViewModel item)
         {
             return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :

@@ -12,11 +12,11 @@ namespace GitHub.Services
         IServiceProvider GitServiceProvider { get; set; }
 
         T GetService<T>() where T : class;
-        Ret GetService<T, Ret>() where T : class
-                                 where Ret : class;
+        TRet GetService<T, TRet>() where T : class
+                                 where TRet : class;
 
         object TryGetService(Type t);
-        object TryGetService(string typename);
+        object TryGetService(string typeName);
         T TryGetService<T>() where T : class;
 
         void AddService(Type t, object owner, object instance);

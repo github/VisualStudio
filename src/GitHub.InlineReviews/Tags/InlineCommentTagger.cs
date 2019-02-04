@@ -84,24 +84,73 @@ namespace GitHub.InlineReviews.Tags
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-                    var linesWithComments = new BitArray((endLine - startLine) + 1);
+                    var linesWithTags = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
-                        x.LineNumber <= endLine);
+                        x.LineNumber <= endLine)
+                        .ToArray();
 
-                    foreach (var thread in spanThreads)
+                    var spanThreadsByLine = spanThreads.ToDictionary(model => model.LineNumber);
+
+                    Dictionary<int, InlineAnnotationModel[]> spanAnnotationsByLine = null;
+                    if (side == DiffSide.Right)
+                    {
+                        var spanAnnotations = file.InlineAnnotations?.Where(x =>
+                                x.EndLine - 1 >= startLine &&
+                                x.EndLine - 1 <= endLine);
+
+                        spanAnnotationsByLine = spanAnnotations?.GroupBy(model => model.EndLine)
+                            .ToDictionary(models => models.Key - 1, models => models.ToArray());
+                    }
+
+                    var lines = spanThreadsByLine.Keys.Union(spanAnnotationsByLine?.Keys ?? Enumerable.Empty<int>());
+                    foreach (var line in lines)
                     {
                         var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+                        var snapshotLine = snapshot.GetLineFromLineNumber(line);
 
-                        if ((side == DiffSide.Left && thread.DiffLineType == DiffChangeType.Delete) ||
-                            (side == DiffSide.Right && thread.DiffLineType != DiffChangeType.Delete))
+                        if (spanThreadsByLine.TryGetValue(line, out var thread))
                         {
-                            linesWithComments[thread.LineNumber - startLine] = true;
+                            var isThreadDeleteSide = thread.DiffLineType == DiffChangeType.Delete;
+                            var sidesMatch = side == DiffSide.Left && isThreadDeleteSide || side == DiffSide.Right && !isThreadDeleteSide;
+                            if (!sidesMatch)
+                            {
+                                thread = null;
+                            }
+                        }
+
+                        InlineAnnotationModel[] annotations = null;
+                        spanAnnotationsByLine?.TryGetValue(line, out annotations);
+
+                        if (thread != null || annotations != null)
+                        {
+                            linesWithTags[line - startLine] = true;
+
+                            CheckAnnotationLevel? summaryAnnotationLevel = null;
+                            if (annotations != null)
+                            {
+                                var hasFailure = annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+                                if (hasFailure)
+                                {
+                                    summaryAnnotationLevel = CheckAnnotationLevel.Failure;
+                                }
+                                else
+                                { 
+                                    var hasWarning = annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                    summaryAnnotationLevel = hasWarning ? CheckAnnotationLevel.Warning : CheckAnnotationLevel.Notice;
+                                }
+                            }
+
+                            var showInlineTag = new ShowInlineCommentTag(currentSession, line, thread?.DiffLineType ?? DiffChangeType.Add)
+                            {
+                                Thread = thread,
+                                Annotations = annotations,
+                                SummaryAnnotationLevel = summaryAnnotationLevel,
+                            };
 
                             result.Add(new TagSpan<ShowInlineCommentTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineCommentTag(currentSession, thread)));
+                                new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                showInlineTag));
                         }
                     }
 
@@ -113,7 +162,7 @@ namespace GitHub.InlineReviews.Tags
 
                             if (lineNumber >= startLine &&
                                 lineNumber <= endLine &&
-                                !linesWithComments[lineNumber - startLine]
+                                !linesWithTags[lineNumber - startLine]
                                 && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);

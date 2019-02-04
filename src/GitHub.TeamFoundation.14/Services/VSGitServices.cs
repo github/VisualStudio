@@ -1,10 +1,4 @@
-﻿#if TEAMEXPLORER15
-// Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
-extern alias SF15;
-using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
-#endif
-
-using System;
+﻿using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -81,7 +75,8 @@ namespace GitHub.Services
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
             Assumes.Present(teamExplorer);
@@ -90,22 +85,14 @@ namespace GitHub.Services
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
-#elif TEAMEXPLORER15
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
-            typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
-            var cloneTask = gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
-
-            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
-            await cloneTask;
-#elif TEAMEXPLORER16
-            // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
-            // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
-            // Progress won't be displayed on the status bar, but it appears prominently on the Team Explorer Home view.
+#elif TEAMEXPLORER15 || TEAMEXPLORER16
+            // The progress parameter uses the ServiceProgressData type which is defined in
+            // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
+            // would cause type conflicts, so we're using reflection to call CloneAsync.
             var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
             Assumes.NotNull(cloneAsyncMethod);
-            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), null };
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, cancellationToken, progress };
             var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
@@ -188,7 +175,7 @@ namespace GitHub.Services
             return ret ?? String.Empty;
         }
 
-        public IEnumerable<ILocalRepositoryModel> GetKnownRepositories()
+        public IEnumerable<LocalRepositoryModel> GetKnownRepositories()
         {
             try
             {
@@ -197,7 +184,7 @@ namespace GitHub.Services
             catch (Exception ex)
             {
                 log.Error(ex, "Error loading the repository list from the registry");
-                return Enumerable.Empty<ILocalRepositoryModel>();
+                return Enumerable.Empty<LocalRepositoryModel>();
             }
         }
 

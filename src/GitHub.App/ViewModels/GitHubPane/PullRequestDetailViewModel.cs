@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Commands;
@@ -17,18 +18,19 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 using Serilog;
 using static System.FormattableString;
+using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
 namespace GitHub.ViewModels.GitHubPane
 {
-    /// <summary>
-    /// A view model which displays the details of a pull request.
-    /// </summary>
+    /// <inheritdoc cref="IPullRequestDetailViewModel"/>
     [Export(typeof(IPullRequestDetailViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IStaticReviewFileMap
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -39,6 +41,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ITeamExplorerContext teamExplorerContext;
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
+        readonly IGitService gitService;
+
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -56,7 +60,7 @@ namespace GitHub.ViewModels.GitHubPane
         bool refreshOnActivate;
         Uri webUrl;
         IDisposable sessionSubscription;
-        IReadOnlyList<IPullRequestCheckViewModel> checks;
+        IReadOnlyList<IPullRequestCheckViewModel> checks = Array.Empty<IPullRequestCheckViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDetailViewModel"/> class.
@@ -77,7 +81,8 @@ namespace GitHub.ViewModels.GitHubPane
             ITeamExplorerContext teamExplorerContext,
             IPullRequestFilesViewModel files,
             ISyncSubmodulesCommand syncSubmodulesCommand,
-            IViewViewModelFactory viewViewModelFactory)
+            IViewViewModelFactory viewViewModelFactory,
+            IGitService gitService)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -86,6 +91,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
             Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
+            Guard.ArgumentNotNull(gitService, nameof(gitService));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -94,6 +100,8 @@ namespace GitHub.ViewModels.GitHubPane
             this.teamExplorerContext = teamExplorerContext;
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
+            this.gitService = gitService;
+
             Files = files;
 
             Checkout = ReactiveCommand.CreateFromObservable(
@@ -127,17 +135,21 @@ namespace GitHub.ViewModels.GitHubPane
             SubscribeOperationError(SyncSubmodules);
 
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
+
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
+
+            ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
         }
+
+        [Import(AllowDefault = true)]
+        private IStaticReviewFileMapManager StaticReviewFileMapManager { get; set; }
 
         private void DoOpenDetailsUrl()
         {
             usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
 
-        /// <summary>
-        /// Gets the underlying pull request model.
-        /// </summary>
+        /// <inheritdoc/>
         public PullRequestDetailModel Model
         {
             get { return model; }
@@ -155,124 +167,89 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        /// <summary>
-        /// Gets the local repository.
-        /// </summary>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        /// <inheritdoc/>
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
-        /// <summary>
-        /// Gets the owner of the remote repository that contains the pull request.
-        /// </summary>
-        /// <remarks>
-        /// The remote repository may be different from the local repository if the local
-        /// repository is a fork and the user is viewing pull requests from the parent repository.
-        /// </remarks>
+        /// <inheritdoc/>
         public string RemoteRepositoryOwner { get; private set; }
 
-        /// <summary>
-        /// Gets the Pull Request number.
-        /// </summary>
+        /// <inheritdoc/>
         public int Number { get; private set; }
 
-        /// <summary>
-        /// Gets the Pull Request author.
-        /// </summary>
+        /// <inheritdoc/>
         public IActorViewModel Author
         {
             get { return author; }
             private set { this.RaiseAndSetIfChanged(ref author, value); }
         }
 
-        /// <summary>
-        /// Gets the session for the pull request.
-        /// </summary>
+        /// <inheritdoc/>
         public IPullRequestSession Session { get; private set; }
 
-        /// <summary>
-        /// Gets a string describing how to display the pull request's source branch.
-        /// </summary>
+        /// <inheritdoc/>
         public string SourceBranchDisplayName
         {
             get { return sourceBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref sourceBranchDisplayName, value); }
         }
 
-        /// <summary>
-        /// Gets a string describing how to display the pull request's target branch.
-        /// </summary>
+        /// <inheritdoc/>
         public string TargetBranchDisplayName
         {
             get { return targetBranchDisplayName; }
             private set { this.RaiseAndSetIfChanged(ref targetBranchDisplayName, value); }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the pull request branch is checked out.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsCheckedOut
         {
             get { return isCheckedOut; }
             private set { this.RaiseAndSetIfChanged(ref isCheckedOut, value); }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the pull request comes from a fork.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsFromFork
         {
             get { return isFromFork; }
             private set { this.RaiseAndSetIfChanged(ref isFromFork, value); }
         }
 
-        /// <summary>
-        /// Gets the pull request body.
-        /// </summary>
+        /// <inheritdoc/>
         public string Body
         {
             get { return body; }
             private set { this.RaiseAndSetIfChanged(ref body, value); }
         }
 
-        /// <summary>
-        /// Gets the state associated with the <see cref="Checkout"/> command.
-        /// </summary>
+        /// <inheritdoc/>
         public IPullRequestCheckoutState CheckoutState
         {
             get { return checkoutState; }
             private set { this.RaiseAndSetIfChanged(ref checkoutState, value); }
         }
 
-        /// <summary>
-        /// Gets the state associated with the <see cref="Pull"/> and <see cref="Push"/> commands.
-        /// </summary>
+        /// <inheritdoc/>
         public IPullRequestUpdateState UpdateState
         {
             get { return updateState; }
             private set { this.RaiseAndSetIfChanged(ref updateState, value); }
         }
 
-        /// <summary>
-        /// Gets the error message to be displayed in the action area as a result of an error in a
-        /// git operation.
-        /// </summary>
+        /// <inheritdoc/>
         public string OperationError
         {
             get { return operationError; }
             private set { this.RaiseAndSetIfChanged(ref operationError, value); }
         }
 
-        /// <summary>
-        /// Gets the latest pull request review for each user.
-        /// </summary>
+        /// <inheritdoc/>
         public IReadOnlyList<IPullRequestReviewSummaryViewModel> Reviews
         {
             get { return reviews; }
             private set { this.RaiseAndSetIfChanged(ref reviews, value); }
         }
 
-        /// <summary>
-        /// Gets the pull request's changed files.
-        /// </summary>
+        /// <inheritdoc/>
         public IPullRequestFilesViewModel Files { get; }
 
         /// <summary>
@@ -284,52 +261,37 @@ namespace GitHub.ViewModels.GitHubPane
             private set { this.RaiseAndSetIfChanged(ref webUrl, value); }
         }
 
-        /// <summary>
-        /// Gets a command that checks out the pull request locally.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Checkout { get; }
 
-        /// <summary>
-        /// Gets a command that pulls changes to the current branch.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Pull { get; }
 
-        /// <summary>
-        /// Gets a command that pushes changes from the current branch.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Push { get; }
 
-        /// <summary>
-        /// Sync submodules for PR branch.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
-        /// <summary>
-        /// Gets a command that opens the pull request on GitHub.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
-        /// <summary>
-        /// Gets a command that navigates to a pull request review.
-        /// </summary>
+        /// <inheritdoc/>
         public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
+
+        /// <inheritdoc/>
         public IReadOnlyList<IPullRequestCheckViewModel> Checks
         {
             get { return checks; }
             private set { this.RaiseAndSetIfChanged(ref checks, value); }
         }
 
-        /// <summary>
-        /// Initializes the view model.
-        /// </summary>
-        /// <param name="localRepository">The local repository.</param>
-        /// <param name="connection">The connection to the repository host.</param>
-        /// <param name="owner">The pull request's repository owner.</param>
-        /// <param name="repo">The pull request's repository name.</param>
-        /// <param name="number">The pull request number.</param>
+        /// <inheritdoc/>
         public async Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,
@@ -395,13 +357,14 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList();
+                Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
                 await Files.InitializeAsync(Session);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
-                IsCheckedOut = localBranches.Contains(LocalRepository.CurrentBranch);
+                var currentBranch = gitService.GetBranch(LocalRepository);
+                IsCheckedOut = localBranches.Contains(currentBranch);
 
                 if (IsCheckedOut)
                 {
@@ -414,6 +377,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pullEnabled)
                     {
                         pullToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPullToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -426,6 +390,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pushEnabled)
                     {
                         pushToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPushToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -440,7 +405,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
 
                     var submodulesToSync = await pullRequestsService.CountSubmodulesToSync(LocalRepository);
-                    var syncSubmodulesToolTip = string.Format(Resources.SyncSubmodules, submodulesToSync);
+                    var syncSubmodulesToolTip = string.Format(CultureInfo.InvariantCulture, Resources.SyncSubmodules, submodulesToSync);
 
                     UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesToolTip, submodulesToSync);
                     CheckoutState = null;
@@ -448,8 +413,14 @@ namespace GitHub.ViewModels.GitHubPane
                 else
                 {
                     var caption = localBranches.Count > 0 ?
-                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckout,
+                            localBranches.First().DisplayName) :
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckoutTo,
+                            await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
                     var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
@@ -516,11 +487,7 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        /// <summary>
-        /// Gets the full path to a file in the working directory.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <returns>The full path to the file in the working directory.</returns>
+        /// <inheritdoc/>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
             return Path.Combine(LocalRepository.LocalPath, file.RelativePath);
@@ -530,6 +497,7 @@ namespace GitHub.ViewModels.GitHubPane
         public override void Activated()
         {
             active = true;
+            this.StaticReviewFileMapManager?.RegisterStaticReviewFileMap(this);
 
             if (refreshOnActivate)
             {
@@ -539,7 +507,43 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public override void Deactivated() => active = false;
+        public override void Deactivated()
+        {
+            this.StaticReviewFileMapManager?.UnregisterStaticReviewFileMap(this);
+            active = false;
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
+        {
+            if (this.pullRequestsService != null)
+            {
+                string commitId = objectish.Substring(0, objectish.IndexOf(':'));
+                string relativePath = objectish.Substring(objectish.IndexOf(':')+1).TrimStart('/');
+
+                return this.pullRequestsService.ExtractToTempFile(
+                    this.Session.LocalRepository,
+                    this.Session.PullRequest,
+                    relativePath,
+                    commitId,
+                    this.pullRequestsService.GetEncoding(this.Session.LocalRepository, relativePath));
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
+            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
+            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
+            {
+                return staticReviewFileMap.GetObjectishFromLocalPathAsync(localPath, cancellationToken);
+            }
+
+            return Task.FromResult<string>(null);
+        }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -646,10 +650,8 @@ namespace GitHub.ViewModels.GitHubPane
             }
         }
 
-        void DoShowReview(IPullRequestReviewSummaryViewModel item)
+        void DoShowReview(IPullRequestReviewSummaryViewModel review)
         {
-            var review = item;
-
             if (review.State == PullRequestReviewState.Pending)
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/review/new"));
@@ -658,6 +660,11 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/reviews/{review.User.Login}"));
             }
+        }
+
+        void DoShowAnnotations(IPullRequestCheckViewModel checkView)
+        {
+            NavigateTo(Invariant($"{RemoteRepositoryOwner}/{LocalRepository.Name}/pull/{Number}/checkruns/{checkView.CheckRunId}"));
         }
 
         class CheckoutCommandState : IPullRequestCheckoutState

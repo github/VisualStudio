@@ -57,14 +57,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             return teamExplorerServices.IsNotificationVisible(new Guid(Guids.TeamExplorerInstall3rdPartyGitTools));
         }
 
-        protected async override void RepoChanged(bool changed)
+        protected async override void RepoChanged()
         {
             IsLoggedIn = true;
             IsVisible = false;
 
-            base.RepoChanged(changed);
+            base.RepoChanged();
 
-            IsVisible = await IsAGitHubRepo();
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
 
             if (IsVisible)
             {
@@ -93,7 +93,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
 
         public override async void Refresh()
         {
-            IsVisible = await IsAGitHubRepo();
+            IsVisible = await IsAGitHubRepo(ActiveRepoUri);
             if (IsVisible)
             {
                 IsLoggedIn = await IsUserAuthenticated();

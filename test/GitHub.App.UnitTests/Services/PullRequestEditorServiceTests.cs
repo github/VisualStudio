@@ -20,10 +20,8 @@ public class PullRequestEditorServiceTests
         public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
             int expectNearestLine, int expectMatchingLines)
         {
-            var target = CreateNavigationService();
-
             int matchedLines;
-            var nearestLine = target.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
+            var nearestLine = PullRequestEditorService.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
 
             Assert.That(nearestLine, Is.EqualTo(expectNearestLine));
             Assert.That(matchedLines, Is.EqualTo(expectMatchingLines));

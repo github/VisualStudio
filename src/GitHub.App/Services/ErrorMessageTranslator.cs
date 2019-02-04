@@ -7,6 +7,7 @@ using ReactiveUI;
 using ReactiveUI.Legacy;
 
 #pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CA1034 // Nested types should not be visible
 
 namespace GitHub.Services
 {

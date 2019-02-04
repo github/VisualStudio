@@ -111,7 +111,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             IViewViewModelFactory factory = null,
             IPullRequestSession session = null,
             IPullRequestSessionFile file = null,
-            PullRequestReviewModel review = null,
             IEnumerable<InlineCommentModel> comments = null,
             bool newThread = false)
         {
@@ -119,7 +118,6 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             factory = factory ?? CreateFactory();
             session = session ?? CreateSession();
             file = file ?? CreateFile();
-            review = review ?? new PullRequestReviewModel();
             comments = comments ?? CreateComments();
 
             var result = new PullRequestReviewCommentThreadViewModel(draftStore, factory);
@@ -134,7 +132,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
                 thread.Comments.Returns(comments.ToList());
                 thread.LineNumber.Returns(10);
 
-                await result.InitializeAsync(session, file, review, thread, true);
+                await result.InitializeAsync(session, file, thread, true);
             }
 
             return result;
@@ -184,9 +182,12 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var result = Substitute.For<IPullRequestSession>();
             result.User.Returns(new ActorModel { Login = "Viewer" });
             result.RepositoryOwner.Returns("owner");
-            result.LocalRepository.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
-            result.LocalRepository.Name.Returns("repo");
-            result.LocalRepository.Owner.Returns("shouldnt-be-used");
+            var localRepository = new LocalRepositoryModel
+            {
+                CloneUrl = new UriString("https://github.com/owner/repo"),
+                Name = "repo"
+            };
+            result.LocalRepository.Returns(localRepository);
             result.PullRequest.Returns(new PullRequestDetailModel
             {
                 Number = 47,

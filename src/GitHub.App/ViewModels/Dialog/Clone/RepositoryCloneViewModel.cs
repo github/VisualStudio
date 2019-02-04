@@ -29,7 +29,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IUsageTracker usageTracker;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
-        IRepositoryModel previousRepository;
+        RepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
 
@@ -137,8 +137,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
 
-            // Users in group A will see the URL tab by default
-            if (await IsGroupA().ConfigureAwait(false))
+            // When a clipboard URL has been set, show the URL tab by default
+            if (!string.IsNullOrEmpty(UrlTab.Url))
             {
                 SelectedTabIndex = 2;
             }
@@ -155,14 +155,6 @@ namespace GitHub.ViewModels.Dialog.Clone
                     usageTracker.IncrementCounter(model => model.NumberOfCloneViewUrlTab).Forget();
                     break;
             }
-        }
-
-        // Put 50% of users in group A
-        async Task<bool> IsGroupA()
-        {
-            var userGuid = await usageService.GetUserGuid().ConfigureAwait(false);
-            var lastByte = userGuid.ToByteArray().Last();
-            return lastByte % 2 == 0;
         }
 
         void BrowseForDirectory()
@@ -183,7 +175,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        void UpdatePath(IRepositoryModel repository)
+        void UpdatePath(RepositoryModel repository)
         {
             if (repository != null)
             {
@@ -239,7 +231,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        string ValidatePathWarning(IRepositoryModel repositoryModel, string path)
+        string ValidatePathWarning(RepositoryModel repositoryModel, string path)
         {
             if (repositoryModel != null)
             {
