@@ -60,45 +60,45 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -806,7 +806,7 @@
     <value>没有活动的存储库可以导航</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>The working file is different to the file at '{0}'. Please checkout the corresponding branch, pull request or commit.</value>
+    <value>工作文件与'{0}'中的文件不同。请签出相应的分支, 拉取请求或提交。</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>请打开存储库“{0}”，然后重试</value>
@@ -833,18 +833,18 @@
     <value>您已经克隆到此位置。单击 "打开" 打开本地存储库。</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
-    <value>Can't find GitHub URL for repository</value>
+    <value>无法找到此存储库的GitHub URL</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Repositories must have a remote called "origin" defined in order to locate their GitHub URL.</value>
+    <value>存储库必须定义一个名为 "origin" 的远端, 才能找到其 GitHub URL。</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below.</value>
+    <value>请将您现有的远端之一重命名为 "origin", 或添加一个名为 "origin" 的新远端并进行获取。这可以从命令行或通过单击下面的按钮来完成。</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
-    <value>Couldn't find file corresponding to '{0}' in the repository. Please do a 'git fetch' or checkout the target pull request.</value>
+    <value>在存储库中找不到与 '{0}' 相对应的文件。请通过 "git fetch" 或签出目标拉取请求。</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
-    <value>{0} most recently pushed</value>
+    <value>{0} 最近已推送</value>
   </data>
 </root>
