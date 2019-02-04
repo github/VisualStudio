@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Shell.CodeContainerManagement;
 using NSubstitute;
 using NUnit.Framework;
 using Task = System.Threading.Tasks.Task;
+using ServiceProgressData = Microsoft.VisualStudio.Shell.ServiceProgressData;
 
 public class GitHubContainerProviderTests
 {
@@ -16,7 +17,7 @@ public class GitHubContainerProviderTests
         [Test]
         public async Task CloneOrOpenRepository_CloneDialogResult_Returned_By_ShowCloneDialog()
         {
-            var downloadProgress = Substitute.For<IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData>>();
+            var downloadProgress = Substitute.For<IProgress<ServiceProgressData>>();
             var cancellationToken = CancellationToken.None;
             var dialogService = Substitute.For<IDialogService>();
             var result = new CloneDialogResult(@"x:\repo", "https://github.com/owner/repo");
@@ -36,7 +37,7 @@ public class GitHubContainerProviderTests
             var browseOnlineUrl = "https://github.com/owner/browseOnlineUrl";
             var remoteCodeContainer = new RemoteCodeContainer("Name", Guid.NewGuid(), new Uri(displayUrl), new Uri(browseOnlineUrl),
                 DateTimeOffset.Now, new Dictionary<string, string>());
-            var downloadProgress = Substitute.For<IProgress<Microsoft.VisualStudio.Shell.ServiceProgressData>>();
+            var downloadProgress = Substitute.For<IProgress<ServiceProgressData>>();
             var cancellationToken = CancellationToken.None;
             var dialogService = Substitute.For<IDialogService>();
             var result = new CloneDialogResult(@"x:\repo", "https://github.com/owner/repo");
@@ -47,6 +48,42 @@ public class GitHubContainerProviderTests
             await target.AcquireCodeContainerAsync(remoteCodeContainer, downloadProgress, cancellationToken);
 
             await dialogService.Received(1).ShowCloneDialog(Arg.Any<IConnection>(), displayUrl);
+        }
+
+        [Test]
+        public async Task Completes_When_Returning_CodeContainer()
+        {
+            var downloadProgress = Substitute.For<IProgress<ServiceProgressData>>();
+            var cancellationToken = CancellationToken.None;
+            var dialogService = Substitute.For<IDialogService>();
+            var result = new CloneDialogResult(@"x:\repo", "https://github.com/owner/repo");
+            dialogService.ShowCloneDialog(null).ReturnsForAnyArgs(result);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var target = CreateGitHubContainerProvider(dialogService: dialogService, cloneService: cloneService);
+
+            var codeContainer = await target.AcquireCodeContainerAsync(downloadProgress, cancellationToken);
+
+            Assert.That(codeContainer, Is.Not.Null);
+            downloadProgress.Received(1).Report(
+                Arg.Is<ServiceProgressData>(x => x.TotalSteps > 0 && x.CurrentStep == x.TotalSteps));
+        }
+
+        [Test]
+        public async Task Does_Not_Complete_When_CloneDialog_Canceled()
+        {
+            var downloadProgress = Substitute.For<IProgress<ServiceProgressData>>();
+            var cancellationToken = CancellationToken.None;
+            var dialogService = Substitute.For<IDialogService>();
+            var result = (CloneDialogResult)null;
+            dialogService.ShowCloneDialog(null).ReturnsForAnyArgs(result);
+            var cloneService = Substitute.For<IRepositoryCloneService>();
+            var target = CreateGitHubContainerProvider(dialogService: dialogService, cloneService: cloneService);
+
+            var codeContainer = await target.AcquireCodeContainerAsync(downloadProgress, cancellationToken);
+
+            await cloneService.ReceivedWithAnyArgs(0).CloneOrOpenRepository(null, null, null);
+            downloadProgress.ReceivedWithAnyArgs(0).Report(null);
+            Assert.That(codeContainer, Is.Null);
         }
 
         static GitHubContainerProvider CreateGitHubContainerProvider(IDialogService dialogService = null,
