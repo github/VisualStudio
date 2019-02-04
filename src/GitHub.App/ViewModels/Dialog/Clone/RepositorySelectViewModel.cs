@@ -179,9 +179,14 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
             {
+                var urlString = item.Url.ToString();
+                var urlStringWithGit = urlString + ".git";
+                var urlStringWithSlash = urlString + "/";
                 return
                     item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.Url.ToString().Contains(Filter, StringComparison.OrdinalIgnoreCase);
+                    urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                    urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                    urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
             }
 
             return true;
