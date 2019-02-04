@@ -7,6 +7,8 @@ environment:
     - BUILD_TYPE: normal
 
 install:
+- choco install --no-progress BCC-MSBuildLog
+- choco install --no-progress BCC-Submission
 - ps: |
     $full_build = Test-Path env:GHFVS_KEY
     $forVSInstaller = $env:BUILD_TYPE -eq "vsinstaller"
@@ -37,10 +39,12 @@ install:
 
 build_script:
 - ps: scripts\build.ps1 -AppVeyor -Package:$package -BuildNumber:$env:APPVEYOR_BUILD_NUMBER -ForVSInstaller:$forVSInstaller
+
 test:
   categories:
     except:
       - Timings
+
 on_success:
 - ps: |
     if ($package) {
