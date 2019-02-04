@@ -57,7 +57,8 @@ for:
   branches:
     only:
       - /releases/.*-vsinstaller/
+      - master
   environment:
     matrix:
-      - BUILD_TYPE: vsinstaller
       - BUILD_TYPE: package
+      - BUILD_TYPE: vsinstaller
