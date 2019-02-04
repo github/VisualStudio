@@ -79,6 +79,10 @@ namespace GitHub.StartPage
 
             var uri = request.Url.ToRepositoryUrl();
             var repositoryName = request.Url.RepositoryName;
+
+            // Report all steps complete before returning a CodeContainer
+            downloadProgress.Report(new ServiceProgressData(string.Empty, string.Empty, 1, 1));
+
             return new CodeContainer(
                 localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
                                 new CodeContainerSourceControlProperties(repositoryName, request.Path, new Guid(Guids.GitSccProviderId))),
