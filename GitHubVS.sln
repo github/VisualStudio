@@ -141,6 +141,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL.Core", "sub
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL", "submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj", "{791B408C-0ABC-465B-9EB1-A2422D67F418}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.StartPage.UnitTests", "test\GitHub.StartPage.UnitTests\GitHub.StartPage.UnitTests.csproj", "{B467682B-9F0E-42D8-8A20-1DE78F798793}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -493,6 +495,14 @@ Global
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.Release|Any CPU.Build.0 = Release|Any CPU
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -527,6 +537,7 @@ Global
 		{65542DEE-D3BE-4810-B85A-08E970413A21} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{3321CE72-26ED-4D1E-A8F5-6901FB783007} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
 		{791B408C-0ABC-465B-9EB1-A2422D67F418} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
+		{B467682B-9F0E-42D8-8A20-1DE78F798793} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}
