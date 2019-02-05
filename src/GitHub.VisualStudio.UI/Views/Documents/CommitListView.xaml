@@ -31,7 +31,7 @@
                         Grid.Column="0">
                     <Ellipse Height="28"
                              Width="28"
-                             Fill="#e1e4e8" /> 
+                             Fill="{DynamicResource GitHubTimelineEventBackgroundBrush}" /> 
 
                     <ghfvs:OcticonImage DockPanel.Dock="Left"
                                     Foreground="{DynamicResource VsBrush.WindowText}"
