@@ -57,9 +57,9 @@
                     <InlineUIContainer BaselineAlignment="TextBottom">
                         <v:ActorAvatarView ViewModel="{Binding Author}" Width="14" Height="14"/>
                     </InlineUIContainer>
-                    <TextBlock FontWeight="Bold" Text="{Binding Author.Login, Mode=OneWay}"/>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Author.Login, Mode=OneWay}"/>
                     wants to merge
-                    <TextBlock FontWeight="Bold" Text="{Binding CommitCount, Mode=OneWay, StringFormat={x:Static ghfvs:Resources.CommitCountFormat}}"/>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding CommitCount, Mode=OneWay, StringFormat={x:Static ghfvs:Resources.CommitCountFormat}}"/>
                     into
                     <InlineUIContainer BaselineAlignment="Bottom">
                         <Border CornerRadius="2" Padding="5 0" Background="{DynamicResource GitHubBranchNameBackgroundBrush}">
@@ -100,7 +100,7 @@
                     <Border Padding="6" Background="{DynamicResource GitHubBranchNameBackgroundBrush}" BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="0 0 0 1">
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                             <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4">
-                                <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                                <Run FontWeight="SemiBold" Text="{Binding Author.Login}" />
                                 <Run Text="commented" />
                             </TextBlock>
                             <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
@@ -144,7 +144,7 @@
                                 <Border Padding="6" Background="{DynamicResource GitHubBranchNameBackgroundBrush}" BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="0 0 0 1">
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
                                         <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4">
-                                            <Run FontWeight="Bold" Text="{Binding Author.Login}" />
+                                            <Run FontWeight="SemiBold" Text="{Binding Author.Login}" />
                                             <Run Text="commented" />
                                         </TextBlock>
 
