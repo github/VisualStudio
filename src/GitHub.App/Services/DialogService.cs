@@ -51,7 +51,7 @@ namespace GitHub.Services
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
             if (url != null)
             {
-                viewModel.UrlTab.Url = url;
+                viewModel.Url = url;
             }
 
             if (connection != null)
@@ -67,15 +67,6 @@ namespace GitHub.Services
                 return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel)
                     .ConfigureAwait(false);
             }
-        }
-
-        public async Task<string> ShowReCloneDialog(RepositoryModel repository)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-
-            var viewModel = factory.CreateViewModel<IRepositoryRecloneViewModel>();
-            viewModel.SelectedRepository = repository;
-            return (string)await showDialog.ShowWithFirstConnection(viewModel);
         }
 
         public async Task ShowCreateGist(IConnection connection)
