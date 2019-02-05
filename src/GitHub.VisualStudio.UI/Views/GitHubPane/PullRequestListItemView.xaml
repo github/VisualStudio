@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
+             xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="300"
              Padding="0 4">
     <d:DesignData.DataContext>
@@ -13,7 +14,7 @@
                                                     CommentCount="4"
                                                     IsCurrent="True"
                                                     UpdatedAt="2018-01-29"
-                                                    Checks="Success">
+                                                    ChecksSummary="Success">
             <ghfvs:PullRequestListItemViewModelDesigner.Author>
                 <ghfvs:ActorViewModelDesigner Login="shana"/>
             </ghfvs:PullRequestListItemViewModelDesigner.Author>
@@ -95,12 +96,23 @@
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="8 0">
-                <TextBlock Opacity="0.5"  Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
+                <TextBlock Opacity="0.5" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 4 0" Visibility="{Binding CommentCount, Converter={ghfvs:CountToVisibilityConverter}}"> <ghfvs:OcticonImage Icon="comment" Width="12" Height="12" Margin="0 0 0 -2"/>
                     <Run Text="{Binding CommentCount, Mode=OneWay}" BaselineAlignment="Bottom"/>
                 </TextBlock>
-                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
-                <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
-                <ghfvs:OcticonImage Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding Checks, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+                <ghfvs:OcticonImage Icon="check" Foreground="#2cbe4e" Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Success}}"/>
+                <ghfvs:OcticonImage Icon="x" Foreground="#cb2431" Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Failure}}"/>
+                <ghfvs:OcticonImage Icon="primitive_dot" Foreground="#f1c647" Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Pending}}"/>
+                <controls:PullRequestStatusCircle 
+                    Height="18" Width="18"
+                    Radius="8" InnerRadius="5"
+                    Visibility="{Binding ChecksSummary, Converter={ghfvs:EqualsToVisibilityConverter Mixed}}"
+                    PendingCount="{Binding ChecksPendingCount}"
+                    PendingColor="#f1c647"
+                    ErrorCount="{Binding ChecksErrorCount}"
+                    ErrorColor="#cb2431"
+                    SuccessCount="{Binding ChecksSuccessCount}"
+                    SuccessColor="#2cbe4e"
+                    />
             </StackPanel>
         </Grid>
     </Grid>

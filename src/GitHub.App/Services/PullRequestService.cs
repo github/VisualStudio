@@ -226,64 +226,65 @@ namespace GitHub.Services
                 item.Reviews = null;
 
                 var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+                var statuses = item.LastCommit?.Statuses;
 
-                var hasCheckRuns = checkRuns?.Any() ?? false;
-                var hasStatuses = item.LastCommit?.Statuses?.Any() ?? false;
+                var totalCount = 0;
+                var pendingCount = 0;
+                var successCount = 0;
+                var errorCount = 0;
 
-                if (!hasCheckRuns && !hasStatuses)
+                if (checkRuns != null)
                 {
-                    item.Checks = PullRequestChecksState.None;
+                    totalCount += checkRuns.Length;
+
+                    pendingCount += checkRuns.Count(model => model.Status != CheckStatusState.Completed);
+
+                    successCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        (model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                    errorCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                                        model.Conclusion.HasValue &&
+                                                                        !(model.Conclusion == CheckConclusionState.Success ||
+                                                                         model.Conclusion == CheckConclusionState.Neutral));
+                }
+
+                if (statuses != null)
+                {
+                    totalCount += statuses.Count;
+
+                    pendingCount += statuses.Count(model =>
+                        model.State == StatusState.Pending || model.State == StatusState.Expected);
+
+                    successCount += statuses.Count(model => model.State == StatusState.Success);
+
+                    errorCount += statuses.Count(model =>
+                        model.State == StatusState.Error || model.State == StatusState.Failure);
+                }
+
+                item.ChecksPendingCount = pendingCount;
+                item.ChecksSuccessCount = successCount;
+                item.ChecksErrorCount = errorCount;
+
+                if (totalCount == 0)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.None;
+                }
+                else if (totalCount == pendingCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Pending;
+                }
+                else if (totalCount == successCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Success;
+                }
+                else if (totalCount == errorCount)
+                {
+                    item.ChecksSummary = PullRequestChecksSummaryState.Failure;
                 }
                 else
                 {
-                    var checksHasFailure = false;
-                    var checksHasCompleteSuccess = true;
-
-                    if (hasCheckRuns)
-                    {
-                        checksHasFailure = checkRuns
-                            .Any(model => model.Conclusion.HasValue
-                                          && (model.Conclusion.Value == CheckConclusionState.Failure
-                                              || model.Conclusion.Value == CheckConclusionState.ActionRequired));
-
-                        if (!checksHasFailure)
-                        {
-                            checksHasCompleteSuccess = checkRuns
-                                .All(model => model.Conclusion.HasValue
-                                              && (model.Conclusion.Value == CheckConclusionState.Success
-                                                  || model.Conclusion.Value == CheckConclusionState.Neutral));
-                        }
-                    }
-
-                    var statusHasFailure = false;
-                    var statusHasCompleteSuccess = true;
-
-                    if (!checksHasFailure && hasStatuses)
-                    {
-                        statusHasFailure = item.LastCommit
-                            .Statuses
-                            .Any(status => status.State == StatusState.Failure
-                                           || status.State == StatusState.Error);
-
-                        if (!statusHasFailure)
-                        {
-                            statusHasCompleteSuccess =
-                                item.LastCommit.Statuses.All(status => status.State == StatusState.Success);
-                        }
-                    }
-
-                    if (checksHasFailure || statusHasFailure)
-                    {
-                        item.Checks = PullRequestChecksState.Failure;
-                    }
-                    else if (statusHasCompleteSuccess && checksHasCompleteSuccess)
-                    {
-                        item.Checks = PullRequestChecksState.Success;
-                    }
-                    else
-                    {
-                        item.Checks = PullRequestChecksState.Pending;
-                    }
+                    item.ChecksSummary = PullRequestChecksSummaryState.Mixed;
                 }
 
                 item.LastCommit = null;

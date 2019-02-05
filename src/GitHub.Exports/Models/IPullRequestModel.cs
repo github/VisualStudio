@@ -11,9 +11,10 @@ namespace GitHub.Models
         Merged,
     }
 
-    public enum PullRequestChecksState
+    public enum PullRequestChecksSummaryState
     {
         None,
+        Mixed,
         Pending,
         Success,
         Failure
