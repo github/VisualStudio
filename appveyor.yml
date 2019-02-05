@@ -12,7 +12,7 @@ install:
 - ps: |
     $full_build = Test-Path env:GHFVS_KEY
     $forVSInstaller = $env:BUILD_TYPE -eq "vsinstaller"
-    $package = $full_build -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master" -or $forVSInstaller -or $env:BUILD_TYPE -eq "package")
+    $package = $full_build -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $forVSInstaller -or $env:BUILD_TYPE -eq "package")
 
     $message = "Building "
     if ($package) { $message += "and packaging "}
