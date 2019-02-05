@@ -115,7 +115,7 @@
                             Margin="0 -4 0 0"
                             ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
-                        View on GitHub
+                        View Conversation
                     </ghfvs:GitHubActionLink>
 
                     <Rectangle Margin="5 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
