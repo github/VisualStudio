@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -23,6 +24,7 @@ namespace GitHub.ViewModels.Dialog.Clone
     {
         static readonly ILogger log = LogManager.ForContext<RepositorySelectViewModel>();
         readonly IRepositoryCloneService service;
+        readonly IGitHubContextService gitHubContextService;
         IConnection connection;
         Exception error;
         string filter;
@@ -35,15 +37,26 @@ namespace GitHub.ViewModels.Dialog.Clone
         IRepositoryItemViewModel selectedItem;
 
         [ImportingConstructor]
-        public RepositorySelectViewModel(IRepositoryCloneService service)
+        public RepositorySelectViewModel(IRepositoryCloneService service, IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(service, nameof(gitHubContextService));
 
             this.service = service;
+            this.gitHubContextService = gitHubContextService;
 
-            repository = this.WhenAnyValue(x => x.SelectedItem)
-                .Select(CreateRepository)
+            var selectedRepository = this.WhenAnyValue(x => x.SelectedItem)
+                .Select(CreateRepository);
+
+            var filterRepository = this.WhenAnyValue(x => x.Filter)
+                .Select(f => gitHubContextService.FindContextFromUrl(f))
+                .Where(c => c?.LinkType == LinkType.Repository)
+                .Select(c => new RepositoryModel(c.RepositoryName, c.Url));
+
+            repository = selectedRepository
+                .Merge(filterRepository)
                 .ToProperty(this, x => x.Repository);
+
             this.WhenAnyValue(x => x.Filter).Subscribe(_ => ItemsView?.Refresh());
         }
 
@@ -166,7 +179,14 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
             {
-                return item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                var urlString = item.Url.ToString();
+                var urlStringWithGit = urlString + ".git";
+                var urlStringWithSlash = urlString + "/";
+                return
+                    item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase) ||
+                    urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                    urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                    urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
             }
 
             return true;
