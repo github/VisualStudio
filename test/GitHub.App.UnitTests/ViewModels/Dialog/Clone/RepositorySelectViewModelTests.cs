@@ -57,6 +57,8 @@ public class RepositorySelectViewModelTests
         [TestCase("filter", null)]
         [TestCase("https://github.com", null)]
         [TestCase("https://github.com/github/VisualStudio", "https://github.com/github/VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "https://github.com/github/VisualStudio/blob/master/README.md")]
+        [TestCase("https://github.com/github/VisualStudio/pull/2208", null)]
         public void Set_Repository_When_Filter_Is_Url(string url, string expectUrl)
         {
             var expectCloneUrl = expectUrl != null ? new UriString(expectUrl) : null;
@@ -66,6 +68,24 @@ public class RepositorySelectViewModelTests
             var target = new RepositorySelectViewModel(repositoryCloneService, gitHubContextService);
 
             target.Filter = url;
+
+            Assert.That(target.Repository?.CloneUrl, Is.EqualTo(expectCloneUrl));
+        }
+
+        [TestCase("filter;https://github.com/github/VisualStudio", "https://github.com/github/VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio;filter", null)]
+        public void Change_Filters(string filters, string expectUrl)
+        {
+            var expectCloneUrl = expectUrl != null ? new UriString(expectUrl) : null;
+            var repositoryCloneService = CreateRepositoryCloneService();
+            var gitHubContextService = new GitHubContextService(Substitute.For<IGitHubServiceProvider>(),
+                Substitute.For<IGitService>(), Substitute.For<IVSServices>());
+            var target = new RepositorySelectViewModel(repositoryCloneService, gitHubContextService);
+
+            foreach (var filter in filters.Split(';'))
+            {
+                target.Filter = filter;
+            }
 
             Assert.That(target.Repository?.CloneUrl, Is.EqualTo(expectCloneUrl));
         }
