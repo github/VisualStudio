@@ -185,7 +185,7 @@ New-Module -ScriptBlock {
 
 New-Module -ScriptBlock {
     function Write-Manifest([string]$directory) {
-        Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
+        Add-Type -Path (Join-Path $rootDirectory build\Release\Newtonsoft.Json.dll)
 
         $manifest = @{
             NewestExtension = @{
