@@ -12,23 +12,25 @@
     <XlfLanguages>zh-CN</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <GeneratePkgDefFile>false</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{11569514-5AE5-4B5B-92A2-F10B0967DE5F}</ProjectGuid>
+    <ProjectGuid>{D26B4B40-0C94-48AD-8019-0B9BE46E0071}</ProjectGuid>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHub.VisualStudio</RootNamespace>
-    <AssemblyName>GitHub.VisualStudio</AssemblyName>
+    <RootNamespace>GitHub.VisualStudio.Vsix</RootNamespace>
+    <AssemblyName>GitHub.VisualStudio.Vsix</AssemblyName>
     <StartAction>Program</StartAction>
     <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -41,8 +43,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CreateVsixContainer>False</CreateVsixContainer>
-    <DeployExtension>False</DeployExtension>
+    <CreateVsixContainer>True</CreateVsixContainer>
+    <DeployExtension>True</DeployExtension>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
     <OutputPath>..\..\build\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
@@ -106,134 +108,27 @@
     <Reference Include="System.Xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\common\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
-    <Compile Include="AssemblyResolverPackage.cs" />
-    <Compile Include="Commands\BlameLinkCommand.cs" />
-    <Compile Include="Commands\CreateGistCommand.cs" />
-    <Compile Include="Commands\OpenFromClipboardCommand.cs" />
-    <Compile Include="Commands\OpenFromUrlCommand.cs" />
-    <Compile Include="Commands\ShowMessageBoxCommand.cs" />
-    <Compile Include="Commands\LinkCommandBase.cs" />
-    <Compile Include="Commands\CopyLinkCommand.cs" />
-    <Compile Include="Commands\OpenLinkCommand.cs" />
-    <Compile Include="Commands\SyncSubmodulesCommand.cs" />
-    <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
-    <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
-    <Compile Include="Commands\OpenPullRequestsCommand.cs" />
-    <Compile Include="Commands\GoToSolutionOrPullRequestFileCommand.cs" />
-    <Compile Include="GitContextPackage.cs" />
-    <Compile Include="GitHubPanePackage.cs" />
-    <Compile Include="Helpers\BindingPathHelper.cs" />
-    <Compile Include="IServiceProviderPackage.cs" />
-    <Compile Include="Helpers\ActiveDocumentSnapshot.cs" />
-    <Compile Include="Commands\AddConnectionCommand.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\Browser.cs" />
-    <Compile Include="Services\JsonConnectionCache.cs" />
-    <Compile Include="Services\LocalRepositories.cs" />
-    <Compile Include="Services\ShowDialogService.cs" />
-    <Compile Include="Services\UsageService.cs" />
-    <Compile Include="Services\UsageTracker.cs" />
-    <Compile Include="Services\VSGitExtFactory.cs" />
-    <Compile Include="Settings\Constants.cs" />
-    <Compile Include="Services\ConnectionManager.cs" />
-    <Compile Include="Services\Program.cs" />
-    <Compile Include="Services\SelectedTextProvider.cs" />
-    <Compile Include="Settings\generated\PackageSettingsGen.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PackageSettingsGen.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\OptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Settings\PackageSettings.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="GitHubPackage.cs" />
-    <Compile Include="Services\GitHubServiceProvider.cs" />
-    <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\Settings\OptionsControl.xaml.cs">
-      <DependentUpon>OptionsControl.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="VSPackage.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Settings\generated\PackageSettingsGen.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
-      <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
+    <Content Include="Resources\logo_128x128.png">
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="..\common\settings.json">
-      <Link>Properties\settings.json</Link>
-    </None>
+    <Content Include="Resources\preview_200x200.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="GitHub.VisualStudio.imagemanifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="GitHub.VisualStudio.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
-    </VSCTCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">
-      <Link>Properties\CodeAnalysisDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-    <Resource Include="Resources\default_org_avatar.png" />
-    <Resource Include="Resources\default_user_avatar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Resources\icons\clippy.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\link_external.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\question.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\mark_github_toolbar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\refresh.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\arrow_right.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\arrow_left.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\icons\git_pull_request.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\icons\mark_github.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Settings\OptionsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>GitHub.VisualStudio.UI</CustomToolNamespace>
-    </Page>
+    <Content Include="LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Core\Akavache.Core.csproj">
@@ -362,6 +257,26 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj" ReferenceOutputAssembly="false">
+      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
+      <Name>GitHub.TeamFoundation.14</Name>
+      <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj" ReferenceOutputAssembly="false">
+      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
+      <Name>GitHub.TeamFoundation.15</Name>
+      <Private>True</Private>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.TeamFoundation.16\GitHub.TeamFoundation.16.csproj" ReferenceOutputAssembly="false">
+      <Project>{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}</Project>
+      <Name>GitHub.TeamFoundation.16</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
       <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
       <Name>GitHub.UI.Reactive</Name>
@@ -382,6 +297,12 @@
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
+      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
+      <Name>GitHub.VisualStudio</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -406,6 +327,9 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3">
       <Version>1.1.11</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <!-- Include required NuGet dependencies-->
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
