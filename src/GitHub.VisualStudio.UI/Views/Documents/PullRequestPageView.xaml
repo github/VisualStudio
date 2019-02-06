@@ -125,66 +125,13 @@
 
         <ItemsControl Name="timeline" ItemsSource="{Binding Timeline}">
             <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type ghfvs:CommentViewModel}">
-                    <Grid Margin="0 16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <v:ActorAvatarView Width="35" 
-                                           Height="35"
-                                           VerticalAlignment="Top"
-                                           Margin="0 0 5 0"
-                                           ViewModel="{Binding Author}" />
-
-                        <Border BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="1" 
-                                Grid.Column="1" VerticalAlignment="Top">
-                            <StackPanel Orientation="Vertical">
-                                <Border Padding="6" Background="{DynamicResource GitHubBranchNameBackgroundBrush}" BorderBrush="{DynamicResource GitHubHeaderSeparatorBrush}" BorderThickness="0 0 0 1">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" >
-                                        <TextBlock Foreground="{DynamicResource GitHubVsToolWindowText}" Margin="4">
-                                            <Run FontWeight="SemiBold" Text="{Binding Author.Login}" />
-                                            <Run Text="commented" />
-                                        </TextBlock>
-
-                                        <ui:GitHubActionLink Content="{Binding CreatedAt, Converter={ui:DurationToStringConverter}}"
-                                                         Command="{Binding OpenOnGitHub}"
-                                                         Foreground="{DynamicResource GitHubVsToolWindowText}"
-                                                         VerticalAlignment="Center"
-                                                         Opacity="0.75" />
-                                        <Border Background="{DynamicResource VsBrush.InfoBackground}"
-                                                BorderBrush="{DynamicResource VsBrush.AccentPale}"
-                                                BorderThickness="1"
-                                                CornerRadius="3"
-                                                Padding="2 1"
-                                                VerticalAlignment="Center"
-                                                Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                                          <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
-                                        </Border>
-                                    </StackPanel>
-                                </Border>
-
-                                <markdig:MarkdownViewer Name="bodyMarkdown" Margin="8" Foreground="{DynamicResource VsBrush.WindowText}" Markdown="{Binding Body}"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                </DataTemplate>
-
                 <DataTemplate DataType="{x:Type ghfvs:CommentViewModelDesigner}">
-                    <v:CommentView />
+                    <local:IssueishCommentView />
                 </DataTemplate>
-
                 <DataTemplate DataType="{x:Type ghfvs:CommitListViewModel}">
                     <local:CommitListView />
                 </DataTemplate>
             </ItemsControl.Resources>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <ContentControl Content="{Binding}"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
         </ItemsControl>
     </StackPanel>
 </UserControl>

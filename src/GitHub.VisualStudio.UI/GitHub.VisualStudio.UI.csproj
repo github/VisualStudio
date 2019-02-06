@@ -30,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Documents\IssueishCommentView.xaml.cs">
+      <DependentUpon>IssueishCommentView.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\GitHubPane\NoRemoteOriginView.xaml.cs">
       <DependentUpon>NoRemoteOriginView.xaml</DependentUpon>
     </Compile>

@@ -1,4 +1,4 @@
-﻿<views:GenericCommentView x:Class="GitHub.VisualStudio.Views.CommentView"
+﻿<views:GenericPullRequestReviewCommentView x:Class="GitHub.VisualStudio.Views.PullRequestReviewCommentView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -240,4 +240,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</views:GenericCommentView>
+</views:GenericPullRequestReviewCommentView>

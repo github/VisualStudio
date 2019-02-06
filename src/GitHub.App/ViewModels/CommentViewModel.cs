@@ -18,7 +18,7 @@ namespace GitHub.ViewModels
     /// </summary>
     [Export(typeof(ICommentViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class CommentViewModel : ReactiveObject, ICommentViewModel
+    public class CommentViewModel : ViewModelBase, ICommentViewModel
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
         readonly ICommentService commentService;

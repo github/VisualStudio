@@ -74,7 +74,7 @@ namespace GitHub.ViewModels.Documents
             }
         }
 
-        public void Dispose() => closeOrReopenCaption.Dispose();
+        public void Dispose() => closeOrReopenCaption?.Dispose();
 
         async Task DoCloseOrReopen()
         {

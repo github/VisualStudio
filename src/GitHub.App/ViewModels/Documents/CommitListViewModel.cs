@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace GitHub.ViewModels.Documents
     /// <summary>
     /// Displays a list of commit summaries in a pull request timeline.
     /// </summary>
+    [Export(typeof(ICommitListViewModel))]
     public class CommitListViewModel : ViewModelBase, ICommitListViewModel
     {
         /// <summary>

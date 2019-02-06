@@ -11,13 +11,13 @@ using ReactiveUI;
 
 namespace GitHub.VisualStudio.Views
 {
-    public class GenericCommentView : ViewBase<ICommentViewModel, GenericCommentView> { }
+    public class GenericPullRequestReviewCommentView : ViewBase<IPullRequestReviewCommentViewModel, GenericPullRequestReviewCommentView> { }
 
-    [ExportViewFor(typeof(ICommentViewModel))]
+    [ExportViewFor(typeof(IPullRequestReviewCommentViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class CommentView : GenericCommentView
+    public partial class PullRequestReviewCommentView : GenericPullRequestReviewCommentView
     {
-        public CommentView()
+        public PullRequestReviewCommentView()
         {
             InitializeComponent();
             this.Loaded += CommentView_Loaded;
