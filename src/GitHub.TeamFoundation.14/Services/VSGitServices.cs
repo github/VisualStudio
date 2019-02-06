@@ -86,6 +86,18 @@ namespace GitHub.Services
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
 #elif TEAMEXPLORER15 || TEAMEXPLORER16
+            // IGitActionsExt is proffered by SccProviderPackage, but isn't advertised.
+            // To ensure that getting IGitActionsExt doesn't return null, we first request the
+            // SccService which is advertised. This forces SccProviderPackage to load
+            // and proffer IGitActionsExt.
+            var gitSccServiceGuid = new Guid("28C35EB2-67EA-4C5F-B49D-DACF73A66989");
+            var gitSccServiceType = Type.GetTypeFromCLSID(gitSccServiceGuid);
+            var gitSccService = serviceProvider.GetService(gitSccServiceType);
+            if (gitSccService is null)
+            {
+                log.Warning("Couldn't find Git SccService with Guid {Guid}", gitSccServiceGuid);
+            }
+
             // The progress parameter uses the ServiceProgressData type which is defined in
             // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
             // would cause type conflicts, so we're using reflection to call CloneAsync.
