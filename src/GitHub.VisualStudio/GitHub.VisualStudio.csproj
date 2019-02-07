@@ -174,9 +174,6 @@
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
