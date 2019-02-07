@@ -35,7 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8E1F
 	ProjectSection(SolutionItems) = preProject
 		scripts\Modules\BuildUtils.psm1 = scripts\Modules\BuildUtils.psm1
 		scripts\Modules\Debugging.psm1 = scripts\Modules\Debugging.psm1
-		scripts\Modules\Vsix.psm1 = scripts\Modules\Vsix.psm1
+		scripts\modules\Versioning.ps1 = scripts\modules\Versioning.ps1
+		scripts\modules\Vsix.ps1 = scripts\modules\Vsix.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C5F8D-14B3-443D-B044-0E209AE12BDF}"
@@ -153,6 +154,14 @@ Global
 		ReleaseWithoutVsix|Any CPU = ReleaseWithoutVsix|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.Build.0 = DebugWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.ActiveCfg = ReleaseWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.Build.0 = ReleaseWithoutVsix|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugWithoutVsix|Any CPU
@@ -505,14 +514,6 @@ Global
 		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugWithoutVsix|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.Build.0 = DebugWithoutVsix|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.ActiveCfg = ReleaseWithoutVsix|Any CPU
-		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.Build.0 = ReleaseWithoutVsix|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
