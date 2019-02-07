@@ -233,33 +233,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Core\Akavache.Core.csproj">
-      <Project>{9e17369d-da49-48c1-9767-c5178a17bfb8}</Project>
-      <Name>Akavache.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Sqlite3\Akavache.Sqlite3.csproj">
-      <Project>{a003b735-6f6c-4df8-a663-78651a1b6ce0}</Project>
-      <Name>Akavache.Sqlite3</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
-      <Project>{3321ce72-26ed-4d1e-a8f5-6901fb783007}</Project>
-      <Name>Octokit.GraphQL.Core</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj">
-      <Project>{791b408c-0abc-465b-9eb1-a2422d67f418}</Project>
-      <Name>Octokit.GraphQL</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
-      <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
-      <Name>Octokit.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
@@ -279,15 +252,6 @@
       <Project>{a4f579f3-77d3-450a-aacc-f2653ef11e69}</Project>
       <Name>ReactiveUI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj">
-      <Project>{ad0306b7-f88e-44a4-ab36-1d04822e9234}</Project>
-      <Name>Splat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
-      <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
-      <Name>CredentialManagement</Name>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
@@ -305,20 +269,10 @@
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
-      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
-      <Name>GitHub.Extensions.Reactive</Name>
       <Private>True</Private>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
@@ -334,13 +288,6 @@
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
-      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
-      <Name>GitHub.InlineReviews</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj">
       <Project>{54e8d71a-aabb-4698-95fe-7f11612b8e59}</Project>
       <Name>GitHub.Resources</Name>
@@ -351,27 +298,9 @@
       <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
       <Name>GitHub.Services.Vssdk</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
-      <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
-      <PrivateAssets>All</PrivateAssets>
-      <Name>GitHub.StartPage</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
-      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
-      <Name>GitHub.UI.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
