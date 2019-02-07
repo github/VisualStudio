@@ -81,6 +81,9 @@
     <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetVsixContainer>$(OutputPath)GitHub.VisualStudio.vsix</TargetVsixContainer>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- Only deploy extension when building inside Visual Studio -->
     <DeployExtension>False</DeployExtension>
