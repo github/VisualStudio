@@ -64,7 +64,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CreateVsixContainer>True</CreateVsixContainer>
+    <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>True</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
