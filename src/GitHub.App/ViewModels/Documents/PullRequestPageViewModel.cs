@@ -23,6 +23,7 @@ namespace GitHub.ViewModels.Documents
         readonly IPullRequestService service;
         readonly IPullRequestSessionManager sessionManager;
         readonly ITeamExplorerServices teServices;
+        readonly IUsageTracker usageTracker;
         ActorModel currentUserModel;
         ReactiveList<IViewModel> timeline = new ReactiveList<IViewModel>();
 
@@ -35,7 +36,8 @@ namespace GitHub.ViewModels.Documents
             IViewViewModelFactory factory,
             IPullRequestService service,
             IPullRequestSessionManager sessionManager,
-            ITeamExplorerServices teServices)
+            ITeamExplorerServices teServices,
+            IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(service, nameof(service));
@@ -46,6 +48,7 @@ namespace GitHub.ViewModels.Documents
             this.service = service;
             this.sessionManager = sessionManager;
             this.teServices = teServices;
+            this.usageTracker = usageTracker;
 
             timeline.ItemsRemoved.Subscribe(TimelineItemRemoved);
 
@@ -106,6 +109,7 @@ namespace GitHub.ViewModels.Documents
             }
 
             await AddPlaceholder().ConfigureAwait(true);
+            await usageTracker.IncrementCounter(x => x.NumberOfPRConversationsOpened);
         }
 
         /// <inheritdoc/>
