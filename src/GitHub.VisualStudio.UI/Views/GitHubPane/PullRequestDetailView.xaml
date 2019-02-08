@@ -95,6 +95,82 @@
             <TextBlock Opacity="0.5"
                        Text="{Binding Model.UpdatedAt, StringFormat={x:Static ghfvs:Resources.UpdatedFormat}, Converter={ghfvs:DurationToStringConverter}, Mode=OneWay}"/>
 
+            <!-- User actions -->
+            <StackPanel Orientation="Horizontal" 
+                        Margin="0 0 0 -4"
+                        ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
+                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
+                    View Conversation
+                </ghfvs:GitHubActionLink>
+
+                <Rectangle Margin="5 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
+
+                <!-- Checkout pull request button -->
+                <ghfvs:GitHubActionLink Command="{Binding Checkout}"
+                                        Content="{Binding CheckoutState.Caption}"
+                                        VerticalAlignment="Center"
+                                        TextTrimming="CharacterEllipsis"
+                                        Visibility="{Binding CheckoutState, Converter={ghfvs:NullToVisibilityConverter}}"
+                                        ToolTip="{Binding CheckoutState.ToolTip}"
+                                        ToolTipService.ShowOnDisabled="True"/>
+
+                <!-- Pull/push buttons -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
+                    <ghfvs:OcticonImage Icon="arrow_down"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
+                    <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Pull}"
+                                            Command="{Binding Pull}"
+                                            Margin="4,0"
+                                            ToolTip="{Binding UpdateState.PullToolTip}"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            VerticalAlignment="Center"/>
+                    <ghfvs:OcticonImage Icon="arrow_up"/>
+                    <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
+                    <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Push}"
+                                            Command="{Binding Push}"
+                                            Margin="4,0"
+                                            ToolTip="{Binding UpdateState.PushToolTip}"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            VerticalAlignment="Center"/>
+                    <!-- Sync submodules -->
+                    <ghfvs:OcticonImage Icon="package"
+                                        Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
+                    <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"
+                                Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
+                    <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Sync}"
+                                            Command="{Binding SyncSubmodules}"
+                                            Margin="4 0"
+                                            ToolTip="{Binding UpdateState.SyncSubmodulesToolTip}"
+                                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
+                </StackPanel>
+
+                <!-- Branch checked out and up-to-date -->
+                <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                           Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
+                                        <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+
+                    <ghfvs:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
+                    <Run Text="{x:Static ghfvs:Resources.LocalBranchUpToDate}"/>
+                </TextBlock>
+            </StackPanel>
+            <!-- /User actions -->
+
             <!-- Git operation error message -->
             <TextBox Foreground="Red" 
                      Margin="-2 4"
@@ -110,106 +186,6 @@
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
             <ghfvs:ScrollingVerticalStackPanel>
-
-                <StackPanel Orientation="Horizontal" 
-                            Margin="0 -4 0 0"
-                            ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
-                    <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
-                        View on GitHub
-                    </ghfvs:GitHubActionLink>
-
-                    <Rectangle Margin="5 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
-
-                    <!-- Checkout pull request button -->
-                    <ghfvs:GitHubActionLink Command="{Binding Checkout}"
-                                            Content="{Binding CheckoutState.Caption}"
-                                            VerticalAlignment="Center"
-                                            TextTrimming="CharacterEllipsis"
-                                            Visibility="{Binding CheckoutState, Converter={ghfvs:NullToVisibilityConverter}}"
-                                            ToolTip="{Binding CheckoutState.ToolTip}"
-                                            ToolTipService.ShowOnDisabled="True"/>
-
-                    <!-- Pull/push buttons -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                    Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToInverseVisibilityConverter}}">
-                        <ghfvs:OcticonImage Icon="arrow_down"/>
-                        <TextBlock Text="{Binding UpdateState.CommitsBehind}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Pull}"
-                                                Command="{Binding Pull}"
-                                                Margin="4,0"
-                                                ToolTip="{Binding UpdateState.PullToolTip}"
-                                                ToolTipService.ShowOnDisabled="True"
-                                                VerticalAlignment="Center"/>
-                        <ghfvs:OcticonImage Icon="arrow_up"/>
-                        <TextBlock Text="{Binding UpdateState.CommitsAhead}" VerticalAlignment="Center"/>
-                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Push}"
-                                                Command="{Binding Push}"
-                                                Margin="4,0"
-                                                ToolTip="{Binding UpdateState.PushToolTip}"
-                                                ToolTipService.ShowOnDisabled="True"
-                                                VerticalAlignment="Center"/>
-                        <!-- Sync submodules -->
-                        <ghfvs:OcticonImage Icon="package"
-                                            Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
-                        <TextBlock  Margin="4 0 0 0" Text="{Binding UpdateState.SubmodulesToSync}" VerticalAlignment="Center"
-                                    Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
-                        <ghfvs:GitHubActionLink Content="{x:Static ghfvs:Resources.Sync}"
-                                                Command="{Binding SyncSubmodules}"
-                                                Margin="4 0"
-                                                ToolTip="{Binding UpdateState.SyncSubmodulesToolTip}"
-                                                Visibility="{Binding UpdateState.SyncSubmodulesEnabled, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}" />
-                    </StackPanel>
-
-                    <!-- Branch checked out and up-to-date -->
-                    <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
-                               Visibility="{Binding UpdateState.UpToDate, FallbackValue=Collapsed, Converter={ghfvs:BooleanToVisibilityConverter}}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CheckoutMessage}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding UpdateState.CommitsAhead}" Value="0"/>
-                                            <Condition Binding="{Binding UpdateState.CommitsBehind}" Value="0"/>
-                                        </MultiDataTrigger.Conditions>
-                                        <MultiDataTrigger.Setters>
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </MultiDataTrigger.Setters>
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-
-                        <ghfvs:OcticonImage Icon="check" Foreground="#6CC644" Margin="0 0 0 -4"/>
-                        <Run Text="{x:Static ghfvs:Resources.LocalBranchUpToDate}"/>
-                    </TextBlock>
-                </StackPanel>
-
-                <!-- Author and open time -->
-                <ghfvs:SectionControl Name="descriptionSection"
-                                      HeaderText="{x:Static ghfvs:Resources.Description}"
-                                      IsExpanded="True"
-                                      ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
-                    <StackPanel Orientation="Vertical">
-                        <!-- View conversation on GitHub -->
-                        <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
-                            <v:ActorAvatarView ViewModel="{Binding Author}"
-                                               VerticalAlignment="Bottom"
-                                               Width="16"
-                                               Height="16"
-                                               Margin="0,0,0,1"/>
-
-                            <TextBlock VerticalAlignment="Center" Margin="4 0" TextWrapping="Wrap">
-                                <Run FontWeight="SemiBold" Text="{Binding Model.Author.Login, Mode=OneWay}" />
-                                <Run Text="{x:Static ghfvs:Resources.Wrote}" />
-                            </TextBlock>
-                        </StackPanel>
-                        <!-- PR Body -->
-                        <markdig:MarkdownViewer Name="bodyMarkdown"
-                                                Margin="2 4 10 6"
-                                                Markdown="{Binding Body}"/>
-                    </StackPanel>
-                </ghfvs:SectionControl>
 
                 <ghfvs:SectionControl Name="reviewsSection"
                                       HeaderText="{x:Static ghfvs:Resources.Reviewers}"

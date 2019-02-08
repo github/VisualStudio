@@ -31,19 +31,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         static PullRequestListViewModel CreateTarget(
             IPullRequestSessionManager sessionManager = null,
             IRepositoryService repositoryService = null,
-            IPullRequestService service = null,
-            IOpenIssueishDocumentCommand openDocumentCommand = null)
+            IPullRequestService service = null)
         {
             sessionManager = sessionManager ?? CreateSessionManager();
             repositoryService = repositoryService ?? CreateRepositoryService();
             service = service ?? CreatePullRequestService();
-            openDocumentCommand = openDocumentCommand ?? Substitute.For<IOpenIssueishDocumentCommand>();
 
             return new PullRequestListViewModel(
                 sessionManager,
                 repositoryService,
-                service,
-                openDocumentCommand);
+                service);
         }
 
         static async Task<PullRequestListViewModel> CreateTargetAndInitialize(
