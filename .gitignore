@@ -238,6 +238,13 @@ coverage.xml
 #Msbuild binary log output
 output.binlog
 
+# KDiff3
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
+*.orig
+
 AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt
