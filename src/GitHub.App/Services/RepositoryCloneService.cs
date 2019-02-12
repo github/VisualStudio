@@ -99,8 +99,8 @@ namespace GitHub.Services
                         Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
-                            Repositories = org.Repositories(null, null, null, null, null, null, null, order, null, null)
-                                .AllPages()
+                            Repositories = org.Repositories(100, null, null, null, null, null, null, order, null, null)
+                                .Nodes
                                 .Select(repositorySelection).ToList()
                         }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
