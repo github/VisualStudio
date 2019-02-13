@@ -99,17 +99,20 @@
             <StackPanel Orientation="Horizontal" 
                         Margin="0 0 0 -4"
                         ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
-                <!-- TODO: Needs hook up -->
+                <!-- TODO: Needs to be re-hooked up :grimacing: -->
                 <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
                     View on GitHub
                 </ghfvs:GitHubActionLink>
 
                 <Rectangle Margin="5 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
 
-                <!-- TODO: Needs hook up -->
-                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
-                    42
-                </ghfvs:GitHubActionLink>
+                <StackPanel Orientation="Horizontal">
+                    <ghfvs:OcticonImage Margin="0 2 4 0" Foreground="{DynamicResource VsBrush.GrayText}" Width="12" Height="12" Icon="comment"/>
+                    <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
+                        <!-- TODO: Needs hook up -->
+                        42
+                    </ghfvs:GitHubActionLink>
+                </StackPanel>
 
                 <Rectangle Margin="5 0" Width="1" Height="12" VerticalAlignment="Center" Style="{DynamicResource Separator}" />
 
