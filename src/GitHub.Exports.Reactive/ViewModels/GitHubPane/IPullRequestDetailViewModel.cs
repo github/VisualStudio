@@ -172,11 +172,6 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <summary>
-        /// Gets a command that opens the pull request conversation in a document pane.
-        /// </summary>
-        ReactiveCommand<Unit, Unit> OpenConversation { get; }
-
-        /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
         ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }

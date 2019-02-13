@@ -124,7 +124,6 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public ReactiveCommand<Unit, Unit> Pull { get; }
         public ReactiveCommand<Unit, Unit> Push { get; }
         public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
-        public ReactiveCommand<Unit, Unit> OpenConversation { get; }
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
         public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
         public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }

@@ -99,7 +99,8 @@
             <StackPanel Orientation="Horizontal" 
                         Margin="0 0 0 -4"
                         ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
-                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
+                <!-- TODO: Hook this up to open the conversation view -->
+                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View Conversation
                 </ghfvs:GitHubActionLink>
 

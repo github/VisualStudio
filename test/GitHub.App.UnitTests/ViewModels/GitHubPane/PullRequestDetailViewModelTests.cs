@@ -612,8 +612,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IPullRequestFilesViewModel>(),
                 Substitute.For<ISyncSubmodulesCommand>(),
                 Substitute.For<IViewViewModelFactory>(),
-                gitService,
-                Substitute.For<IOpenIssueishDocumentCommand>());
+                gitService);
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
