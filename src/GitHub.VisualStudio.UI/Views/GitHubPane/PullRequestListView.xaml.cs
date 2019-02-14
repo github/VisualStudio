@@ -98,7 +98,7 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
             if (pr != null && vm != null)
             {
-                vm.OpenConversation.Execute(pr);
+                vm.OpenConversation.Execute(pr).Subscribe();
             }
         }
 
