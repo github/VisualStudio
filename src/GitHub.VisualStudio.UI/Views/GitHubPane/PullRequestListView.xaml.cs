@@ -90,6 +90,18 @@ namespace GitHub.VisualStudio.Views.GitHubPane
             }
         }
 
+        void ListBoxItem_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var control = sender as ListBoxItem;
+            var pr = control?.DataContext as IPullRequestListItemViewModel;
+            var vm = DataContext as IPullRequestListViewModel;
+
+            if (pr != null && vm != null)
+            {
+                vm.OpenConversation.Execute(pr);
+            }
+        }
+
         void authorFilterDropDown_PopupOpened(object sender, EventArgs e)
         {
             authorFilter.FocusSearchBox();
