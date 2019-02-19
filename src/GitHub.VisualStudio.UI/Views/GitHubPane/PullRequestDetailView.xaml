@@ -66,7 +66,7 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Vertical"
                     Margin="8 0 0 0">
-            
+
             <!-- Title -->
             <TextBlock Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}"
                        TextWrapping="Wrap"
@@ -99,8 +99,7 @@
             <StackPanel Orientation="Horizontal" 
                         Margin="0 0 0 -4"
                         ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
-                <!-- TODO: Needs to be re-hooked up :grimacing: -->
-                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenConversation}">
+                <ghfvs:GitHubActionLink Margin="0 6" Command="{Binding OpenOnGitHub}">
                     View on GitHub
                 </ghfvs:GitHubActionLink>
 
@@ -259,7 +258,7 @@
                                       HeaderText="{Binding Files.ChangedFilesCount, StringFormat={x:Static ghfvs:Resources.ChangesCountFormat}}"
                                       Margin="0 8 10 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true"/>
-                
+
                 <!-- Put the changes tree outside its expander, so it can scroll horizontally 
                      while the header remains fixed -->
                 <local:PullRequestFilesView DataContext="{Binding Files}"
