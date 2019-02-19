@@ -367,12 +367,19 @@ namespace GitHub.ViewModels.GitHubPane
 
                 this.RaiseAndSetIfChanged(ref targetBranch, value);
 
-                // Note: Asking for this up front in the constructor causes MEF cardinality issues much of the time.
-                // Delaying when I ask for it seems to have better results.
-                var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                var vsDiffBase = componentModel.GetService<IVsDiffBase>();
+                try
+                {
+                    // Note: Asking for this up front in the constructor causes MEF cardinality issues much of the time.
+                    // Delaying when I ask for it seems to have better results.
+                    var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
+                    var vsDiffBase = componentModel.GetService<IVsDiffBase>();
 
-                vsDiffBase.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
+                    vsDiffBase.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
+                }
+                catch
+                {
+                    // silently fail if something goes wrong, likely when the VS Pull Requests package is not installed
+                }
             }
         }
 
@@ -380,10 +387,18 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get
             {
-                var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                var vsDiffBase = componentModel.GetService<IVsDiffBase>();
+                try
+                {
+                    var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
+                    var vsDiffBase = componentModel.GetService<IVsDiffBase>();
 
-                return vsDiffBase.GetChangesList();
+                    return vsDiffBase.GetChangesList();
+                }
+                catch
+                {
+                    // silently fail if something goes wrong, likely when the VS Pull Requests package is not installed
+                    return null;
+                }
             }
         }
 
