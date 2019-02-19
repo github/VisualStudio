@@ -19,14 +19,12 @@ using GitHub.Models.Drafts;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Octokit;
 using ReactiveUI;
 using Serilog;
 using IConnection = GitHub.Models.IConnection;
 using static System.FormattableString;
-using Microsoft.VisualStudio.RichReview.Contracts;
-using System.Threading;
-using Microsoft.VisualStudio.ComponentModelHost;
 
 namespace GitHub.ViewModels.GitHubPane
 {

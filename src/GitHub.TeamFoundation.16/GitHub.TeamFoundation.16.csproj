@@ -47,12 +47,6 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.RichReviews.Contracts">
-      <HintPath>..\..\..\Cascade-reviews\bin\Debug\Cascade.Reviews.VSIX\Microsoft.VisualStudio.RichReviews.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.RichReview.UX">
-      <HintPath>..\..\..\Cascade-reviews\bin\Debug\Cascade.Reviews.VSIX\Microsoft.VisualStudio.RichReview.UX.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Common">
       <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Common.dll</HintPath>
       <Private>False</Private>
@@ -230,6 +224,9 @@
     </PackageReference>
     <PackageReference Include="LibGit2Sharp.NativeBinaries">
       <Version>1.0.164</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.RichReview.Internal">
+      <Version>0.3.793</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.5.0</Version>
