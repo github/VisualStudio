@@ -372,28 +372,9 @@ namespace GitHub.ViewModels.GitHubPane
                 // Note: Asking for this up front in the constructor causes MEF cardinality issues much of the time.
                 // Delaying when I ask for it seems to have better results.
                 var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                var diffBaseService = componentModel.GetService<IDiffBaseService>();
+                var vsDiffBase = componentModel.GetService<IVsDiffBase>();
 
-                try
-                {
-                    // TODO should not call make this call synchronous - need to learn patterns for async/await usage that are common in this project
-                    if (targetBranch != null)
-                    {
-                        string mergeBase = diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(activeLocalRepo.LocalPath, targetBranch.Name, CancellationToken.None).Result;
-                        diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = targetBranch.Name, LongDescription = targetBranch.Name };
-
-                        this.RaisePropertyChanged(nameof(ChangesUserControl));
-                        return;
-                    }
-                }
-                catch
-                {
-                    // currently hitting errors if the target branch does not exist - will have to fetch from the proper remote. How to be sure what remote?
-                    // for prototyping, let's just eat all exceptions and clear the DiffBase if we can't figure it out.
-                }
-
-                diffBaseService.DiffBaseInfo = null;
-                this.RaisePropertyChanged(nameof(ChangesUserControl));
+                vsDiffBase.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
             }
         }
 
@@ -402,9 +383,9 @@ namespace GitHub.ViewModels.GitHubPane
             get
             {
                 var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                var diffBaseService = componentModel.GetService<IDiffBaseService>();
+                var vsDiffBase = componentModel.GetService<IVsDiffBase>();
 
-                return diffBaseService.DiffBaseInformationProvider.GitHubChangesUserControl;
+                return vsDiffBase.GetChangesList();
             }
         }
 

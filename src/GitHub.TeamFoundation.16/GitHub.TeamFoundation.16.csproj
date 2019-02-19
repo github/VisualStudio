@@ -47,6 +47,12 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\src\common\signing.props" />
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.RichReviews.Contracts">
+      <HintPath>..\..\..\Cascade-reviews\bin\Debug\Cascade.Reviews.VSIX\Microsoft.VisualStudio.RichReviews.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.RichReview.UX">
+      <HintPath>..\..\..\Cascade-reviews\bin\Debug\Cascade.Reviews.VSIX\Microsoft.VisualStudio.RichReview.UX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.TeamFoundation.Common">
       <HintPath>..\..\lib\16.0\Microsoft.TeamFoundation.Common.dll</HintPath>
       <Private>False</Private>
@@ -163,6 +169,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Services\VsDiffBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
