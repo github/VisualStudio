@@ -313,6 +313,7 @@ namespace GitHub.InlineReviews.Services
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
                         State = pr.State.FromGraphQl(),
                         UpdatedAt = pr.UpdatedAt,
+                        CommentCount = pr.Comments(0, null, null, null).TotalCount,
                         Comments = pr.Comments(null, null, null, null).AllPages().Select(comment => new CommentModel
                         {
                             Id = comment.Id.Value,

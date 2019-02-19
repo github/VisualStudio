@@ -37,10 +37,15 @@ namespace GitHub.Models
         /// Gets or sets the date/time at which the issue or pull request was last updated.
         /// </summary>
         public DateTimeOffset UpdatedAt { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the comments on the issue or pull request.
         /// </summary>
         public IReadOnlyList<CommentModel> Comments { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of comments on the issue or pull request.
+        /// </summary>
+        public int CommentCount { get; set; }
     }
 }
