@@ -63,11 +63,11 @@ namespace GitHub.ViewModels
         public Uri WebUrl
         {
             get { return webUrl; }
-            private set { this.RaiseAndSetIfChanged(ref webUrl, value); }
+            protected set { this.RaiseAndSetIfChanged(ref webUrl, value); }
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; protected set; }
 
         protected Task InitializeAsync(
             RemoteRepositoryModel repository,

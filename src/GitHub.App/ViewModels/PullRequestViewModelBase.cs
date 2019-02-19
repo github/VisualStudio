@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using ReactiveUI;
@@ -59,6 +60,7 @@ namespace GitHub.ViewModels
             State = model.State;
             SourceBranchDisplayName = GetBranchDisplayName(fork, model.HeadRepositoryOwner, model.HeadRefName);
             TargetBranchDisplayName = GetBranchDisplayName(fork, model.BaseRepositoryOwner, model.BaseRefName);
+            WebUrl = localRepository.CloneUrl.ToRepositoryUrl().Append("pull/" + Number);
         }
 
         static string GetBranchDisplayName(bool isFromFork, string owner, string label)

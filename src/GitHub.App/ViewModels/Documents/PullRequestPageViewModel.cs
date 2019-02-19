@@ -23,6 +23,7 @@ namespace GitHub.ViewModels.Documents
         readonly IPullRequestService service;
         readonly IPullRequestSessionManager sessionManager;
         readonly ITeamExplorerServices teServices;
+        readonly IVisualStudioBrowser visualStudioBrowser;
         readonly IUsageTracker usageTracker;
         ActorModel currentUserModel;
         ReactiveList<IViewModel> timeline = new ReactiveList<IViewModel>();
@@ -37,22 +38,26 @@ namespace GitHub.ViewModels.Documents
             IPullRequestService service,
             IPullRequestSessionManager sessionManager,
             ITeamExplorerServices teServices,
+            IVisualStudioBrowser visualStudioBrowser,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(service, nameof(service));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(visualStudioBrowser, nameof(visualStudioBrowser));
             Guard.ArgumentNotNull(teServices, nameof(teServices));
 
             this.factory = factory;
             this.service = service;
             this.sessionManager = sessionManager;
             this.teServices = teServices;
+            this.visualStudioBrowser = visualStudioBrowser;
             this.usageTracker = usageTracker;
 
             timeline.ItemsRemoved.Subscribe(TimelineItemRemoved);
 
             ShowCommit = ReactiveCommand.CreateFromTask<string>(DoShowCommit);
+            OpenOnGitHub = ReactiveCommand.Create(DoOpenOnGitHub);
         }
 
         /// <inheritdoc/>
@@ -196,6 +201,11 @@ namespace GitHub.ViewModels.Documents
         {
             await service.FetchCommit(LocalRepository, Repository, oid).ConfigureAwait(true);
             teServices.ShowCommitDetails(oid);
+        }
+
+        void DoOpenOnGitHub()
+        {
+            visualStudioBrowser.OpenUrl(WebUrl);
         }
 
         void TimelineItemRemoved(IViewModel item)
