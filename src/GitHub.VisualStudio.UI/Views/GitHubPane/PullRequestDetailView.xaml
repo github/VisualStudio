@@ -221,7 +221,7 @@
 
                 <ghfvs:SectionControl Name="reviewsSection"
                                       HeaderText="{x:Static ghfvs:Resources.Reviewers}"
-                                      IsExpanded="False"
+                                      IsExpanded="True"
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true">
                     <ItemsControl ItemsSource="{Binding Reviews}" Margin="0 4 12 4">
@@ -235,7 +235,7 @@
 
                 <ghfvs:SectionControl Name="checksSection"
                                       HeaderText="Checks"
-                                      IsExpanded="False"
+                                      IsExpanded="True"
                                       Margin="0 8 0 0"
                                       ghfvs:ScrollingVerticalStackPanel.IsFixed="true"
                                       Visibility="{Binding Checks.Count, Converter={ghfvs:CountToVisibilityConverter}}">
