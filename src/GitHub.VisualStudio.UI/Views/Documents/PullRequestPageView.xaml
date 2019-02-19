@@ -14,7 +14,7 @@
     <d:DesignData.DataContext>
         <ghfvs:PullRequestPageViewModelDesigner/>
     </d:DesignData.DataContext>
-    
+
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -42,6 +42,7 @@
 
             <TextBlock Margin="0 8"
                        Foreground="{DynamicResource VsBrush.WindowText}"
+                       TextWrapping="Wrap"
                        Style="{DynamicResource {x:Static vsui:VsResourceKeys.TextBlockEnvironment200PercentFontSizeStyleKey}}">
                 <Run Text="{Binding Title, Mode=OneWay}"/>
                 <Hyperlink Command="{Binding OpenOnGitHub}">
@@ -113,7 +114,7 @@
                                     CornerRadius="3"
                                     Padding="2 1"
                                     Visibility="{Binding IsPending, Converter={ui:BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                              <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
+                                <TextBlock FontSize="10" Text="{x:Static ghfvs:Resources.Pending}" />
                             </Border>
                         </StackPanel>
                     </Border>
