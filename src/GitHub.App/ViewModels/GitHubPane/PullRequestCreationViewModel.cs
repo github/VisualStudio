@@ -9,7 +9,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
@@ -19,7 +18,6 @@ using GitHub.Models.Drafts;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Validation;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Octokit;
 using ReactiveUI;
 using Serilog;
@@ -40,6 +38,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IModelServiceFactory modelServiceFactory;
         readonly IMessageDraftStore draftStore;
         readonly IGitService gitService;
+        readonly IVsDiffBase vsDiffBase;
         readonly IScheduler timerScheduler;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         LocalRepositoryModel activeLocalRepo;
@@ -52,8 +51,9 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
-            IGitService gitService)
-            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
+            IGitService gitService,
+            [Import(AllowDefault = true)] IVsDiffBase vsDiffBase)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, vsDiffBase, DefaultScheduler.Instance)
         {
         }
 
@@ -63,6 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
             INotificationService notifications,
             IMessageDraftStore draftStore,
             IGitService gitService,
+            IVsDiffBase vsDiffBase,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
@@ -76,6 +77,8 @@ namespace GitHub.ViewModels.GitHubPane
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
             this.gitService = gitService;
+            this.vsDiffBase = vsDiffBase;
+            this.timerScheduler = timerScheduler;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -369,16 +372,11 @@ namespace GitHub.ViewModels.GitHubPane
 
                 try
                 {
-                    // Note: Asking for this up front in the constructor causes MEF cardinality issues much of the time.
-                    // Delaying when I ask for it seems to have better results.
-                    var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                    var vsDiffBase = componentModel.GetService<IVsDiffBase>();
-
-                    vsDiffBase.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
+                    vsDiffBase?.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
                 }
-                catch
+                catch (Exception e)
                 {
-                    // silently fail if something goes wrong, likely when the VS Pull Requests package is not installed
+                    log.Error(e, "Couldn't set diff base");
                 }
             }
         }
@@ -389,14 +387,11 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 try
                 {
-                    var componentModel = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SComponentModel)) as IComponentModel;
-                    var vsDiffBase = componentModel.GetService<IVsDiffBase>();
-
-                    return vsDiffBase.GetChangesList();
+                    return vsDiffBase?.GetChangesList();
                 }
-                catch
+                catch (Exception e)
                 {
-                    // silently fail if something goes wrong, likely when the VS Pull Requests package is not installed
+                    log.Error(e, "Couldn't set diff base");
                     return null;
                 }
             }
