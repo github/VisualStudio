@@ -22,7 +22,6 @@ namespace GitHub.VisualStudio.Views.Documents
         public IssueishCommentView()
         {
             InitializeComponent();
-            this.Loaded += CommentView_Loaded;
             bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
             DataContextChanged += HandleDataContextChanged;
         }
@@ -38,15 +37,6 @@ namespace GitHub.VisualStudio.Views.Documents
             if (DataContext is IIssueishCommentViewModel vm)
             {
                 GetBrowser().OpenUrl(vm.WebUrl);
-            }
-        }
-
-        private void CommentView_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (buttonPanel.IsVisible)
-            {
-                BringIntoView();
-                body.Focus();
             }
         }
 
@@ -71,14 +61,6 @@ namespace GitHub.VisualStudio.Views.Documents
             if (command?.CanExecute(null) == true)
             {
                 command.Execute(null);
-            }
-        }
-
-        private void buttonPanel_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
-        {
-            if (buttonPanel.IsVisible)
-            {
-                BringIntoView();
             }
         }
 
