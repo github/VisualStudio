@@ -50,8 +50,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             var filterRepository = this.WhenAnyValue(x => x.Filter)
                 .Select(f => gitHubContextService.FindContextFromUrl(f))
-                .Where(c => c?.LinkType == LinkType.Repository)
-                .Select(c => new RepositoryModel(c.RepositoryName, c.Url));
+                .Select(CreateRepository);
 
             repository = selectedRepository
                 .Merge(filterRepository)
@@ -179,14 +178,21 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
             {
-                var urlString = item.Url.ToString();
-                var urlStringWithGit = urlString + ".git";
-                var urlStringWithSlash = urlString + "/";
-                return
-                    item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase) ||
-                    urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
-                    urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
-                    urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
+                if (new UriString(Filter).IsHypertextTransferProtocol)
+                {
+                    var urlString = item.Url.ToString();
+                    var urlStringWithGit = urlString + ".git";
+                    var urlStringWithSlash = urlString + "/";
+                    return
+                        urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return
+                        item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                }
             }
 
             return true;
@@ -197,6 +203,18 @@ namespace GitHub.ViewModels.Dialog.Clone
             return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :
                 null;
+        }
+
+        RepositoryModel CreateRepository(GitHubContext context)
+        {
+            switch (context?.LinkType)
+            {
+                case LinkType.Repository:
+                case LinkType.Blob:
+                    return new RepositoryModel(context.RepositoryName, context.Url);
+            }
+
+            return null;
         }
     }
 }

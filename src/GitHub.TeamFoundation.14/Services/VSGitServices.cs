@@ -86,14 +86,22 @@ namespace GitHub.Services
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
 #elif TEAMEXPLORER15 || TEAMEXPLORER16
+            // IGitActionsExt is proffered by SccProviderPackage, but isn't advertised.
+            // To ensure that getting IGitActionsExt doesn't return null, we first request the
+            // IGitExt service which is advertised. This forces SccProviderPackage to load
+            // and proffer IGitActionsExt.
+            var gitExt = serviceProvider.GetService(typeof(IGitExt));
+            Assumes.NotNull(gitExt);
+            var gitActionsExt = serviceProvider.GetService<IGitActionsExt>();
+            Assumes.NotNull(gitActionsExt);
+
             // The progress parameter uses the ServiceProgressData type which is defined in
             // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
             // would cause type conflicts, so we're using reflection to call CloneAsync.
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
             var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
             Assumes.NotNull(cloneAsyncMethod);
             var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, cancellationToken, progress };
-            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitActionsExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await cloneTask;

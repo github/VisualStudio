@@ -445,6 +445,7 @@ Line 4";
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
                 var baseContents = @"Line 1
@@ -500,6 +501,7 @@ Line 4";
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1
@@ -553,6 +555,7 @@ Line 4";
             }
 
             [Test]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1

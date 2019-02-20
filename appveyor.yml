@@ -2,17 +2,14 @@ os: Visual Studio 2017
 version: '2.8.0.{build}'
 skip_tags: true
 
-environment:
-  matrix:
-    - BUILD_TYPE: normal
-
 install:
 - choco install --no-progress BCC-MSBuildLog
 - choco install --no-progress BCC-Submission
 - ps: |
     $full_build = Test-Path env:GHFVS_KEY
     $forVSInstaller = $env:BUILD_TYPE -eq "vsinstaller"
-    $package = $full_build -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master" -or $forVSInstaller -or $env:BUILD_TYPE -eq "package")
+    $forPackage = $env:BUILD_TYPE -eq "package"
+    $package = $full_build -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $forVSInstaller -or $forPackage)
 
     $message = "Building "
     if ($package) { $message += "and packaging "}
@@ -55,10 +52,23 @@ on_success:
 for:
 -
   branches:
+    except:
+      - /releases/.*-vsinstaller/
+  environment:
+    matrix:
+      - BUILD_TYPE: normal
+-
+  branches:
     only:
       - /releases/.*-vsinstaller/
-      - master
   environment:
     matrix:
       - BUILD_TYPE: package
       - BUILD_TYPE: vsinstaller
+-
+  branches:
+    only:
+      - master
+  environment:
+    matrix:
+      - BUILD_TYPE: package

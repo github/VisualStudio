@@ -26,6 +26,7 @@ public class RepositorySelectViewModelTests
         [TestCase("https://github.com/jcansdale/TestDriven.Net", "owner", "name", "https://github.com/jcansdale/TestDriven.Net-issues", 1)]
         [TestCase("https://github.com/owner/name/", "owner", "name", "https://github.com/owner/name", 1, Description = "Trailing slash")]
         [TestCase("https://github.com/owner/name.git", "owner", "name", "https://github.com/owner/name", 1, Description = "Trailing .git")]
+        [TestCase("github.com", "owner", "name", "https://github.com/owner/name", 0, Description = "Don't include host name in search")]
         public async Task Filter(string filter, string owner, string name, string url, int expectCount)
         {
             var contributedToRepositories = new[]
@@ -57,6 +58,8 @@ public class RepositorySelectViewModelTests
         [TestCase("filter", null)]
         [TestCase("https://github.com", null)]
         [TestCase("https://github.com/github/VisualStudio", "https://github.com/github/VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio/blob/master/README.md", "https://github.com/github/VisualStudio/blob/master/README.md")]
+        [TestCase("https://github.com/github/VisualStudio/pull/2208", null)]
         public void Set_Repository_When_Filter_Is_Url(string url, string expectUrl)
         {
             var expectCloneUrl = expectUrl != null ? new UriString(expectUrl) : null;
@@ -66,6 +69,24 @@ public class RepositorySelectViewModelTests
             var target = new RepositorySelectViewModel(repositoryCloneService, gitHubContextService);
 
             target.Filter = url;
+
+            Assert.That(target.Repository?.CloneUrl, Is.EqualTo(expectCloneUrl));
+        }
+
+        [TestCase("filter;https://github.com/github/VisualStudio", "https://github.com/github/VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio;filter", null)]
+        public void Change_Filters(string filters, string expectUrl)
+        {
+            var expectCloneUrl = expectUrl != null ? new UriString(expectUrl) : null;
+            var repositoryCloneService = CreateRepositoryCloneService();
+            var gitHubContextService = new GitHubContextService(Substitute.For<IGitHubServiceProvider>(),
+                Substitute.For<IGitService>(), Substitute.For<IVSServices>());
+            var target = new RepositorySelectViewModel(repositoryCloneService, gitHubContextService);
+
+            foreach (var filter in filters.Split(';'))
+            {
+                target.Filter = filter;
+            }
 
             Assert.That(target.Repository?.CloneUrl, Is.EqualTo(expectCloneUrl));
         }
