@@ -1,11 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading;
+using GitHub.Logging;
 using GitHub.Services;
 using Microsoft.VisualStudio.RichReview.Contracts;
 using Microsoft.VisualStudio.RichReview.UX.Controls;
 using Microsoft.VisualStudio.RichReview.UX.Controls.ViewModel;
 using Microsoft.VisualStudio.Shell;
+using Serilog;
 
 namespace GitHub.TeamFoundation.Services
 {
@@ -27,6 +29,8 @@ namespace GitHub.TeamFoundation.Services
 
     internal class VsDiffBase : IVsDiffBase
     {
+        static readonly ILogger log = LogManager.ForContext<VsDiffBase>();
+
         readonly Lazy<object> diffBaseServiceObject;
 
         // store this in a static because this class does not seem to be a singleton
@@ -41,19 +45,26 @@ namespace GitHub.TeamFoundation.Services
         {
             ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                if (diffBaseServiceObject.Value is IDiffBaseService diffBaseService)
+                try
                 {
-                    try
+                    if (diffBaseServiceObject.Value is IDiffBaseService diffBaseService)
                     {
-                        string mergeBase = await diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(repoPath, branchName, CancellationToken.None);
-                        diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = branchName, LongDescription = branchName };
+                        try
+                        {
+                            string mergeBase = await diffBaseService.DiffBaseInformationProvider.GetMergeBaseAsync(repoPath, branchName, CancellationToken.None);
+                            diffBaseService.DiffBaseInfo = new DiffBaseInfo() { Id = mergeBase, ShortDescription = branchName, LongDescription = branchName };
+                        }
+                        catch
+                        {
+                            // currently hitting errors if the target branch does not exist - will have to fetch from the proper remote. How to be sure what remote?
+                            // for prototyping, let's just eat all exceptions and clear the DiffBase if we can't figure it out.
+                            diffBaseService.DiffBaseInfo = null;
+                        }
                     }
-                    catch
-                    {
-                        // currently hitting errors if the target branch does not exist - will have to fetch from the proper remote. How to be sure what remote?
-                        // for prototyping, let's just eat all exceptions and clear the DiffBase if we can't figure it out.
-                        diffBaseService.DiffBaseInfo = null;
-                    }
+                }
+                catch (Exception e)
+                {
+                    log.Error(e, nameof(SetDiffBase));
                 }
             });
         }
