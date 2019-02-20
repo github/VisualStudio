@@ -186,8 +186,7 @@
                         Grid.Column="2" Grid.Row="3" 
                         Margin="4 8" 
                         HorizontalAlignment="Left"
-                        Orientation="Horizontal"
-                        IsVisibleChanged="buttonPanel_IsVisibleChanged">
+                        Orientation="Horizontal">
                 <StackPanel.Style>
                     <Style TargetType="FrameworkElement">
                         <Setter Property="Visibility" Value="Collapsed"/>
