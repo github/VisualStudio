@@ -26,6 +26,8 @@ namespace GitHub.ViewModels.Documents
         /// </summary>
         ReactiveCommand<string, Unit> ShowCommit { get; }
 
+        ReactiveCommand<Unit, Unit> OpenInPane { get; }
+
         /// <summary>
         /// Initializes the view model with data.
         /// </summary>

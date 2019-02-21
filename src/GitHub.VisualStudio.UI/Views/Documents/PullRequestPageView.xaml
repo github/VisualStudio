@@ -48,6 +48,7 @@
                 <Hyperlink Command="{Binding OpenOnGitHub}">
                     (#<Run Text="{Binding Number, Mode=OneWay}"/>)
                 </Hyperlink>
+                <Hyperlink Command="{Binding OpenInPane}">(Open in pane)</Hyperlink>
             </TextBlock>
 
             <StackPanel Grid.Row="1" Orientation="Horizontal">

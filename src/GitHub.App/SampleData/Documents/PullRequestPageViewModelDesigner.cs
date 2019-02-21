@@ -98,6 +98,7 @@ When leaving an inline comment, the comment posts successfully and then a new co
         public string Title { get; set; } = "Save drafts of comments";
         public Uri WebUrl { get; set; }
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<Unit, Unit> OpenInPane { get; }
         public ReactiveCommand<string, Unit> ShowCommit { get; }
 
 

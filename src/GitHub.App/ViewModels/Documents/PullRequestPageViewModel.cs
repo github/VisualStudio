@@ -8,6 +8,7 @@ using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Documents
@@ -25,6 +26,7 @@ namespace GitHub.ViewModels.Documents
         readonly ITeamExplorerServices teServices;
         readonly IVisualStudioBrowser visualStudioBrowser;
         readonly IUsageTracker usageTracker;
+        readonly IGitHubPaneViewModel gitHubPaneViewModel;
         ActorModel currentUserModel;
         ReactiveList<IViewModel> timeline = new ReactiveList<IViewModel>();
 
@@ -39,7 +41,8 @@ namespace GitHub.ViewModels.Documents
             IPullRequestSessionManager sessionManager,
             ITeamExplorerServices teServices,
             IVisualStudioBrowser visualStudioBrowser,
-            IUsageTracker usageTracker)
+            IUsageTracker usageTracker,
+            IGitHubPaneViewModel gitHubPaneViewModel)
         {
             Guard.ArgumentNotNull(factory, nameof(factory));
             Guard.ArgumentNotNull(service, nameof(service));
@@ -53,11 +56,18 @@ namespace GitHub.ViewModels.Documents
             this.teServices = teServices;
             this.visualStudioBrowser = visualStudioBrowser;
             this.usageTracker = usageTracker;
+            this.gitHubPaneViewModel = gitHubPaneViewModel;
 
             timeline.ItemsRemoved.Subscribe(TimelineItemRemoved);
 
             ShowCommit = ReactiveCommand.CreateFromTask<string>(DoShowCommit);
             OpenOnGitHub = ReactiveCommand.Create(DoOpenOnGitHub);
+            OpenInPane = ReactiveCommand.Create(DoOpenInPane);
+        }
+
+        void DoOpenInPane()
+        {
+            gitHubPaneViewModel.NavigateTo(new Uri($"github://pane/{LocalRepository.Owner}/{LocalRepository.Name}/pull/{Number}"));
         }
 
         /// <inheritdoc/>
@@ -71,6 +81,8 @@ namespace GitHub.ViewModels.Documents
 
         /// <inheritdoc/>
         public ReactiveCommand<string, Unit> ShowCommit { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenInPane { get; }
 
         /// <inheritdoc/>
         public async Task InitializeAsync(
