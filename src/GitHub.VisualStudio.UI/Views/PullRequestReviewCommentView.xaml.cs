@@ -1,21 +1,27 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Input;
+using GitHub.Exports;
 using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
+using GitHub.VisualStudio.UI.Helpers;
 using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.Views
 {
-    public class GenericCommentView : ViewBase<ICommentViewModel, GenericCommentView> { }
+    public class GenericPullRequestReviewCommentView : ViewBase<IPullRequestReviewCommentViewModel, GenericPullRequestReviewCommentView> { }
 
-    public partial class CommentView : GenericCommentView
+    [ExportViewFor(typeof(IPullRequestReviewCommentViewModel))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public partial class PullRequestReviewCommentView : GenericPullRequestReviewCommentView
     {
-        public CommentView()
+        public PullRequestReviewCommentView()
         {
             InitializeComponent();
             this.Loaded += CommentView_Loaded;
+            bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
 
             this.WhenActivated(d =>
             {

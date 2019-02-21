@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -10,6 +11,11 @@ namespace GitHub.ViewModels
     /// </summary>
     public interface IPullRequestReviewCommentThreadViewModel : ICommentThreadViewModel
     {
+        /// <summary>
+        /// Gets the comments in the thread.
+        /// </summary>
+        IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
+
         /// <summary>
         /// Gets the current pull request review session.
         /// </summary>
