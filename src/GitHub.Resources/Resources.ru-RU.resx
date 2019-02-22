@@ -59,46 +59,46 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -118,767 +118,734 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>Select a containing folder for your new repository.</value>
+    <value>Выберите папку для нового репозитория.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a Repository</value>
+    <value>Клонировать репозиторий</value>
   </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
-    <value>Open from GitHub</value>
+    <value>Открыть из GitHub</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>Не удалось подключиться к github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>Create a GitHub Gist</value>
+    <value>Создать GitHub gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>Create a {0} Repository</value>
+    <value>Создать {0} репозиторий</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>Please enter an Enterprise URL</value>
+    <value>Введите URL-адрес предприятия</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Please enter a valid Enterprise URL</value>
+    <value>Введите допустимый URL-адрес предприятия</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>Not an Enterprise server. Please enter an Enterprise URL</value>
+    <value>Это не сервер предприятия. Введите URL-адрес предприятия</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(forgot your password?)</value>
+    <value>(Забыли пароль?)</value>
   </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
-    <value>Make sure to use your password and not a Personal Access token to sign in.</value>
+    <value>Используйте для входа только свой пароль, а не личный маркер доступа.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Check your username and password, then try again</value>
+    <value>Проверьте имя пользователя и пароль и повторите попытку.</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>Sign in failed.</value>
+    <value>Сбой входа.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
-    <value>Connect To GitHub</value>
+    <value>Подключиться к GitHub</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
-    <value>Please enter your password</value>
+    <value>Введите пароль</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
+    <value>Запрос на вытягивание для ветви **{0}** успешно создан в [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
-    <value>Publish repository</value>
+    <value>Опубликовать репозиторий</value>
   </data>
   <data name="PublishToTitle" xml:space="preserve">
-    <value>Publish repository to {0}</value>
+    <value>Опубликовать репозиторий в {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
-    <value>Please enter a title for the Pull Request</value>
+    <value>Введите заголовок для запроса на вытягивание</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
-    <value>Source and target branch cannot be the same</value>
+    <value>Исходная и целевая ветви не могут совпадать</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>Source branch doesn't exist remotely, have you pushed it?</value>
+    <value>Исходная ветвь не существует удаленно, вы отправили ее?</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No selected repository.</value>
+    <value>Нет выбранного репозитория.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>Please enter a repository path</value>
+    <value>Введите путь к репозиторию</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
-    <value>Please enter a valid path</value>
+    <value>Введите допустимый путь</value>
   </data>
   <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
-    <value>Path contains invalid characters</value>
+    <value>Путь содержит недопустимые символы</value>
   </data>
   <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
-    <value>Path too long</value>
+    <value>Слишком длинный путь</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
-    <value>Repository '{0}/{1}' already exists.</value>
+    <value>Репозиторий "{0}/{1}" уже существует.</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
-    <value>Change the repository name or select a different account and try again.</value>
+    <value>Измените имя репозитория или выберите другую учетную запись и повторите попытку.</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>Exceeded private repositories quota.</value>
+    <value>Превышена квота для частных репозиториев.</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
-    <value>Repository with same name already exists at this location</value>
+    <value>Репозиторий с таким именем уже существует в этом расположении</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
-    <value>Please enter a repository name</value>
+    <value>Введите имя репозитория.</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
-    <value>Repository name must be fewer than 100 characters</value>
+    <value>Имя репозитория должно содержать меньше 100 символов</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>Will be created as {0}</value>
+    <value>Будет создан как {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
+    <value>Откройте приложение двухфакторной проверки подлинности на устройстве, чтобы просмотреть код проверки подлинности.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>We sent you a message via SMS with your authentication code.</value>
+    <value>Мы отправили вам SMS с кодом проверки подлинности.</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>Two-Factor authentication required</value>
+    <value>Требуется двухфакторная проверка подлинности</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>Enter a sign in authentication code here</value>
+    <value>Введите знак в коде проверки подлинности</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>Please enter your username or email address</value>
+    <value>Введите имя пользователя или адрес электронной почты</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
-    <value>Username or email address must not have spaces</value>
+    <value>Имя пользователя или адрес электронной почты не должны содержать пробелы</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>Pull Requests</value>
+    <value>Запросы на вытягивание</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>Pull Request</value>
+    <value>Запрос на вытягивание</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>add</value>
+    <value>добавлено</value>
   </data>
   <data name="Fork" xml:space="preserve">
-    <value>fork</value>
+    <value>вилка</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>[invalid]</value>
+    <value>[недопустимый]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
-    <value>You must pull before you can push</value>
+    <value>Нужно вытянуть, прежде чем отправлять</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>No commits to pull</value>
+    <value>Нет фиксаций для вытягивания</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>No commits to push</value>
+    <value>Нет фиксаций для отправки</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
-    <value>*No description provided.*</value>
+    <value>*Описание не указано.*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>Checkout {0}</value>
+    <value>Извлечение {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>Checkout to {0}</value>
+    <value>Извлечь в {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>Pull from {0} branch {1}</value>
+    <value>Вытянуть из ветви {0} {1}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>Push to {0} branch {1}</value>
+    <value>Отправить в ветвь {0} {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>remote</value>
+    <value>удаленный</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
-    <value>rename</value>
+    <value>переименование</value>
   </data>
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
-    <value>The source repository is no longer available.</value>
+    <value>Репозиторий исходного кода больше не доступен.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Cannot checkout as your working directory has uncommitted changes.</value>
+    <value>Не удается извлечь, так как рабочий каталог имеет незафиксированные изменения.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
-    <value>Sync {0} submodules</value>
+    <value>Синхронизация подмодулей ({0})</value>
   </data>
   <data name="CouldntFindGitOnPath" xml:space="preserve">
-    <value>Couldn't find Git.exe on PATH.
+    <value>Не удалось найти Git.exe по пути в переменной PATH.
 
-Please install Git for Windows from:
+Установите Git для Windows со страницы:
 https://git-scm.com/download/win</value>
   </data>
   <data name="Approved" xml:space="preserve">
-    <value>Approved</value>
+    <value>Утверждено</value>
   </data>
   <data name="ChangesRequested" xml:space="preserve">
-    <value>Changes Requested</value>
+    <value>Запрошены изменения</value>
   </data>
   <data name="Commented" xml:space="preserve">
-    <value>Commented</value>
+    <value>Комментарий добавлен</value>
   </data>
   <data name="InProgress" xml:space="preserve">
-    <value>InProgress</value>
+    <value>Выполняется</value>
   </data>
   <data name="NavigateToEditorStatusMessage" xml:space="preserve">
-    <value>Press Enter to navigate to Editor</value>
+    <value>Нажмите клавишу ВВОД для перехода в редактор</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>Checkout PR branch before navigating to Editor</value>
+    <value>Извлечь ветвь PR до перехода в редактор</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Press Enter to navigate to Editor (PR branch must be checked out)</value>
+    <value>Нажмите клавишу ВВОД для перехода в редактор (ветвь PR должна быть извлечена)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Fork Repository</value>
+    <value>Создать вилку репозитория</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Switch Origin</value>
+    <value>Переключить источник</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
-    <value>Are you sure you want to cancel this review? You will lose all your pending comments.</value>
+    <value>Вы действительно хотите отменить эту проверку? Все ожидающие комментарии будут потеряны.</value>
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
-    <value>Cancel Review</value>
+    <value>Отменить проверку</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>A file exists at the destination path.</value>
+    <value>В пути назначения существует файл.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
-    <value>Logout Required</value>
+    <value>Требуется выход из системы</value>
   </data>
   <data name="day" xml:space="preserve">
-    <value>{0:N0} day ago</value>
+    <value>{0:N0} дн. назад</value>
   </data>
   <data name="days" xml:space="preserve">
-    <value>{0:N0} days ago</value>
+    <value>{0:N0} дн. назад</value>
   </data>
   <data name="hour" xml:space="preserve">
-    <value>{0:N0} hour ago</value>
+    <value>{0:N0} ч назад</value>
   </data>
   <data name="hours" xml:space="preserve">
-    <value>{0:N0} hours ago</value>
+    <value>{0:N0} ч назад</value>
   </data>
   <data name="JustNow" xml:space="preserve">
-    <value>just now</value>
+    <value>сейчас</value>
   </data>
   <data name="minute" xml:space="preserve">
-    <value>{0:N0} minute ago</value>
+    <value>{0:N0} мин назад</value>
   </data>
   <data name="minutes" xml:space="preserve">
-    <value>{0:N0} minutes ago</value>
+    <value>{0:N0} мин назад</value>
   </data>
   <data name="month" xml:space="preserve">
-    <value>{0:N0} month ago</value>
+    <value>{0:N0} мес. назад</value>
   </data>
   <data name="months" xml:space="preserve">
-    <value>{0:N0} months ago</value>
+    <value>{0:N0} мес. назад</value>
   </data>
   <data name="second" xml:space="preserve">
-    <value>{0:N0} second ago</value>
+    <value>{0:N0} с назад</value>
   </data>
   <data name="seconds" xml:space="preserve">
-    <value>{0:N0} seconds ago</value>
+    <value>{0:N0} с назад</value>
   </data>
   <data name="year" xml:space="preserve">
-    <value>{0:N0} year ago</value>
+    <value>{0:N0} г. назад</value>
   </data>
   <data name="years" xml:space="preserve">
-    <value>{0:N0} years ago</value>
+    <value>{0:N0} года/лет назад</value>
   </data>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
-    <value>Invalid authentication code</value>
+    <value>Недопустимый код проверки подлинности</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>Try entering the code again or clicking the resend button to get a new authentication code.</value>
+    <value>Попробуйте ввести код еще раз или нажать кнопку повторной отправки, чтобы получить новый код проверки подлинности.</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>Authentication code sent!</value>
+    <value>Код проверки подлинности отправлен.</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
-    <value>If you do not receive the authentication code, contact support@github.com.</value>
+    <value>Если вы не получите код проверки подлинности, обратитесь по адресу support@github.com.</value>
   </data>
   <data name="browsePathButtonContent" xml:space="preserve">
-    <value>Browse</value>
+    <value>Обзор</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>Could not connect to github.com</value>
+    <value>Не удалось подключиться к github.com</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
-    <value>Could not connect to the server.</value>
+    <value>Не удалось подключиться к серверу.</value>
   </data>
   <data name="CreateLink" xml:space="preserve">
-    <value>Create</value>
+    <value>Создать</value>
   </data>
   <data name="DescriptionOptional" xml:space="preserve">
-    <value>Description (Optional)</value>
+    <value>Описание (необязательно)</value>
   </data>
   <data name="openInBrowser" xml:space="preserve">
-    <value>Open in Browser</value>
+    <value>Открыть в браузере</value>
   </data>
   <data name="CancelLink" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Отмена</value>
   </data>
   <data name="gistCreatedMessage" xml:space="preserve">
-    <value>Gist created</value>
+    <value>Gist создан</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>Failed to create gist</value>
+    <value>Не удалось создать gist</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
-    <value>by</value>
+    <value>по</value>
   </data>
   <data name="Options_PrivacyTitle" xml:space="preserve">
-    <value>Privacy</value>
+    <value>Конфиденциальность</value>
   </data>
   <data name="Options_MetricsLabel" xml:space="preserve">
-    <value>Help us improve by sending anonymous usage data</value>
+    <value>Помогите нам улучшить продукт, отправляя анонимные данные об использовании</value>
   </data>
   <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
-    <value>Could not copy to the clipboard. Please try again.</value>
+    <value>Не удалось скопировать в буфер обмена. Повторите попытку.</value>
   </data>
   <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
-    <value>Link copied to clipboard</value>
+    <value>Ссылка скопирована в буфер обмена</value>
   </data>
   <data name="RepositoryPublishedMessage" xml:space="preserve">
-    <value>Repository created successfully.</value>
+    <value>Репозиторий успешно создан.</value>
   </data>
   <data name="makePrivateGist" xml:space="preserve">
-    <value>Private Gist</value>
+    <value>Частный gist</value>
   </data>
   <data name="fileNameText" xml:space="preserve">
-    <value>File Name</value>
+    <value>Имя файла</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>You are not signed in to {0}, so certain git operations may fail. [Sign in now]({1})</value>
+    <value>Вы не вошли в {0}, поэтому некоторые операции Git могут завершиться сбоем. [Войти в систему]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
-    <value>Wiki</value>
+    <value>Вики-сайт</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>Pulse</value>
+    <value>Импульс</value>
   </data>
   <data name="pathText" xml:space="preserve">
-    <value>Path</value>
+    <value>Путь</value>
   </data>
   <data name="IssuesNavigationItemText" xml:space="preserve">
-    <value>Issues</value>
+    <value>Вопросы</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
-    <value>Graphs</value>
+    <value>Диаграммы</value>
   </data>
   <data name="GitHubPublishSectionTitle" xml:space="preserve">
-    <value>Publish to GitHub</value>
+    <value>Опубликовать в GitHub</value>
   </data>
   <data name="BlurbText" xml:space="preserve">
-    <value>Powerful collaboration, code review, and code management for open source and private projects.</value>
+    <value>Эффективные средства совместной работы, проверки кода и управления кодом для закрытых проектов и проектов открытого кода.</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
-    <value>Connect…</value>
+    <value>Подключиться…</value>
   </data>
   <data name="CloneLink" xml:space="preserve">
-    <value>Clone</value>
+    <value>Клонировать</value>
   </data>
   <data name="verifyText" xml:space="preserve">
-    <value>Verify</value>
+    <value>Проверить</value>
   </data>
   <data name="twoFactorAuthText" xml:space="preserve">
-    <value>Two-factor authentication</value>
+    <value>Двухфакторная проверка подлинности</value>
   </data>
   <data name="SignUpLink" xml:space="preserve">
-    <value>Sign up</value>
+    <value>Зарегистрироваться</value>
   </data>
   <data name="SignOutLink" xml:space="preserve">
-    <value>Sign out</value>
+    <value>Выход</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
-    <value>Send the code to your registered SMS Device again</value>
+    <value>Снова отправить код на зарегистрированное устройство для SMS</value>
   </data>
   <data name="resendCodeButtonContent" xml:space="preserve">
-    <value>Resend</value>
+    <value>Повторно отправить</value>
   </data>
   <data name="RepoNameText" xml:space="preserve">
-    <value>Repository Name</value>
+    <value>Имя репозитория</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>This repository does not have a remote. Fill out the form to publish it to GitHub.</value>
+    <value>У этого репозитория нет удаленного репозитория. Заполните форму на публикацию в GitHub.</value>
   </data>
   <data name="publishText" xml:space="preserve">
-    <value>Publish</value>
+    <value>Опубликовать</value>
   </data>
   <data name="orText" xml:space="preserve">
-    <value>or</value>
+    <value>или</value>
   </data>
   <data name="openTwoFactorAuthAppText" xml:space="preserve">
-    <value>Open the two-factor authentication app on your device to view your authentication code.</value>
+    <value>Откройте приложение двухфакторной проверки подлинности на устройстве, чтобы просмотреть код проверки подлинности.</value>
   </data>
   <data name="noRepositoriesMessageText" xml:space="preserve">
-    <value>No repositories</value>
+    <value>Нет репозиториев</value>
   </data>
   <data name="nameText" xml:space="preserve">
-    <value>Name</value>
+    <value>Имя</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>Private Repository</value>
+    <value>Частный репозиторий</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Local path</value>
+    <value>Локальный путь</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
-    <value>License</value>
+    <value>Лицензия</value>
   </data>
   <data name="learnMoreLink" xml:space="preserve">
-    <value>Learn more</value>
+    <value>Дополнительные сведения</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Git ignore</value>
+    <value>Игнорировать Git</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
-    <value>Search repositories</value>
+    <value>Поиск по репозиториям</value>
   </data>
   <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>Some or all repositories may not have loaded. Close the dialog and try again.</value>
+    <value>Не были загружены некоторые или все репозитории. Закройте это диалоговое окно и повторите попытку.</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
-    <value>An error occurred while loading repositories</value>
+    <value>Произошла ошибка при загрузке панелей репозиториев</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>GitHub Enterprise server address</value>
+    <value>Адрес сервера GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>The host isn't available or is not a GitHub Enterprise server. Check the address and try again.</value>
+    <value>Узел недоступен или не является сервером GitHub Enterprise. Проверьте адрес и повторите попытку.</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
-    <value>Username or email</value>
+    <value>Имя пользователя или адрес электронной почты</value>
   </data>
   <data name="PasswordPrompt" xml:space="preserve">
-    <value>Password</value>
+    <value>Пароль</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>Войти</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
-    <value>Please check your internet connection and try again.</value>
+    <value>Проверьте подключение к Интернету и повторите попытку.</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Don’t have GitHub Enterprise? </value>
+    <value>У вас нет GitHub Enterprise? </value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>Don’t have an account? </value>
+    <value>У вас нет учетной записи? </value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
-    <value>Title (required)</value>
+    <value>Заголовок (обязательно)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Description</value>
+    <value>Описание</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>Publish this repository to GitHub and get powerful collaboration, code review, and code management for open source and private projects.</value>
+    <value>Опубликуйте этот репозиторий в GitHub и получите эффективные средства совместной работы, проверки кода и управления кодом для закрытых проектов и проектов открытого кода.</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
-    <value>This repository is not on GitHub</value>
+    <value>Этот репозиторий находится не в GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>No repository</value>
+    <value>Репозиторий отсутствует</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>We couldn't find a git repository here. Open a git project or click "File -&gt; Add to Source Control" in a project to get started.</value>
+    <value>Не удалось найти здесь репозиторий Git. Откройте проект Git или выберите "Файл" -&gt; "Добавить в систему управления версиями" в проекте, чтобы приступить к работе.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
-    <value>Create an account</value>
+    <value>Создать учетную запись</value>
   </data>
   <data name="filterBranchesText" xml:space="preserve">
-    <value>Filter branches</value>
+    <value>Фильтровать ветви</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
-    <value>Publish to GitHub</value>
+    <value>Опубликовать в GitHub</value>
   </data>
   <data name="GetStartedText" xml:space="preserve">
-    <value>Get Started</value>
+    <value>Начало работы</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>Sign in</value>
+    <value>Войти</value>
   </data>
   <data name="SignInCallToAction" xml:space="preserve">
-    <value>Sign in...</value>
+    <value>Войти...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>Local branch up to date</value>
+    <value>Локальная ветвь актуальна</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>Changes ({0})</value>
+    <value>Изменения ({0})</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>View Changes</value>
+    <value>Просмотр изменений</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>Compare File as Default Action</value>
+    <value>Сравнить файл в качестве действия по умолчанию</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
-    <value>View File</value>
+    <value>Просмотр файла</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
-    <value>Open File as Default Action</value>
+    <value>Открыть файл в качестве действия по умолчанию</value>
   </data>
   <data name="SwitchToListView" xml:space="preserve">
-    <value>Switch to List View</value>
+    <value>Перейти к представлению списка</value>
   </data>
   <data name="SwitchToTreeView" xml:space="preserve">
-    <value>Switch to Tree View</value>
+    <value>Перейти к представлению в виде дерева</value>
   </data>
   <data name="UpdatedFormat" xml:space="preserve">
-    <value>updated {0}</value>
+    <value>обновлен {0}</value>
   </data>
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
-    <value>View Pull Request on GitHub</value>
+    <value>Просмотреть запрос на вытягивание в GitHub</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>Welcome to GitHub for Visual Studio! Why not take a look at our [training](show-training) or [documentation](show-docs)?
+    <value>Добро пожаловать в GitHub для Visual Studio. Рекомендуем вам ознакомиться с нашим [обучением](show-training) или нашей [документацией](show-docs)?
 
-[Don't show this again](dont-show-again)</value>
+[Больше не показывать](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
-    <value>Updated</value>
+    <value>Обновлено</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>Show PR comments on editor margin</value>
+    <value>Показать комментарии PR на поле окна редактора</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
-    <value>Experimental features</value>
+    <value>Экспериментальные функции</value>
   </data>
   <data name="Options_ExperimentalNote" xml:space="preserve">
-    <value>These features might change in a future version</value>
+    <value>Эти компоненты могут быть изменены в будущей версии</value>
   </data>
   <data name="ViewChangesInSolution" xml:space="preserve">
-    <value>View Changes in Solution</value>
+    <value>Просмотреть изменения в решении</value>
   </data>
   <data name="OpenFileInSolution" xml:space="preserve">
-    <value>Open File in Solution</value>
+    <value>Открыть файл в решении</value>
   </data>
   <data name="TokenPrompt" xml:space="preserve">
-    <value>Token</value>
+    <value>Токен</value>
   </data>
   <data name="ContinueYourReview" xml:space="preserve">
-    <value>Continue your review</value>
+    <value>Продолжайте проверку</value>
   </data>
   <data name="AddYourReview" xml:space="preserve">
-    <value>Add your review</value>
+    <value>Добавьте проверку</value>
   </data>
   <data name="Reviewers" xml:space="preserve">
-    <value>Reviewers</value>
+    <value>Рецензенты</value>
   </data>
   <data name="AddReviewComment" xml:space="preserve">
-    <value>Add review comment</value>
+    <value>Добавить комментарий к проверке</value>
   </data>
   <data name="AddSingleComment" xml:space="preserve">
-    <value>Add a single comment</value>
+    <value>Добавить отдельный комментарий</value>
   </data>
   <data name="ForkNavigationItemText" xml:space="preserve">
-    <value>Fork</value>
+    <value>Вилка</value>
   </data>
   <data name="Options_DebuggingTitle" xml:space="preserve">
-    <value>Debugging</value>
+    <value>Отладка</value>
   </data>
   <data name="Options_EnableTraceLoggingText" xml:space="preserve">
-    <value>Enable Trace Logging</value>
+    <value>Включить ведение журнала трассировки</value>
   </data>
   <data name="BlendDialogText" xml:space="preserve">
-    <value>The GitHub extension is not available inside Blend</value>
+    <value>Расширение GitHub недоступно внутри Blend</value>
   </data>
   <data name="UpdateComment" xml:space="preserve">
-    <value>Update comment</value>
+    <value>Обновить комментарий</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Отмена</value>
   </data>
   <data name="Pending" xml:space="preserve">
-    <value>Pending</value>
+    <value>Ожидание</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
-    <value>Start a review</value>
+    <value>Начать проверку</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>You must commit and push your changes to add a comment here.</value>
+    <value>Вам нужно зафиксировать и отправить изменения, чтобы добавить сюда комментарий.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
-    <value>Previous Comment</value>
+    <value>Предыдущий комментарий</value>
   </data>
   <data name="NextComment" xml:space="preserve">
-    <value>Next Comment</value>
+    <value>Следующий комментарий</value>
   </data>
   <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
-    <value>View, Checkout or Create a Pull request</value>
+    <value>Просмотр, извлечение или создание запроса на вытягивание</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>Back</value>
+    <value>Назад</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Fork Repository</value>
+    <value>Создать вилку репозитория</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
-    <value>Fork the repository</value>
+    <value>Создать вилку репозитория</value>
   </data>
   <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
-    <value> Update your local repository's</value>
+    <value> В своем локальном репозитории обновите</value>
   </data>
   <data name="ToPointTo" xml:space="preserve">
-    <value>to point to</value>
+    <value>для указания на</value>
   </data>
   <data name="CreatePullRequest" xml:space="preserve">
-    <value>Create pull request</value>
+    <value>Создать запрос на вытягивание</value>
   </data>
   <data name="SignInToGitHub" xml:space="preserve">
-    <value>Sign in to GitHub</value>
+    <value>Войти в GitHub</value>
   </data>
   <data name="Pull" xml:space="preserve">
-    <value>Pull</value>
+    <value>Вытянуть</value>
   </data>
   <data name="Push" xml:space="preserve">
-    <value>Push</value>
+    <value>Отправить</value>
   </data>
   <data name="Sync" xml:space="preserve">
-    <value>Sync</value>
+    <value>Синхронизировать</value>
   </data>
   <data name="Wrote" xml:space="preserve">
-    <value>wrote</value>
+    <value>записал</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>Submit your review for</value>
+    <value>Отправьте проверку для</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
-    <value>Your review summary</value>
+    <value>Сводка по вашей проверке</value>
   </data>
   <data name="CommentOnly" xml:space="preserve">
-    <value>Comment only</value>
+    <value>Только комментарий</value>
   </data>
   <data name="Approve" xml:space="preserve">
-    <value>Approve</value>
+    <value>Утвердить</value>
   </data>
   <data name="RequestChanges" xml:space="preserve">
-    <value>Request changes</value>
+    <value>Запросить изменения</value>
   </data>
   <data name="Comments" xml:space="preserve">
-    <value>Comments</value>
+    <value>Комментарии</value>
   </data>
   <data name="OutdatedComments" xml:space="preserve">
-    <value>Outdated comments</value>
+    <value>Устаревшие комментарии</value>
   </data>
   <data name="CreateNew" xml:space="preserve">
-    <value>Create New</value>
+    <value>Создать</value>
   </data>
   <data name="Assignee" xml:space="preserve">
-    <value>Assignee</value>
+    <value>Уполномоченное лицо</value>
   </data>
   <data name="Author" xml:space="preserve">
-    <value>Author</value>
+    <value>Автор</value>
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
-    <value>Sign in with your browser</value>
+    <value>Войдите с помощью браузера</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>Open</value>
+    <value>Открыть</value>
   </data>
   <data name="FilterByAuthor" xml:space="preserve">
-    <value>Filter by Author</value>
+    <value>Фильтровать по автору</value>
   </data>
   <data name="SelectFork" xml:space="preserve">
-    <value>Select Fork</value>
+    <value>Выберите вилку</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>Are you sure you want to delete this comment?</value>
+    <value>Действительно удалить этот комментарий?</value>
   </data>
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>Delete Comment</value>
+    <value>Удаление комментария</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>Retry</value>
+    <value>Повторить</value>
   </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
-    <value>There aren't any open pull requests</value>
+    <value>Нет открытых запросов на вытягивание</value>
   </data>
   <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
-    <value>Pull requests let you tell others about changes you've pushed to a repository on GitHub</value>
+    <value>Запросы на вытягивание позволяют сообщить другим об изменениях, отправленных вами в репозиторий в GitHub</value>
   </data>
   <data name="NoResultsMatchedYourSearch" xml:space="preserve">
-    <value>No results matched your search.</value>
+    <value>Нет результатов, отвечающих условиям поиска.</value>
   </data>
   <data name="ToGetStartedYouCan" xml:space="preserve">
-    <value>To get started you can</value>
+    <value>Чтобы приступить к работе, вы можете</value>
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
-    <value>create a pull request</value>
+    <value>создать запрос на вытягивание</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
-    <value>Open repository at '{0}'?</value>
+    <value>Открыть репозиторий в "{0}"?</value>
   </data>
   <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
-    <value>The target URL has a different owner to the current repository.</value>
+    <value>Целевой URL-адрес имеет другого владельца для текущего репозитория.</value>
   </data>
   <data name="NoActiveRepositoryMessage" xml:space="preserve">
-    <value>There is no active repository to navigate</value>
+    <value>Отсутствует активный репозиторий для перехода</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>The working file is different to the file at '{0}'. Please checkout the corresponding branch, pull request or commit.</value>
+    <value>Рабочий файл отличается от файла в "{0}". Извлеките соответствующую ветвь, фиксацию или запрос на вытягивание.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
-    <value>Please open the repository '{0}' and try again</value>
+    <value>Откройте репозиторий "{0}" и повторите попытку</value>
   </data>
   <data name="UnknownLinkTypeMessage" xml:space="preserve">
-    <value>Couldn't open from '{0}'. Only URLs that link to repository files are currently supported.</value>
+    <value>Не удалось открыть из "{0}". Сейчас поддерживаются только URL-адреса, ссылающиеся на файлы репозитория.</value>
   </data>
   <data name="NoGitHubUrlMessage" xml:space="preserve">
-    <value>Couldn't a find a GitHub URL in clipboard</value>
+    <value>Не удалось найти URL-адрес GitHub в буфере обмена</value>
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
-    <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
+    <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
   <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+    <value>В этом расположении уже существует каталог, но он не содержит репозиторий.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
+    <value>В этом расположении уже существует репозиторий, но у него отсутствует удаленный репозиторий с именем "origin".</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>A repository already exists at this location, but it has a remote of {0}.</value>
+    <value>В этом расположении уже существует репозиторий, но у него имеется удаленный репозиторий {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
-    <value>You have already cloned to this location. Click 'Open' to open the local repository.</value>
+    <value>Вы уже клонировали в это расположение. Нажмите кнопку "Открыть", чтобы открыть локальный репозиторий.</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
-    <value>Can't find GitHub URL for repository</value>
+    <value>Не удается найти URL-адрес GitHub для репозитория</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Repositories must have a remote called "origin" defined in order to locate their GitHub URL.</value>
+    <value>У репозиториев должен быть определен удаленный репозиторий "origin" для обнаружения их URL-адреса GitHub.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Please rename one of your existing remotes to 'origin' or add a new remote named 'origin' and fetch. This can be done from the command line or by clicking the button below.</value>
+    <value>Переименуйте один из существующих удаленных репозиториев в "origin" или добавьте новый удаленный репозиторий с такими именем и выполните принесение. Это можно сделать с помощью командной строки или приведенной ниже кнопки.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
-    <value>Couldn't find file corresponding to '{0}' in the repository. Please do a 'git fetch' or checkout the target pull request.</value>
+    <value>Не удалось найти соответствующий файл "{0}" в репозитории. Выполните команду "git fetch" или извлечение целевого запроса на вытягивание.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
-    <value>{0} most recently pushed</value>
-  </data>
-  <data name="OpenConversation" xml:space="preserve">
-    <value>Open Conversation</value>
-  </data>
-  <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
-  </data>
-  <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
-  </data>
-  <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
-  </data>
-  <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
-  </data>
-  <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
-  </data>
-  <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
-  </data>
-  <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
-  </data>
-  <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
-  </data>
-  <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
-  </data>
-  <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>Отправлено последний раз: {0}</value>
   </data>
 </root>
