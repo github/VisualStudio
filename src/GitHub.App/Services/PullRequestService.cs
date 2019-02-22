@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using GitHub.Api;
 using GitHub.App.Services;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -35,7 +36,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestService : IPullRequestService, IStaticReviewFileMap
+    public class PullRequestService : IssueishService, IPullRequestService, IStaticReviewFileMap
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
@@ -68,9 +69,11 @@ namespace GitHub.Services
             IGitClient gitClient,
             IGitService gitService,
             IVSGitExt gitExt,
+            IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
             IOperatingSystem os,
             IUsageTracker usageTracker)
+            : base(apiClientFactory, graphqlFactory)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
@@ -86,7 +89,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states)
+            Models.PullRequestState[] states)
         {
 
             ICompiledQuery<Page<PullRequestListItemModel>> query;
@@ -212,7 +215,7 @@ namespace GitHub.Services
                 { nameof(owner), owner },
                 { nameof(name), name },
                 { nameof(after), after },
-                { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
+                { nameof(states), states.Select(x => (Octokit.GraphQL.Model.PullRequestState)x).ToList() },
             };
 
             var result = await graphql.Run(query, vars);
@@ -574,6 +577,21 @@ namespace GitHub.Services
                     return Observable.Return(Unit.Default);
                 }
             });
+        }
+
+        public async Task<bool> FetchCommit(LocalRepositoryModel localRepository, RepositoryModel remoteRepository, string sha)
+        {
+            using (var repo = gitService.GetRepository(localRepository.LocalPath))
+            {
+                if (!await gitClient.CommitExists(repo, sha).ConfigureAwait(false))
+                {
+                    var remote = await CreateRemote(repo, remoteRepository.CloneUrl).ConfigureAwait(false);
+                    await gitClient.Fetch(repo, remote).ConfigureAwait(false);
+                    return await gitClient.CommitExists(repo, sha).ConfigureAwait(false);
+                }
+
+                return true;
+            }
         }
 
         public IObservable<string> GetDefaultLocalBranchName(LocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
