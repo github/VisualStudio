@@ -118,734 +118,734 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>为新存储库选择包含文件夹。</value>
+    <value>Vyberte nadřazenou složku pro nové úložiště.</value>
   </data>
   <data name="CloneTitle" xml:space="preserve">
-    <value>克隆存储库</value>
+    <value>Klonovat úložiště</value>
   </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
-    <value>从 GitHub 打开</value>
+    <value>Otevřít z GitHubu</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>无法连接到 github.com</value>
+    <value>Nepodařilo se připojit ke github.com.</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
-    <value>创建 GitHub Gist</value>
+    <value>Vytvořit gist GitHubu</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>创建 {0} 存储库</value>
+    <value>Vytvořit úložiště {0}</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>请输入 Enterprise URL</value>
+    <value>Zadejte prosím adresu URL severu Enterprise.</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>请输入有效的 Enterprise URL</value>
+    <value>Zadejte prosím platnou adresu URL severu Enterprise.</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>不是 Enterprise 服务器。请输入 Enterprise URL</value>
+    <value>Nejedná se o server Enterprise. Zadejte prosím adresu URL serveru Enterprise.</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
-    <value>(忘记了密码?)</value>
+    <value>(zapomněli jste heslo?)</value>
   </data>
   <data name="LoginFailedForbiddenMessage" xml:space="preserve">
-    <value>请确保使用密码而非个人访问令牌进行登录。</value>
+    <value>K přihlášení použijte heslo, ne token PAT.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>请检查用户名和密码，然后重试</value>
+    <value>Zkontrolujte svoje uživatelské jméno a heslo a zkuste to znovu.</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
-    <value>登录失败。</value>
+    <value>Přihlášení se nepovedlo.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
-    <value>连接到 GitHub</value>
+    <value>Připojit ke GitHubu</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
-    <value>请输入密码</value>
+    <value>Zadejte prosím heslo.</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>已成功创建分支 **{0}** 的拉取请求，创建时间为 [{1}] ({2})</value>
+    <value>Žádost o přijetí změn pro větev **{0}** se úspěšně vytvořila v [{1}]({2})</value>
   </data>
   <data name="PublishTitle" xml:space="preserve">
-    <value>发布存储库</value>
+    <value>Publikovat úložiště</value>
   </data>
   <data name="PublishToTitle" xml:space="preserve">
-    <value>将存储库发布到 {0}</value>
+    <value>Publikovat úložiště na {0}</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
-    <value>请输入拉取请求标题</value>
+    <value>Zadejte prosím název žádosti o přijetí změn.</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
-    <value>源和目标分支不能相同</value>
+    <value>Zdrojová a cílová větev nemůžou být stejné.</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>源分支在远程不存在，是否已推送该分支?</value>
+    <value>Zdrojová větev neexistuje vzdáleně, nasdíleli jste ji?</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>没有选择任何存储库。</value>
+    <value>Není vybrané žádné úložiště.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>请输入存储库路径</value>
+    <value>Zadejte prosím cestu k úložišti.</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
-    <value>请输入有效的路径</value>
+    <value>Zadejte prosím platnou cestu.</value>
   </data>
   <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
-    <value>路径包含无效的字符</value>
+    <value>Cesta obsahuje neplatné znaky.</value>
   </data>
   <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
-    <value>路径过长</value>
+    <value>Cesta je moc dlouhá.</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
-    <value>存储库“{0}/{1}”已存在。</value>
+    <value>Úložiště {0}/{1} už existuje.</value>
   </data>
   <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
-    <value>请更改存储库名称或选择其他帐户，然后重试。</value>
+    <value>Změňte název úložiště nebo vyberte jiný účet a zkuste to znovu.</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>已超出专用存储库配额。</value>
+    <value>Došlo k překročení kvóty pro privátní úložiště.</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
-    <value>此位置已存在具有相同名称的存储库</value>
+    <value>Úložiště se stejným názvem už v tomto umístění existuje.</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
-    <value>请输入存储库名称</value>
+    <value>Zadejte prosím název úložiště.</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
-    <value>存储库名称的长度必须少于 100 个字符。</value>
+    <value>Název úložiště musí mít méně než 100 znaků.</value>
   </data>
   <data name="SafeRepositoryNameWarning" xml:space="preserve">
-    <value>将创建为 {0}</value>
+    <value>Vytvoří se jako {0}.</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>打开设备上的双因素身份验证应用以查看你的验证码。</value>
+    <value>Otevřete aplikaci pro dvoufaktorové ověřování na vašem zařízení a zobrazte svůj ověřovací kód.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
-    <value>我们已通过短信向你发送了验证码。</value>
+    <value>Poslali jsme vám SMS s vaším ověřovacím kódem.</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>需要双因素身份验证</value>
+    <value>Vyžaduje se dvoufaktorové ověřování.</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>在此处输入验证码符号</value>
+    <value>Sem zadejte ověřovací kód pro přihlášení.</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>请输入用户名或电子邮件地址</value>
+    <value>Zadejte prosím svoje uživatelské jméno nebo e-mailovou adresu.</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
-    <value>用户名或电子邮件地址不能包含空格</value>
+    <value>Uživatelské jméno nebo e-mailová adresa nesmí obsahovat mezery.</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>拉取请求</value>
+    <value>Žádosti o přijetí změn</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>拉取请求</value>
+    <value>Žádost o přijetí změn</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
-    <value>添加</value>
+    <value>přidat</value>
   </data>
   <data name="Fork" xml:space="preserve">
-    <value>分支</value>
+    <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
-    <value>[无效]</value>
+    <value>[neplatný]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
-    <value>必须先拉取然后才能推送</value>
+    <value>Před nasdílením změn musíte napřed přijmout změny.</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>没有可拉取的提交</value>
+    <value>Žádná potvrzení k přijetí</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>没有可推送的提交</value>
+    <value>Žádná potvrzení k nasdílení</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
-    <value>* 未提供说明。*</value>
+    <value>*Není zadaný žádný popis.*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>签出 {0}</value>
+    <value>Rezervovat {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>签出到 {0}</value>
+    <value>Rezervovat pro {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>从分支 {1} 拉取 {0}</value>
+    <value>Přijmout změny z větve {0} {1}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>推送到 {0} 分支 {1}</value>
+    <value>Nasdílet změny do větve {0} {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>远程</value>
+    <value>vzdálené úložiště</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
-    <value>重命名</value>
+    <value>přejmenovat</value>
   </data>
   <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
-    <value>源存储库不再可用。</value>
+    <value>Úložiště zdrojového kódu už není k dispozici.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>你的工作目录包含未提交的更改，因此无法签出。</value>
+    <value>Nelze rezervovat, protože pracovní adresář obsahuje nepotvrzené změny.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
-    <value>同步 {0} 子模块</value>
+    <value>Synchronizovat dílčí moduly {0}</value>
   </data>
   <data name="CouldntFindGitOnPath" xml:space="preserve">
-    <value>路径上找不到 Git.exe。
+    <value>Git.exe se na zadané cestě nepodařilo najít.
 
-请从以下位置安装适用于 Windows 的 Git:
+Nainstalujte si prosím Git pro Windows z tohoto umístění:
 https://git-scm.com/download/win</value>
   </data>
   <data name="Approved" xml:space="preserve">
-    <value>已批准</value>
+    <value>Schválené</value>
   </data>
   <data name="ChangesRequested" xml:space="preserve">
-    <value>已请求更改</value>
+    <value>Požadované změny</value>
   </data>
   <data name="Commented" xml:space="preserve">
-    <value>已注释</value>
+    <value>Okomentované</value>
   </data>
   <data name="InProgress" xml:space="preserve">
-    <value>正在进行</value>
+    <value>Probíhá zpracování.</value>
   </data>
   <data name="NavigateToEditorStatusMessage" xml:space="preserve">
-    <value>按 Enter 以导航到编辑器</value>
+    <value>Pokud chcete přejít do editoru, stiskněte Enter.</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>请先签出拉取请求分支，然后再导航到编辑器</value>
+    <value>Před přechodem do editoru napřed rezervujte větev PR.</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>按 Enter 以导航到编辑器(必须签出拉取请求分支)</value>
+    <value>Pokud chcete přejít do editoru, stiskněte Enter (větev PR musí být rezervovaná).</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>分叉存储库</value>
+    <value>Fork úložiště</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>切换原点</value>
+    <value>Přepnout úložiště Origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
-    <value>确实要取消此评审吗? 将会丢失所有挂起的评论。</value>
+    <value>Opravdu chcete tuto revizi zrušit? Všechny vaše čekající komentáře se ztratí.</value>
   </data>
   <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
-    <value>取消评审</value>
+    <value>Zrušit revizi</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>目标路径中存在一个文件。</value>
+    <value>Soubor na cílové cestě existuje.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
-    <value>需要注销</value>
+    <value>Vyžaduje se odhlášení.</value>
   </data>
   <data name="day" xml:space="preserve">
-    <value>{0:N0} 天前</value>
+    <value>před {0:N0} dnem</value>
   </data>
   <data name="days" xml:space="preserve">
-    <value>{0:N0} 天前</value>
+    <value>před {0:N0} dny</value>
   </data>
   <data name="hour" xml:space="preserve">
-    <value>{0:N0} 小时前</value>
+    <value>před {0:N0} hodinou</value>
   </data>
   <data name="hours" xml:space="preserve">
-    <value>{0:N0} 小时前</value>
+    <value>před {0:N0} hodinami</value>
   </data>
   <data name="JustNow" xml:space="preserve">
-    <value>此刻</value>
+    <value>právě teď</value>
   </data>
   <data name="minute" xml:space="preserve">
-    <value>{0:N0} 分钟前</value>
+    <value>před {0:N0} minutou</value>
   </data>
   <data name="minutes" xml:space="preserve">
-    <value>{0:N0} 分钟前</value>
+    <value>před {0:N0} minutami</value>
   </data>
   <data name="month" xml:space="preserve">
-    <value>{0:N0} 个月前</value>
+    <value>před {0:N0} měsícem</value>
   </data>
   <data name="months" xml:space="preserve">
-    <value>{0:N0} 个月前</value>
+    <value>před {0:N0} měsíci</value>
   </data>
   <data name="second" xml:space="preserve">
-    <value>{0:N0} 秒前</value>
+    <value>před {0:N0} sekundou</value>
   </data>
   <data name="seconds" xml:space="preserve">
-    <value>{0:N0} 秒前</value>
+    <value>před {0:N0} sekundami</value>
   </data>
   <data name="year" xml:space="preserve">
-    <value>{0:N0} 年前</value>
+    <value>před {0:N0} rokem</value>
   </data>
   <data name="years" xml:space="preserve">
-    <value>{0:N0} 年前</value>
+    <value>před {0:N0} roky</value>
   </data>
   <data name="authenticationFailedLabelContent" xml:space="preserve">
-    <value>验证码无效</value>
+    <value>Neplatný ověřovací kód</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>请尝试重新输入代码，或单击“重新发送”按钮以获取新的验证码。</value>
+    <value>Zkuste zadat kód znovu nebo kliknutím na tlačítko pro opětovné odeslání získejte nový ověřovací kód.</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>已发送验证码！</value>
+    <value>Ověřovací kód se odeslal.</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
-    <value>如果未收到验证码，请联系 support@github.com。</value>
+    <value>Pokud ověřovací kód nedostanete, obraťte se na support@github.com.</value>
   </data>
   <data name="browsePathButtonContent" xml:space="preserve">
-    <value>浏览</value>
+    <value>Procházet</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>无法连接到 github.com</value>
+    <value>Nepodařilo se připojit ke github.com.</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
-    <value>无法连接到服务器。</value>
+    <value>Nepodařilo se připojit k serveru.</value>
   </data>
   <data name="CreateLink" xml:space="preserve">
-    <value>创建</value>
+    <value>Vytvořit</value>
   </data>
   <data name="DescriptionOptional" xml:space="preserve">
-    <value>说明(可选)</value>
+    <value>Popis (nepovinné)</value>
   </data>
   <data name="openInBrowser" xml:space="preserve">
-    <value>在浏览器中打开</value>
+    <value>Otevřít v prohlížeči</value>
   </data>
   <data name="CancelLink" xml:space="preserve">
-    <value>取消</value>
+    <value>Storno</value>
   </data>
   <data name="gistCreatedMessage" xml:space="preserve">
-    <value>已创建 Gist</value>
+    <value>Gist se vytvořil.</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>未能创建 gist</value>
+    <value>Gist se nepodařilo vytvořit.</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
-    <value>依据</value>
+    <value>podle</value>
   </data>
   <data name="Options_PrivacyTitle" xml:space="preserve">
-    <value>隐私</value>
+    <value>Ochrana osobních údajů</value>
   </data>
   <data name="Options_MetricsLabel" xml:space="preserve">
-    <value>请匿名发送使用情况数据，帮助我们不断改进</value>
+    <value>Pomozte nám s vylepšováním posíláním anonymních dat o používání</value>
   </data>
   <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
-    <value>无法复制到剪贴板。请重试。</value>
+    <value>Zkopírování do schránky se nepodařilo. Zkuste to prosím znovu.</value>
   </data>
   <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
-    <value>复制到剪贴板的链接</value>
+    <value>Odkaz se zkopíroval do schránky.</value>
   </data>
   <data name="RepositoryPublishedMessage" xml:space="preserve">
-    <value>已成功创建存储库。</value>
+    <value>Úložiště se úspěšně vytvořilo.</value>
   </data>
   <data name="makePrivateGist" xml:space="preserve">
-    <value>专用 Gist</value>
+    <value>Privátní gist</value>
   </data>
   <data name="fileNameText" xml:space="preserve">
-    <value>文件名</value>
+    <value>Název souboru</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>你未登录到 {0}，因此某些 git 操作可能会失败。[立即登录]({1})</value>
+    <value>Nejste přihlášeni k {0}, takže některé operace git se asi nezdaří. [Přihlásit]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>脉冲</value>
+    <value>Impulz</value>
   </data>
   <data name="pathText" xml:space="preserve">
-    <value>路径</value>
+    <value>Cesta</value>
   </data>
   <data name="IssuesNavigationItemText" xml:space="preserve">
-    <value>问题</value>
+    <value>Problémy</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
-    <value>关系图</value>
+    <value>Grafy</value>
   </data>
   <data name="GitHubPublishSectionTitle" xml:space="preserve">
-    <value>发布到 GitHub</value>
+    <value>Publikovat na GitHub</value>
   </data>
   <data name="BlurbText" xml:space="preserve">
-    <value>用于开放源和私有项目的功能强大的协作、代码评审和代码管理。</value>
+    <value>Výkonná spolupráce, revize kódu a správa kódu pro open source a privátní projekty.</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
-    <value>连接...</value>
+    <value>Připojit…</value>
   </data>
   <data name="CloneLink" xml:space="preserve">
-    <value>克隆</value>
+    <value>Klonovat</value>
   </data>
   <data name="verifyText" xml:space="preserve">
-    <value>验证</value>
+    <value>Ověřit</value>
   </data>
   <data name="twoFactorAuthText" xml:space="preserve">
-    <value>双重身份验证</value>
+    <value>Dvoufaktorové ověřování</value>
   </data>
   <data name="SignUpLink" xml:space="preserve">
-    <value>注册</value>
+    <value>Zaregistrovat se</value>
   </data>
   <data name="SignOutLink" xml:space="preserve">
-    <value>注销</value>
+    <value>Odhlásit se</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
-    <value>再次将代码发送到你注册的 SMS 设备</value>
+    <value>Znovu odeslat kód na vaše registrované zařízení SMS</value>
   </data>
   <data name="resendCodeButtonContent" xml:space="preserve">
-    <value>重新发送</value>
+    <value>Poslat znovu</value>
   </data>
   <data name="RepoNameText" xml:space="preserve">
-    <value>存储库名称</value>
+    <value>Název úložiště</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>此存储库没有远程。填写此表单以将其发布到 GitHub。</value>
+    <value>Toto úložiště nemá vzdálené úložiště. Vyplňte formulář pro jeho publikování na GitHubu.</value>
   </data>
   <data name="publishText" xml:space="preserve">
-    <value>发布</value>
+    <value>Publikovat</value>
   </data>
   <data name="orText" xml:space="preserve">
-    <value>或者</value>
+    <value>nebo</value>
   </data>
   <data name="openTwoFactorAuthAppText" xml:space="preserve">
-    <value>打开设备上的双因素身份验证应用以查看你的验证码。</value>
+    <value>Otevřete aplikaci pro dvoufaktorové ověřování na vašem zařízení a zobrazte svůj ověřovací kód.</value>
   </data>
   <data name="noRepositoriesMessageText" xml:space="preserve">
-    <value>没有存储库</value>
+    <value>Žádná úložiště</value>
   </data>
   <data name="nameText" xml:space="preserve">
-    <value>名称</value>
+    <value>Název</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>专用存储库</value>
+    <value>Privátní úložiště</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>本地路径</value>
+    <value>Místní cesta</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
-    <value>许可证</value>
+    <value>Licence</value>
   </data>
   <data name="learnMoreLink" xml:space="preserve">
-    <value>了解详细信息</value>
+    <value>Další informace</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Git 忽略</value>
+    <value>Ignorování Gitu</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
-    <value>搜索存储库</value>
+    <value>Hledat úložiště</value>
   </data>
   <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>可能未加载部分或所有存储库。请关闭对话框，然后重试。</value>
+    <value>Některá nebo všechna úložiště se možná nenačetla. Zavřete dialogové okno a zkuste to znovu.</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
-    <value>加载存储库时出现错误</value>
+    <value>Při načítání úložišť došlo k chybě.</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>GitHub Enterprise 服务器地址</value>
+    <value>Adresa serveru GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>主机不可用或不是 GitHub Enterprise 服务器。请检查地址，然后重试。</value>
+    <value>Hostitel není dostupný nebo se nejedná o server GitHub Enterprise. Zkontrolujte adresu a zkuste to znovu.</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
-    <value>用户名或电子邮件</value>
+    <value>Uživatelské jméno nebo e-mail</value>
   </data>
   <data name="PasswordPrompt" xml:space="preserve">
-    <value>密码</value>
+    <value>Heslo</value>
   </data>
   <data name="LoginLink" xml:space="preserve">
-    <value>登录</value>
+    <value>Přihlásit se</value>
   </data>
   <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
-    <value>请检查你的 Internet 连接，然后重试。 </value>
+    <value>Zkontrolujte prosím připojení k internetu a zkuste to znovu.</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>没有 GitHub Enterprise?</value>
+    <value>Nemáte GitHub Enterprise?</value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>没有帐户?</value>
+    <value>Nemáte účet?</value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
-    <value>标题(必需)</value>
+    <value>Název (povinné)</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>描述</value>
+    <value>Popis</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>将此存储库发布到 GitHub 并获取用于开放源和私有项目的功能强大的协作、代码评审和代码管理。</value>
+    <value>Publikujte toto úložiště na GitHub a získáte výkonnou spolupráci, revizi kódu a správu kódu pro open source a privátní projekty.</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
-    <value>此存储库不在 GitHub 上</value>
+    <value>Toto úložiště není na GitHubu.</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>没有任何存储库</value>
+    <value>Žádné úložiště</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
-    <value>此处找不到 git 存储库。请打开 git 项目或在项目中单击“文件”-&gt;“添加到源代码管理”以开始使用。</value>
+    <value>Žádné úložiště git jsme tady nenašli. Pokud chcete začít, otevřete projekt git nebo klikněte v projektu na Soubor -&gt; Přidat do správy zdrojového kódu.</value>
   </data>
   <data name="CreateAccountLink" xml:space="preserve">
-    <value>创建帐户</value>
+    <value>Vytvořit účet</value>
   </data>
   <data name="filterBranchesText" xml:space="preserve">
-    <value>筛选分支</value>
+    <value>Filtrovat větve</value>
   </data>
   <data name="PublishToGitHubButton" xml:space="preserve">
-    <value>发布到 GitHub</value>
+    <value>Publikovat na GitHub</value>
   </data>
   <data name="GetStartedText" xml:space="preserve">
-    <value>入门</value>
+    <value>Začínáme</value>
   </data>
   <data name="SignInLink" xml:space="preserve">
-    <value>登录</value>
+    <value>Přihlásit se</value>
   </data>
   <data name="SignInCallToAction" xml:space="preserve">
-    <value>登录...</value>
+    <value>Přihlásit se...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>最新的本地分支</value>
+    <value>Místní větev je aktuální.</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
-    <value>更改({0})</value>
+    <value>Změny ({0})</value>
   </data>
   <data name="ViewChanges" xml:space="preserve">
-    <value>查看更改</value>
+    <value>Zobrazit změny</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>将文件比作默认操作</value>
+    <value>Porovnat soubor jako výchozí akce</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
-    <value>查看文件</value>
+    <value>Zobrazit soubor</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
-    <value>将文件作为默认操作打开</value>
+    <value>Otevřít soubor jako výchozí akce</value>
   </data>
   <data name="SwitchToListView" xml:space="preserve">
-    <value>切换到列表视图</value>
+    <value>Přepnout na zobrazení seznamu</value>
   </data>
   <data name="SwitchToTreeView" xml:space="preserve">
-    <value>切换到树状视图</value>
+    <value>Přepnout na stromové zobrazení</value>
   </data>
   <data name="UpdatedFormat" xml:space="preserve">
-    <value>已更新 {0}</value>
+    <value>aktualizoval(a) {0}</value>
   </data>
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
-    <value>查看 GitHub 上的拉取请求</value>
+    <value>Zobrazit žádost o přijetí změn na GitHubu</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>欢迎使用适用于 Visual Studio 的 GitHub! 何不看看我们的[培训](show-training)或[文档](show-docs)?
+    <value>Vítá vás GitHub pro Visual Studio. Podívejte se na naše [školení](show-training) a [dokumentaci](show-docs).
 
-[不再显示](dont-show-again)</value>
+[Příště už nezobrazovat](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
-    <value>更新</value>
+    <value>Aktualizováno</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>在编辑器边距上显示拉取请求注释</value>
+    <value>Zobrazit komentáře PR na okraji editoru</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
-    <value>实验性功能</value>
+    <value>Experimentální funkce</value>
   </data>
   <data name="Options_ExperimentalNote" xml:space="preserve">
-    <value>这些功能在未来版本中可能会更改</value>
+    <value>Tyto funkce se můžou v budoucí verzi změnit.</value>
   </data>
   <data name="ViewChangesInSolution" xml:space="preserve">
-    <value>查看解决方案中的更改</value>
+    <value>Zobrazit změny v řešení</value>
   </data>
   <data name="OpenFileInSolution" xml:space="preserve">
-    <value>在解决方案中打开文件</value>
+    <value>Otevřít soubor v řešení</value>
   </data>
   <data name="TokenPrompt" xml:space="preserve">
-    <value>令牌</value>
+    <value>Token</value>
   </data>
   <data name="ContinueYourReview" xml:space="preserve">
-    <value>继续你的评审</value>
+    <value>Pokračovat v revizi</value>
   </data>
   <data name="AddYourReview" xml:space="preserve">
-    <value>添加你的评审</value>
+    <value>Přidat revizi</value>
   </data>
   <data name="Reviewers" xml:space="preserve">
-    <value>审阅者</value>
+    <value>Revidující</value>
   </data>
   <data name="AddReviewComment" xml:space="preserve">
-    <value>添加评审评论</value>
+    <value>Přidat komentář revize</value>
   </data>
   <data name="AddSingleComment" xml:space="preserve">
-    <value>添加单个注释</value>
+    <value>Přidat jeden komentář</value>
   </data>
   <data name="ForkNavigationItemText" xml:space="preserve">
-    <value>分支</value>
+    <value>Fork</value>
   </data>
   <data name="Options_DebuggingTitle" xml:space="preserve">
-    <value>调试</value>
+    <value>Ladění</value>
   </data>
   <data name="Options_EnableTraceLoggingText" xml:space="preserve">
-    <value>启用跟踪日志记录</value>
+    <value>Povolit protokolování trasování</value>
   </data>
   <data name="BlendDialogText" xml:space="preserve">
-    <value>GitHub 扩展在 Blend 中不可用</value>
+    <value>Rozšíření GitHub není k dispozici v Blendu.</value>
   </data>
   <data name="UpdateComment" xml:space="preserve">
-    <value>更新评论</value>
+    <value>Aktualizovat komentář</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>取消</value>
+    <value>Zrušit</value>
   </data>
   <data name="Pending" xml:space="preserve">
-    <value>挂起</value>
+    <value>Čekající</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
-    <value>开始评审</value>
+    <value>Zahájit revizi</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>必须提交并推送你的更改才能在此处添加评论。</value>
+    <value>Pokud sem chcete přidat komentář, musíte potvrdit a nasdílet změny.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
-    <value>上一个评论</value>
+    <value>Předchozí komentář</value>
   </data>
   <data name="NextComment" xml:space="preserve">
-    <value>下一个评论</value>
+    <value>Další komentář</value>
   </data>
   <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
-    <value>查看、签出或创建拉取请求</value>
+    <value>Zobrazit, rezervovat nebo vytvořit žádost o přijetí změn</value>
   </data>
   <data name="Back" xml:space="preserve">
-    <value>上一步</value>
+    <value>Zpět</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>分叉存储库</value>
+    <value>Fork úložiště</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
-    <value>创建存储库分支</value>
+    <value>Fork úložiště</value>
   </data>
   <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
-    <value> 更新本地存储库的</value>
+    <value> Aktualizovat pro místní úložiště</value>
   </data>
   <data name="ToPointTo" xml:space="preserve">
-    <value>指向</value>
+    <value>přejít na</value>
   </data>
   <data name="CreatePullRequest" xml:space="preserve">
-    <value>创建拉取请求</value>
+    <value>Vytvořit žádost o přijetí změn</value>
   </data>
   <data name="SignInToGitHub" xml:space="preserve">
-    <value>登录到 GitHub</value>
+    <value>Přihlásit se ke GitHubu</value>
   </data>
   <data name="Pull" xml:space="preserve">
-    <value>拉取</value>
+    <value>Přijmout změny</value>
   </data>
   <data name="Push" xml:space="preserve">
-    <value>推送</value>
+    <value>Vložit</value>
   </data>
   <data name="Sync" xml:space="preserve">
-    <value>同步</value>
+    <value>Synchronizovat</value>
   </data>
   <data name="Wrote" xml:space="preserve">
-    <value>已写入</value>
+    <value>zapsal(a)</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>提交评审</value>
+    <value>Odeslat revizi pro</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
-    <value>评审摘要</value>
+    <value>Souhrn vaší revize</value>
   </data>
   <data name="CommentOnly" xml:space="preserve">
-    <value>仅注释</value>
+    <value>Jenom komentář</value>
   </data>
   <data name="Approve" xml:space="preserve">
-    <value>批准</value>
+    <value>Schválit</value>
   </data>
   <data name="RequestChanges" xml:space="preserve">
-    <value>请求更改</value>
+    <value>Požádat o změny</value>
   </data>
   <data name="Comments" xml:space="preserve">
-    <value>评论</value>
+    <value>Komentáře</value>
   </data>
   <data name="OutdatedComments" xml:space="preserve">
-    <value>过时的注释</value>
+    <value>Zastaralé komentáře</value>
   </data>
   <data name="CreateNew" xml:space="preserve">
-    <value>新建</value>
+    <value>Vytvořit nový</value>
   </data>
   <data name="Assignee" xml:space="preserve">
-    <value>代理人</value>
+    <value>Pověřená osoba</value>
   </data>
   <data name="Author" xml:space="preserve">
-    <value>作者</value>
+    <value>Autor</value>
   </data>
   <data name="SignInWithYourBrowser" xml:space="preserve">
-    <value>使用浏览器登录</value>
+    <value>Přihlásit se pomocí prohlížeče</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>打开</value>
+    <value>Otevřít</value>
   </data>
   <data name="FilterByAuthor" xml:space="preserve">
-    <value>按作者筛选</value>
+    <value>Filtrovat podle autora</value>
   </data>
   <data name="SelectFork" xml:space="preserve">
-    <value>选择分支</value>
+    <value>Vybrat fork</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>是否确实要删除此评论?</value>
+    <value>Opravdu chcete odstranit tento komentář?</value>
   </data>
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
-    <value>删除评论</value>
+    <value>Odstranit komentář</value>
   </data>
   <data name="Retry" xml:space="preserve">
-    <value>重试</value>
+    <value>Opakovat</value>
   </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
-    <value>没有任何开放的拉取请求</value>
+    <value>Nejsou k dispozici žádné otevřené žádosti o přijetí změn.</value>
   </data>
   <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
-    <value>通过拉取请求，可告知其他人发布到 GitHub 上的存储库的更改</value>
+    <value>Žádosti o přijetí změn vám umožňují informovat ostatní o změnách, které jste nasdíleli do úložiště na GitHubu.</value>
   </data>
   <data name="NoResultsMatchedYourSearch" xml:space="preserve">
-    <value>没有与搜索匹配的结果。</value>
+    <value>Vašemu hledání neodpovídají žádné výsledky.</value>
   </data>
   <data name="ToGetStartedYouCan" xml:space="preserve">
-    <value>若要开始，可以</value>
+    <value>Pokud chcete začít, můžete</value>
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
-    <value>创建拉取请求</value>
+    <value>vytvořit žádost o přijetí změn</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
-    <value>要打开 {0} 中的存储库?</value>
+    <value>Otevřít úložiště v {0}?</value>
   </data>
   <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
-    <value>目标 URL 的所有者与当前存储库的所有者不同。</value>
+    <value>Cílová adresa URL má jiného vlastníka než aktuální úložiště.</value>
   </data>
   <data name="NoActiveRepositoryMessage" xml:space="preserve">
-    <value>没有可导航的任何活动存储库</value>
+    <value>Není k dispozici žádné aktivní úložiště, do kterého by bylo možné přejít.</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>工作文件不同于 {0} 处的文件。请签出相应的分支、拉取请求或提交。</value>
+    <value>Pracovní soubor je jiný než soubor v {0}. Rezervujte si prosím odpovídající větev, žádost o přijetí změn nebo potvrzení.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
-    <value>请打开存储库 {0}，然后重试</value>
+    <value>Otevřete prosím úložiště {0} a zkuste to znovu.</value>
   </data>
   <data name="UnknownLinkTypeMessage" xml:space="preserve">
-    <value>无法从 {0} 打开。当前仅支持链接到存储库文件的 URL。</value>
+    <value>Nelze otevřít z {0}. Momentálně jsou podporované jenom adresy URL, které odkazují na soubory v úložišti.</value>
   </data>
   <data name="NoGitHubUrlMessage" xml:space="preserve">
-    <value>在剪贴板中找不到 GitHub URL</value>
+    <value>Ve schránce se nepodařilo najít adresu URL na GitHubu.</value>
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
-    <value>当前存储库中找不到目标 URL。请执行提取后重试。</value>
+    <value>V aktuálním úložišti se nepodařilo najít cílovou adresu URL. Zkuste to znovu po načtení změn.</value>
   </data>
   <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>在此位置已存在一个目录，但它不包含存储库。</value>
+    <value>V tomto umístění je už adresář, ale neobsahuje úložiště.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程。</value>
+    <value>Úložiště už v tomto umístění existuje, ale nemá vzdálené úložiště s názvem origin.</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>此位置已存在一个存储库，但该存储库具有名为 {0} 的远程。</value>
+    <value>Úložiště už v tomto umístění existuje, ale má vzdálené úložiště {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
-    <value>已克隆到此位置。单击“打开”打开本地存储库。</value>
+    <value>Do tohoto umístění jste už klonovali. Kliknutím na Otevřít otevřete místní úložiště.</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
-    <value>找不到存储库的 GitHub URL</value>
+    <value>Pro úložiště nelze najít adresu URL na GitHubu.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>存储库必须定义名为 "origin" 的远程才能找到其 GitHub URL。</value>
+    <value>Úložiště musí mít definované vzdálené úložiště s názvem origin, aby bylo možné vyhledat jejich adresu URL na GitHubu.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>请将其中一个现有远程重命名为 "origin" 或添加一个名为 "origin" 的新远程并提取。可从命令行或通过单击下面的按钮完成此操作。</value>
+    <value>Přejmenujte prosím jedno z vašich existujících vzdálených úložišť na origin nebo přidejte nové vzdálené úložiště s názvem origin a načtěte je. Můžete to provést z příkazového řádku nebo kliknutím na tlačítko níže.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
-    <value>在存储库中找不到对应于 {0} 的文件。请执行 "git fetch" 或签出目标拉取请求。</value>
+    <value>V úložišti se nepodařilo najít soubor odpovídající {0}. Proveďte prosím příkaz git fetch nebo rezervujte žádost o přijetí změn v cíli.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
-    <value>最近已推送 {0}</value>
+    <value>{0} – naposledy nasdíleno</value>
   </data>
 </root>

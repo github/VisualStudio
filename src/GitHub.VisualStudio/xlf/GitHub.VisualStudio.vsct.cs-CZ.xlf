@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-CN" original="../GitHub.VisualStudio.vsct">
+  <file datatype="xml" source-language="en" target-language="cs-CZ" original="../GitHub.VisualStudio.vsct">
     <body>
       <trans-unit id="addConnectionCommand|ButtonText">
         <source>&amp;Connect to GitHub</source>
-        <target xml:lang="de" state="translated">连接到 GitHub(&amp;C)</target>
+        <target xml:lang="de" state="translated">&amp;Připojit ke GitHubu</target>
         <note />
       </trans-unit>
       <trans-unit id="addConnectionCommand|LocCanonicalName">
@@ -14,7 +14,7 @@
       </trans-unit>
       <trans-unit id="backCommand|ButtonText">
         <source>Back</source>
-        <target xml:lang="de" state="translated">后退</target>
+        <target xml:lang="de" state="translated">Zpět</target>
         <note />
       </trans-unit>
       <trans-unit id="backCommand|LocCanonicalName">
@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="copyLinkCommand|ButtonText">
         <source>Copy link to clipboard</source>
-        <target xml:lang="de" state="translated">将链接复制到剪贴板</target>
+        <target xml:lang="de" state="translated">Zkopírovat odkaz do schránky</target>
         <note />
       </trans-unit>
       <trans-unit id="copyLinkCommand|LocCanonicalName">
@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="forwardCommand|ButtonText">
         <source>Forward</source>
-        <target xml:lang="de" state="translated">转发</target>
+        <target xml:lang="de" state="translated">Vpřed</target>
         <note />
       </trans-unit>
       <trans-unit id="forwardCommand|LocCanonicalName">
@@ -44,7 +44,7 @@
       </trans-unit>
       <trans-unit id="githubCommand|ButtonText">
         <source>View on GitHub</source>
-        <target xml:lang="de" state="translated">在 GitHub 上查看</target>
+        <target xml:lang="de" state="translated">Zobrazit na GitHubu</target>
         <note />
       </trans-unit>
       <trans-unit id="githubCommand|LocCanonicalName">
@@ -54,7 +54,7 @@
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
         <source>Go To Solution/PR File</source>
-        <target xml:lang="de" state="translated">转到解决方案/拉取请求文件</target>
+        <target xml:lang="de" state="translated">Přejít k řešení nebo souboru PR</target>
         <note />
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
@@ -64,7 +64,7 @@
       </trans-unit>
       <trans-unit id="helpCommand|ButtonText">
         <source>Help</source>
-        <target xml:lang="de" state="translated">帮助</target>
+        <target xml:lang="de" state="translated">Nápověda</target>
         <note />
       </trans-unit>
       <trans-unit id="helpCommand|LocCanonicalName">
@@ -74,7 +74,7 @@
       </trans-unit>
       <trans-unit id="idBlameCommand|ButtonText">
         <source>Blame</source>
-        <target xml:lang="de" state="translated">Blame</target>
+        <target xml:lang="de" state="translated">Příčina</target>
         <note />
       </trans-unit>
       <trans-unit id="idBlameCommand|LocCanonicalName">
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistCommand|ButtonText">
         <source>Create a GitHub Gist</source>
-        <target xml:lang="de" state="translated">创建 GitHub Gist</target>
+        <target xml:lang="de" state="translated">Vytvořit gist GitHubu</target>
         <note />
       </trans-unit>
       <trans-unit id="idCreateGistCommand|LocCanonicalName">
@@ -94,7 +94,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
         <source>Create an Enterprise Gist</source>
-        <target xml:lang="de" state="translated">创建 Enterprise Gist</target>
+        <target xml:lang="de" state="translated">Vytvořit gist Enterprise</target>
         <note />
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
@@ -114,17 +114,17 @@
       </trans-unit>
       <trans-unit id="idGitHubToolbar|ButtonText">
         <source>WindowToolBar</source>
-        <target xml:lang="de" state="translated">WindowToolBar</target>
+        <target xml:lang="de" state="translated">Panel nástrojů okna</target>
         <note />
       </trans-unit>
       <trans-unit id="idGitHubToolbar|CommandName">
         <source>Window Toolbar</source>
-        <target xml:lang="de" state="translated">窗口工具栏</target>
+        <target xml:lang="de" state="translated">Panel nástrojů okna</target>
         <note />
       </trans-unit>
       <trans-unit id="openFromClipboardCommand|ButtonText">
         <source>Open from clipboard</source>
-        <target xml:lang="de" state="translated">从剪贴板打开</target>
+        <target xml:lang="de" state="translated">Otevřít ze schránky</target>
         <note />
       </trans-unit>
       <trans-unit id="openFromClipboardCommand|LocCanonicalName">
@@ -134,7 +134,7 @@
       </trans-unit>
       <trans-unit id="openFromUrlCommand|ButtonText">
         <source>Open from GitHub...</source>
-        <target xml:lang="de" state="translated">从 GitHub 打开...</target>
+        <target xml:lang="de" state="translated">Otevřít z GitHubu...</target>
         <note />
       </trans-unit>
       <trans-unit id="openFromUrlCommand|LocCanonicalName">
@@ -144,7 +144,7 @@
       </trans-unit>
       <trans-unit id="openLinkCommand|ButtonText">
         <source>Open on GitHub</source>
-        <target xml:lang="de" state="translated">在 GitHub 上打开</target>
+        <target xml:lang="de" state="translated">Otevřít na GitHubu</target>
         <note />
       </trans-unit>
       <trans-unit id="openLinkCommand|LocCanonicalName">
@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="pullRequestCommand|ButtonText">
         <source>Pull Requests</source>
-        <target xml:lang="de" state="translated">拉取请求</target>
+        <target xml:lang="de" state="translated">Žádosti o přijetí změn</target>
         <note />
       </trans-unit>
       <trans-unit id="pullRequestCommand|LocCanonicalName">
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="refreshCommand|ButtonText">
         <source>Refresh</source>
-        <target xml:lang="de" state="translated">刷新</target>
+        <target xml:lang="de" state="translated">Aktualizovat</target>
         <note />
       </trans-unit>
       <trans-unit id="refreshCommand|LocCanonicalName">
@@ -174,7 +174,7 @@
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|ButtonText">
         <source>Show Current Pull Request</source>
-        <target xml:lang="de" state="translated">显示当前拉取请求</target>
+        <target xml:lang="de" state="translated">Zobrazit aktuální žádost o přijetí změn</target>
         <note />
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
@@ -194,7 +194,7 @@
       </trans-unit>
       <trans-unit id="syncSubmodulesCommand|ButtonText">
         <source>Sync Submodules</source>
-        <target xml:lang="de" state="translated">同步子模块</target>
+        <target xml:lang="de" state="translated">Synchronizovat dílčí moduly</target>
         <note />
       </trans-unit>
       <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
