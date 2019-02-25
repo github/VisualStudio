@@ -67,12 +67,6 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            // Never show on diff views
-            if (IsDiffView(wpfTextViewHost.TextView))
-            {
-                return null;
-            }
-
             return new PullRequestFileMargin(
                 wpfTextViewHost.TextView,
                 enableInlineCommentsCommand.Value,
