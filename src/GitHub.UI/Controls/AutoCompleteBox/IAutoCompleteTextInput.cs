@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,9 +19,9 @@ namespace GitHub.UI
         int SelectionStart { get; }
         int SelectionLength { get; }
         string Text { get; set; }
-        IObservable<KeyEventArgs> PreviewKeyDown { get; }
-        IObservable<RoutedEventArgs> SelectionChanged { get; }
-        IObservable<TextChangedEventArgs> TextChanged { get; }
+        IObservable<EventPattern<KeyEventArgs>> PreviewKeyDown { get; }
+        IObservable<EventPattern<RoutedEventArgs>> SelectionChanged { get; }
+        IObservable<EventPattern<TextChangedEventArgs>> TextChanged { get; }
         UIElement Control { get; }
         Point GetPositionFromCharIndex(int charIndex);
         Thickness Margin { get; set; }

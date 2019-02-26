@@ -668,37 +668,30 @@ namespace GitHub.UI
 
         IObservable<bool> ObserveTextBoxChanges()
         {
-            return textInput
+            var distinctTextChanges = textInput
                 .TextChanged
-                .Select(args =>
-                {
-                    return true;
-                });
+                .Select(_ => textInput.Text ?? "")
+                .DistinctUntilChanged();
 
-//            var distinctTextChanges = textInput
-//                .TextChanged
-//                .Select(_ => textInput.Text ?? "")
-//                .DistinctUntilChanged();
-//
-//            if (MinimumPopulateDelay >= 0)
-//            {
-//                distinctTextChanges = distinctTextChanges
-//                    .Throttle(TimeSpan.FromMilliseconds(MinimumPopulateDelay), RxApp.MainThreadScheduler);
-//            }
-//
-//            return distinctTextChanges
-//                .Select(text => {
-//                    bool userChangedTextBox = ignoreTextPropertyChange == 0;
-//                    if (ignoreTextPropertyChange > 0) ignoreTextPropertyChange--;
-//
-//                    return new { Text = text, ShouldPopulate = text.Length > 0 && userChangedTextBox };
-//                })
-//                .Do(textInfo =>
-//                {
-//                    userCalledPopulate = textInfo.ShouldPopulate;
-//                    UpdateAutoCompleteTextValue(textInfo.Text);
-//                })
-//                .Select(textInfo => textInfo.ShouldPopulate);
+            if (MinimumPopulateDelay >= 0)
+            {
+                distinctTextChanges = distinctTextChanges
+                    .Throttle(TimeSpan.FromMilliseconds(MinimumPopulateDelay), RxApp.MainThreadScheduler);
+            }
+
+            return distinctTextChanges
+                .Select(text => {
+                    bool userChangedTextBox = ignoreTextPropertyChange == 0;
+                    if (ignoreTextPropertyChange > 0) ignoreTextPropertyChange--;
+
+                    return new { Text = text, ShouldPopulate = text.Length > 0 && userChangedTextBox };
+                })
+                .Do(textInfo =>
+                {
+                    userCalledPopulate = textInfo.ShouldPopulate;
+                    UpdateAutoCompleteTextValue(textInfo.Text);
+                })
+                .Select(textInfo => textInfo.ShouldPopulate);
         }
 
         /// <summary>
