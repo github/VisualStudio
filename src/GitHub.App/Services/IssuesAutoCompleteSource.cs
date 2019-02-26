@@ -16,21 +16,22 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class IssuesAutoCompleteSource : IAutoCompleteSource
     {
-        readonly LocalRepositoryModel localRepositoryModel;
+        readonly ITeamExplorerContext teamExplorerContext;
         readonly IGraphQLClientFactory graphqlFactory;
 
         [ImportingConstructor]
-        public IssuesAutoCompleteSource(LocalRepositoryModel localRepositoryModel, IGraphQLClientFactory graphqlFactory)
+        public IssuesAutoCompleteSource(ITeamExplorerContext teamExplorerContext, IGraphQLClientFactory graphqlFactory)
         {
-            Guard.ArgumentNotNull(localRepositoryModel, nameof(localRepositoryModel));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
 
-            this.localRepositoryModel = localRepositoryModel;
+            this.teamExplorerContext = teamExplorerContext;
             this.graphqlFactory = graphqlFactory;
         }
 
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
+            var localRepositoryModel = teamExplorerContext.ActiveRepository;
             var query = new Query().Repository(owner: localRepositoryModel.Owner, name: localRepositoryModel.Name)
                 .Select(repository =>
                     repository.Issues(null, null, null, null, null, null, null)

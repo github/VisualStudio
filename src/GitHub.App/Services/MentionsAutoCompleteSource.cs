@@ -20,26 +20,27 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class MentionsAutoCompleteSource : IAutoCompleteSource
     {
-        readonly LocalRepositoryModel localRepositoryModel;
+        readonly ITeamExplorerContext teamExplorerContext;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IAvatarProvider avatarProvider;
 
         [ImportingConstructor]
-        public MentionsAutoCompleteSource(LocalRepositoryModel localRepositoryModel, 
+        public MentionsAutoCompleteSource(ITeamExplorerContext teamExplorerContext, 
             IGraphQLClientFactory graphqlFactory,
             IAvatarProvider avatarProvider)
         {
-            Guard.ArgumentNotNull(localRepositoryModel, nameof(localRepositoryModel));
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
             Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
             Guard.ArgumentNotNull(avatarProvider, nameof(avatarProvider));
 
-            this.localRepositoryModel = localRepositoryModel;
+            this.teamExplorerContext = teamExplorerContext;
             this.graphqlFactory = graphqlFactory;
             this.avatarProvider = avatarProvider;
         }
 
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
+            var localRepositoryModel = teamExplorerContext.ActiveRepository;
             var query = new Query().Repository(owner: localRepositoryModel.Owner, name: localRepositoryModel.Name)
                 .Select(repository =>
                     repository.MentionableUsers(null, null, null, null)
