@@ -10,5 +10,5 @@
 5. Click the **Publish to GitHub** button.
 ![Location of the Publish to GitHub button in the Team Explorer pane](images/publish-to-github.png)
 6. Enter a name and description for the repository on GitHub.
-7. Check the **Private Repository** box if you want to upload the repository as a private repository on GitHub. You must have a [Developer, Team or Business account](https://github.com/pricing) to create private repositories.
+7. Check the **Private Repository** box if you want to upload the repository as a private repository on GitHub.
 8. Click the **Publish** button.
