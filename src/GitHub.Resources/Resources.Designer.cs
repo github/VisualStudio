@@ -70,6 +70,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to added some commits.
+        /// </summary>
+        public static string AddedSomeCommits {
+            get {
+                return ResourceManager.GetString("AddedSomeCommits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add review comment.
         /// </summary>
         public static string AddReviewComment {
@@ -93,6 +102,15 @@ namespace GitHub {
         public static string AddYourReview {
             get {
                 return ResourceManager.GetString("AddYourReview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to and others.
+        /// </summary>
+        public static string AndOthers {
+            get {
+                return ResourceManager.GetString("AndOthers", resourceCulture);
             }
         }
         
@@ -313,6 +331,42 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close and comment.
+        /// </summary>
+        public static string CloseAndComment {
+            get {
+                return ResourceManager.GetString("CloseAndComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close issue.
+        /// </summary>
+        public static string CloseIssue {
+            get {
+                return ResourceManager.GetString("CloseIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close pull request.
+        /// </summary>
+        public static string ClosePullRequest {
+            get {
+                return ResourceManager.GetString("ClosePullRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comment.
+        /// </summary>
+        public static string Comment {
+            get {
+                return ResourceManager.GetString("Comment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Commented.
         /// </summary>
         public static string Commented {
@@ -336,6 +390,15 @@ namespace GitHub {
         public static string Comments {
             get {
                 return ResourceManager.GetString("Comments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} commits.
+        /// </summary>
+        public static string CommitCountFormat {
+            get {
+                return ResourceManager.GetString("CommitCountFormat", resourceCulture);
             }
         }
         
@@ -1225,6 +1288,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open Conversation.
+        /// </summary>
+        public static string OpenConversation {
+            get {
+                return ResourceManager.GetString("OpenConversation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open File as Default Action.
         /// </summary>
         public static string OpenFileAsDefaultAction {
@@ -1608,6 +1680,33 @@ namespace GitHub {
         public static string RenamedFileStatus {
             get {
                 return ResourceManager.GetString("RenamedFileStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reopen and comment.
+        /// </summary>
+        public static string ReopenAndComment {
+            get {
+                return ResourceManager.GetString("ReopenAndComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reopen issue.
+        /// </summary>
+        public static string ReopenIssue {
+            get {
+                return ResourceManager.GetString("ReopenIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reopen pull request.
+        /// </summary>
+        public static string ReopenPullRequest {
+            get {
+                return ResourceManager.GetString("ReopenPullRequest", resourceCulture);
             }
         }
         
