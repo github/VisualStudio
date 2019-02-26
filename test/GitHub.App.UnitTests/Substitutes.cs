@@ -40,6 +40,7 @@ namespace UnitTests
             {
                 var ret = Substitute.For<IVSGitServices>();
                 ret.GetLocalClonePathFromGitProvider().Returns(@"c:\foo\bar");
+                ret.Clone("https://github.com/failing/url", @"c:\dev\bar", true).Returns(x => { throw new Exception(); });
                 return ret;
             }
         }

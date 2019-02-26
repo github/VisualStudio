@@ -122,6 +122,23 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
+        [Test]
+        public async Task CleansDirectoryOnCloneFailed()
+        {
+            var serviceProvider = Substitutes.GetServiceProvider();
+            var operatingSystem = serviceProvider.GetOperatingSystem();
+            var vsGitServices = serviceProvider.GetVSGitServices();
+            var cloneService = CreateRepositoryCloneService(serviceProvider);
+
+            Assert.ThrowsAsync<Exception>(async () => {
+                await cloneService.CloneRepository("https://github.com/failing/url", @"c:\dev\bar");
+            });
+
+            operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
+            operatingSystem.Directory.Received().DeleteDirectory(@"c:\dev\bar");
+            await vsGitServices.Received().Clone("https://github.com/failing/url", @"c:\dev\bar", true);
+        }
+
         static RepositoryCloneService CreateRepositoryCloneService(IGitHubServiceProvider sp)
         {
             return new RepositoryCloneService(sp.GetOperatingSystem(), sp.GetVSGitServices(), sp.GetTeamExplorerServices(),
