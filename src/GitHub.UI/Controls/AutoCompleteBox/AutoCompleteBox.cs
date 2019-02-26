@@ -632,7 +632,7 @@ namespace GitHub.UI
             if (textInput != null)
             {
                 UnsubscribeToEvent("SelectionChanged");
-//                UnsubscribeToEvent("OnTextBoxTextChanged");
+                UnsubscribeToEvent("OnTextBoxTextChanged");
             }
 
             textInput = value;
@@ -646,18 +646,18 @@ namespace GitHub.UI
                     supportsShortcutOriginalValue = shortcutContainer.SupportsKeyboardShortcuts;
                 }
 
-//                SubscribeToEvent("OnTextBoxTextChanged", ObserveTextBoxChanges()
-//                    .Subscribe(shouldPopulate =>
-//                    {
-//                        if (shouldPopulate)
-//                        {
-//                            PopulateDropDown();
-//                        }
-//                        else
-//                        {
-//                            DismissDropDown();
-//                        }
-//                    }));
+                SubscribeToEvent("OnTextBoxTextChanged", 
+                    ObserveTextBoxChanges().Subscribe(shouldPopulate =>
+                    {
+                        if (shouldPopulate)
+                        {
+                            PopulateDropDown();
+                        }
+                        else
+                        {
+                            DismissDropDown();
+                        }
+                    }));
 
                 if (Text != null)
                 {
@@ -668,30 +668,37 @@ namespace GitHub.UI
 
         IObservable<bool> ObserveTextBoxChanges()
         {
-            var distinctTextChanges = textInput
+            return textInput
                 .TextChanged
-                .Select(_ => textInput.Text ?? "")
-                .DistinctUntilChanged();
-
-            if (MinimumPopulateDelay >= 0)
-            {
-                distinctTextChanges = distinctTextChanges
-                    .Throttle(TimeSpan.FromMilliseconds(MinimumPopulateDelay), RxApp.MainThreadScheduler);
-            }
-
-            return distinctTextChanges
-                .Select(text => {
-                    bool userChangedTextBox = ignoreTextPropertyChange == 0;
-                    if (ignoreTextPropertyChange > 0) ignoreTextPropertyChange--;
-
-                    return new { Text = text, ShouldPopulate = text.Length > 0 && userChangedTextBox };
-                })
-                .Do(textInfo =>
+                .Select(args =>
                 {
-                    userCalledPopulate = textInfo.ShouldPopulate;
-                    UpdateAutoCompleteTextValue(textInfo.Text);
-                })
-                .Select(textInfo => textInfo.ShouldPopulate);
+                    return true;
+                });
+
+//            var distinctTextChanges = textInput
+//                .TextChanged
+//                .Select(_ => textInput.Text ?? "")
+//                .DistinctUntilChanged();
+//
+//            if (MinimumPopulateDelay >= 0)
+//            {
+//                distinctTextChanges = distinctTextChanges
+//                    .Throttle(TimeSpan.FromMilliseconds(MinimumPopulateDelay), RxApp.MainThreadScheduler);
+//            }
+//
+//            return distinctTextChanges
+//                .Select(text => {
+//                    bool userChangedTextBox = ignoreTextPropertyChange == 0;
+//                    if (ignoreTextPropertyChange > 0) ignoreTextPropertyChange--;
+//
+//                    return new { Text = text, ShouldPopulate = text.Length > 0 && userChangedTextBox };
+//                })
+//                .Do(textInfo =>
+//                {
+//                    userCalledPopulate = textInfo.ShouldPopulate;
+//                    UpdateAutoCompleteTextValue(textInfo.Text);
+//                })
+//                .Select(textInfo => textInfo.ShouldPopulate);
         }
 
         /// <summary>
