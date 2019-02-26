@@ -95,6 +95,7 @@ namespace GitHub.Models
             public int NumberOfGitHubOpens { get; set; }
             public int NumberOfEnterpriseOpens { get; set; }
             public int NumberOfClonesToDefaultClonePath { get; set; }
+            public int NumberOfPRConversationsOpened { get; set; }
         }
     }
 }
