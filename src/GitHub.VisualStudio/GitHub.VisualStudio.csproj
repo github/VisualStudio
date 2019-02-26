@@ -24,9 +24,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio</AssemblyName>
-    <StartAction>Program</StartAction>
-    <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
     <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
