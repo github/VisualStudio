@@ -21,7 +21,8 @@ namespace GitHub.Exports
     {
         Unknown,
         Blob,
-        Blame
+        Blame,
+        Repository
     }
 
     /// <summary>

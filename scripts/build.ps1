@@ -38,6 +38,10 @@ Param(
     ,
     [switch]
     $Trace = $false
+    ,
+    [switch]
+    $ForVSInstaller = $false
+
 )
 
 Set-StrictMode -Version Latest
@@ -53,19 +57,16 @@ Vsix | out-null
 
 Push-Location $rootDirectory
 
+if ($Package -and $BuildNumber -gt -1) {
+    $BumpVersion = $true
+}
+
 if ($UpdateSubmodules) {
     Update-Submodules
 }
 
 if ($Clean) {
 	Clean-WorkingTree
-}
-
-$fullBuild = Test-Path env:GHFVS_KEY
-$publishable = $fullBuild -and $AppVeyor -and ($env:APPVEYOR_PULL_REQUEST_NUMBER -or $env:APPVEYOR_REPO_BRANCH -eq "master")
-if ($publishable) { #forcing a deploy flag for CI
-    $Package = $true
-    $BumpVersion = $true
 }
 
 if ($BumpVersion) {
@@ -79,6 +80,6 @@ if ($Package) {
     Write-Output "Building GitHub for Visual Studio"
 }
 
-Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package
+Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller
 
 Pop-Location

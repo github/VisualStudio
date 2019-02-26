@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,27 +36,38 @@ namespace GitHub.StartPage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubContainerProvider>();
 
+        readonly Lazy<IGitHubServiceProvider> gitHubServiceProvider;
+
+        public GitHubContainerProvider() : this(
+            new Lazy<IGitHubServiceProvider>(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider))
+        {
+        }
+
+        public GitHubContainerProvider(Lazy<IGitHubServiceProvider> gitHubServiceProvider)
+        {
+            this.gitHubServiceProvider = gitHubServiceProvider;
+        }
+
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
-
-            return await RunAcquisition(downloadProgress, cancellationToken, null);
+            return await RunAcquisition(downloadProgress, null, cancellationToken);
         }
 
         public async Task<CodeContainer> AcquireCodeContainerAsync(RemoteCodeContainer onlineCodeContainer, IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
             var repository = new RepositoryModel(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
-            return await RunAcquisition(downloadProgress, cancellationToken, repository);
+            return await RunAcquisition(downloadProgress, repository, cancellationToken);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
-        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, RepositoryModel repository)
+        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, RepositoryModel repository, CancellationToken cancellationToken)
         {
             CloneDialogResult request = null;
 
             try
             {
-                var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
+                var uiProvider = await Task.Run(() => gitHubServiceProvider.Value);
+                request = await ShowCloneDialog(uiProvider, downloadProgress, cancellationToken, repository);
             }
             catch (Exception e)
             {
@@ -69,6 +79,10 @@ namespace GitHub.StartPage
 
             var uri = request.Url.ToRepositoryUrl();
             var repositoryName = request.Url.RepositoryName;
+
+            // Report all steps complete before returning a CodeContainer
+            downloadProgress.Report(new ServiceProgressData(string.Empty, string.Empty, 1, 1));
+
             return new CodeContainer(
                 localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
                                 new CodeContainerSourceControlProperties(repositoryName, request.Path, new Guid(Guids.GitSccProviderId))),
@@ -81,47 +95,33 @@ namespace GitHub.StartPage
                 lastAccessed: DateTimeOffset.UtcNow);
         }
 
-        async Task<CloneDialogResult> ShowCloneDialog(
+        static async Task<CloneDialogResult> ShowCloneDialog(
             IGitHubServiceProvider gitHubServiceProvider,
             IProgress<ServiceProgressData> progress,
+            CancellationToken cancellationToken,
             RepositoryModel repository = null)
         {
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
             var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
             var usageTracker = gitHubServiceProvider.GetService<IUsageTracker>();
-            CloneDialogResult result = null;
 
-            if (repository == null)
-            {
-                result = await dialogService.ShowCloneDialog(null);
-            }
-            else
-            {
-                var basePath = await dialogService.ShowReCloneDialog(repository);
-
-                if (basePath != null)
-                {
-                    var path = Path.Combine(basePath, repository.Name);
-                    result = new CloneDialogResult(path, repository.CloneUrl);
-                }
-            }
-
-            if (result != null)
+            var cloneUrl = repository?.CloneUrl;
+            if (await dialogService.ShowCloneDialog(null, cloneUrl) is CloneDialogResult result)
             {
                 try
                 {
-                    await cloneService.CloneOrOpenRepository(result, progress);
+                    await cloneService.CloneOrOpenRepository(result, progress, cancellationToken);
                     usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
+                    return result;
                 }
                 catch
                 {
                     var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
                     teServices.ShowError($"Failed to clone the repository '{result.Url.RepositoryName}'");
-                    result = null;
                 }
             }
 
-            return result;
+            return null;
         }
     }
 }

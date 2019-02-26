@@ -206,9 +206,9 @@ namespace GitHub.App.UnitTests.ViewModels
                 var target = await CreateTarget(session);
 
                 target.Body = "body";
-                target.StartReview.Execute();
+                await target.StartReview.Execute();
 
-                session.Received(1).StartReview();
+                await session.Received(1).StartReview();
             }
         }
 
@@ -250,8 +250,7 @@ namespace GitHub.App.UnitTests.ViewModels
             };
         }
 
-        static ICommentThreadViewModel CreateThread(
-            bool canPost = true)
+        static ICommentThreadViewModel CreateThread()
         {
             var result = Substitute.For<ICommentThreadViewModel>();
             return result;

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.App;
 using GitHub.Commands;
@@ -17,18 +18,20 @@ using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using LibGit2Sharp;
+using Microsoft.VisualStudio.StaticReviews.Contracts;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using Serilog;
 using static System.FormattableString;
 using ReactiveCommand = ReactiveUI.ReactiveCommand;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels.GitHubPane
 {
     /// <inheritdoc cref="IPullRequestDetailViewModel"/>
     [Export(typeof(IPullRequestDetailViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel
+    public sealed class PullRequestDetailViewModel : PanePageViewModelBase, IPullRequestDetailViewModel, IStaticReviewFileMap
     {
         static readonly ILogger log = LogManager.ForContext<PullRequestDetailViewModel>();
 
@@ -40,6 +43,8 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
         readonly IGitService gitService;
+        readonly IOpenIssueishDocumentCommand openDocumentCommand;
+
         IModelService modelService;
         PullRequestDetailModel model;
         IActorViewModel author;
@@ -79,7 +84,8 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestFilesViewModel files,
             ISyncSubmodulesCommand syncSubmodulesCommand,
             IViewViewModelFactory viewViewModelFactory,
-            IGitService gitService)
+            IGitService gitService,
+            IOpenIssueishDocumentCommand openDocumentCommand)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -89,6 +95,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
             Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
             Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(openDocumentCommand, nameof(openDocumentCommand));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -98,6 +105,8 @@ namespace GitHub.ViewModels.GitHubPane
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
+            this.openDocumentCommand = openDocumentCommand;
+
             Files = files;
 
             Checkout = ReactiveCommand.CreateFromObservable(
@@ -130,17 +139,17 @@ namespace GitHub.ViewModels.GitHubPane
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
+            OpenConversation = ReactiveCommand.Create(DoOpenConversation);
+
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
-        
+
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
 
             ShowAnnotations = ReactiveCommand.Create<IPullRequestCheckViewModel>(DoShowAnnotations);
         }
 
-        private void DoOpenDetailsUrl()
-        {
-            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
-        }
+        [Import(AllowDefault = true)]
+        private IStaticReviewFileMapManager StaticReviewFileMapManager { get; set; }
 
         /// <inheritdoc/>
         public PullRequestDetailModel Model
@@ -267,6 +276,9 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> OpenConversation { get; }
+
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <inheritdoc/>
@@ -350,7 +362,7 @@ namespace GitHub.ViewModels.GitHubPane
                 Body = !string.IsNullOrWhiteSpace(pullRequest.Body) ? pullRequest.Body : Resources.NoDescriptionProvidedMarkdown;
                 Reviews = PullRequestReviewSummaryViewModel.BuildByUser(Session.User, pullRequest).ToList();
 
-                Checks = (IReadOnlyList<IPullRequestCheckViewModel>) PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
+                Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
                 await Files.InitializeAsync(Session);
 
@@ -370,6 +382,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pullEnabled)
                     {
                         pullToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPullToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -382,6 +395,7 @@ namespace GitHub.ViewModels.GitHubPane
                     if (pushEnabled)
                     {
                         pushToolTip = string.Format(
+                            CultureInfo.InvariantCulture,
                             Resources.PullRequestDetailsPushToolTip,
                             IsFromFork ? Resources.Fork : Resources.Remote,
                             SourceBranchDisplayName);
@@ -396,7 +410,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
 
                     var submodulesToSync = await pullRequestsService.CountSubmodulesToSync(LocalRepository);
-                    var syncSubmodulesToolTip = string.Format(Resources.SyncSubmodules, submodulesToSync);
+                    var syncSubmodulesToolTip = string.Format(CultureInfo.InvariantCulture, Resources.SyncSubmodules, submodulesToSync);
 
                     UpdateState = new UpdateCommandState(divergence, pullEnabled, pushEnabled, pullToolTip, pushToolTip, syncSubmodulesToolTip, submodulesToSync);
                     CheckoutState = null;
@@ -404,8 +418,14 @@ namespace GitHub.ViewModels.GitHubPane
                 else
                 {
                     var caption = localBranches.Count > 0 ?
-                        string.Format(Resources.PullRequestDetailsCheckout, localBranches.First().DisplayName) :
-                        string.Format(Resources.PullRequestDetailsCheckoutTo, await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckout,
+                            localBranches.First().DisplayName) :
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resources.PullRequestDetailsCheckoutTo,
+                            await pullRequestsService.GetDefaultLocalBranchName(LocalRepository, Model.Number, Model.Title));
                     var clean = await pullRequestsService.IsWorkingDirectoryClean(LocalRepository);
                     string disabled = null;
 
@@ -482,6 +502,7 @@ namespace GitHub.ViewModels.GitHubPane
         public override void Activated()
         {
             active = true;
+            this.StaticReviewFileMapManager?.RegisterStaticReviewFileMap(this);
 
             if (refreshOnActivate)
             {
@@ -491,7 +512,43 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public override void Deactivated() => active = false;
+        public override void Deactivated()
+        {
+            this.StaticReviewFileMapManager?.UnregisterStaticReviewFileMap(this);
+            active = false;
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetLocalPathFromObjectishAsync(string objectish, CancellationToken cancellationToken)
+        {
+            if (this.pullRequestsService != null)
+            {
+                string commitId = objectish.Substring(0, objectish.IndexOf(':'));
+                string relativePath = objectish.Substring(objectish.IndexOf(':')+1).TrimStart('/');
+
+                return this.pullRequestsService.ExtractToTempFile(
+                    this.Session.LocalRepository,
+                    this.Session.PullRequest,
+                    relativePath,
+                    commitId,
+                    this.pullRequestsService.GetEncoding(this.Session.LocalRepository, relativePath));
+            }
+
+            return Task.FromResult<string>(null);
+        }
+
+        /// <inheritdoc/>
+        public Task<string> GetObjectishFromLocalPathAsync(string localPath, CancellationToken cancellationToken)
+        {
+            // We rely on pull request service's global map here instead of trying to get it from IPullRequestSessionManager via ITextBuffer
+            // because it is possible that the file queried wasn't opened by GitHub extension and instead was opened by LSP
+            if (this.pullRequestsService is IStaticReviewFileMap staticReviewFileMap)
+            {
+                return staticReviewFileMap.GetObjectishFromLocalPathAsync(localPath, cancellationToken);
+            }
+
+            return Task.FromResult<string>(null);
+        }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -596,6 +653,21 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsBusy = false;
             }
+        }
+
+        void DoOpenConversation()
+        {
+            var p = new OpenIssueishParams(
+                HostAddress.Create(LocalRepository.CloneUrl),
+                RemoteRepositoryOwner,
+                LocalRepository.Name,
+                Number);
+            openDocumentCommand.Execute(p);
+        }
+
+        void DoOpenDetailsUrl()
+        {
+            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
 
         void DoShowReview(IPullRequestReviewSummaryViewModel review)

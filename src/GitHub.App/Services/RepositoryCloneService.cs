@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -69,13 +70,8 @@ namespace GitHub.Services
             {
                 var order = new RepositoryOrder
                 {
-                    Field = RepositoryOrderField.Name,
-                    Direction = OrderDirection.Asc
-                };
-
-                var affiliation = new RepositoryAffiliation?[]
-                {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
+                    Field = RepositoryOrderField.PushedAt,
+                    Direction = OrderDirection.Desc
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -94,14 +90,17 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, affiliation, null)
+                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
+                            .Select(repositorySelection).ToList(),
+                        ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
+                            .Nodes
                             .Select(repositorySelection).ToList(),
                         Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
-                            Repositories = org.Repositories(null, null, null, null, null, null, null, order, null, null)
-                                .AllPages()
+                            Repositories = org.Repositories(100, null, null, null, null, null, null, order, null, null)
+                                .Nodes
                                 .Select(repositorySelection).ToList()
                         }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
@@ -115,7 +114,8 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task CloneOrOpenRepository(
             CloneDialogResult cloneDialogResult,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
 
@@ -148,7 +148,7 @@ namespace GitHub.Services
             else
             {
                 var cloneUrl = repositoryUrl.ToString();
-                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+                await CloneRepository(cloneUrl, repositoryPath, progress, cancellationToken).ConfigureAwait(true);
 
                 if (isDotCom)
                 {
@@ -198,7 +198,8 @@ namespace GitHub.Services
         public async Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
@@ -211,7 +212,7 @@ namespace GitHub.Services
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
                 if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))

@@ -1,5 +1,8 @@
 ﻿using System;
 
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1720 // Identifier contains type name
+
 namespace GitHub.Models
 {
     public class UsageModel
@@ -87,14 +90,12 @@ namespace GitHub.Models
             public int ExecuteToggleInlineCommentMarginCommand { get; set; }
             public int NumberOfPullRequestFileMarginToggleInlineCommentMargin { get; set; }
             public int NumberOfPullRequestFileMarginViewChanges { get; set; }
-            public int NumberOfCloneViewGitHubTab { get; set; }
-            public int NumberOfCloneViewEnterpriseTab { get; set; }
-            public int NumberOfCloneViewUrlTab { get; set; }
             public int NumberOfGitHubClones { get; set; }
             public int NumberOfEnterpriseClones { get; set; }
             public int NumberOfGitHubOpens { get; set; }
             public int NumberOfEnterpriseOpens { get; set; }
             public int NumberOfClonesToDefaultClonePath { get; set; }
+            public int NumberOfPRConversationsOpened { get; set; }
         }
     }
 }

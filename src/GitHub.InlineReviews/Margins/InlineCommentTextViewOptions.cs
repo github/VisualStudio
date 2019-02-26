@@ -4,8 +4,8 @@ namespace GitHub.InlineReviews.Margins
 {
     public static class InlineCommentTextViewOptions
     {
-        public static EditorOptionKey<bool> MarginVisibleId = new EditorOptionKey<bool>("TextViewHost/InlineCommentMarginVisible");
+        public static readonly EditorOptionKey<bool> MarginVisibleId = new EditorOptionKey<bool>("TextViewHost/InlineCommentMarginVisible");
 
-        public static EditorOptionKey<bool> MarginEnabledId = new EditorOptionKey<bool>("TextViewHost/InlineCommentMarginEnabled");
+        public static readonly EditorOptionKey<bool> MarginEnabledId = new EditorOptionKey<bool>("TextViewHost/InlineCommentMarginEnabled");
     }
 }

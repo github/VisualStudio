@@ -18,7 +18,6 @@ namespace GitHub.ViewModels
     /// </summary>
     public abstract class CommentThreadViewModel : ReactiveObject, ICommentThreadViewModel
     {
-        readonly ReactiveList<ICommentViewModel> comments = new ReactiveList<ICommentViewModel>();
         readonly Dictionary<ICommentViewModel, IObserver<ICommentViewModel>> draftThrottles =
             new Dictionary<ICommentViewModel, IObserver<ICommentViewModel>>();
         readonly IScheduler timerScheduler;
@@ -52,13 +51,7 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
-        public IReactiveList<ICommentViewModel> Comments => comments;
-
-        /// <inheritdoc/>
         public IActorViewModel CurrentUser { get; private set; }
-
-        /// <inheritdoc/>
-        IReadOnlyReactiveList<ICommentViewModel> ICommentThreadViewModel.Comments => comments;
 
         protected IMessageDraftStore DraftStore { get; }
 
@@ -72,20 +65,18 @@ namespace GitHub.ViewModels
         public abstract Task DeleteComment(ICommentViewModel comment);
 
         /// <summary>
-        /// Adds a placeholder comment that will allow the user to enter a reply, and wires up
+        /// Initializes a placeholder comment that will allow the user to enter a reply, and wires up
         /// event listeners for saving drafts.
         /// </summary>
         /// <param name="placeholder">The placeholder comment view model.</param>
         /// <returns>An object which when disposed will remove the event listeners.</returns>
-        protected IDisposable AddPlaceholder(ICommentViewModel placeholder)
+        protected IDisposable InitializePlaceholder(ICommentViewModel placeholder)
         {
-            Comments.Add(placeholder);
-
             return placeholder.WhenAnyValue(
                 x => x.EditState,
                 x => x.Body,
                 (state, body) => (state, body))
-                .Subscribe(x => PlaceholderChanged(placeholder, x.state, x.body));
+                .Subscribe(x => PlaceholderChanged(placeholder, x.state));
         }
 
         /// <summary>
@@ -120,7 +111,7 @@ namespace GitHub.ViewModels
 
         protected abstract (string key, string secondaryKey) GetDraftKeys(ICommentViewModel comment);
 
-        void PlaceholderChanged(ICommentViewModel placeholder, CommentEditState state, string body)
+        void PlaceholderChanged(ICommentViewModel placeholder, CommentEditState state)
         {
             if (state == CommentEditState.Editing)
             {

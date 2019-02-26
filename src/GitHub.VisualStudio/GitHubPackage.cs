@@ -1,21 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.ComponentModel.Design;
-using System.ComponentModel.Composition;
-using System.Runtime.InteropServices;
 using GitHub.Api;
 using GitHub.Commands;
-using GitHub.Info;
 using GitHub.Exports;
+using GitHub.Info;
 using GitHub.Logging;
+using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.Services.Vssdk.Commands;
 using GitHub.Settings;
-using GitHub.VisualStudio.Helpers;
+using GitHub.ViewModels.Documents;
+using GitHub.ViewModels.GitHubPane;
 using GitHub.VisualStudio.Commands;
 using GitHub.Services.Vssdk.Commands;
 using GitHub.Services.Vssdk.Services;
 using GitHub.ViewModels.GitHubPane;
+using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio;
@@ -24,6 +29,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
+using Microsoft;
+using static System.FormattableString;
 
 namespace GitHub.VisualStudio
 {
@@ -31,7 +38,7 @@ namespace GitHub.VisualStudio
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideAutoLoad(Guids.UIContext_Git, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
     public class GitHubPackage : AsyncPackage
     {
@@ -80,6 +87,8 @@ namespace GitHub.VisualStudio
             if (ExportForVisualStudioProcessAttribute.IsVisualStudioProcess())
             {
                 var componentModel = (IComponentModel)(await GetServiceAsync(typeof(SComponentModel)));
+                Assumes.Present(componentModel);
+
                 var exports = componentModel.DefaultExportProvider;
                 commands = new IVsCommandBase[]
                 {
@@ -111,11 +120,15 @@ namespace GitHub.VisualStudio
 
             await JoinableTaskFactory.SwitchToMainThreadAsync();
             var menuService = (IMenuCommandService)(await GetServiceAsync(typeof(IMenuCommandService)));
+            Assumes.Present(menuService);
+
             menuService.AddCommands(commands);
         }
 
         async Task EnsurePackageLoaded(Guid packageGuid)
         {
+            await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
+
             var shell = await GetServiceAsync(typeof(SVsShell)) as IVsShell;
             if (shell != null)
             {
@@ -191,6 +204,7 @@ namespace GitHub.VisualStudio
     [ProvideService(typeof(IVSGitExt), IsAsyncQueryable = true)]
     [ProvideService(typeof(IGitHubToolWindowManager))]
     [ProvideService(typeof(ITippingService))]
+    [ProvideToolWindow(typeof(IssueishDocumentPane), DocumentLikeTool = true, MultiInstances = true)]
     [Guid(ServiceProviderPackageId)]
     public sealed class ServiceProviderPackage : AsyncPackage, IServiceProviderPackage, IGitHubToolWindowManager
     {
@@ -233,6 +247,8 @@ namespace GitHub.VisualStudio
 
         public async Task<IGitHubPaneViewModel> ShowGitHubPane()
         {
+            await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
+
             var pane = ShowToolWindow(new Guid(GitHubPane.GitHubPaneGuid));
             if (pane == null)
                 return null;
@@ -246,8 +262,49 @@ namespace GitHub.VisualStudio
             return await gitHubPane.GetViewModelAsync();
         }
 
+        public async Task<IIssueishPaneViewModel> ShowIssueishDocumentPane(
+            HostAddress address,
+            string owner,
+            string repository,
+            int number)
+        {
+            var id = Invariant($"{address.WebUri}|{owner}/{repository}#{number}");
+            var pane = GetOrCreateToolWindow<IssueishDocumentPane>(id);
+
+            if (pane != null && pane.Frame is IVsWindowFrame frame)
+            {
+                ErrorHandler.ThrowOnFailure(frame.Show());
+                return await pane.GetViewModelAsync();
+            }
+
+            return null;
+        }
+
+        T GetOrCreateToolWindow<T>(string id) where T : AsyncPaneBase
+        {
+            for (var i = 0; i < int.MaxValue; ++i)
+            {
+                var result = (T)FindToolWindow(typeof(T), i, false);
+
+                if (result != null && result.Id == id)
+                {
+                    return result;
+                }
+                else if (result == null)
+                {
+                    result = (T)FindToolWindow(typeof(T), i, true);
+                    result.Id = id;
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
         static ToolWindowPane ShowToolWindow(Guid windowGuid)
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             IVsWindowFrame frame;
             if (ErrorHandler.Failed(Services.UIShell.FindToolWindow((uint)__VSCREATETOOLWIN.CTW_fForceCreate,
                 ref windowGuid, out frame)))
@@ -267,7 +324,7 @@ namespace GitHub.VisualStudio
                 log.Error("Unable to grab instance of GitHubPane '{Guid}'", UI.GitHubPane.GitHubPaneGuid);
                 return null;
             }
-            return docView as GitHubPane;
+            return docView as ToolWindowPane;
         }
 
         async Task<object> CreateService(IAsyncServiceContainer container, CancellationToken cancellationToken, Type serviceType)
@@ -290,6 +347,8 @@ namespace GitHub.VisualStudio
                 // These services are got through MEF and we will take a performance hit if ILoginManager is requested during 
                 // InitializeAsync. TODO: We can probably make LoginManager a normal MEF component rather than a service.
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(serviceProvider);
+
                 var keychain = serviceProvider.GetService<IKeychain>();
                 var oauthListener = serviceProvider.GetService<IOAuthCallbackListener>();
 
@@ -319,6 +378,8 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IUsageService))
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(sp);
+
                 var environment = new Rothko.Environment();
                 return new UsageService(sp, environment);
             }
@@ -327,6 +388,11 @@ namespace GitHub.VisualStudio
                 var usageService = await GetServiceAsync(typeof(IUsageService)) as IUsageService;
                 var serviceProvider = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
                 var settings = await GetServiceAsync(typeof(IPackageSettings)) as IPackageSettings;
+
+                Assumes.Present(usageService);
+                Assumes.Present(serviceProvider);
+                Assumes.Present(settings);
+
                 return new UsageTracker(serviceProvider, usageService, settings);
             }
             else if (serviceType == typeof(IVSGitExt))
@@ -352,6 +418,8 @@ namespace GitHub.VisualStudio
             else
             {
                 var sp = await GetServiceAsync(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
+                Assumes.Present(sp);
+
                 return sp.TryGetService(serviceType);
             }
         }

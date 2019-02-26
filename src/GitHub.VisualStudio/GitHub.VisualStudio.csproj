@@ -9,7 +9,7 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
-    <XlfLanguages>zh-CN</XlfLanguages>
+    <XlfLanguages>cs-CZ;de-DE;es-ES;fr-FR;it-IT;ja-JP;ko-KR;pl-PL;pt-BR;ru-RU;tr-TR;zh-CN;zh-TW</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -118,6 +118,7 @@
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\OpenIssueishDocumentCommand.cs" />
     <Compile Include="Commands\SyncSubmodulesCommand.cs" />
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
@@ -153,7 +154,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\IssueishDocumentPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>

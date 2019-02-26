@@ -55,6 +55,7 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartPagePackage.cs" />
   </ItemGroup>
@@ -97,9 +98,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
       <Version>15.8.33</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
-      <Version>15.8.122</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>

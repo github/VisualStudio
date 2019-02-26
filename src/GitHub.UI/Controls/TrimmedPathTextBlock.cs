@@ -118,7 +118,7 @@ namespace GitHub.UI
 
             while (true)
             {
-                renderText = CreateFormattedText(string.Join(Path.DirectorySeparatorChar.ToString(), parts));
+                renderText = CreateFormattedText(string.Join(new string(Path.DirectorySeparatorChar, 1), parts));
 
                 if (renderText.Width <= availableSize.Width || nextPart == -1)
                     break;

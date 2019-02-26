@@ -160,10 +160,10 @@ namespace GitHub.InlineReviews.ViewModels
             }
 
             fileSubscription?.Dispose();
-            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(LinesChanged);
+            fileSubscription = file.LinesChanged.ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LinesChanged(x).Forget());
         }
 
-        async void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        async Task LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
         {
             try
             {
@@ -196,7 +196,9 @@ namespace GitHub.InlineReviews.ViewModels
 
             AvailableForComment =
                 file.Diff.Any(chunk => chunk.Lines
-                    .Any(line => line.NewLineNumber - 1 == lineNumber));
+                    .Any(line => leftBuffer ?
+                        line.OldLineNumber - 1 == lineNumber :
+                        line.NewLineNumber - 1 == lineNumber));
 
             var thread = file.InlineCommentThreads?.FirstOrDefault(x =>
                 x.LineNumber == lineNumber &&

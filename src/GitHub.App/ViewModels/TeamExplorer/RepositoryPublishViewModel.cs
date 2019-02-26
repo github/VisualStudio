@@ -31,7 +31,6 @@ namespace GitHub.ViewModels.TeamExplorer
         readonly IModelServiceFactory modelServiceFactory;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
-        readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly ObservableAsPropertyHelper<string> title;
         readonly IUsageTracker usageTracker;
 
@@ -91,11 +90,6 @@ namespace GitHub.ViewModels.TeamExplorer
             InitializeValidation();
 
             PublishRepository = InitializePublishRepositoryCommand();
-
-            canKeepPrivate = CanKeepPrivateObservable.CombineLatest(PublishRepository.IsExecuting,
-                (canKeep, publishing) => canKeep && !publishing)
-                .ToProperty(this, x => x.CanKeepPrivate);
-
             PublishRepository.IsExecuting.Subscribe(x => IsBusy = x);
 
             var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
@@ -116,7 +110,6 @@ namespace GitHub.ViewModels.TeamExplorer
         }
 
         public string Title { get { return title.Value; } }
-        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
         public ReactiveCommand<Unit, ProgressState> PublishRepository { get; private set; }
         public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }
