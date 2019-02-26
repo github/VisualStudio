@@ -149,18 +149,6 @@
                             SpellCheck.IsEnabled="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationTitleTextBox}"/>
 
-        <ghfvs:PromptTextBox Grid.Row="2"
-                            MinHeight="100"
-                            Margin="10,5"
-                            AcceptsReturn="True"
-                            PromptText="{x:Static ghfvs:Resources.Description}"
-                            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                            Style="{DynamicResource GitHubVsPromptTextBox}"
-                            VerticalScrollBarVisibility="Auto"
-                            TextWrapping="Wrap"
-                            SpellCheck.IsEnabled="True"
-                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationDescriptionTextBox}"/>
-
         <ghfvs:AutoCompleteBox
             Grid.Row="3"
             MinHeight="100"
