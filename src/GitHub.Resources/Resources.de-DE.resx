@@ -848,4 +848,37 @@ https://git-scm.com/download/win</value>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>Letzte {0} mithilfe von Push übertragene Elemente</value>
   </data>
+  <data name="OpenConversation" xml:space="preserve">
+    <value>Open Conversation</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Close pull request</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Close issue</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Close and comment</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Reopen and comment</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Reopen issue</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} commits</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Reopen pull request</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>added some commits</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>and others</value>
+  </data>
 </root>
