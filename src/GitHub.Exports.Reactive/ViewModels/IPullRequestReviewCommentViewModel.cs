@@ -17,15 +17,6 @@ namespace GitHub.ViewModels
         bool CanStartReview { get; }
 
         /// <summary>
-        /// Gets the caption for the "Commit" button.
-        /// </summary>
-        /// <remarks>
-        /// This will be "Add a single comment" when not in review mode and "Add review comment"
-        /// when in review mode.
-        /// </remarks>
-        string CommitCaption { get; }
-
-        /// <summary>
         /// Gets a value indicating whether this comment is part of a pending pull request review.
         /// </summary>
         bool IsPending { get; }

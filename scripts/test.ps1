@@ -97,6 +97,12 @@ if (!$?) {
     $exitcode = 11
 }
 
+Write-Output "Running GitHub.StartPage.UnitTests..."
+Run-NUnit test GitHub.StartPage.UnitTests $TimeoutDuration $config
+if (!$?) {
+    $exitcode = 12
+}
+
 if ($exitcode -ne 0) {
     $host.SetShouldExit($exitcode)
 }

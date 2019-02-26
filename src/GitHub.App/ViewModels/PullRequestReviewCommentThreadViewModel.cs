@@ -23,6 +23,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestReviewCommentThreadViewModel : CommentThreadViewModel, IPullRequestReviewCommentThreadViewModel
     {
+        readonly ReactiveList<ICommentViewModel> comments = new ReactiveList<ICommentViewModel>();
         readonly IViewViewModelFactory factory;
         readonly ObservableAsPropertyHelper<bool> needsPush;
         IPullRequestSessionFile file;
@@ -51,6 +52,9 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
+        public IReactiveList<ICommentViewModel> Comments => comments;
+
+        /// <inheritdoc/>
         public IPullRequestSession Session { get; private set; }
 
         /// <inheritdoc/>
@@ -76,7 +80,11 @@ namespace GitHub.ViewModels
         public bool NeedsPush => needsPush.Value;
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(IPullRequestSession session,
+        IReadOnlyReactiveList<ICommentViewModel> IPullRequestReviewCommentThreadViewModel.Comments => comments;
+
+        /// <inheritdoc/>
+        public async Task InitializeAsync(
+            IPullRequestSession session,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
@@ -121,7 +129,8 @@ namespace GitHub.ViewModels
                     vm.Body = draft.Body;
                 }
 
-                AddPlaceholder(vm);
+                InitializePlaceholder(vm);
+                comments.Add(vm);
             }
         }
 
@@ -154,7 +163,8 @@ namespace GitHub.ViewModels
                 vm.Body = draft.Body;
             }
 
-            AddPlaceholder(vm);
+            InitializePlaceholder(vm);
+            comments.Add(vm);
         }
 
         public override async Task PostComment(ICommentViewModel comment)

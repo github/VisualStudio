@@ -114,7 +114,7 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy = $false) {
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [bool]$Deploy = $false) {
         $msbuild = Find-MSBuild
 
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed -MSBuildPath (Split-Path -parent $msbuild) }
@@ -185,7 +185,7 @@ New-Module -ScriptBlock {
 
 New-Module -ScriptBlock {
     function Write-Manifest([string]$directory) {
-        Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
+        Add-Type -Path (Join-Path $rootDirectory build\Release\Newtonsoft.Json.dll)
 
         $manifest = @{
             NewestExtension = @{

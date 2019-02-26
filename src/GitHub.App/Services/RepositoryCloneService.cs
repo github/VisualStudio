@@ -114,7 +114,8 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task CloneOrOpenRepository(
             CloneDialogResult cloneDialogResult,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
 
@@ -147,7 +148,7 @@ namespace GitHub.Services
             else
             {
                 var cloneUrl = repositoryUrl.ToString();
-                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+                await CloneRepository(cloneUrl, repositoryPath, progress, cancellationToken).ConfigureAwait(true);
 
                 if (isDotCom)
                 {
@@ -197,7 +198,8 @@ namespace GitHub.Services
         public async Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
@@ -210,7 +212,7 @@ namespace GitHub.Services
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
                 if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))

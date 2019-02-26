@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
@@ -74,7 +75,8 @@ namespace GitHub.Services
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
             Assumes.Present(teamExplorer);
@@ -84,14 +86,22 @@ namespace GitHub.Services
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
 #elif TEAMEXPLORER15 || TEAMEXPLORER16
-            // The ServiceProgressData type is in a Visual Studio 2019 assembly that we don't currently have access to.
-            // Using reflection to call the CloneAsync in order to avoid conflicts with the Visual Studio 2017 version.
-            // Progress won't be displayed on the status bar, but it appears prominently on the Team Explorer Home view.
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
+            // IGitActionsExt is proffered by SccProviderPackage, but isn't advertised.
+            // To ensure that getting IGitActionsExt doesn't return null, we first request the
+            // IGitExt service which is advertised. This forces SccProviderPackage to load
+            // and proffer IGitActionsExt.
+            var gitExt = serviceProvider.GetService(typeof(IGitExt));
+            Assumes.NotNull(gitExt);
+            var gitActionsExt = serviceProvider.GetService<IGitActionsExt>();
+            Assumes.NotNull(gitActionsExt);
+
+            // The progress parameter uses the ServiceProgressData type which is defined in
+            // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
+            // would cause type conflicts, so we're using reflection to call CloneAsync.
             var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
             Assumes.NotNull(cloneAsyncMethod);
-            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, null, null };
-            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitExt, cloneParameters);
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, cancellationToken, progress };
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitActionsExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await cloneTask;

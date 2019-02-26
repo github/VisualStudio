@@ -48,15 +48,14 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-# VSTest is hanging. Skip tests for now; we're still running Appveyor which will handle the tests.
-#- task: VSTest@2
-#  inputs:
-#    searchFolder: '$(Build.SourcesDirectory)\test'
-#    testAssemblyVer2: '**\bin\**\*Tests.dll'
-#    platform: '$(buildPlatform)'
-#    configuration: '$(buildConfiguration)'
-#    diagnosticsEnabled: true
-#    runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
+- task: VSTest@2
+  inputs:
+    searchFolder: '$(Build.SourcesDirectory)\test'
+    testAssemblyVer2: '**\bin\**\*Tests.dll'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
+    runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
 
 - task: PublishBuildArtifacts@1
   inputs:
