@@ -646,18 +646,18 @@ namespace GitHub.UI
                     supportsShortcutOriginalValue = shortcutContainer.SupportsKeyboardShortcuts;
                 }
 
-//                SubscribeToEvent("OnTextBoxTextChanged", ObserveTextBoxChanges()
-//                    .Subscribe(shouldPopulate =>
-//                    {
-//                        if (shouldPopulate)
-//                        {
-//                            PopulateDropDown();
-//                        }
-//                        else
-//                        {
-//                            DismissDropDown();
-//                        }
-//                    }));
+                SubscribeToEvent("OnTextBoxTextChanged", 
+                    ObserveTextBoxChanges().Subscribe(shouldPopulate =>
+                    {
+                        if (shouldPopulate)
+                        {
+                            PopulateDropDown();
+                        }
+                        else
+                        {
+                            DismissDropDown();
+                        }
+                    }));
 
                 if (Text != null)
                 {

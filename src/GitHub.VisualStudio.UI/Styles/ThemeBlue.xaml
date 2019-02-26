@@ -67,7 +67,7 @@
   <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FFCCCEDB" />
   <SolidColorBrush x:Key="GitHubFileExpanderHeaderBackgroundBrush" Color="#FFD6DBE9" />
 
-    <SolidColorBrush x:Key="GitHubTimelineEventBackgroundBrush" Color="#FFe1e4e8" />
+  <SolidColorBrush x:Key="GitHubTimelineEventBackgroundBrush" Color="#FFe1e4e8" />
 
     <!-- Not selected, nor focused -->
     <Color x:Key="GHBoxTextColor">#333333</Color>
