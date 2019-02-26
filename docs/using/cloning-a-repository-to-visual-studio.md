@@ -35,7 +35,7 @@ Go to `File > Open > Open From GitHub...`
 
 You can also filter the repository results by using the *Filter* text box.
 
-In addition to using the list of personal, collaborator and organization repositories, you can enter a repository URL or repository owner and name to clone a public repository.
+In addition to using the list of personal, collaborator and organization repositories, you can enter a repository URL to clone a public repository.
 
 ![Unified clone and open dialog](images/unified-clone-dialog.png)
 
