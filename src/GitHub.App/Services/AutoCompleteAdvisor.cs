@@ -25,7 +25,7 @@ namespace GitHub.Services
         readonly Lazy<Dictionary<string, IAutoCompleteSource>> prefixSourceMap;
 
         [ImportingConstructor]
-        public AutoCompleteAdvisor([ImportMany]IEnumerable<IAutoCompleteSource> autocompleteSources)
+        public AutoCompleteAdvisor([ImportMany(typeof(IAutoCompleteSource))]IEnumerable<IAutoCompleteSource> autocompleteSources)
         {
             prefixSourceMap = new Lazy<Dictionary<string, IAutoCompleteSource>>(
                 () => autocompleteSources.ToDictionary(s => s.Prefix, s => s));
