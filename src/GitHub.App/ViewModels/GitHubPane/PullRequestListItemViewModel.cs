@@ -19,7 +19,10 @@ namespace GitHub.ViewModels.GitHubPane
         {
             Id = model.Id;
             Author = new ActorViewModel(model.Author);
-            Checks = model.Checks;
+            ChecksSummary = model.ChecksSummary;
+            ChecksErrorCount = model.ChecksErrorCount;
+            ChecksPendingCount = model.ChecksPendingCount;
+            ChecksSuccessCount = model.ChecksSuccessCount;
             CommentCount = model.CommentCount;
             Number = model.Number;
             Title = model.Title;
@@ -33,7 +36,16 @@ namespace GitHub.ViewModels.GitHubPane
         public IActorViewModel Author { get; }
 
         /// <inheritdoc/>
-        public PullRequestChecksState Checks { get; }
+        public PullRequestChecksSummaryState ChecksSummary { get; }
+
+        /// <inheritdoc/>
+        public int ChecksSuccessCount { get; }
+
+        /// <inheritdoc/>
+        public int ChecksPendingCount { get; }
+
+        /// <inheritdoc/>
+        public int ChecksErrorCount { get; }
 
         /// <inheritdoc/>
         public int CommentCount { get; }
