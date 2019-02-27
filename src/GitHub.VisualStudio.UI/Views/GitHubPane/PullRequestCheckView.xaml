@@ -33,7 +33,7 @@
             <TextBlock Foreground="{DynamicResource VsBrush.GrayText}" TextTrimming="CharacterEllipsis" Text="{Binding Description}" ToolTip="{Binding DurationStatus}" />
         </StackPanel>
 
-        <StackPanel DockPanel.Dock="Right" Orientation="Vertical">
+        <StackPanel DockPanel.Dock="Right" Orientation="Vertical" MinWidth="50">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Border HorizontalAlignment="Right" CornerRadius="3" Background="{DynamicResource GitHubRequiredCheckBackgroundBrush}" Margin="0 0 0 2" Padding="3 1"
