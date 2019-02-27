@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Windows.Input;
 using GitHub.Models;
 using GitHub.Validation;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -12,23 +11,12 @@ namespace GitHub.ViewModels
     /// <summary>
     /// Base class for the Repository publish/create dialogs. It represents the details about the repository itself.
     /// </summary>
-    public abstract class RepositoryFormViewModel : DialogViewModelBase
+    public abstract class RepositoryFormViewModel : ViewModelBase
     {
         readonly ObservableAsPropertyHelper<string> safeRepositoryName;
 
         protected RepositoryFormViewModel()
         {
-            CanKeepPrivateObservable = this.WhenAny(
-                x => x.SelectedAccount.IsEnterprise,
-                x => x.SelectedAccount.IsOnFreePlan,
-                x => x.SelectedAccount.HasMaximumPrivateRepositories,
-                (isEnterprise, isOnFreePlan, hasMaxPrivateRepos) =>
-                isEnterprise.Value || (!isOnFreePlan.Value && !hasMaxPrivateRepos.Value));
-
-            CanKeepPrivateObservable
-                .Where(x => !x)
-                .Subscribe(x => KeepPrivate = false);
-
             safeRepositoryName = this.WhenAny(x => x.RepositoryName, x => x.Value)
                 .Select(x => x != null ? GetSafeRepositoryName(x) : null)
                 .ToProperty(this, x => x.SafeRepositoryName);
@@ -38,10 +26,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Description to set on the repo (optional)
         /// </summary>
-        [AllowNull]
         public string Description
         {
-            [return: AllowNull]
             get { return description; }
             set { this.RaiseAndSetIfChanged(ref description, value); }
         }
@@ -60,10 +46,8 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Name of the repository as typed by user
         /// </summary>
-        [AllowNull]
         public string RepositoryName
         {
-            [return: AllowNull]
             get { return repositoryName; }
             set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
         }
@@ -75,7 +59,6 @@ namespace GitHub.ViewModels
         /// </summary>
         public string SafeRepositoryName
         {
-            [return: AllowNull]
             get { return safeRepositoryName.Value; }
         }
 
@@ -85,22 +68,11 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Account where the repository is going to be created on
         /// </summary>
-        [AllowNull]
         public IAccount SelectedAccount
         {
-            [return: AllowNull]
             get { return selectedAccount; }
             set { this.RaiseAndSetIfChanged(ref selectedAccount, value); }
         }
-
-        public bool ShowUpgradePlanWarning { get; private set; }
-
-        public bool ShowUpgradeToMicroPlanWarning { get; private set; }
-
-        [AllowNull]
-        public ICommand UpgradeAccountPlan { get; private set; }
-
-        protected IObservable<bool> CanKeepPrivateObservable { get; private set; }
 
         // These are the characters which are permitted when creating a repository name on GitHub The Website
         static readonly Regex invalidRepositoryCharsRegex = new Regex(@"[^0-9A-Za-z_\.\-]", RegexOptions.ECMAScript);

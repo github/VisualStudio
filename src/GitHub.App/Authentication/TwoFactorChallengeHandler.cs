@@ -4,10 +4,11 @@ using System.Reactive.Linq;
 using GitHub.ViewModels;
 using Octokit;
 using ReactiveUI;
-using NullGuard;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Helpers;
+using GitHub.Extensions;
+using GitHub.ViewModels.Dialog;
 
 namespace GitHub.Authentication
 {
@@ -16,22 +17,22 @@ namespace GitHub.Authentication
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorChallengeHandler : ReactiveObject, IDelegatingTwoFactorChallengeHandler
     {
-        ITwoFactorDialogViewModel twoFactorDialog;
-        [AllowNull]
+        ILogin2FaViewModel twoFactorDialog;
         public IViewModel CurrentViewModel
         {
-            [return:AllowNull]
             get { return twoFactorDialog; }
-            private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ITwoFactorDialogViewModel)value); }
+            private set { this.RaiseAndSetIfChanged(ref twoFactorDialog, (ILogin2FaViewModel)value); }
         }
 
-        public void SetViewModel([AllowNull]IViewModel vm)
+        public void SetViewModel(IViewModel vm)
         {
             CurrentViewModel = vm;
         }
 
         public async Task<TwoFactorChallengeResult> HandleTwoFactorException(TwoFactorAuthorizationException exception)
         {
+            Guard.ArgumentNotNull(exception, nameof(exception));
+
             await ThreadingHelper.SwitchToMainThreadAsync();
 
             var userError = new TwoFactorRequiredUserError(exception);
@@ -50,7 +51,7 @@ namespace GitHub.Authentication
         public async Task ChallengeFailed(Exception exception)
         {
             await ThreadingHelper.SwitchToMainThreadAsync();
-            await twoFactorDialog.Cancel.ExecuteAsync(null);
+            twoFactorDialog.Cancel();
         }
     }
 }

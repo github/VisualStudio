@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
+using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
+using Serilog;
 
 namespace GitHub.Api
 {
@@ -12,46 +18,60 @@ namespace GitHub.Api
     /// </summary>
     public class LoginManager : ILoginManager
     {
-        readonly string[] scopes = { "user", "repo", "gist", "write:public_key" };
-        readonly ILoginCache loginCache;
-        readonly ITwoFactorChallengeHandler twoFactorChallengeHandler;
+        const string ScopesHeader = "X-OAuth-Scopes";
+        static readonly ILogger log = LogManager.ForContext<LoginManager>();
+        static readonly Uri UserEndpoint = new Uri("user", UriKind.Relative);
+        readonly IKeychain keychain;
+        readonly Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler;
         readonly string clientId;
         readonly string clientSecret;
+        readonly IReadOnlyList<string> minimumScopes;
+        readonly IReadOnlyList<string> requestedScopes;
         readonly string authorizationNote;
         readonly string fingerprint;
+        IOAuthCallbackListener oauthListener;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginManager"/> class.
         /// </summary>
-        /// <param name="loginCache">The cache in which to store login details.</param>
+        /// <param name="keychain">The keychain in which to store credentials.</param>
         /// <param name="twoFactorChallengeHandler">The handler for 2FA challenges.</param>
+        /// <param name="oauthListener">The callback listener to signal successful login.</param>
         /// <param name="clientId">The application's client API ID.</param>
         /// <param name="clientSecret">The application's client API secret.</param>
+        /// <param name="minimumScopes">The minimum acceptable scopes.</param>
+        /// <param name="requestedScopes">The scopes to request when logging in.</param>
         /// <param name="authorizationNote">An note to store with the authorization.</param>
         /// <param name="fingerprint">The machine fingerprint.</param>
         public LoginManager(
-            ILoginCache loginCache,
-            ITwoFactorChallengeHandler twoFactorChallengeHandler,
+            IKeychain keychain,
+            Lazy<ITwoFactorChallengeHandler> twoFactorChallengeHandler,
+            IOAuthCallbackListener oauthListener,
             string clientId,
             string clientSecret,
+            IReadOnlyList<string> minimumScopes,
+            IReadOnlyList<string> requestedScopes,
             string authorizationNote = null,
             string fingerprint = null)
         {
-            Guard.ArgumentNotNull(loginCache, nameof(loginCache));
+            Guard.ArgumentNotNull(keychain, nameof(keychain));
             Guard.ArgumentNotNull(twoFactorChallengeHandler, nameof(twoFactorChallengeHandler));
             Guard.ArgumentNotEmptyString(clientId, nameof(clientId));
             Guard.ArgumentNotEmptyString(clientSecret, nameof(clientSecret));
 
-            this.loginCache = loginCache;
+            this.keychain = keychain;
             this.twoFactorChallengeHandler = twoFactorChallengeHandler;
+            this.oauthListener = oauthListener;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
+            this.minimumScopes = minimumScopes;
+            this.requestedScopes = requestedScopes;
             this.authorizationNote = authorizationNote;
             this.fingerprint = fingerprint;
         }
 
         /// <inheritdoc/>
-        public async Task<User> Login(
+        public async Task<LoginResult> Login(
             HostAddress hostAddress,
             IGitHubClient client,
             string userName,
@@ -64,11 +84,11 @@ namespace GitHub.Api
 
             // Start by saving the username and password, these will be used by the `IGitHubClient`
             // until an authorization token has been created and acquired:
-            await loginCache.SaveLogin(userName, password, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, password, hostAddress).ConfigureAwait(false);
 
             var newAuth = new NewAuthorization
             {
-                Scopes = scopes,
+                Scopes = requestedScopes,
                 Note = authorizationNote,
                 Fingerprint = fingerprint,
             };
@@ -95,44 +115,83 @@ namespace GitHub.Api
                     // be using a personal access token as the password.
                     if (EnterpriseWorkaround(hostAddress, e))
                     {
-                        auth = new ApplicationAuthorization(password);
+                        auth = new ApplicationAuthorization(0, 
+                            null, null, null, null, null, null, null,
+                            DateTimeOffset.MinValue, DateTimeOffset.MinValue, null, password);
                     }
                     else
                     {
-                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }
             } while (auth == null);
 
-            await loginCache.SaveLogin(userName, auth.Token, hostAddress).ConfigureAwait(false);
+            await keychain.Save(userName, auth.Token, hostAddress).ConfigureAwait(false);
+            return await ReadUserWithRetry(client).ConfigureAwait(false);
+        }
 
-            var retry = 0;
+        /// <inheritdoc/>
+        public async Task<LoginResult> LoginViaOAuth(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            IOauthClient oauthClient,
+            Action<Uri> openBrowser,
+            CancellationToken cancel)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+            Guard.ArgumentNotNull(client, nameof(client));
+            Guard.ArgumentNotNull(oauthClient, nameof(oauthClient));
+            Guard.ArgumentNotNull(openBrowser, nameof(openBrowser));
 
-            while (true)
+            var state = Guid.NewGuid().ToString();
+            var loginUrl = GetLoginUrl(oauthClient, state);
+            var listen = oauthListener.Listen(state, cancel);
+
+            openBrowser(loginUrl);
+
+            var code = await listen.ConfigureAwait(false);
+            var request = new OauthTokenRequest(clientId, clientSecret, code);
+            var token = await oauthClient.CreateAccessToken(request).ConfigureAwait(false);
+
+            await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
+            var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+            await keychain.Save(result.User.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<LoginResult> LoginWithToken(
+            HostAddress hostAddress,
+            IGitHubClient client,
+            string token)
+        {
+            Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
+            Guard.ArgumentNotNull(client, nameof(client));
+            Guard.ArgumentNotEmptyString(token, nameof(token));
+
+            await keychain.Save("[token]", token, hostAddress).ConfigureAwait(false);
+
+            try
             {
-                try
-                {
-                    return await client.User.Current().ConfigureAwait(false);
-                }
-                catch (AuthorizationException)
-                {
-                    if (retry++ == 3) throw;
-                }
-
-                // It seems that attempting to use a token immediately sometimes fails, retry a few
-                // times with a delay of of 1s to allow the token to propagate.
-                await Task.Delay(1000);
+                var result = await ReadUserWithRetry(client).ConfigureAwait(false);
+                await keychain.Save(result.User.Login, token, hostAddress).ConfigureAwait(false);
+                return result;
+            }
+            catch
+            {
+                await keychain.Delete(hostAddress).ConfigureAwait(false);
+                throw;
             }
         }
 
         /// <inheritdoc/>
-        public Task<User> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
+        public Task<LoginResult> LoginFromCache(HostAddress hostAddress, IGitHubClient client)
         {
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            return client.User.Current();
+            return ReadUserWithRetry(client);
         }
 
         /// <inheritdoc/>
@@ -141,7 +200,7 @@ namespace GitHub.Api
             Guard.ArgumentNotNull(hostAddress, nameof(hostAddress));
             Guard.ArgumentNotNull(client, nameof(client));
 
-            await loginCache.EraseLogin(hostAddress);
+            await keychain.Delete(hostAddress).ConfigureAwait(false);
         }
 
         async Task<ApplicationAuthorization> CreateAndDeleteExistingApplicationAuthorization(
@@ -170,18 +229,18 @@ namespace GitHub.Api
                         twoFactorAuthenticationCode).ConfigureAwait(false);
                 }
 
-                if (result.Token == string.Empty)
+                if (string.IsNullOrEmpty(result.Token))
                 {
                     if (twoFactorAuthenticationCode == null)
                     {
-                        await client.Authorization.Delete(result.Id);
+                        await client.Authorization.Delete(result.Id).ConfigureAwait(false);
                     }
                     else
                     {
-                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode);
+                        await client.Authorization.Delete(result.Id, twoFactorAuthenticationCode).ConfigureAwait(false);
                     }
                 }
-            } while (result.Token == string.Empty && retry++ == 0);
+            } while (string.IsNullOrEmpty(result.Token) && retry++ == 0);
 
             return result;
         }
@@ -194,7 +253,7 @@ namespace GitHub.Api
         {
             for (;;)
             {
-                var challengeResult = await twoFactorChallengeHandler.HandleTwoFactorException(exception);
+                var challengeResult = await twoFactorChallengeHandler.Value.HandleTwoFactorException(exception).ConfigureAwait(false);
 
                 if (challengeResult == null)
                 {
@@ -218,8 +277,8 @@ namespace GitHub.Api
                     }
                     catch (Exception e)
                     {
-                        await twoFactorChallengeHandler.ChallengeFailed(e);
-                        await loginCache.EraseLogin(hostAddress).ConfigureAwait(false);
+                        await twoFactorChallengeHandler.Value.ChallengeFailed(e).ConfigureAwait(false);
+                        await keychain.Delete(hostAddress).ConfigureAwait(false);
                         throw;
                     }
                 }
@@ -230,7 +289,7 @@ namespace GitHub.Api
             }
         }
 
-        ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
+        static ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
         {
             // If a mock IGitHubClient is not set up correctly, it can return null from
             // IGutHubClient.Authorization.Create - this will cause an infinite loop in Login()
@@ -257,6 +316,74 @@ namespace GitHub.Api
                 (e is NotFoundException ||
                  e is ForbiddenException ||
                  apiException?.StatusCode == (HttpStatusCode)422);
+        }
+
+        async Task<LoginResult> ReadUserWithRetry(IGitHubClient client)
+        {
+            var retry = 0;
+
+            while (true)
+            {
+                try
+                {
+                    return await GetUserAndCheckScopes(client).ConfigureAwait(false);
+                }
+                catch (AuthorizationException)
+                {
+                    if (retry++ == 3) throw;
+                }
+
+                // It seems that attempting to use a token immediately sometimes fails, retry a few
+                // times with a delay of of 1s to allow the token to propagate.
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+        }
+
+        async Task<LoginResult> GetUserAndCheckScopes(IGitHubClient client)
+        {
+            var response = await client.Connection.Get<User>(
+                UserEndpoint, null, null).ConfigureAwait(false);
+
+            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            {
+                var returnedScopes = new ScopesCollection(response.HttpResponse.Headers[ScopesHeader]
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .ToArray());
+
+                if (returnedScopes.Matches(minimumScopes))
+                {
+                    return new LoginResult(response.Body, returnedScopes);
+                }
+                else
+                {
+                    log.Error("Incorrect API scopes: require {RequiredScopes} but got {Scopes}", minimumScopes, returnedScopes);
+                }
+            }
+            else
+            {
+                log.Error("Error reading scopes: /user succeeded but scopes header was not present");
+            }
+
+            throw new IncorrectScopesException(
+                "Incorrect API scopes. Required: " + string.Join(",", minimumScopes));
+        }
+
+        Uri GetLoginUrl(IOauthClient client, string state)
+        {
+            var request = new OauthLoginRequest(ApiClientConfiguration.ClientId);
+
+            request.State = state;
+
+            foreach (var scope in requestedScopes)
+            {
+                request.Scopes.Add(scope);
+            }
+
+            var uri = client.GetGitHubLoginUrl(request);
+            
+            // OauthClient.GetGitHubLoginUrl seems to give the wrong URL. Fix this.
+            return new Uri(uri.ToString().Replace("/api/v3", ""));
         }
     }
 }

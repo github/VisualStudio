@@ -12,7 +12,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:OcticonImage">
-                    <ui:FixedAspectRatioPanel HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                    <ui:FixedAspectRatioPanel Background="{TemplateBinding Background}"
+                                              HorizontalContentAlignment="Center" 
+                                              VerticalContentAlignment="Center">
                         <Viewbox>
                             <ui:OcticonPath 
                                 Fill="{TemplateBinding Foreground}" 

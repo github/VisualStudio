@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GitHub.UI.Controls.Octicons;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -35,7 +34,6 @@ namespace GitHub.UI
 
         public Octicon Icon
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
@@ -54,7 +52,7 @@ namespace GitHub.UI
                 return g.Value;
 
             throw new ArgumentException(
-                String.Format(CultureInfo.InvariantCulture, "Unknown Octicon: {0}", icon), "icon");
+                String.Format(CultureInfo.InvariantCulture, "Unknown Octicon: {0}", icon), nameof(icon));
         }
 
         // Initializes the cache dictionary with lazy entries for all available octicons
@@ -72,7 +70,7 @@ namespace GitHub.UI
             if (name == "lock")
                 name = "_lock";
 
-            var pathData = OcticonPaths.ResourceManager.GetString(name);
+            var pathData = OcticonPaths.ResourceManager.GetString(name, CultureInfo.InvariantCulture);
 
             if (pathData == null)
             {

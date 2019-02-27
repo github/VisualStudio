@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.UserFilterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views"
+             mc:Ignorable="d" d:DesignHeight="200" d:DesignWidth="150">
+    <d:DesignData.DataContext>
+        <ghfvs:UserFilterViewModelDesigner/>
+    </d:DesignData.DataContext>
+    
+    <DockPanel>
+        <ghfvs:PromptTextBox Name="searchBox"
+                             DockPanel.Dock="Top"
+                             Margin="2"
+                             PromptText="Search"
+                             Text="{Binding Filter, Delay=300, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button DockPanel.Dock="Top"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{Binding ClearSelection}"
+                Margin="2"
+                HorizontalContentAlignment="Stretch"
+                Visibility="{Binding Selected, Converter={ghfvs:NullToVisibilityConverter}}">
+            <DockPanel>
+                <ghfvs:OcticonImage DockPanel.Dock="Right" Icon="x"/>
+                <TextBlock>Clear filter</TextBlock>
+            </DockPanel>
+        </Button>
+        <ListBox Background="Transparent"
+                 BorderThickness="0"
+                 ItemsSource="{Binding UsersView}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <EventSetter Event="MouseLeftButtonUp" Handler="ListBoxItem_MouseLeftButtonUp"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <local:ActorAvatarView ViewModel="{Binding}" Width="16" Height="16"/>
+                        <TextBlock Margin="4"
+                                   Text="{Binding Login}"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

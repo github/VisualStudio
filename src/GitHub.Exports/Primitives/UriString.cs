@@ -25,7 +25,6 @@ namespace GitHub.Primitives
     [TypeConverter(typeof(UriStringConverter))]
     public class UriString : StringEquivalent<UriString>, IEquatable<UriString>
     {
-        //static readonly NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
         static readonly Regex sshRegex = new Regex(@"^.+@(?<host>(\[.*?\]|[a-z0-9-.]+?))(:(?<owner>.*?))?(/(?<repo>.*)(\.git)?)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         readonly Uri url;
 
@@ -44,11 +43,17 @@ namespace GitHub.Primitives
                 SetFilePath(uriString);
             }
 
-            if (RepositoryName != null)
+            if (Owner != null && RepositoryName != null)
             {
-                NameWithOwner = Owner != null 
-                    ? string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName) 
-                    : RepositoryName;
+                NameWithOwner = string.Format(CultureInfo.InvariantCulture, "{0}/{1}", Owner, RepositoryName);
+            }
+            else if (Owner != null)
+            {
+                NameWithOwner = Owner;
+            }
+            else if (RepositoryName != null)
+            {
+                NameWithOwner = RepositoryName;
             }
         }
 
@@ -66,18 +71,16 @@ namespace GitHub.Primitives
 
         void SetUri(Uri uri)
         {
+            var ownerSegment = FindSegment(uri.Segments, 0);
+            var repositorySegment = FindSegment(uri.Segments, 1);
+
             Host = uri.Host;
-            if (uri.Segments.Any())
-            {
-                RepositoryName = GetRepositoryName(uri.Segments.Last());
-            }
-            
-            if (uri.Segments.Length > 2)
-            {
-                Owner = (uri.Segments[uri.Segments.Length - 2] ?? "").TrimEnd('/').ToNullIfEmpty();
-            }
-            
+            Owner = ownerSegment;
+            RepositoryName = GetRepositoryName(repositorySegment);
             IsHypertextTransferProtocol = uri.IsHypertextTransferProtocol();
+
+            string FindSegment(string[] segments, int number)
+                => segments.Skip(number + 1).FirstOrDefault()?.TrimEnd("/");
         }
 
         void SetFilePath(Uri uri)
@@ -130,10 +133,12 @@ namespace GitHub.Primitives
         public bool IsValidUri => url != null;
 
         /// <summary>
-        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL.
+        /// Attempts a best-effort to convert the remote origin to a GitHub Repository URL,
+        /// optionally changing the owner.
         /// </summary>
+        /// <param name="owner">The owner to use, if null uses <see cref="Owner"/>.</param>
         /// <returns>A converted uri, or the existing one if we can't convert it (which might be null)</returns>
-        public Uri ToRepositoryUrl()
+        public Uri ToRepositoryUrl(string owner = null)
         {
             // we only want to process urls that represent network resources
             if (!IsScpUri && (!IsValidUri || IsFileUri)) return url;
@@ -142,11 +147,15 @@ namespace GitHub.Primitives
                 ? url.Scheme
                 : Uri.UriSchemeHttps;
 
+            var nameWithOwner = owner != null && RepositoryName != null ?
+                string.Format(CultureInfo.InvariantCulture, "{0}/{1}", owner, RepositoryName) :
+                NameWithOwner;
+
             return new UriBuilder
             {
                 Scheme = scheme,
                 Host = Host,
-                Path = NameWithOwner,
+                Path = nameWithOwner,
                 Port = url?.Port == 80
                     ? -1
                     : (url?.Port ?? -1)
@@ -205,11 +214,36 @@ namespace GitHub.Primitives
             return String.Concat(Value, addition);
         }
 
+        /// <summary>
+        /// Compare repository URLs ignoring any trailing ".git" or difference in case.
+        /// </summary>
+        /// <returns>True if URLs reference the same repository.</returns>
+        public static bool RepositoryUrlsAreEqual(UriString uri1, UriString uri2)
+        {
+            if (!uri1.IsHypertextTransferProtocol || !uri2.IsHypertextTransferProtocol)
+            {
+                // Not a repository URL
+                return false;
+            }
+
+            // Normalize repository URLs
+            var str1 = uri1.ToRepositoryUrl().ToString();
+            var str2 = uri2.ToRepositoryUrl().ToString();
+            return string.Equals(str1, str2, StringComparison.OrdinalIgnoreCase);
+        }
+
         public override string ToString()
         {
             // Makes this look better in the debugger.
             return Value;
         }
+
+        /// <summary>
+        /// Makes a copy of the URI with the specified owner.
+        /// </summary>
+        /// <param name="owner">The owner.</param>
+        /// <returns>A new <see cref="UriString"/>.</returns>
+        public UriString WithOwner(string owner) => ToUriString(ToRepositoryUrl(owner));
 
         protected UriString(SerializationInfo info, StreamingContext context)
             : this(GetSerializedValue(info))
@@ -239,7 +273,7 @@ namespace GitHub.Primitives
 
         static string GetRepositoryName(string repositoryNameSegment)
         {
-            if (String.IsNullOrEmpty(repositoryNameSegment) 
+            if (String.IsNullOrEmpty(repositoryNameSegment)
                 || repositoryNameSegment.Equals("/", StringComparison.Ordinal))
             {
                 return null;

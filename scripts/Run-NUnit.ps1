@@ -8,55 +8,47 @@ Param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $Project,
-    [int]
-    $TimeoutDuration,
+    $BasePathToProject
+    ,
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]
-    $Configuration,
+    $Project
+    ,
+    [int]
+    $TimeoutDuration
+    ,
+    [string]
+    $Configuration
+    ,
     [switch]
     $AppVeyor = $false
 )
 
-$rootDirectory = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
-Push-Location $rootDirectory
-$dll = "src\$Project\bin\$Configuration\$Project.dll"
+$scriptsDirectory = $PSScriptRoot
+$rootDirectory = Split-Path ($scriptsDirectory)
+. $scriptsDirectory\modules.ps1 | out-null
 
-if ($AppVeyor) {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
-    $args = "-noshadow", "-framework:net-4.5", "-exclude:Timings", $dll
-    [object[]] $output = "$consoleRunner " + ($args -join " ")
-    & $consoleRunner ($args | %{ "`"$_`"" })
-    if($LastExitCode -ne 0) {
-        $host.SetShouldExit($LastExitCode)
+$dll = "$BasePathToProject\$Project\bin\$Configuration\$Project.dll"
+$nunitDirectory = Join-Path $rootDirectory packages\NUnit.ConsoleRunner.3.7.0\tools
+$consoleRunner = Join-Path $nunitDirectory nunit3-console.exe
+$xml = Join-Path $rootDirectory "nunit-$Project.xml"
+
+& {
+    Trap {
+        Write-Output "$Project tests failed"
+        exit -1
     }
-} else {
-    $nunitDirectory = Join-Path $rootDirectory packages\NUnit.Runners.2.6.4\tools
-    $consoleRunner = Join-Path $nunitDirectory nunit-console-x86.exe
 
-    $xml = Join-Path $rootDirectory "nunit-$Project.xml"
-    $outputPath = [System.IO.Path]::GetTempFileName()
-
-    $args = "-noshadow", "-xml:$xml", "-framework:net-4.5", "-exclude:Timings", $dll
-    [object[]] $output = "$consoleRunner " + ($args -join " ")
-
-    $process = Start-Process -PassThru -NoNewWindow -RedirectStandardOutput $outputPath $consoleRunner ($args | %{ "`"$_`"" })
-    Wait-Process -InputObject $process -Timeout $TimeoutDuration -ErrorAction SilentlyContinue
-    if ($process.HasExited) {
-        $output += Get-Content $outputPath
-        $exitCode = $process.ExitCode
+    $args = @()
+    if ($AppVeyor) {
+        $args = $dll, "--where", "cat!=Timings", "--result=$xml;format=AppVeyor"
     } else {
-        $output += "Tests timed out. Backtrace:"
-        $output += Get-DotNetStack $process.Id
-        $exitCode = 9999
+        $args = $dll, "--where", "cat!=Timings", "--result=$xml"
     }
 
-    Stop-Process -InputObject $process
-    Remove-Item $outputPath
-    Pop-Location
-
-    $result = New-Object System.Object
-    $result | Add-Member -Type NoteProperty -Name Output -Value $output
-    $result | Add-Member -Type NoteProperty -Name ExitCode -Value $exitCode
-    $result
+    Run-Process -Fatal $TimeoutDuration $consoleRunner $args
+    if (!$?) {
+        Die 1 "$Project tests failed"
+    }
 }

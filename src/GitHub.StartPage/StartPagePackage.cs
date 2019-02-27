@@ -2,22 +2,18 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Shell;
-using GitHub.Services;
-using GitHub.UI;
-using GitHub.ViewModels;
-using System.IO;
-using Microsoft.TeamFoundation.Controls;
-using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio.Shell.CodeContainerManagement;
-using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
-using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
-using Task = System.Threading.Tasks.Task;
-using System.ComponentModel;
+using GitHub.Logging;
 using GitHub.Models;
-using GitHub.Extensions;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.CodeContainerManagement;
+using Microsoft.VisualStudio.Threading;
+using Serilog;
+using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
+using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.StartPage
 {
@@ -38,42 +34,59 @@ namespace GitHub.StartPage
     [Guid(Guids.CodeContainerProviderId)]
     public class GitHubContainerProvider : ICodeContainerProvider
     {
+        static readonly ILogger log = LogManager.ForContext<GitHubContainerProvider>();
+
+        readonly Lazy<IGitHubServiceProvider> gitHubServiceProvider;
+
+        public GitHubContainerProvider() : this(
+            new Lazy<IGitHubServiceProvider>(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider))
+        {
+        }
+
+        public GitHubContainerProvider(Lazy<IGitHubServiceProvider> gitHubServiceProvider)
+        {
+            this.gitHubServiceProvider = gitHubServiceProvider;
+        }
+
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
-
-            return await RunAcquisition(downloadProgress, cancellationToken, null);
+            return await RunAcquisition(downloadProgress, null, cancellationToken);
         }
 
         public async Task<CodeContainer> AcquireCodeContainerAsync(RemoteCodeContainer onlineCodeContainer, IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
             var repository = new RepositoryModel(onlineCodeContainer.Name, UriString.ToUriString(onlineCodeContainer.DisplayUrl));
-            return await RunAcquisition(downloadProgress, cancellationToken, repository);
+            return await RunAcquisition(downloadProgress, repository, cancellationToken);
         }
 
-        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, IRepositoryModel repository)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "cancellationToken")]
+        async Task<CodeContainer> RunAcquisition(IProgress<ServiceProgressData> downloadProgress, RepositoryModel repository, CancellationToken cancellationToken)
         {
             CloneDialogResult request = null;
 
             try
             {
-                var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
-                await ShowTeamExplorerPage(uiProvider);
-                request = await ShowCloneDialog(uiProvider, downloadProgress, repository);
+                var uiProvider = await Task.Run(() => gitHubServiceProvider.Value);
+                request = await ShowCloneDialog(uiProvider, downloadProgress, cancellationToken, repository);
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: log
+                log.Error(e, "Error showing Start Page clone dialog");
             }
 
             if (request == null)
                 return null;
 
-            var path = Path.Combine(request.BasePath, request.Repository.Name);
-            var uri = request.Repository.CloneUrl.ToRepositoryUrl();
+            var uri = request.Url.ToRepositoryUrl();
+            var repositoryName = request.Url.RepositoryName;
+
+            // Report all steps complete before returning a CodeContainer
+            downloadProgress.Report(new ServiceProgressData(string.Empty, string.Empty, 1, 1));
+
             return new CodeContainer(
-                localProperties: new CodeContainerLocalProperties(path, CodeContainerType.Folder,
-                                new CodeContainerSourceControlProperties(request.Repository.Name, path, new Guid(Guids.GitSccProviderId))),
-                remote: new RemoteCodeContainer(request.Repository.Name,
+                localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
+                                new CodeContainerSourceControlProperties(repositoryName, request.Path, new Guid(Guids.GitSccProviderId))),
+                remote: new RemoteCodeContainer(repositoryName,
                                                 new Guid(Guids.CodeContainerProviderId),
                                                 uri,
                                                 new Uri(uri.ToString().TrimSuffix(".git")),
@@ -82,77 +95,33 @@ namespace GitHub.StartPage
                 lastAccessed: DateTimeOffset.UtcNow);
         }
 
-        async Task ShowTeamExplorerPage(IGitHubServiceProvider gitHubServiceProvider)
-        {
-            var te = gitHubServiceProvider?.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
-
-            if (te != null)
-            {
-                var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.Connect), null);
-
-                if (page == null)
-                {
-                    var tcs = new TaskCompletionSource<ITeamExplorerPage>();
-                    PropertyChangedEventHandler handler = null;
-
-                    handler = new PropertyChangedEventHandler((s, e) =>
-                    {
-                        if (e.PropertyName == "CurrentPage")
-                        {
-                            tcs.SetResult(te.CurrentPage);
-                            te.PropertyChanged -= handler;
-                        }
-                    });
-
-                    te.PropertyChanged += handler;
-
-                    page = await tcs.Task;
-                }
-            }
-        }
-
-        async Task<CloneDialogResult> ShowCloneDialog(
+        static async Task<CloneDialogResult> ShowCloneDialog(
             IGitHubServiceProvider gitHubServiceProvider,
             IProgress<ServiceProgressData> progress,
-            IRepositoryModel repository = null)
+            CancellationToken cancellationToken,
+            RepositoryModel repository = null)
         {
             var dialogService = gitHubServiceProvider.GetService<IDialogService>();
             var cloneService = gitHubServiceProvider.GetService<IRepositoryCloneService>();
-            CloneDialogResult result = null;
-            
-            if (repository == null)
-            {
-                result = await dialogService.ShowCloneDialog(null);
-            }
-            else
-            {
-                var basePath = await dialogService.ShowReCloneDialog(repository);
+            var usageTracker = gitHubServiceProvider.GetService<IUsageTracker>();
 
-                if (basePath != null)
-                {
-                    result = new CloneDialogResult(basePath, repository);
-                }
-            }
-            
-            if (result != null)
+            var cloneUrl = repository?.CloneUrl;
+            if (await dialogService.ShowCloneDialog(null, cloneUrl) is CloneDialogResult result)
             {
                 try
                 {
-                    await cloneService.CloneRepository(
-                        result.Repository.CloneUrl,
-                        result.Repository.Name,
-                        result.BasePath,
-                        progress);
+                    await cloneService.CloneOrOpenRepository(result, progress, cancellationToken);
+                    usageTracker.IncrementCounter(x => x.NumberOfStartPageClones).Forget();
+                    return result;
                 }
                 catch
                 {
                     var teServices = gitHubServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError($"Failed to clone the repository '{result.Repository.Name}'");
-                    result = null;
+                    teServices.ShowError($"Failed to clone the repository '{result.Url.RepositoryName}'");
                 }
             }
 
-            return result;
+            return null;
         }
     }
 }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Exports;
+using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Models;
-using GitHub.UI;
-using GitHub.ViewModels;
-using NullGuard;
+using GitHub.ViewModels.Dialog;
+using GitHub.ViewModels.Dialog.Clone;
 
 namespace GitHub.Services
 {
@@ -12,61 +15,98 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DialogService : IDialogService
     {
-        readonly IUIProvider uiProvider;
+        readonly IViewViewModelFactory factory;
+        readonly IShowDialogService showDialog;
+        readonly IGitHubContextService gitHubContextService;
 
         [ImportingConstructor]
-        public DialogService(IUIProvider uiProvider)
+        public DialogService(
+            IViewViewModelFactory factory,
+            IShowDialogService showDialog,
+            IGitHubContextService gitHubContextService)
         {
-            this.uiProvider = uiProvider;
+            Guard.ArgumentNotNull(factory, nameof(factory));
+            Guard.ArgumentNotNull(showDialog, nameof(showDialog));
+            Guard.ArgumentNotNull(showDialog, nameof(gitHubContextService));
+
+            this.factory = factory;
+            this.showDialog = showDialog;
+            this.gitHubContextService = gitHubContextService;
         }
 
-        public Task<CloneDialogResult> ShowCloneDialog([AllowNull] IConnection connection)
+        public async Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null)
         {
-            var controller = uiProvider.Configure(UIControllerFlow.Clone, connection);
-            var basePath = default(string);
-            var repository = default(IRepositoryModel);
-
-            controller.TransitionSignal.Subscribe(x =>
+            if (string.IsNullOrEmpty(url))
             {
-                var vm = x.View.ViewModel as IBaseCloneViewModel;
-
-                vm.Done.Subscribe(_ =>
+                var clipboardContext = gitHubContextService.FindContextFromClipboard();
+                switch (clipboardContext?.LinkType)
                 {
-                    basePath = vm?.BaseRepositoryPath;
-                    repository = vm?.SelectedRepository;
-                });
-            });
-
-            uiProvider.RunInDialog(controller);
-
-            var result = repository != null && basePath != null ?
-                new CloneDialogResult(basePath, repository) : null;
-            return Task.FromResult(result);
-        }
-
-        public Task<string> ShowReCloneDialog(IRepositoryModel repository)
-        {
-            var controller = uiProvider.Configure(UIControllerFlow.ReClone);
-            var basePath = default(string);
-
-            controller.TransitionSignal.Subscribe(x =>
-            {
-                var vm = x.View.ViewModel as IBaseCloneViewModel;
-
-                if (vm != null)
-                {
-                    vm.SelectedRepository = repository;
+                    case LinkType.Blob:
+                    case LinkType.Repository:
+                        url = clipboardContext?.Url;
+                        break;
                 }
+            }
 
-                vm.Done.Subscribe(_ =>
-                {
-                    basePath = vm?.BaseRepositoryPath;
-                });
-            });
+            var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
+            if (url != null)
+            {
+                viewModel.Url = url;
+            }
 
-            uiProvider.RunInDialog(controller);
+            if (connection != null)
+            {
+                return (CloneDialogResult)await showDialog.Show(
+                    viewModel,
+                    connection,
+                    ApiClientConfiguration.RequestedScopes)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                return (CloneDialogResult)await showDialog.ShowWithFirstConnection(viewModel)
+                    .ConfigureAwait(false);
+            }
+        }
 
-            return Task.FromResult(basePath);
+        public async Task ShowCreateGist(IConnection connection)
+        {
+            var viewModel = factory.CreateViewModel<IGistCreationViewModel>();
+
+            if (connection != null)
+            {
+                await viewModel.InitializeAsync(connection);
+                await showDialog.Show(viewModel);
+            }
+            else
+            {
+                await showDialog.ShowWithFirstConnection(viewModel);
+            }
+        }
+
+        public async Task ShowCreateRepositoryDialog(IConnection connection)
+        {
+            Guard.ArgumentNotNull(connection, nameof(connection));
+
+            var viewModel = factory.CreateViewModel<IRepositoryCreationViewModel>();
+            await viewModel.InitializeAsync(connection);
+            await showDialog.Show(viewModel);
+        }
+
+        public async Task<IConnection> ShowLoginDialog()
+        {
+            var viewModel = factory.CreateViewModel<ILoginViewModel>();
+            return (IConnection)await showDialog.Show(viewModel);
+        }
+
+        public async Task ShowForkDialog(LocalRepositoryModel repository, IConnection connection)
+        {
+            Guard.ArgumentNotNull(repository, nameof(repository));
+            Guard.ArgumentNotNull(connection, nameof(connection));
+
+            var viewModel = factory.CreateViewModel<IForkRepositoryViewModel>();
+            await viewModel.InitializeAsync(repository, connection);
+            await showDialog.Show(viewModel);
         }
     }
 }

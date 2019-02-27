@@ -42,6 +42,11 @@ namespace GitHub.VisualStudio.UI.Views
             login.IsEnabled = true;
         }
 
+        private void retry_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.Retry();
+        }
+
         void repositories_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ViewModel.OpenRepository();
@@ -68,7 +73,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "FormatRepositoryName")
                 return String.Empty;
 
-            var item = values[0] as ILocalRepositoryModel;
+            var item = values[0] as LocalRepositoryModel;
             var context = values[1] as IGitHubConnectSection;
             if (item == null)
                 return String.Empty;
@@ -93,7 +98,7 @@ namespace GitHub.VisualStudio.UI.Views
             if (values.Length != 2 || parameter as string != "IsCurrentRepository")
                 return false;
 
-            var item = values[0] as ILocalRepositoryModel;
+            var item = values[0] as LocalRepositoryModel;
             var context = values[1] as IGitAwareItem;
             return context?.ActiveRepoUri == item?.CloneUrl && String.Equals(context?.ActiveRepo?.LocalPath, item?.LocalPath, StringComparison.OrdinalIgnoreCase);
         }

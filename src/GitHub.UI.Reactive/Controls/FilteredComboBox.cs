@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using GitHub.Extensions.Reactive;
-using NullGuard;
 using ReactiveUI;
 
 namespace GitHub.UI
@@ -46,7 +45,6 @@ namespace GitHub.UI
 
         public string FilterText
         {
-            [return: AllowNull]
             get { return (string)GetValue(FilterTextProperty); }
             set { SetValue(FilterTextProperty, value); }
         }
@@ -129,7 +127,7 @@ namespace GitHub.UI
             };
         }
 
-        public CustomPopupPlacement[] PlacePopup(Size popupSize, Size targetSize, Point offset)
+        public static CustomPopupPlacement[] PlacePopup(Size popupSize, Size targetSize, Point offset)
         {
             return new[] { new CustomPopupPlacement(new Point(0, targetSize.Height), PopupPrimaryAxis.Vertical) };
         }

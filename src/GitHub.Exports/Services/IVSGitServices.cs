@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 
@@ -17,18 +18,22 @@ namespace GitHub.Services
         /// <param name="recurseSubmodules">Whether to recursively clone submodules.</param>
         /// <param name="progress">
         /// An object through which to report progress. This must be of type
-        /// <see cref="System.IProgress{Microsoft.VisualStudio.Shell.ServiceProgressData}"/>, but
+        /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
         /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
         /// </param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <seealso cref="System.IProgress{T}"/>
+        /// <seealso cref="Microsoft.VisualStudio.Shell.ServiceProgressData"/>
         Task Clone(
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null);
+            object progress = null,
+            CancellationToken? cancellationToken = null);
 
         string GetActiveRepoPath();
         LibGit2Sharp.IRepository GetActiveRepo();
-        IEnumerable<ILocalRepositoryModel> GetKnownRepositories();
+        IEnumerable<LocalRepositoryModel> GetKnownRepositories();
         string SetDefaultProjectPath(string path);
     }
 }

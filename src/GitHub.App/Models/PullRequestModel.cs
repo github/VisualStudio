@@ -2,14 +2,13 @@
 using System.Globalization;
 using GitHub.Primitives;
 using GitHub.VisualStudio.Helpers;
-using NullGuard;
 using System.Diagnostics;
 using System.Collections.Generic;
+using GitHub.Extensions;
 
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    [NullGuard(ValidationFlags.None)]
     public sealed class PullRequestModel : NotificationAwareObject, IPullRequestModel,
         IEquatable<PullRequestModel>,
         IComparable<PullRequestModel>
@@ -36,7 +35,7 @@ namespace GitHub.Models
             Assignee = other.Assignee;
         }
 
-        public override bool Equals([AllowNull]object obj)
+        public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))
                 return true;
@@ -49,50 +48,50 @@ namespace GitHub.Models
             return Number.GetHashCode();
         }
 
-        bool IEquatable<IPullRequestModel>.Equals([AllowNull]IPullRequestModel other)
+        bool IEquatable<IPullRequestModel>.Equals(IPullRequestModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Number == other.Number;
         }
 
-        bool IEquatable<PullRequestModel>.Equals([AllowNull]PullRequestModel other)
+        bool IEquatable<PullRequestModel>.Equals(PullRequestModel other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Number == other.Number;
         }
 
-        public int CompareTo([AllowNull]IPullRequestModel other)
+        public int CompareTo(IPullRequestModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public int CompareTo([AllowNull]PullRequestModel other)
+        public int CompareTo(PullRequestModel other)
         {
             return other != null ? UpdatedAt.CompareTo(other.UpdatedAt) : 1;
         }
 
-        public static bool operator >([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
+        public static bool operator >(PullRequestModel lhs, PullRequestModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return lhs?.CompareTo(rhs) > 0;
         }
 
-        public static bool operator <([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
+        public static bool operator <(PullRequestModel lhs, PullRequestModel rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return (object)lhs == null || lhs.CompareTo(rhs) < 0;
         }
 
-        public static bool operator ==([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
+        public static bool operator ==(PullRequestModel lhs, PullRequestModel rhs)
         {
             return ReferenceEquals(lhs, rhs);
         }
 
-        public static bool operator !=([AllowNull]PullRequestModel lhs, [AllowNull]PullRequestModel rhs)
+        public static bool operator !=(PullRequestModel lhs, PullRequestModel rhs)
         {
             return !(lhs == rhs);
         }
@@ -103,11 +102,16 @@ namespace GitHub.Models
         public string Title
         {
             get { return title; }
-            set { title = value; this.RaisePropertyChange(); }
+            set
+            {
+                Guard.ArgumentNotNull(value, nameof(value));
+                title = value;
+                this.RaisePropertyChange();
+            }
         }
 
-        PullRequestStateEnum status;
-        public PullRequestStateEnum State
+        PullRequestState status;
+        public PullRequestState State
         {
             get { return status; }
             set
@@ -122,8 +126,8 @@ namespace GitHub.Models
         }
 
         // TODO: Remove these property once maintainer workflow has been merged to master.
-        public bool IsOpen => State == PullRequestStateEnum.Open;
-        public bool Merged => State == PullRequestStateEnum.Merged;
+        public bool IsOpen => State == PullRequestState.Open;
+        public bool Merged => State == PullRequestState.Merged;
 
         int commentCount;
         public int CommentCount
@@ -154,31 +158,18 @@ namespace GitHub.Models
         }
 
         public GitReferenceModel Base { get; set; }
-        [AllowNull]
         public GitReferenceModel Head { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public IAccount Author { get; set; }
-        public IReadOnlyCollection<IPullRequestFileModel> ChangedFiles { get; set; } = new IPullRequestFileModel[0];
-        public IReadOnlyCollection<ICommentModel> Comments { get; set; } = new ICommentModel[0];
-
-        IReadOnlyCollection<IPullRequestReviewCommentModel> reviewComments = new IPullRequestReviewCommentModel[0];
-        public IReadOnlyCollection<IPullRequestReviewCommentModel> ReviewComments
-        {
-            get { return reviewComments; }
-            set { reviewComments = value; this.RaisePropertyChange(); }
-        }
 
         IAccount assignee;
-        [AllowNull]
         public IAccount Assignee
         {
-            [return: AllowNull]
             get { return assignee; }
             set { assignee = value; this.RaisePropertyChange(); }
         }
 
-        [return: AllowNull] // nullguard thinks a string.Format can return null. sigh.
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, "id:{0} title:{1} created:{2:u} updated:{3:u}", Number, Title, CreatedAt, UpdatedAt);

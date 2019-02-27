@@ -107,7 +107,7 @@ namespace GitHub.Validation
 
     public class ReactivePropertyValidator<TProp> : ReactivePropertyValidator
     {
-        readonly ReactiveCommand<ReactivePropertyValidationResult> validateCommand;
+        readonly ReactiveCommand<ValidationParameter, ReactivePropertyValidationResult> validateCommand;
         ValidationParameter currentValidationParameter;
         ObservableAsPropertyHelper<ReactivePropertyValidationResult> validationResult;
 
@@ -118,12 +118,12 @@ namespace GitHub.Validation
 
         public override Task<ReactivePropertyValidationResult> ExecuteAsync()
         {
-            return validateCommand.ExecuteAsyncTask(currentValidationParameter);
+            return validateCommand.Execute(currentValidationParameter).ToTask();
         }
 
         public override Task ResetAsync()
         {
-            return validateCommand.ExecuteAsync(new ValidationParameter { RequiresReset = true })
+            return validateCommand.Execute(new ValidationParameter { RequiresReset = true })
                 .Select(_ => Unit.Default)
                 .ToTask();
         }
@@ -139,9 +139,9 @@ namespace GitHub.Validation
 
         public ReactivePropertyValidator(IObservable<TProp> propertyChangeSignal)
         {
-            validateCommand = ReactiveCommand.CreateAsyncObservable(param =>
+            validateCommand = ReactiveCommand.CreateFromObservable((ValidationParameter param) =>
             {
-                var validationParams = (ValidationParameter)param ?? new ValidationParameter();
+                var validationParams = param ?? new ValidationParameter();
 
                 if (validationParams.RequiresReset)
                 {
@@ -177,7 +177,7 @@ namespace GitHub.Validation
             propertyChangeSignal
                 .Select(x => new ValidationParameter { PropertyValue = x, RequiresReset = false })
                 .Do(validationParameter => currentValidationParameter = validationParameter)
-                .Subscribe(validationParameter => validateCommand.Execute(validationParameter));
+                .Subscribe(validationParameter => validateCommand.Execute(validationParameter).Subscribe());
         }
 
         public ReactivePropertyValidator<TProp> IfTrue(Func<TProp, bool> predicate, string errorMessage)
@@ -276,12 +276,21 @@ namespace GitHub.Validation
             return This.IfTrue(String.IsNullOrEmpty, errorMessage);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "System.UriBuilder",
+            Justification = "We're using UriBuilder to validate the URL because Uri.TryCreate fails if no scheme specified.")]
         public static ReactivePropertyValidator<string> IfNotUri(this ReactivePropertyValidator<string> This, string errorMessage)
         {
             return This.IfFalse(s =>
             {
-                Uri uri;
-                return Uri.TryCreate(s, UriKind.Absolute, out uri);
+                try
+                {
+                    new UriBuilder(s);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }, errorMessage);
         }
 

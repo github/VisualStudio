@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
+using GitHub.Api;
 
 namespace GitHub.Services
 {
@@ -13,19 +14,22 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
+        IApiClient ApiClient { get; }
+
         IObservable<IAccount> GetCurrentUser();
+        IObservable<IAccount> GetUser(string login);
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
+        IObservable<RemoteRepositoryModel> GetRepository(string owner, string repo);
+        IObservable<RemoteRepositoryModel> GetForks(RepositoryModel repository);
         IObservable<LicenseItem> GetLicenses();
         IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
-        IObservable<IPullRequestModel> GetPullRequest(ILocalRepositoryModel repo, int number);
-        ITrackingCollection<IPullRequestModel> GetPullRequests(ILocalRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
-        IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
-            IBranch sourceBranch, IBranch targetBranch,
+        IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);
+        IObservable<IPullRequestModel> CreatePullRequest(LocalRepositoryModel sourceRepository, RepositoryModel targetRepository,
+            BranchModel sourceBranch, BranchModel targetBranch,
             string title, string body);
-        IObservable<IBranch> GetBranches(IRepositoryModel repo);
+        IObservable<BranchModel> GetBranches(RepositoryModel repo);
         IObservable<Unit> InvalidateAll();
-        IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
+        IObservable<string> GetFileContents(RepositoryModel repo, string commitSha, string path, string fileSha);
     }
 }

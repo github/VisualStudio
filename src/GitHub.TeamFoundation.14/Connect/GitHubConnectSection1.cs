@@ -1,5 +1,4 @@
 ﻿using GitHub.Api;
-using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using Microsoft.TeamFoundation.Controls;
@@ -19,10 +18,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings settings,
-            IVSServices vsServices,
-            IRepositoryCloneService cloneService,
-            IDialogService dialogService)
-            : base(serviceProvider, apiFactory, holder, manager, settings, vsServices, cloneService, dialogService, 1)
+            ITeamExplorerServices teamExplorerServices,
+            ILocalRepositories localRepositories,
+            IUsageTracker usageTracker)
+            : base(serviceProvider, apiFactory, holder, manager, settings, teamExplorerServices, localRepositories, usageTracker, 1)
         {
         }
     }

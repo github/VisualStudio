@@ -11,6 +11,9 @@ using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace GitHub.Services
 {
@@ -25,7 +28,7 @@ namespace GitHub.Services
         CannotDropFolder,
         CannotDropFolderUnauthorizedAccess,
         ClipboardFailed,
-        ClonedFailed,
+        CloneOrOpenFailed,
         CloneFailedNotLoggedIn,
         CommitCreateFailed,
         CommitRevertFailed,
@@ -65,6 +68,7 @@ namespace GitHub.Services
         Global,
         RefreshFailed,
         GistCreateFailed,
+        RepoForkFailed
     }
 
     public static class StandardUserErrors
@@ -122,7 +126,7 @@ namespace GitHub.Services
             },
             { ErrorType.ClipboardFailed, Map(Defaults("Failed to copy text to the clipboard.")) },
             {
-                ErrorType.ClonedFailed, Map(Defaults("Failed to clone the repository '{0}'", "Email support@github.com if you continue to have problems."),
+                ErrorType.CloneOrOpenFailed, Map(Defaults("Failed to clone or open the repository '{0}'", "Email support@github.com if you continue to have problems."),
                     new[]
                     {
                         new Translation(@"fatal: bad config file line (\d+) in (.+)", "Failed to clone the repository '{0}'", @"The config file '$2' is corrupted at line $1. You may need to open the file and try to fix any errors."),
@@ -137,8 +141,8 @@ namespace GitHub.Services
             { ErrorType.EnterpriseConnectFailed, Map(Defaults("Connecting to GitHub Enterprise instance failed", "Could not find a GitHub Enterprise instance at '{0}'. Double check the URL and your internet/intranet connection.")) },
             { ErrorType.LaunchEnterpriseConnectionFailed, Map(Defaults("Failed to launch the enterprise connection.")) },
             { ErrorType.LogFileError, Map(Defaults("Could not open the log file", "Could not find or open the log file.")) },
-            { ErrorType.LoginFailed, Map(Defaults("login failed", "Unable to retrieve your user info from the server. A proxy server might be interfering with the request.")) },
-            { ErrorType.LogoutFailed, Map(Defaults("logout failed", "Logout failed. A proxy server might be interfering with the request.")) },
+            { ErrorType.LoginFailed, Map(Defaults("Login failed", "Unable to retrieve your user info from the server. A proxy server might be interfering with the request.")) },
+            { ErrorType.LogoutFailed, Map(Defaults("Logout failed", "Logout failed. A proxy server might be interfering with the request.")) },
             { ErrorType.RepoCreationAsPrivateNotAvailableForFreePlan, Map(Defaults("Failed to create private repository", "You are currently on a free plan and unable to create private repositories. Either make the repository public or upgrade your account on the website to a plan that allows for private repositories.")) },
             { ErrorType.RepoCreationFailed, Map(Defaults("Failed to create repository", "An error occurred while creating the repository. You might need to open a shell and debug the state of this repo.")) },
             { ErrorType.RepoExistsOnDisk, Map(Defaults("Failed to create repository", "A repository named '{0}' exists in the directory\n'{1}'.")) },
@@ -150,6 +154,7 @@ namespace GitHub.Services
                 ErrorType.RefreshFailed, Map(Defaults("Refresh failed", "Refresh failed unexpectedly. Please email support@github.com if this error persists."),
                     new Translation<HttpRequestException>("Refresh failed", "Could not connect to the remote server. The server or your internect connection could be down")) },
             { ErrorType.GistCreateFailed, Map(Defaults("Failed to create gist", "Creating a gist failed unexpectedly. Try logging back in.")) },
+            { ErrorType.RepoForkFailed, Map(Defaults("Failed to create fork")) },
         }));
 
         public static string GetUserFriendlyErrorMessage(this Exception exception, ErrorType errorType, params object[] messageArgs)
@@ -174,14 +179,6 @@ namespace GitHub.Services
             return DisplayErrorMessage(ErrorType.RepoExistsOnDisk, new object[] { repositoryName, fullPath }, new[] { OpenPathInExplorer(fullPath), Cancel });
         }
 
-        public static IObservable<RecoveryOptionResult> ShowCloneError(this Exception exception,
-            ErrorType errorType,
-            string displayName,
-            string repositoryLocalWorkingDirectory)
-        {
-            return exception.DisplayErrorMessage(errorType, new object[] { displayName }, null);
-        }
-
         public static IObservable<RecoveryOptionResult> ShowUserErrorThatRequiresNavigatingToBilling(
             this Exception exception,
             IAccount account)
@@ -192,7 +189,7 @@ namespace GitHub.Services
 
             return exception.DisplayErrorMessage(
                 errorType,
-                new object[] { },
+                Array.Empty<object>(),
                 new[] { OpenBrowser("View Plans", account.Billing()), Cancel });
         }
 
@@ -215,7 +212,7 @@ namespace GitHub.Services
             return userError.Throw();
         }
 
-        static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
+        public static UserError GetUserFriendlyError(this Exception exception, ErrorType errorType, params object[] messageArgs)
         {
             return Translator.Value.GetUserError(errorType, exception, messageArgs);
         }

@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -53,42 +52,36 @@ namespace GitHub.UI
 
         public Octicon IconChecked
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(IconCheckedProperty); }
             set { SetValue(IconCheckedProperty, value); }
 }
 
         public Geometry PathChecked
         {
-            [return: AllowNull]
             get { return (Geometry)GetValue(PathCheckedProperty); }
             set { SetValue(PathCheckedProperty, value); }
         }
 
         public Octicon IconUnchecked
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(IconUncheckedProperty); }
             set { SetValue(IconUncheckedProperty, value); }
         }
 
         public Geometry PathUnchecked
         {
-            [return: AllowNull]
             get { return (Geometry)GetValue(PathUncheckedProperty); }
             set { SetValue(PathUncheckedProperty, value); }
         }
 
         public Octicon IconIndeterminate
         {
-            [return: AllowNull]
             get { return (Octicon)GetValue(IconIndeterminateProperty); }
             set { SetValue(IconIndeterminateProperty, value); }
         }
 
         public Geometry PathIndeterminate
         {
-            [return: AllowNull]
             get { return (Geometry)GetValue(PathIndeterminateProperty); }
             set { SetValue(PathIndeterminateProperty, value); }
         }

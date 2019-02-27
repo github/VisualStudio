@@ -1,7 +1,10 @@
 ﻿<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
 
   <Symbols>
+    <!-- We need to ensure that `GitHub.VisualStudio` has loaded before any of these resources are used. -->
+    <!-- This should happen when `AssemblyResolverPackage` auto-loads on `UICONTEXT.NoSolution`. -->
     <String Name="Resources" Value="/GitHub.VisualStudio;component/Resources/icons" />
+    
     <Guid Name="guidImages" Value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" />
     <ID Name="logo" Value="1" />
     <ID Name="arrow_left" Value="2" />

@@ -1,46 +1,55 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.Composition;
-using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.TeamFoundation;
 using GitHub.VisualStudio;
+using Microsoft.TeamFoundation.Controls;
 using Microsoft.TeamFoundation.Git.Controls.Extensibility;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
+using Serilog;
+using Microsoft;
 
 namespace GitHub.Services
 {
-    [NullGuard.NullGuard(NullGuard.ValidationFlags.None)]
     [Export(typeof(IVSGitServices))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSGitServices : IVSGitServices
     {
+        static readonly ILogger log = LogManager.ForContext<VSGitServices>();
+
         readonly IGitHubServiceProvider serviceProvider;
-        readonly IVsStatusbar statusBar;
+
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
+        readonly Lazy<IStatusBarNotificationService> statusBar;
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
+        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
         /// that instances of this type cannot be created if the TeamFoundation dlls are not available
         /// (otherwise we'll have multiple instances of IVSServices exports, and that would be Bad(tm))
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         IGitExt gitExtService;
 
         [ImportingConstructor]
-        public VSGitServices(IGitHubServiceProvider serviceProvider)
+        public VSGitServices(IGitHubServiceProvider serviceProvider,
+            Lazy<IStatusBarNotificationService> statusBar,
+            Lazy<ITeamExplorerServices> teamExplorerServices)
         {
             this.serviceProvider = serviceProvider;
-            this.statusBar = serviceProvider.GetService<IVsStatusbar>();
+            this.statusBar = statusBar;
+            this.teamExplorerServices = teamExplorerServices;
         }
-
-        public event EventHandler ActiveRepoChanged;
 
         // The Default Repository Path that VS uses is hidden in an internal
         // service 'ISccSettingsService' registered in an internal service
@@ -56,7 +65,7 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the default cloning path from the registry '{0}'", ex));
+                log.Error(ex, "Error loading the default cloning path from the registry");
             }
             return ret;
         }
@@ -66,26 +75,82 @@ namespace GitHub.Services
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
+            var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
+            Assumes.Present(teamExplorer);
+
 #if TEAMEXPLORER14
-            var gitExt = serviceProvider.GetService<IGitRepositoriesExt>();
-            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+            await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await WaitForCloneOnHomePageAsync(teamExplorer);
+#elif TEAMEXPLORER15 || TEAMEXPLORER16
+            // IGitActionsExt is proffered by SccProviderPackage, but isn't advertised.
+            // To ensure that getting IGitActionsExt doesn't return null, we first request the
+            // IGitExt service which is advertised. This forces SccProviderPackage to load
+            // and proffer IGitActionsExt.
+            var gitExt = serviceProvider.GetService(typeof(IGitExt));
+            Assumes.NotNull(gitExt);
+            var gitActionsExt = serviceProvider.GetService<IGitActionsExt>();
+            Assumes.NotNull(gitActionsExt);
 
-            // The operation will have completed when CanClone goes false and then true again.
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => !x).Take(1);
-            await gitExt.WhenAnyValue(x => x.CanClone).Where(x => x).Take(1);
-#else
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var typedProgress = ((Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>)progress) ??
-                new Progress<Microsoft.VisualStudio.Shell.ServiceProgressData>();
+            // The progress parameter uses the ServiceProgressData type which is defined in
+            // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
+            // would cause type conflicts, so we're using reflection to call CloneAsync.
+            var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
+            Assumes.NotNull(cloneAsyncMethod);
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, cancellationToken, progress };
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitActionsExt, cloneParameters);
 
-            await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-            {
-                typedProgress.ProgressChanged += (s, e) => statusBar.SetText(e.ProgressText);
-                await gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
-            });
+            NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
+            await cloneTask;
 #endif
+            // Change Team Explorer context to the newly cloned repository
+            teamExplorerServices.Value.OpenRepository(clonePath);
+        }
+
+        static async Task StartClonenOnConnectPageAsync(
+            ITeamExplorer teamExplorer, string cloneUrl, string clonePath, bool recurseSubmodules)
+        {
+            var connectPage = await NavigateToPageAsync(teamExplorer, new Guid(TeamExplorerPageIds.Connect));
+            Assumes.Present(connectPage);
+            var gitExt = connectPage.GetService<IGitRepositoriesExt>();
+            Assumes.Present(gitExt);
+
+            gitExt.Clone(cloneUrl, clonePath, recurseSubmodules ? CloneOptions.RecurseSubmodule : CloneOptions.None);
+        }
+
+        static async Task WaitForCloneOnHomePageAsync(ITeamExplorer teamExplorer)
+        {
+            // The clone progress bar appears on the GettingStartedSection of the Home page,
+            // so we wait for this to be hidden before continuing.
+            var sectionId = new Guid("d0200918-c025-4cc3-9dee-4f5e89d0c918"); // GettingStartedSection
+            await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(p => p.GetId() == new Guid(TeamExplorerPageIds.Home))
+                .Select(p => p.GetSection(sectionId))
+                .Where(s => s != null)
+                .Select(s => s.WhenAnyValue(x => x.IsVisible))
+                .Switch()                           // Watch the topmost section
+                .StartWith(false)                   // If no events arrive default to invisible
+                .Throttle(TimeSpan.FromSeconds(1))  // Ignore glitch where section starts invisible
+                .Any(x => x == false);
+        }
+
+        static void NavigateToHomePage(ITeamExplorer teamExplorer)
+        {
+            teamExplorer.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
+        }
+
+        static async Task<ITeamExplorerPage> NavigateToPageAsync(ITeamExplorer teamExplorer, Guid pageId)
+        {
+            teamExplorer.NavigateToPage(pageId, null);
+            var page = await teamExplorer
+                .WhenAnyValue(x => x.CurrentPage)
+                .Where(x => x?.GetId() == pageId)
+                .Take(1);
+            return page;
         }
 
         IGitRepositoryInfo GetRepoFromVS()
@@ -109,11 +174,16 @@ namespace GitHub.Services
             if (repo != null)
                 ret = repo.RepositoryPath;
             if (ret == null)
-                ret = serviceProvider.GetSolution().GetRepositoryFromSolution()?.Info?.Path;
+            {
+                using (var repository = serviceProvider.GetSolution().GetRepositoryFromSolution())
+                {
+                    ret = repository?.Info?.Path;
+                }
+            }
             return ret ?? String.Empty;
         }
 
-        public IEnumerable<ILocalRepositoryModel> GetKnownRepositories()
+        public IEnumerable<LocalRepositoryModel> GetKnownRepositories()
         {
             try
             {
@@ -121,8 +191,8 @@ namespace GitHub.Services
             }
             catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error loading the repository list from the registry '{0}'", ex));
-                return Enumerable.Empty<ILocalRepositoryModel>();
+                log.Error(ex, "Error loading the repository list from the registry");
+                return Enumerable.Empty<LocalRepositoryModel>();
             }
         }
 

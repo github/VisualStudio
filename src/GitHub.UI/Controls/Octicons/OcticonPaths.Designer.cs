@@ -19,7 +19,7 @@ namespace GitHub.UI.Controls.Octicons {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class OcticonPaths {
@@ -1096,7 +1096,7 @@ namespace GitHub.UI.Controls.Octicons {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to M7 6H1c-0.55 0-1 0.45-1 1v5h2v3c0 0.55 0.45 1 1 1h2c0.55 0 1-0.45 1-1V12h2V7c0-0.55-0.45-1-1-1z m0 5h-1V9h-1v6H3V9h-1v2H1V7h6v4z m0-8C7 1.34 5.66 0 4 0S1 1.34 1 3s1.34 3 3 3 3-1.34 3-3zM4 5c-1.11 0-2-0.89-2-2S2.89 1 4 1s2 0.89 2 2-0.89 2-2 2z.
+        ///   Looks up a localized string similar to M 12 14.002 a 0.998 0.998 0 0 1 -0.998 0.998 H 1.001 A 1 1 0 0 1 0 13.999 V 13 c 0 -2.633 4 -4 4 -4 s 0.229 -0.409 0 -1 c -0.841 -0.62 -0.944 -1.59 -1 -4 c 0.173 -2.413 1.867 -3 3 -3 s 2.827 0.586 3 3 c -0.056 2.41 -0.159 3.38 -1 4 c -0.229 0.59 0 1 0 1 s 4 1.367 4 4 v 1.002 Z.
         /// </summary>
         internal static string person {
             get {

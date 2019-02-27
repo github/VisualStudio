@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using GitHub.Extensions;
-using NullGuard;
 
 namespace GitHub.Validation
 {
@@ -23,15 +22,22 @@ namespace GitHub.Validation
             DependentPropertyName = dependentPropertyName;
         }
 
-        protected override ValidationResult IsValid([AllowNull]object value, [AllowNull]ValidationContext validationContext)
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             return ValidationResult.Success;
         }
 
         public bool IsValidationRequired(ValidationContext validationContext)
         {
+            Guard.ArgumentNotNull(validationContext, nameof(validationContext));
+
             var instance = validationContext.ObjectInstance;
-            Debug.Assert(instance != null, "The ValidationContext does not allow null instances.");
+
+            if (instance == null)
+            {
+                throw new ArgumentException("ValidationContext.ObjectInstance must not be null.");
+            }
+
             var property = instance.GetType().GetProperty(DependentPropertyName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             if (property == null || property.PropertyType != typeof(bool))
             {

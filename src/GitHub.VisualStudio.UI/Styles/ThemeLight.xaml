@@ -13,7 +13,7 @@
   <Color x:Key="GitHubActionLinkItemColor">#FF0E70C0</Color>
   <SolidColorBrush x:Key="GitHubActionLinkItemBrush" Color="{StaticResource GitHubActionLinkItemColor}" PresentationOptions:Freeze="true" />
 
-  <Color x:Key="GitHubHeaderSeparatorColor">#FFEEEEF2</Color>
+  <Color x:Key="GitHubHeaderSeparatorColor">#FFcccedb</Color>
   <SolidColorBrush x:Key="GitHubHeaderSeparatorBrush" Color="{StaticResource GitHubHeaderSeparatorColor}" PresentationOptions:Freeze="true" />
   
   <Color x:Key="GitHubPaneTitleColor">#FF1B293E</Color>
@@ -55,4 +55,17 @@
   <SolidColorBrush x:Key="GitHubDirectoryIconForeground" Color="#FFF5D367" />
 
   <SolidColorBrush x:Key="GitHubBranchNameBackgroundBrush" Color="#FFDAE8F6" />
+
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Add" Color="#FFE4E6F2" />
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.Delete" Color="#FFE4E6F2" />
+  <SolidColorBrush x:Key="GitHubDiffChangeBackground.None" Color="{DynamicResource Color.Window}" />
+
+  <SolidColorBrush x:Key="GitHubDiffGlyphFill.None" Color="#9EC7FF" />
+
+  <SolidColorBrush x:Key="GitHubPeekViewBackground" Color="#F5F5F5" />
+  <SolidColorBrush x:Key="GitHubPendingReviewBackground" Color="#FFF8C7" />
+  <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FFCCCEDB"/>
+  <SolidColorBrush x:Key="GitHubFileExpanderHeaderBackgroundBrush" Color="#FFEEEEF2" />
+
+    <SolidColorBrush x:Key="GitHubTimelineEventBackgroundBrush" Color="#FFe1e4e8" />
 </ResourceDictionary>

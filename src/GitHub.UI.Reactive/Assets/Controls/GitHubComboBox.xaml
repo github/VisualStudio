@@ -1,10 +1,10 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+                    xmlns:ghfvs="https://github.com/github/VisualStudio">
 
     <PathGeometry x:Key="arrow">M 0,6 3.5,11 7,6</PathGeometry>
 
-    <ControlTemplate x:Key="ComboBoxTemplate" TargetType="{x:Type ui:GitHubComboBox}">
+    <ControlTemplate x:Key="ComboBoxTemplate" TargetType="{x:Type ghfvs:GitHubComboBox}">
         <Grid x:Name="MainGrid" SnapsToDevicePixels="true"
               MinWidth="{Binding ActualWidth, ElementName=PART_Popup}"
               Background="{TemplateBinding Background}">
@@ -26,7 +26,7 @@
                     </ScrollViewer>
                 </Border>
             </Popup>
-            <ui:OcticonLinkToggleButton
+            <ghfvs:OcticonLinkToggleButton
                 x:Name="toggleButton"
                 Focusable="True"
                 FocusVisualStyle="{DynamicResource NegativeMarginFocusVisual}"
@@ -44,7 +44,7 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Background="Transparent"
                 IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-            </ui:OcticonLinkToggleButton>
+            </ghfvs:OcticonLinkToggleButton>
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
@@ -60,7 +60,7 @@
         </ControlTemplate.Triggers>
         
     </ControlTemplate>
-    <ui:IsLastItemInContainerConverter x:Key="IsLastItemInContainerConverter" />
+    <ghfvs:IsLastItemInContainerConverter x:Key="IsLastItemInContainerConverter" />
 
     <Style x:Key="GitHubComboBoxItem" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}"/>
@@ -87,7 +87,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="GitHubComboBox" TargetType="{x:Type ui:GitHubComboBox}">
+    <Style x:Key="GitHubComboBox" TargetType="{x:Type ghfvs:GitHubComboBox}">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="{DynamicResource GHBoxDividerBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource GHBlueLinkButtonTextBrush}"/>

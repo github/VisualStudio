@@ -1,0 +1,20 @@
+﻿{
+  "profiles": {
+    "Visual Studio 2015": {
+      "executablePath": "$(VsixTestingInstallerPath)",
+      "commandLineArgs": "/ApplicationPath \"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\IDE\\devenv.exe\" /RootSuffix Exp /InstallAndStart \"$(SolutionDir)\\build\\$(Configuration)\\GitHub.VisualStudio.vsix\""
+    },
+    "Visual Studio 2017": {
+      "executablePath": "$(DevEnvDir)devenv.exe",
+      "commandLineArgs": "/rootsuffix Exp /log"
+    },
+    "Visual Studio 2017 - Team Explorer": {
+      "executablePath": "$(VsixTestingInstallerPath)",
+      "commandLineArgs": "/ApplicationPath \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\TeamExplorer\\Common7\\IDE\\devenv.exe\" /RootSuffix Exp /InstallAndStart \"$(SolutionDir)\\build\\$(Configuration)\\GitHub.VisualStudio.vsix\""
+    },
+    "Visual Studio 2019 - Preview": {
+      "executablePath": "$(VsixTestingInstallerPath)",
+      "commandLineArgs": "/ApplicationPath \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Preview\\Common7\\IDE\\devenv.exe\" /RootSuffix Exp /InstallAndStart \"$(SolutionDir)\\build\\$(Configuration)\\GitHub.VisualStudio.vsix\""
+    }
+  }
+}

@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using GitHub.Primitives;
-using NullGuard;
 using GitHub.Services;
 using GitHub.Extensions;
 
@@ -12,21 +11,20 @@ namespace GitHub.VisualStudio.Base
     {
         public static readonly Guid TeamExplorerConnectionsSectionId = new Guid("ef6a7a99-f01f-4c91-ad31-183c1354dd97");
 
-        [AllowNull]
         protected IServiceProvider TEServiceProvider
         {
-            [return: AllowNull]
             get; set;
         }
 
         protected IGitHubServiceProvider ServiceProvider
         {
-            [return: AllowNull]
             get;
         }
 
         protected TeamExplorerBase(IGitHubServiceProvider serviceProvider)
         {
+            Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
+
             ServiceProvider = serviceProvider;
         }
 
@@ -42,12 +40,17 @@ namespace GitHub.VisualStudio.Base
 
         protected static void OpenInBrowser(Lazy<IVisualStudioBrowser> browser, Uri uri)
         {
+            Guard.ArgumentNotNull(browser, nameof(browser));
+            Guard.ArgumentNotNull(uri, nameof(uri));
+
             OpenInBrowser(browser.Value, uri);
         }
 
         protected static void OpenInBrowser(IVisualStudioBrowser browser, Uri uri)
         {
-            Debug.Assert(browser != null, "Could not create a browser helper instance.");
+            Guard.ArgumentNotNull(browser, nameof(browser));
+            Guard.ArgumentNotNull(uri, nameof(uri));
+
             browser?.OpenUrl(uri);
         }
     }

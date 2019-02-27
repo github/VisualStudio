@@ -1,8 +1,10 @@
 ﻿using System;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.Extensions
 {
+#pragma warning disable CS0618 // Type or member is obsolete
     public class RecoveryCommandWithIcon : RecoveryCommand
     {
         public string Icon { get; private set; }
@@ -12,4 +14,5 @@ namespace GitHub.Extensions
             Icon = icon;
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

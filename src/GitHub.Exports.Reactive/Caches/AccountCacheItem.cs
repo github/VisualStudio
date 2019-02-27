@@ -2,6 +2,7 @@
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit;
+using Account = Octokit.Account;
 
 namespace GitHub.Caches
 {
@@ -10,11 +11,6 @@ namespace GitHub.Caches
         public static AccountCacheItem Create(Account apiAccount)
         {
             return new AccountCacheItem(apiAccount);
-        }
-
-        public static AccountCacheItem Create(UserAndScopes userAndScopes)
-        {
-            return new AccountCacheItem(userAndScopes.User);
         }
 
         public AccountCacheItem()

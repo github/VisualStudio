@@ -3,6 +3,7 @@ using GitHub.Primitives;
 using System;
 using System.Threading.Tasks;
 using Octokit;
+using GitHub.Services;
 
 namespace GitHub.Factories
 {

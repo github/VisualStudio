@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="15.8.75-pre" />
+    <PackageReference Include="VsixTesting.Installer" Version="0.1.46-beta-g3578f97a2e" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj" />
+  </ItemGroup>
+</Project>

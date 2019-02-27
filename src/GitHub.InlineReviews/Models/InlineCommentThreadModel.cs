@@ -13,44 +13,47 @@ namespace GitHub.InlineReviews.Models
     class InlineCommentThreadModel : ReactiveObject, IInlineCommentThreadModel
     {
         bool isStale;
-        int lineNumber;
+        int lineNumber = -1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentThreadModel"/> class.
         /// </summary>
         /// <param name="relativePath">The relative path to the file that the thread is on.</param>
-        /// <param name="originalCommitSha">The SHA of the commit that the thread was left con.</param>
-        /// <param name="originalPosition">
-        /// The 1-based line number in the original diff that the thread was left on.
-        /// </param>
+        /// <param name="commitSha">The SHA of the commit that the thread appears on.</param>
         /// <param name="diffMatch">
         /// The last five lines of the thread's diff hunk, in reverse order.
         /// </param>
+        /// <param name="comments">The comments in the thread</param>
         public InlineCommentThreadModel(
             string relativePath,
-            string originalCommitSha,
-            int originalPosition,
+            string commitSha,
             IList<DiffLine> diffMatch,
-            IEnumerable<IPullRequestReviewCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments)
         {
-            Guard.ArgumentNotNull(originalCommitSha, nameof(originalCommitSha));
+            Guard.ArgumentNotNull(relativePath, nameof(relativePath));
+            Guard.ArgumentNotNull(commitSha, nameof(commitSha));
             Guard.ArgumentNotNull(diffMatch, nameof(diffMatch));
 
             Comments = comments.ToList();
             DiffMatch = diffMatch;
-            OriginalCommitSha = originalCommitSha;
-            OriginalPosition = originalPosition;
+            DiffLineType = diffMatch[0].Type;
+            CommitSha = commitSha;
             RelativePath = relativePath;
+
+            foreach (var comment in comments)
+            {
+                comment.Thread = this;
+            }
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
+        public IReadOnlyList<InlineCommentModel> Comments { get; }
 
         /// <inheritdoc/>
         public IList<DiffLine> DiffMatch { get; }
 
         /// <inheritdoc/>
-        public DiffChangeType DiffLineType => DiffMatch.First().Type;
+        public DiffChangeType DiffLineType { get; }
 
         /// <inheritdoc/>
         public bool IsStale
@@ -67,10 +70,7 @@ namespace GitHub.InlineReviews.Models
         }
 
         /// <inheritdoc/>
-        public string OriginalCommitSha { get; }
-
-        /// <inheritdoc/>
-        public int OriginalPosition { get; }
+        public string CommitSha { get; }
 
         /// <inheritdoc/>
         public string RelativePath { get; }

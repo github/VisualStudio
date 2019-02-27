@@ -12,7 +12,7 @@ namespace GitHub.InlineReviews.Tags
     /// <seealso cref="ShowInlineCommentTag"/>
     public abstract class InlineCommentTag : ITag
     {
-        public InlineCommentTag(
+        protected InlineCommentTag(
             IPullRequestSession session,
             int lineNumber,
             DiffChangeType diffChangeType)

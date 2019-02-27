@@ -1,13 +1,15 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.ComponentModel.Composition;
 using System.Globalization;
-using GitHub.VisualStudio;
+using System.IO;
+using GitHub.Logging;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using DTE = EnvDTE.DTE;
 using Rothko;
+using Serilog;
+using EnvDTE;
 
 namespace GitHub.Services
 {
@@ -15,19 +17,26 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class VSServices : IVSServices
     {
+        readonly ILogger log;
         readonly IGitHubServiceProvider serviceProvider;
 
         // Use a prefix (~$) that is defined in the default VS gitignore.
         public const string TempSolutionName = "~$GitHubVSTemp$~";
 
-
         [ImportingConstructor]
-        public VSServices(IGitHubServiceProvider serviceProvider)
+        public VSServices(IGitHubServiceProvider serviceProvider) :
+            this(serviceProvider, LogManager.ForContext<VSServices>())
+        {
+        }
+
+        public VSServices(IGitHubServiceProvider serviceProvider, ILogger log)
         {
             this.serviceProvider = serviceProvider;
+            this.log = log;
         }
 
         string vsVersion;
+        /// <inheritdoc/>
         public string VSVersion
         {
             get
@@ -38,39 +47,11 @@ namespace GitHub.Services
             }
         }
 
-
-        public void ActivityLogMessage(string message)
+        /// <inheritdoc/>
+        public VSConstants.MessageBoxResult ShowMessageBoxInfo(string message)
         {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log message to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogError(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log error to activity log: {0}", message));
-            }
-        }
-
-        public void ActivityLogWarning(string message)
-        {
-            var log = serviceProvider.GetActivityLog();
-            if (log != null)
-            {
-                if (!ErrorHandler.Succeeded(log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_WARNING,
-                            Info.ApplicationInfo.ApplicationSafeName, message)))
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, "Could not log warning to activity log: {0}", message));
-            }
+            return (VSConstants.MessageBoxResult)VsShellUtilities.ShowMessageBox(serviceProvider, message, null,
+                OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         /// <summary>Open a repository in Team Explorer</summary>
@@ -86,19 +67,20 @@ namespace GitHub.Services
             var os = serviceProvider.TryGetService<IOperatingSystem>();
             if (os == null)
             {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find IOperatingSystem service.");
+                log.Error("TryOpenRepository couldn't find IOperatingSystem service");
                 return false;
             }
 
             var dte = serviceProvider.TryGetService<DTE>();
             if (dte == null)
             {
-                VsOutputLogger.WriteLine("TryOpenRepository couldn't find DTE service.");
+                log.Error("TryOpenRepository couldn't find DTE service");
                 return false;
             }
 
-            var repoDir = os.Directory.GetDirectory(repoPath);
-            if(!repoDir.Exists)
+            var gitPath = Path.Combine(repoPath, ".git");
+            var gitDir = os.Directory.GetDirectory(gitPath);
+            if (!gitDir.Exists)
             {
                 return false;
             }
@@ -113,7 +95,7 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Error opening repository. {0}", e);
+                log.Error(e, "Error opening repository");
             }
             finally
             {
@@ -136,32 +118,38 @@ namespace GitHub.Services
             }
             catch (Exception e)
             {
-                VsOutputLogger.WriteLine("Couldn't clean up {0}. {1}", vsTempPath, e);
+                log.Error(e, "Couldn't clean up {TempPath}", vsTempPath);
             }
         }
 
         const string RegistryRootKey = @"Software\Microsoft\VisualStudio";
         const string EnvVersionKey = "EnvVersion";
+        const string InstallationNamePrefix = "VisualStudio/";
         string GetVSVersion()
         {
             var version = typeof(Microsoft.VisualStudio.Shell.ActivityLog).Assembly.GetName().Version;
             var keyPath = String.Format(CultureInfo.InvariantCulture, "{0}\\{1}.{2}_Config\\SplashInfo", RegistryRootKey, version.Major, version.Minor);
             try
             {
-                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                if (version.Major == 14)
                 {
-                    var value = (string)key.GetValue(EnvVersionKey, String.Empty);
-                    if (!String.IsNullOrEmpty(value))
-                        return value;
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(keyPath))
+                    {
+                        var value = (string)key.GetValue(EnvVersionKey, String.Empty);
+                        if (!String.IsNullOrEmpty(value))
+                            return value;
+                    }
                 }
-                // fallback to poking the CommonIDE assembly, which most closely follows the advertised version.
-                var asm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.StartsWith("Microsoft.VisualStudio.CommonIDE", StringComparison.OrdinalIgnoreCase));
-                if (asm != null)
-                    return asm.GetName().Version.ToString();
+                else
+                {
+                    var setupConfiguration = new SetupConfiguration();
+                    var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
+                    return setupInstance.GetInstallationName().TrimPrefix(InstallationNamePrefix);
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                VsOutputLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Error getting the Visual Studio version '{0}'", ex));
+                log.Error(ex, "Error getting the Visual Studio version");
             }
             return version.ToString();
         }

@@ -1,6 +1,6 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <PreventSigningOfAssembly>True</PreventSigningOfAssembly>
+    <PreventSigningOfAssembly>False</PreventSigningOfAssembly>
     <PreviouslyBuiltSuccessfully>True</PreviouslyBuiltSuccessfully>
   </Settings>
 </ProjectConfiguration>

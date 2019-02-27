@@ -12,4 +12,5 @@ namespace GitHub.Extensions
             return apiex?.HttpResponse?.Headers.ContainsKey(GithubHeader) ?? false;
         }
     }
+
 }

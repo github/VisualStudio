@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -36,28 +35,24 @@ namespace GitHub.UI
 
         public Brush IconForeground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(IconForegroundProperty); }
             set { SetValue(IconForegroundProperty, value); }
         }
 
         public Brush ActiveBackground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(ActiveBackgroundProperty); }
             set { SetValue(ActiveBackgroundProperty, value); }
         }
 
         public Brush ActiveForeground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(ActiveForegroundProperty); }
             set { SetValue(ActiveForegroundProperty, value); }
         }
 
         public Brush PressedBackground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(PressedBackgroundProperty); }
             set { SetValue(PressedBackgroundProperty, value); }
         }

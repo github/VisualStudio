@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+                    xmlns:ghfvs="https://github.com/github/VisualStudio"
                     xmlns:uirx="clr-namespace:GitHub.UI">
 
     <PathGeometry x:Key="arrow">M 0,6 3.5,11 7,6</PathGeometry>
@@ -23,7 +23,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Border Grid.Row="0"  BorderThickness="0,0,0,1"  BorderBrush="{TemplateBinding BorderBrush}" Background="#FCFCFC" Padding="5">
-                            <ui:FilterTextBox 
+                            <ghfvs:FilterTextBox 
                                 x:Name="PART_FilterTextBox"
                                 PromptText="Filter" 
                                 Margin="0" 
@@ -40,7 +40,7 @@
                     </Grid>
                 </Border>
             </Popup>
-            <ui:OcticonLinkToggleButton
+            <ghfvs:OcticonLinkToggleButton
                 x:Name="toggleButton"
                 Focusable="False"
                 PathChecked="{StaticResource arrow}"
@@ -57,7 +57,7 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Background="Transparent"
                 IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-            </ui:OcticonLinkToggleButton>
+            </ghfvs:OcticonLinkToggleButton>
 
         </Grid>
         <ControlTemplate.Triggers>
@@ -74,7 +74,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <ui:IsLastItemInContainerConverter x:Key="IsLastItemInContainerConverter" />
+    <ghfvs:IsLastItemInContainerConverter x:Key="IsLastItemInContainerConverter" />
 
     <Style x:Key="GitHubComboBoxItem" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}"/>

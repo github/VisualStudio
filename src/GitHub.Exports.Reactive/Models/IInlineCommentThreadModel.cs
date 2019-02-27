@@ -9,9 +9,9 @@ namespace GitHub.Models
     public interface IInlineCommentThreadModel
     {
         /// <summary>
-        /// Gets or sets the comments in the thread.
+        /// Gets the comments in the thread.
         /// </summary>
-        IReadOnlyList<IPullRequestReviewCommentModel> Comments { get; }
+        IReadOnlyList<InlineCommentModel> Comments { get; }
 
         /// <summary>
         /// Gets the last five lines of the thread's diff hunk, in reverse order.
@@ -36,19 +36,14 @@ namespace GitHub.Models
         bool IsStale { get; set; }
 
         /// <summary>
-        /// Gets or sets the 0-based line number of the comment.
+        /// Gets or sets the 0-based line number of the comment, or -1 of the thread is outdated.
         /// </summary>
         int LineNumber { get; set; }
 
         /// <summary>
-        /// Gets the SHA of the commit that the thread was left con.
+        /// Gets the SHA of the commit that the thread appears on.
         /// </summary>
-        string OriginalCommitSha { get; }
-
-        /// <summary>
-        /// Gets the 1-based line number in the original diff that the thread was left on.
-        /// </summary>
-        int OriginalPosition { get; }
+        string CommitSha { get; }
 
         /// <summary>
         /// Gets the relative path to the file that the thread is on.

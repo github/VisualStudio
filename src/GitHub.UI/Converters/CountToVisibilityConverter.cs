@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -13,7 +11,7 @@ namespace GitHub.UI
     /// </summary>
     public class CountToVisibilityConverter : ValueConverterMarkupExtension<CountToVisibilityConverter>
     {
-        public override object Convert(object value, Type targetType, [AllowNull] object parameter, [AllowNull] CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return ((int)value > 0) ? Visibility.Visible : Visibility.Collapsed;
         }

@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using GitHub.Primitives;
 
 namespace GitHub.Api
 {
@@ -34,6 +33,16 @@ namespace GitHub.Api
         public static string ClientSecret { get; private set; }
 
         /// <summary>
+        /// Gets the minimum scopes required by the application.
+        /// </summary>
+        public static IReadOnlyList<string> MinimumScopes { get; } = new[] { "user", "repo", "gist", "write:public_key" };
+
+        /// <summary>
+        /// Gets the ideal scopes requested by the application.
+        /// </summary>
+        public static IReadOnlyList<string> RequestedScopes { get; } = new[] { "user", "repo", "gist", "write:public_key", "read:org" };
+
+        /// <summary>
         /// Gets a note that will be stored with the OAUTH token.
         /// </summary>
         public static string AuthorizationNote
@@ -49,7 +58,10 @@ namespace GitHub.Api
         {
             get
             {
-                return GetSha256Hash(Info.ApplicationInfo.ApplicationDescription + ":" + GetMachineIdentifier());
+                return GetSha256Hash(
+                    Info.ApplicationInfo.ApplicationDescription + ":" +
+                    GetMachineIdentifier() + ":" +
+                    GetMachineNameSafe());
             }
         }
 
@@ -60,13 +72,13 @@ namespace GitHub.Api
             try
             {
                 // adapted from http://stackoverflow.com/a/1561067
-                var fastedValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
-                    .OrderBy(nic => nic.Speed)
+                var fastestValidNetworkInterface = NetworkInterface.GetAllNetworkInterfaces()
+                    .OrderByDescending(nic => nic.Speed)
                     .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
                     .Select(nic => nic.GetPhysicalAddress().ToString())
-                    .FirstOrDefault(address => address.Length > 12);
+                    .FirstOrDefault(address => address.Length >= 12);
 
-                return fastedValidNetworkInterface ?? GetMachineNameSafe();
+                return fastestValidNetworkInterface ?? GetMachineNameSafe();
             }
             catch (Exception)
             {

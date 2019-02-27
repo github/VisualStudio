@@ -2,18 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using GitHub.Extensions;
+using GitHub.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.InlineReviews.Tags;
+using GitHub.Logging;
+using GitHub.Models;
+using GitHub.Services;
+using GitHub.Services.Vssdk.Commands;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Serilog;
 
 namespace GitHub.InlineReviews.Commands
 {
@@ -22,35 +29,31 @@ namespace GitHub.InlineReviews.Commands
     /// </summary>
     abstract class InlineCommentNavigationCommand : VsCommand<InlineCommentNavigationParams>
     {
+        static readonly ILogger log = LogManager.ForContext<InlineCommentNavigationCommand>();
+        readonly IGitHubServiceProvider serviceProvider;
         readonly IViewTagAggregatorFactoryService tagAggregatorFactory;
         readonly IInlineCommentPeekService peekService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InlineCommentNavigationCommand"/> class.
         /// </summary>
+        /// <param name="serviceProvider"></param>
         /// <param name="tagAggregatorFactory">The tag aggregator factory.</param>
         /// <param name="peekService">The peek service.</param>
         /// <param name="commandSet">The GUID of the group the command belongs to.</param>
         /// <param name="commandId">The numeric identifier of the command.</param>
         protected InlineCommentNavigationCommand(
+            IGitHubServiceProvider serviceProvider,
             IViewTagAggregatorFactoryService tagAggregatorFactory,
             IInlineCommentPeekService peekService,
             Guid commandSet,
             int commandId)
             : base(commandSet, commandId)
         {
+            this.serviceProvider = serviceProvider;
             this.tagAggregatorFactory = tagAggregatorFactory;
             this.peekService = peekService;
-        }
-
-        /// <inheritdoc/>
-        public override bool IsEnabled
-        {
-            get
-            {
-                var tags = GetTags(GetCurrentTextViews());
-                return tags.Count > 1;
-            }
+            BeforeQueryStatus += QueryStatus;
         }
 
         /// <summary>
@@ -75,10 +78,10 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Gets the text buffer position for the specified line.
         /// </summary>
-        /// <param name="parameter">The parameters.</param>
+        /// <param name="textView">The text view containing the buffer</param>
         /// <param name="lineNumber">The 0-based line number.</param>
         /// <returns></returns>
-        protected int GetCursorPoint(ITextView textView, int lineNumber)
+        protected static int GetCursorPoint(ITextView textView, int lineNumber)
         {
             lineNumber = Math.Max(0, Math.Min(lineNumber, textView.TextSnapshot.LineCount - 1));
             return textView.TextSnapshot.GetLineFromLineNumber(lineNumber).Start.Position;
@@ -98,72 +101,86 @@ namespace GitHub.InlineReviews.Commands
         /// </remarks>
         protected IEnumerable<ITextView> GetCurrentTextViews()
         {
-            var serviceProvider = Package;
-            var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
-            if (monitorSelection == null)
-            {
-                yield break;
-            }
+            ThreadHelper.ThrowIfNotOnUIThread();
 
-            object curDocument;
-            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
-            {
-                yield break;
-            }
+            var result = new List<ITextView>();
 
-            IVsWindowFrame frame = curDocument as IVsWindowFrame;
-            if (frame == null)
+            try
             {
-                yield break;
-            }
-
-            object docView = null;
-            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
-            {
-                yield break;
-            }
-
-            if (docView is IVsDifferenceCodeWindow)
-            {
-                var diffWindow = (IVsDifferenceCodeWindow)docView;
-                
-                switch (diffWindow.DifferenceViewer.ViewMode)
+                var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
+                if (monitorSelection == null)
                 {
-                    case DifferenceViewMode.Inline:
-                        yield return diffWindow.DifferenceViewer.InlineView;
-                        break;
-                    case DifferenceViewMode.SideBySide:
-                        switch (diffWindow.DifferenceViewer.ActiveViewType)
-                        {
-                            case DifferenceViewType.LeftView:
-                                yield return diffWindow.DifferenceViewer.LeftView;
-                                yield return diffWindow.DifferenceViewer.RightView;
-                                break;
-                            case DifferenceViewType.RightView:
-                                yield return diffWindow.DifferenceViewer.RightView;
-                                yield return diffWindow.DifferenceViewer.LeftView;
-                                break;
-                        }
-                        yield return diffWindow.DifferenceViewer.LeftView;
-                        break;
-                    case DifferenceViewMode.RightViewOnly:
-                        yield return diffWindow.DifferenceViewer.RightView;
-                        break;
-                }
-            }
-            else if (docView is IVsCodeWindow)
-            {
-                IVsTextView textView;
-                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
-                {
-                    yield break;
+                    return result;
                 }
 
-                var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
-                var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
-                var wpfTextView = adapterFactory.GetWpfTextView(textView);
-                yield return wpfTextView;
+                object curDocument;
+                if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+                {
+                    return result;
+                }
+
+                IVsWindowFrame frame = curDocument as IVsWindowFrame;
+                if (frame == null)
+                {
+                    return result;
+                }
+
+                object docView = null;
+                if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+                {
+                    return result;
+                }
+
+                if (docView is IVsDifferenceCodeWindow)
+                {
+                    var diffWindow = (IVsDifferenceCodeWindow)docView;
+
+                    switch (diffWindow.DifferenceViewer.ViewMode)
+                    {
+                        case DifferenceViewMode.Inline:
+                            result.Add(diffWindow.DifferenceViewer.InlineView);
+                            break;
+                        case DifferenceViewMode.SideBySide:
+                            switch (diffWindow.DifferenceViewer.ActiveViewType)
+                            {
+                                case DifferenceViewType.LeftView:
+                                    result.Add(diffWindow.DifferenceViewer.LeftView);
+                                    result.Add(diffWindow.DifferenceViewer.RightView);
+                                    break;
+                                case DifferenceViewType.RightView:
+                                    result.Add(diffWindow.DifferenceViewer.RightView);
+                                    result.Add(diffWindow.DifferenceViewer.LeftView);
+                                    break;
+                            }
+                            result.Add(diffWindow.DifferenceViewer.LeftView);
+                            break;
+                        case DifferenceViewMode.RightViewOnly:
+                            result.Add(diffWindow.DifferenceViewer.RightView);
+                            break;
+                    }
+                }
+                else if (docView is IVsCodeWindow)
+                {
+                    IVsTextView textView;
+                    if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
+                    {
+                        return result;
+                    }
+
+                    var model = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
+                    Assumes.Present(model);
+
+                    var adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
+                    var wpfTextView = adapterFactory.GetWpfTextView(textView);
+                    result.Add(wpfTextView);
+                }
             }
+            catch (Exception e)
+            {
+                log.Error(e, "Exception in InlineCommentNavigationCommand.GetCurrentTextViews()");
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -208,14 +225,26 @@ namespace GitHub.InlineReviews.Commands
         /// <summary>
         /// Shows the inline comments for the specified tag in a peek view.
         /// </summary>
-        /// <param name="tag"></param>
+        /// <param name="textView">The text view containing the tag</param>
+        /// <param name="tag">The inline comment tag</param>
+        /// <param name="parameter">The navigation parameter detailing a search from the specified tag</param>
+        /// <param name="allTextViews">The full list of text views</param>
         protected void ShowPeekComments(
             InlineCommentNavigationParams parameter,
             ITextView textView,
             ShowInlineCommentTag tag,
             IEnumerable<ITextView> allTextViews)
         {
-            var point = peekService.Show(textView, tag);
+            foreach (var other in allTextViews)
+            {
+                if (other != textView)
+                {
+                    peekService.Hide(other);
+                }
+            }
+
+            var side = tag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+            var point = peekService.Show(textView, side, tag.LineNumber);
 
             if (parameter?.MoveCursor != false)
             {
@@ -231,19 +260,17 @@ namespace GitHub.InlineReviews.Commands
                     textView.Caret.MoveTo(caretPoint.Value);
                 }
             }
-
-            foreach (var other in allTextViews)
-            {
-                if (other != textView)
-                {
-                    peekService.Hide(other);
-                }
-            }
         }
 
-        SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)
+        static SnapshotPoint? Map(IMappingPoint p, ITextSnapshot textSnapshot)
         {
             return p.GetPoint(textSnapshot.TextBuffer, PositionAffinity.Predecessor);
+        }
+
+        void QueryStatus(object sender, EventArgs e)
+        {
+            var tags = GetTags(GetCurrentTextViews());
+            Enabled = tags.Count > 0;
         }
 
         protected interface ITagInfo

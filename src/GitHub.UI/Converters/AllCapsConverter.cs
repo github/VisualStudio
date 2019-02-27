@@ -8,7 +8,7 @@ namespace GitHub.UI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value.ToString().ToUpper();
+            return value.ToString().ToUpper(CultureInfo.CurrentCulture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

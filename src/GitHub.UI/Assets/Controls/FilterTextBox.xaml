@@ -14,7 +14,6 @@
         <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
         <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
         <Setter Property="Padding" Value="3,3,18,3" />
-        <Setter Property="ContextMenu" Value="{DynamicResource DefaultContextMenu}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ui:FilterTextBox}">

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Text.Classification;
 using GitHub.InlineReviews.Services;
 using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -16,65 +16,24 @@ namespace GitHub.InlineReviews.Tags
     {
         readonly IInlineCommentPeekService peekService;
         readonly ITextView textView;
-        readonly BrushesManager brushesManager;
 
         public InlineCommentGlyphFactory(
             IInlineCommentPeekService peekService,
-            ITextView textView,
-            IEditorFormatMap editorFormatMap)
+            ITextView textView)
         {
             this.peekService = peekService;
             this.textView = textView;
-
-            brushesManager = new BrushesManager(editorFormatMap);
-        }
-
-        class BrushesManager
-        {
-            const string AddPropertiesKey = "deltadiff.add.word";
-            const string DeletePropertiesKey = "deltadiff.remove.word";
-            const string NonePropertiesKey = "Indicator Margin";
-
-            readonly ResourceDictionary addProperties;
-            readonly ResourceDictionary deleteProperties;
-            readonly ResourceDictionary noneProperties;
-
-            internal BrushesManager(IEditorFormatMap editorFormatMap)
-            {
-                addProperties = editorFormatMap.GetProperties(AddPropertiesKey);
-                deleteProperties = editorFormatMap.GetProperties(DeletePropertiesKey);
-                noneProperties = editorFormatMap.GetProperties(NonePropertiesKey);
-            }
-
-            internal Brush GetBackground(DiffChangeType diffChangeType)
-            {
-                switch (diffChangeType)
-                {
-                    case DiffChangeType.Add:
-                        return GetBackground(addProperties);
-                    case DiffChangeType.Delete:
-                        return GetBackground(deleteProperties);
-                    case DiffChangeType.None:
-                    default:
-                        return GetBackground(noneProperties);
-                }
-            }
-
-            static Brush GetBackground(ResourceDictionary dictionary)
-            {
-                return dictionary["Background"] as Brush;
-            }
         }
 
         public UIElement GenerateGlyph(IWpfTextViewLine line, InlineCommentTag tag)
         {
             var glyph = CreateGlyph(tag);
+            glyph.DataContext = tag;
             glyph.MouseLeftButtonUp += (s, e) =>
             {
                 if (OpenThreadView(tag)) e.Handled = true;
             };
 
-            glyph.Background = brushesManager.GetBackground(tag.DiffChangeType);
             return glyph;
         }
 
@@ -87,6 +46,7 @@ namespace GitHub.InlineReviews.Tags
             };
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)")]
         static UserControl CreateGlyph(InlineCommentTag tag)
         {
             var addTag = tag as AddInlineCommentTag;
@@ -96,12 +56,25 @@ namespace GitHub.InlineReviews.Tags
             {
                 return new AddInlineCommentGlyph();
             }
-            else if (showTag != null)
+
+            if (showTag != null)
             {
-                return new ShowInlineCommentGlyph()
+                if (showTag.Thread != null && showTag.Annotations != null)
                 {
-                    Opacity = showTag.Thread.IsStale ? 0.5 : 1,
-                };
+                    return new ShowInlineCommentAnnotationGlyph();
+                }
+
+                if (showTag.Thread != null)
+                {
+                    return new ShowInlineCommentGlyph();
+                }
+
+                if (showTag.Annotations != null)
+                {
+                    return new ShowInlineAnnotationGlyph();
+                }
+
+                throw new ArgumentException($"{nameof(showTag)} does not have a thread or annotations");
             }
 
             throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
@@ -114,12 +87,14 @@ namespace GitHub.InlineReviews.Tags
 
             if (addTag != null)
             {
-                peekService.Show(textView, addTag);
+                var side = addTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, addTag.LineNumber);
                 return true;
             }
             else if (showTag != null)
             {
-                peekService.Show(textView, showTag);
+                var side = showTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, showTag.LineNumber);
                 return true;
             }
 

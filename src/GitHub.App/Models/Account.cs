@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
+using GitHub.Extensions;
 using GitHub.Primitives;
-using NullGuard;
 using Octokit;
 using ReactiveUI;
 
@@ -23,8 +23,11 @@ namespace GitHub.Models
             bool isEnterprise,
             int ownedPrivateRepositoryCount,
             long privateRepositoryInPlanCount,
+            string avatarUrl,
             IObservable<BitmapSource> bitmapSource)
         {
+            Guard.ArgumentNotEmptyString(login, nameof(login));
+
             Login = login;
             IsUser = isUser;
             IsEnterprise = isEnterprise;
@@ -32,6 +35,7 @@ namespace GitHub.Models
             PrivateReposInPlan = privateRepositoryInPlanCount;
             IsOnFreePlan = privateRepositoryInPlanCount == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            AvatarUrl = avatarUrl;
             this.bitmapSource = bitmapSource;
 
             bitmapSourceSubscription = bitmapSource
@@ -41,6 +45,8 @@ namespace GitHub.Models
 
         public Account(Octokit.Account account)
         {
+            Guard.ArgumentNotNull(account, nameof(account));
+
             Login = account.Login;
             IsUser = (account as User) != null;
             Uri htmlUrl;
@@ -50,6 +56,7 @@ namespace GitHub.Models
             OwnedPrivateRepos = account.OwnedPrivateRepos;
             IsOnFreePlan = PrivateReposInPlan == 0;
             HasMaximumPrivateRepositories = OwnedPrivateRepos >= PrivateReposInPlan;
+            AvatarUrl = account.AvatarUrl;
         }
 
         public Account(Octokit.Account account, IObservable<BitmapSource> bitmapSource)
@@ -73,15 +80,15 @@ namespace GitHub.Models
 
         public long PrivateReposInPlan { get; private set; }
 
-        [AllowNull]
+        public string AvatarUrl { get; set; }
+
         public BitmapSource Avatar
         {
-            [return: AllowNull]
             get { return avatar; }
             set { avatar = value; this.RaisePropertyChanged(); }
         }
 
-#region Equality things
+        #region Equality things
         public void CopyFrom(IAccount other)
         {
             if (!Equals(other))
@@ -103,7 +110,7 @@ namespace GitHub.Models
             }
         }
 
-        public override bool Equals([AllowNull]object obj)
+        public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))
                 return true;
@@ -113,47 +120,46 @@ namespace GitHub.Models
 
         public override int GetHashCode()
         {
-            return (Login?.GetHashCode() ?? 0) ^ IsUser .GetHashCode() ^ IsEnterprise.GetHashCode();
+            return (Login?.GetHashCode() ?? 0) ^ IsUser.GetHashCode() ^ IsEnterprise.GetHashCode();
         }
 
-        bool IEquatable<IAccount>.Equals([AllowNull]IAccount other)
+        bool IEquatable<IAccount>.Equals(IAccount other)
         {
             if (ReferenceEquals(this, other))
                 return true;
             return other != null && Login == other.Login && IsUser == other.IsUser && IsEnterprise == other.IsEnterprise;
         }
 
-        public int CompareTo([AllowNull]IAccount other)
+        public int CompareTo(IAccount other)
         {
             return other != null ? String.Compare(Login, other.Login, StringComparison.CurrentCulture) : 1;
         }
 
-        public static bool operator >([AllowNull]Account lhs, [AllowNull]Account rhs)
+        public static bool operator >(Account lhs, Account rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return lhs?.CompareTo(rhs) > 0;
         }
 
-        public static bool operator <([AllowNull]Account lhs, [AllowNull]Account rhs)
+        public static bool operator <(Account lhs, Account rhs)
         {
             if (ReferenceEquals(lhs, rhs))
                 return false;
             return (object)lhs == null || lhs.CompareTo(rhs) < 0;
         }
 
-        public static bool operator ==([AllowNull]Account lhs, [AllowNull]Account rhs)
+        public static bool operator ==(Account lhs, Account rhs)
         {
             return Equals(lhs, rhs) && ((object)lhs == null || lhs.CompareTo(rhs) == 0);
         }
 
-        public static bool operator !=([AllowNull]Account lhs, [AllowNull]Account rhs)
+        public static bool operator !=(Account lhs, Account rhs)
         {
             return !(lhs == rhs);
         }
         #endregion
 
-        [return: AllowNull]
         public override string ToString()
         {
             return Login;

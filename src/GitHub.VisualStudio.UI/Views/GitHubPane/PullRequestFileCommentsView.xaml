@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.Views.GitHubPane.PullRequestFileCommentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+
+    <d:DesignData.DataContext>
+        <Binding Path="FileComments">
+            <Binding.Source>
+                <ghfvs:PullRequestReviewViewModelDesigner/>
+            </Binding.Source>
+        </Binding>
+    </d:DesignData.DataContext>
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <CollectionViewSource x:Key="FileComments" Source="{Binding}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="RelativePath"/>
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <ListBox ItemsSource="{Binding Source={StaticResource FileComments}}"
+             Background="Transparent"
+             BorderThickness="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.GroupStyle>
+            <GroupStyle>
+                <GroupStyle.ContainerStyle>
+                    <Style TargetType="{x:Type GroupItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                    <Expander Background="{DynamicResource GitHubFileExpanderHeaderBackgroundBrush}"
+                                              Foreground="{DynamicResource VsBrush.WindowText}"
+                                              IsExpanded="True"
+                                              Padding="0 4 4 4">
+                                        <Expander.Header>
+                                            <DockPanel>
+                                                <ghfvs:OcticonImage DockPanel.Dock="Left" Icon="file_text" Margin="2 0"/>
+                                                <TextBlock DockPanel.Dock="Right" Text="{Binding Items.Count, Mode=OneWay}"/>
+                                                <ghfvs:OcticonImage DockPanel.Dock="Right" Icon="comment" Margin="2 0 2 -2"/>
+                                                <ghfvs:TrimmedPathTextBlock Grid.Column="1"
+                                                                            FontWeight="SemiBold"
+                                                                            Foreground="{DynamicResource VsBrush.WindowText}"
+                                                                            Text="{Binding Name}"
+                                                                            ToolTip="{Binding Name}"/>
+                                            </DockPanel>
+                                        </Expander.Header>
+                                        <ItemsControl ItemsSource="{Binding Items}"
+                                                      Grid.IsSharedSizeScope="True">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border BorderBrush="{DynamicResource GitHubFileExpanderHeaderBackgroundBrush}"
+                                                            BorderThickness="1 0 1 1">
+                                                        <ghfvs:GitHubActionLink Command="{Binding Open}"
+                                                                                Content="{Binding Body, Converter={ghfvs:TrimNewlinesConverter}, Mode=OneWay}"
+                                                                                Foreground="{DynamicResource GitHubVsToolWindowText}"
+                                                                                Margin="4"
+                                                                                TextTrimming="CharacterEllipsis"/>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Expander>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </GroupStyle.ContainerStyle>
+            </GroupStyle>
+        </ListBox.GroupStyle>
+    </ListBox>
+</UserControl>

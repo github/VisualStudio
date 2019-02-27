@@ -2,25 +2,28 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Language.Intellisense;
 using GitHub.InlineReviews.ViewModels;
+using GitHub.ViewModels;
+using System.Reactive;
 
 namespace GitHub.InlineReviews.Peek
 {
-    class InlineCommentPeekableItem : IPeekableItem
+    class InlineCommentPeekableItem : IPeekableItem, IClosable
     {
-        readonly InlineCommentPeekViewModel viewModel;
-
         public InlineCommentPeekableItem(InlineCommentPeekViewModel viewModel)
         {
-            this.viewModel = viewModel;
+            ViewModel = viewModel;
         }
 
         public string DisplayName => "GitHub Code Review";
+        public InlineCommentPeekViewModel ViewModel { get; }
 
         public IEnumerable<IPeekRelationship> Relationships => new[] { InlineCommentPeekRelationship.Instance };
 
+        public IObservable<Unit> Closed => ViewModel.Close;
+
         public IPeekResultSource GetOrCreateResultSource(string relationshipName)
         {
-            return new InlineCommentPeekableResultSource(viewModel);
+            return new InlineCommentPeekableResultSource(ViewModel);
         }
     }
 }

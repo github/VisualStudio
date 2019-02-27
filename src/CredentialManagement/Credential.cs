@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
-using NullGuard;
+using GitHub.Extensions;
 
 namespace GitHub.Authentication.CredentialManagement
 {
@@ -35,9 +35,9 @@ namespace GitHub.Authentication.CredentialManagement
         {}
 
         public Credential(
-            [AllowNull]string username,
-            [AllowNull]SecureString password,
-            [AllowNull]string target = null)
+            string username,
+            SecureString password,
+            string target = null)
         {
             Username = username;
             SecurePassword = password;
@@ -48,9 +48,9 @@ namespace GitHub.Authentication.CredentialManagement
         }
 
         public Credential(
-            [AllowNull]string username,
-            [AllowNull]string password,
-            [AllowNull]string target = null)
+            string username,
+            string password,
+            string target = null)
         {
             Username = username;
             Password = password;
@@ -58,6 +58,28 @@ namespace GitHub.Authentication.CredentialManagement
             Type = CredentialType.Generic;
             PersistenceType = PersistenceType.LocalComputer;
             _lastWriteTime = DateTime.MinValue;
+        }
+
+        public static Credential Load(string key)
+        {
+            var result = new Credential();
+            result.Target = key;
+            result.Type = CredentialType.Generic;
+            return result.Load() ? result : null;
+        }
+
+        public static void Save(string key, string username, string password)
+        {
+            var result = new Credential(username, password, key);
+            result.Save();
+        }
+
+        public static void Delete(string key)
+        {
+            var result = new Credential();
+            result.Target = key;
+            result.Type = CredentialType.Generic;
+            result.Delete();
         }
 
         bool disposed;
@@ -86,10 +108,8 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        [AllowNull]
         public string Username
         {
-            [return: AllowNull]
             get
             {
                 CheckNotDisposed();
@@ -102,10 +122,8 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        [AllowNull]
         public string Password
         {
-            [return: AllowNull]
             get
             {
                 return SecureStringHelper.CreateString(SecurePassword);
@@ -117,7 +135,6 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        [AllowNull]
         public SecureString SecurePassword
         {
             get
@@ -138,10 +155,8 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        [AllowNull]
         public string Target
         {
-            [return: AllowNull]
             get
             {
                 CheckNotDisposed();
@@ -154,10 +169,8 @@ namespace GitHub.Authentication.CredentialManagement
             }
         }
 
-        [AllowNull]
         public string Description
         {
-            [return: AllowNull]
             get
             {
                 CheckNotDisposed();
@@ -245,6 +258,8 @@ namespace GitHub.Authentication.CredentialManagement
 
         public bool Save(byte[] passwordBytes)
         {
+            Guard.ArgumentNotNull(passwordBytes, nameof(passwordBytes));
+
             CheckNotDisposed();
             _unmanagedCodePermission.Demand();
 
@@ -340,6 +355,8 @@ namespace GitHub.Authentication.CredentialManagement
 
         static void ValidatePasswordLength(byte[] passwordBytes)
         {
+            Guard.ArgumentNotNull(passwordBytes, nameof(passwordBytes));
+
             if (passwordBytes.Length > maxPasswordLengthInBytes)
             {
                 var message = string.Format(CultureInfo.InvariantCulture,

@@ -5,6 +5,10 @@ using Microsoft.VisualStudio.Text;
 
 namespace GitHub.InlineReviews.Glyph.Implementation
 {
+    /// <summary>
+    /// Information about the position of a glyph.
+    /// </summary>
+    /// <typeparam name="TGlyphTag">The type of glyph tag we're dealing with.</typeparam>
     internal class GlyphData<TGlyphTag>
     {
         double deltaY;

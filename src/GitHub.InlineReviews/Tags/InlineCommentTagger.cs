@@ -1,130 +1,156 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.InlineReviews.Services;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.InlineReviews.Margins;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Text.Tagging;
 using ReactiveUI;
-using System.Collections;
+using Serilog;
 
 namespace GitHub.InlineReviews.Tags
 {
     /// <summary>
     /// Creates tags in an <see cref="ITextBuffer"/> for inline comment threads.
     /// </summary>
-    sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IEditorContentSource, IDisposable
+    public sealed class InlineCommentTagger : ITagger<InlineCommentTag>, IDisposable
     {
-        readonly IGitService gitService;
-        readonly IGitClient gitClient;
-        readonly IDiffService diffService;
+        static readonly ILogger log = LogManager.ForContext<InlineCommentTagger>();
+        static readonly IReadOnlyList<ITagSpan<InlineCommentTag>> EmptyTags = new ITagSpan<InlineCommentTag>[0];
         readonly ITextBuffer buffer;
         readonly ITextView view;
         readonly IPullRequestSessionManager sessionManager;
-        readonly IInlineCommentPeekService peekService;
-        readonly Subject<ITextSnapshot> signalRebuild;
-        readonly Dictionary<IInlineCommentThreadModel, ITrackingPoint> trackingPoints;
-        readonly int? tabsToSpaces;
-        bool initialized;
-        ITextDocument document;
-        string fullPath;
+        bool needsInitialize = true;
         string relativePath;
-        bool leftHandSide;
-        IDisposable managerSubscription;
-        IDisposable sessionSubscription;
+        DiffSide side;
         IPullRequestSession session;
         IPullRequestSessionFile file;
+        IDisposable fileSubscription;
+        IDisposable sessionManagerSubscription;
+        IDisposable visibleSubscription;
 
         public InlineCommentTagger(
-            IGitService gitService,
-            IGitClient gitClient,
-            IDiffService diffService,
             ITextView view,
             ITextBuffer buffer,
-            IPullRequestSessionManager sessionManager,
-            IInlineCommentPeekService peekService)
+            IPullRequestSessionManager sessionManager)
         {
-            Guard.ArgumentNotNull(gitService, nameof(gitService));
-            Guard.ArgumentNotNull(gitClient, nameof(gitClient));
-            Guard.ArgumentNotNull(diffService, nameof(diffService));
             Guard.ArgumentNotNull(buffer, nameof(buffer));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
-            Guard.ArgumentNotNull(peekService, nameof(peekService));
 
-            this.gitService = gitService;
-            this.gitClient = gitClient;
-            this.diffService = diffService;
             this.buffer = buffer;
             this.view = view;
             this.sessionManager = sessionManager;
-            this.peekService = peekService;
-
-            trackingPoints = new Dictionary<IInlineCommentThreadModel, ITrackingPoint>();
-
-            if (view.Options.GetOptionValue("Tabs/ConvertTabsToSpaces", false))
-            {
-                tabsToSpaces = view.Options.GetOptionValue<int?>("Tabs/TabSize", null);
-            }
-
-            signalRebuild = new Subject<ITextSnapshot>();
-            signalRebuild.Throttle(TimeSpan.FromMilliseconds(500))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => Rebuild(x).Forget());
-
-            this.buffer.Changed += Buffer_Changed;
         }
 
-        public bool ShowMargin => file != null;
+        public bool ShowMargin => file?.Diff?.Count > 0;
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
         public void Dispose()
         {
-            sessionSubscription?.Dispose();
-            managerSubscription?.Dispose();
+            sessionManagerSubscription?.Dispose();
+            sessionManagerSubscription = null;
+            fileSubscription?.Dispose();
+            fileSubscription = null;
+            visibleSubscription?.Dispose();
+            visibleSubscription = null;
         }
 
         public IEnumerable<ITagSpan<InlineCommentTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
-            if (!initialized)
+            if (needsInitialize)
             {
                 // Sucessful initialization will call NotifyTagsChanged, causing this method to be re-called.
-                Initialize();
+                ForgetWithLogging(Initialize());
+                return EmptyTags;
             }
-            else if (file != null)
+            else if (file?.InlineCommentThreads != null)
             {
+                var result = new List<ITagSpan<InlineCommentTag>>();
+                var currentSession = session ?? sessionManager.CurrentSession;
+
+                if (currentSession == null)
+                    return EmptyTags;
+
                 foreach (var span in spans)
                 {
                     var startLine = span.Start.GetContainingLine().LineNumber;
                     var endLine = span.End.GetContainingLine().LineNumber;
-                    var linesWithComments = new BitArray((endLine - startLine) + 1);
+                    var linesWithTags = new BitArray((endLine - startLine) + 1);
                     var spanThreads = file.InlineCommentThreads.Where(x =>
                         x.LineNumber >= startLine &&
-                        x.LineNumber <= endLine);
+                        x.LineNumber <= endLine)
+                        .ToArray();
 
-                    foreach (var thread in spanThreads)
+                    var spanThreadsByLine = spanThreads.ToDictionary(model => model.LineNumber);
+
+                    Dictionary<int, InlineAnnotationModel[]> spanAnnotationsByLine = null;
+                    if (side == DiffSide.Right)
+                    {
+                        var spanAnnotations = file.InlineAnnotations?.Where(x =>
+                                x.EndLine - 1 >= startLine &&
+                                x.EndLine - 1 <= endLine);
+
+                        spanAnnotationsByLine = spanAnnotations?.GroupBy(model => model.EndLine)
+                            .ToDictionary(models => models.Key - 1, models => models.ToArray());
+                    }
+
+                    var lines = spanThreadsByLine.Keys.Union(spanAnnotationsByLine?.Keys ?? Enumerable.Empty<int>());
+                    foreach (var line in lines)
                     {
                         var snapshot = span.Snapshot;
-                        var line = snapshot.GetLineFromLineNumber(thread.LineNumber);
+                        var snapshotLine = snapshot.GetLineFromLineNumber(line);
 
-                        if ((leftHandSide && thread.DiffLineType == DiffChangeType.Delete) ||
-                            (!leftHandSide && thread.DiffLineType != DiffChangeType.Delete))
+                        if (spanThreadsByLine.TryGetValue(line, out var thread))
                         {
-                            var trackingPoint = snapshot.CreateTrackingPoint(line.Start, PointTrackingMode.Positive);
-                            trackingPoints[thread] = trackingPoint;
-                            linesWithComments[thread.LineNumber - startLine] = true;
+                            var isThreadDeleteSide = thread.DiffLineType == DiffChangeType.Delete;
+                            var sidesMatch = side == DiffSide.Left && isThreadDeleteSide || side == DiffSide.Right && !isThreadDeleteSide;
+                            if (!sidesMatch)
+                            {
+                                thread = null;
+                            }
+                        }
 
-                            yield return new TagSpan<ShowInlineCommentTag>(
-                                new SnapshotSpan(line.Start, line.End),
-                                new ShowInlineCommentTag(session, thread));
+                        InlineAnnotationModel[] annotations = null;
+                        spanAnnotationsByLine?.TryGetValue(line, out annotations);
+
+                        if (thread != null || annotations != null)
+                        {
+                            linesWithTags[line - startLine] = true;
+
+                            CheckAnnotationLevel? summaryAnnotationLevel = null;
+                            if (annotations != null)
+                            {
+                                var hasFailure = annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+                                if (hasFailure)
+                                {
+                                    summaryAnnotationLevel = CheckAnnotationLevel.Failure;
+                                }
+                                else
+                                { 
+                                    var hasWarning = annotations.Any(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                    summaryAnnotationLevel = hasWarning ? CheckAnnotationLevel.Warning : CheckAnnotationLevel.Notice;
+                                }
+                            }
+
+                            var showInlineTag = new ShowInlineCommentTag(currentSession, line, thread?.DiffLineType ?? DiffChangeType.Add)
+                            {
+                                Thread = thread,
+                                Annotations = annotations,
+                                SummaryAnnotationLevel = summaryAnnotationLevel,
+                            };
+
+                            result.Add(new TagSpan<ShowInlineCommentTag>(
+                                new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
+                                showInlineTag));
                         }
                     }
 
@@ -132,64 +158,106 @@ namespace GitHub.InlineReviews.Tags
                     {
                         foreach (var line in chunk.Lines)
                         {
-                            var lineNumber = (leftHandSide ? line.OldLineNumber : line.NewLineNumber) - 1;
+                            var lineNumber = (side == DiffSide.Left ? line.OldLineNumber : line.NewLineNumber) - 1;
 
-                            if (lineNumber >= startLine && 
-                                lineNumber <= endLine && 
-                                !linesWithComments[lineNumber - startLine]
-                                && (!leftHandSide || line.Type == DiffChangeType.Delete))
+                            if (lineNumber >= startLine &&
+                                lineNumber <= endLine &&
+                                !linesWithTags[lineNumber - startLine]
+                                && (side == DiffSide.Right || line.Type == DiffChangeType.Delete))
                             {
                                 var snapshotLine = span.Snapshot.GetLineFromLineNumber(lineNumber);
-                                yield return new TagSpan<InlineCommentTag>(
+                                result.Add(new TagSpan<InlineCommentTag>(
                                     new SnapshotSpan(snapshotLine.Start, snapshotLine.End),
-                                    new AddInlineCommentTag(session, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type));
+                                    new AddInlineCommentTag(currentSession, file.CommitSha, relativePath, line.DiffLineNumber, lineNumber, line.Type)));
                             }
                         }
                     }
                 }
+
+                return result;
+            }
+            else
+            {
+                return EmptyTags;
             }
         }
 
-        Task<byte[]> IEditorContentSource.GetContent()
+        async Task Initialize()
         {
-            return Task.FromResult(GetContents(buffer.CurrentSnapshot));
-        }
-
-        void Initialize()
-        {
-            document = buffer.Properties.GetProperty<ITextDocument>(typeof(ITextDocument));
-
-            if (document == null)
-                return;
+            needsInitialize = false;
 
             var bufferInfo = sessionManager.GetTextBufferInfo(buffer);
-            IPullRequestSession session = null;
 
             if (bufferInfo != null)
             {
-                fullPath = bufferInfo.FilePath;
-                leftHandSide = bufferInfo.IsLeftComparisonBuffer;
-
-                if (!bufferInfo.Session.IsCheckedOut)
-                {
-                    session = bufferInfo.Session;
-                }
+                var commitSha = bufferInfo.Side == DiffSide.Left ? "HEAD" : bufferInfo.CommitSha;
+                session = bufferInfo.Session;
+                relativePath = bufferInfo.RelativePath;
+                file = await session.GetFile(relativePath, commitSha);
+                fileSubscription = file.LinesChanged.Subscribe(LinesChanged);
+                side = bufferInfo.Side ?? DiffSide.Right;
+                NotifyTagsChanged();
             }
             else
             {
-                fullPath = document.FilePath;
+                side = DiffSide.Right;
+                await InitializeLiveFile();
+                sessionManagerSubscription = sessionManager
+                    .WhenAnyValue(x => x.CurrentSession)
+                    .Skip(1)
+                    .Subscribe(_ => ForgetWithLogging(InitializeLiveFile()));
             }
+        }
 
-            if (session == null)
+        async Task InitializeLiveFile()
+        {
+            fileSubscription?.Dispose();
+            fileSubscription = null;
+
+            relativePath = sessionManager.GetRelativePath(buffer);
+
+            if (relativePath != null)
             {
-                managerSubscription = sessionManager.WhenAnyValue(x => x.CurrentSession).Subscribe(SessionChanged);
+                file = await sessionManager.GetLiveFile(relativePath, view, buffer);
+
+                var options = view.Options;
+                visibleSubscription =
+                    Observable.FromEventPattern<EditorOptionChangedEventArgs>(options, nameof(options.OptionChanged))
+                    .Select(_ => Unit.Default)
+                    .StartWith(Unit.Default)
+                    .Select(x => options.GetOptionValue(InlineCommentTextViewOptions.MarginVisibleId))
+                    .DistinctUntilChanged()
+                    .Subscribe(VisibleChanged);
             }
             else
             {
-                SessionChanged(session);
+                file = null;
             }
 
-            initialized = true;
+            NotifyTagsChanged();
+        }
+
+        void VisibleChanged(bool enabled)
+        {
+            if (enabled)
+            {
+                fileSubscription = fileSubscription ?? file.LinesChanged.Subscribe(LinesChanged);
+            }
+            else
+            {
+                fileSubscription?.Dispose();
+                fileSubscription = null;
+            }
+        }
+
+        static void ForgetWithLogging(Task task)
+        {
+            task.Catch(e => log.Error(e, "Exception caught while executing background task")).Forget();
+        }
+
+        void LinesChanged(IReadOnlyList<Tuple<int, DiffSide>> lines)
+        {
+            NotifyTagsChanged(lines.Where(x => x.Item2 == side).Select(x => x.Item1));
         }
 
         void NotifyTagsChanged()
@@ -205,109 +273,11 @@ namespace GitHub.InlineReviews.Tags
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(span));
         }
 
-        async void SessionChanged(IPullRequestSession session)
+        void NotifyTagsChanged(IEnumerable<int> lineNumbers)
         {
-            sessionSubscription?.Dispose();
-            this.session = session;
-
-            if (file != null)
+            foreach (var lineNumber in lineNumbers)
             {
-                file = null;
-                NotifyTagsChanged();
-            }
-
-            if (session == null) return;
-
-            relativePath = session.GetRelativePath(fullPath);
-
-            if (relativePath == null) return;
-
-            var snapshot = buffer.CurrentSnapshot;
-
-            if (leftHandSide)
-            {
-                // If we're tagging the LHS of a diff, then the snapshot will be the base commit
-                // (as you'd expect) but that means that the diff will be empty, so get the RHS
-                // snapshot from the view for the comparison.
-                var projection = view.TextSnapshot as IProjectionSnapshot;
-                snapshot = projection?.SourceSnapshots.Count == 2 ? projection.SourceSnapshots[1] : null;
-            }
-
-            if (snapshot == null) return;
-
-            var repository = gitService.GetRepository(session.Repository.LocalPath);
-            file = await session.GetFile(relativePath, !leftHandSide ? this : null);
-
-            if (file == null) return;
-
-            sessionSubscription = file.WhenAnyValue(x => x.InlineCommentThreads)
-                .Subscribe(_ => NotifyTagsChanged());
-
-            NotifyTagsChanged();
-        }
-
-        void Buffer_Changed(object sender, TextContentChangedEventArgs e)
-        {
-            if (file != null)
-            {
-                var snapshot = buffer.CurrentSnapshot;
-
-                foreach (var thread in file.InlineCommentThreads)
-                {
-                    ITrackingPoint trackingPoint;
-
-                    if (trackingPoints.TryGetValue(thread, out trackingPoint))
-                    {
-                        var position = trackingPoint.GetPosition(snapshot);
-                        var lineNumber = snapshot.GetLineNumberFromPosition(position);
-
-                        if (lineNumber != thread.LineNumber)
-                        {
-                            thread.LineNumber = lineNumber;
-                            thread.IsStale = true;
-                            NotifyTagsChanged(thread.LineNumber);
-                        }
-                    }
-                }
-
-                signalRebuild.OnNext(buffer.CurrentSnapshot);
-            }
-        }
-
-        byte[] GetContents(ITextSnapshot snapshot)
-        {
-            var currentText = snapshot.GetText();
-
-            var content = document.Encoding.GetBytes(currentText);
-
-            var preamble = document.Encoding.GetPreamble();
-            if (preamble.Length == 0) return content;
-
-            var completeContent = new byte[preamble.Length + content.Length];
-            Buffer.BlockCopy(preamble, 0, completeContent, 0, preamble.Length);
-            Buffer.BlockCopy(content, 0, completeContent, preamble.Length, content.Length);
-
-            return completeContent;
-        }
-
-        async Task Rebuild(ITextSnapshot snapshot)
-        {
-            if (buffer.CurrentSnapshot == snapshot)
-            {
-                await session.UpdateEditorContent(relativePath);
-
-                foreach (var thread in file.InlineCommentThreads)
-                {
-                    if (thread.LineNumber == -1)
-                    {
-                        trackingPoints.Remove(thread);
-                    }
-                }
-
-                if (buffer.CurrentSnapshot == snapshot)
-                {
-                    NotifyTagsChanged();
-                }
+                NotifyTagsChanged(lineNumber);
             }
         }
     }

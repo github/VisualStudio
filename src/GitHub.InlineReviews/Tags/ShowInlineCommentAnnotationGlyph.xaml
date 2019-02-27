@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="GitHub.InlineReviews.Tags.ShowInlineCommentAnnotationGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:models="clr-namespace:GitHub.Models;assembly=GitHub.Exports"
+             mc:Ignorable="d">
+
+    <Grid>
+        <Border Background="{DynamicResource GitHubGlyphMarginCommentableBackground}" BorderThickness="0,0,1,0" />
+        <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center"  Margin="0,1,0,0">
+            <Canvas Width="16" Height="16">
+                <Canvas.Resources>
+                    <Style TargetType="Path">
+                        <Setter Property="Fill" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
+                        <Setter Property="Stroke" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
+                    </Style>
+                </Canvas.Resources>
+
+                <Ellipse Width="9"
+                         Height="9" 
+                         Canvas.Top="4"
+                         Canvas.Left="6"
+                         Fill="#959DA5"
+                         Stroke="White"
+                         StrokeThickness="1" />
+
+                <Rectangle Width="7"
+                         Height="7" 
+                         Canvas.Top="3.5"
+                         Canvas.Left="1"
+                         Stroke="White"
+                         StrokeThickness="1">
+                    <Rectangle.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="-45" />
+                        </TransformGroup>
+                    </Rectangle.LayoutTransform>
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerInfoFill}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
+                                             Value="{x:Static models:CheckAnnotationLevel.Failure}">
+                                    <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerFailureFill}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SummaryAnnotationLevel}" 
+                                             Value="{x:Static models:CheckAnnotationLevel.Warning}">
+                                    <Setter Property="Fill" Value="{DynamicResource GitHubAnnotationMarkerWarningFill}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+            </Canvas>
+        </Viewbox>
+    </Grid>
+</UserControl>

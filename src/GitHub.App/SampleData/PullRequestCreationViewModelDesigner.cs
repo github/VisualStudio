@@ -1,28 +1,35 @@
-using System.Diagnostics.CodeAnalysis;
-using GitHub.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Validation;
+using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
-using System;
-using System.Reactive;
 
 namespace GitHub.SampleData
 {
     [ExcludeFromCodeCoverage]
-    public class PullRequestCreationViewModelDesigner : DialogViewModelBase, IPullRequestCreationViewModel
+    public class PullRequestCreationViewModelDesigner : PanePageViewModelBase, IPullRequestCreationViewModel
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Branches = new List<IBranch>
+            var repositoryModel = new LocalRepositoryModel
             {
-                new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("don/stub-ui", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("feature/pr/views", new LocalRepositoryModel("http://github.com/user/repo")),
-                new BranchModel("release-1.0.17.0", new LocalRepositoryModel("http://github.com/user/repo")),
+                Name = "repo",
+                CloneUrl = "http://github.com/user/repo"
+            };
+
+            Branches = new List<BranchModel>
+            {
+                new BranchModel("master", repositoryModel),
+                new BranchModel("don/stub-ui", repositoryModel),
+                new BranchModel("feature/pr/views", repositoryModel),
+                new BranchModel("release-1.0.17.0", repositoryModel),
             }.AsReadOnly();
 
-            TargetBranch = new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo"));
+            TargetBranch = new BranchModel("master", repositoryModel);
             SourceBranch = Branches[2];
 
             SelectedAssignee = "Haacked (Phil Haack)";
@@ -33,14 +40,15 @@ namespace GitHub.SampleData
             };
         }
 
-        public IBranch SourceBranch { get; set; }
-        public IBranch TargetBranch { get; set; }
-        public IReadOnlyList<IBranch> Branches { get; set; }
+        public BranchModel SourceBranch { get; set; }
+        public BranchModel TargetBranch { get; set; }
+        public IReadOnlyList<BranchModel> Branches { get; set; }
 
         public string SelectedAssignee { get; set; }
         public List<string> Users { get; set; }
 
-        public IReactiveCommand<IPullRequestModel> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, IPullRequestModel> CreatePullRequest { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public string PRTitle { get; set; }
 
@@ -48,6 +56,6 @@ namespace GitHub.SampleData
 
         public ReactivePropertyValidator BranchValidator { get; }
 
-        public override IObservable<Unit> Done { get; }
+        public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
 }

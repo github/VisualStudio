@@ -1,0 +1,123 @@
+//******************************************
+// Copyright (c) 1997-2001  Microsoft Corporation
+//
+// Default TMF definitions
+// This file is handbuilt to reflect the hardware rlated descriptive trace 'events'
+// that are included with every trace log file.
+//******************************************
+
+// The #typev statement may be used to convert
+// messages into user readable forms.
+// Wherever possible parameters are processed as their native format
+// and the %x!x! style of FormatMessage should be used.
+// (The #type statement  is obsolete)
+//
+// Note Parameter %1 through %9 are predefined
+// Parameter		is					#typev
+// %1			GUID Friendly Name			string
+// %2			GUID SubType Name			string
+// %3			Thread ID				LONG
+// %4			System Time				String
+// %5			Kernel Time	or User Time		String
+// %6			User Time	or NULL			String
+// %7			Sequence Number				LONG
+// %8			Process Id          			LONG
+// %9			CPU Number				LONG
+// %10 and above are the user parameters
+// %254                 Is Reserved
+// %255 		Is reserved
+//
+// Note these parameters are always present, but may not be valid
+// depending on the source.
+//
+// User defined messages always start at message number 10
+// Messages 0 through 9 are reserved for system use.
+// Message number 255 is reserved.
+//
+// Available formats for user arguments are -
+//
+//Name		Description				Format
+//ItemChar						CHAR
+//ItemUChar						UCHAR
+//ItemCharShort						USHORT
+//ItemCharSign						SHORT
+//ItemShort	Signed Short				SHORT
+//ItemUShort	Unsigned Short				USHORT
+//ItemLong	Signed Long, decoded as decimal		LONG
+//ItemULong	Unsigned Long, decoded as decimal	ULONG
+//ItemULongX	Unsigned Long, seen as hexadecimal	ULONG
+//ItemLongLong	Signed 64 Bit value			LONGLONG
+//ItemULongLong	Unsigned 64 Bit value			ULONGLONG
+//ItemWString	Unicode String, null terminated		String
+//ItemPString	Counted Ascii String			String
+//ItemPWString	Counted Unicode String			String
+//ItemUnknown						String
+
+
+
+68fdd900-4a3e-11d1-84f4-0000f80464e3 EventTrace
+#typev Header    0      "EventTrace"
+{
+    BufferSize,     ItemULong                   //10
+    Version,        ItemULong                   //11
+    BuildNumber,    ItemULong                   //12
+    NumProc,        ItemULong                   //13
+    EndTime,        ItemULongLong               //14
+    TimerResolution,ItemULong                   //15
+    MaxFileSize,    ItemULong                   //16
+    LogFileMode,    ItemULongX                  //17
+    BuffersWritten, ItemULong                   //18
+    StartBuffers,   ItemULong                   //19
+    PointerSize,    ItemULong                   //20
+    EventsLost,     ItemULong                   //21
+    CPUSpeed,       ItemULong                   //22
+    LoggerName,     ItemPtr                     //23
+    LogFileName,    ItemPtr                     //24
+    TimeZone,       ItemCharHidden[176]         //25
+    BootTime,       ItemULongLong               //26
+    PerfFrequency,  ItemULongLong               //27
+    StartTime,      ItemULongLong               //28
+    ReservedFlags,  ItemULongX                  //29
+    BuffersLost,    ItemULong                   //30
+}
+
+01853a65-418f-4f36-aefc-dc0f1d2fd235 HWConfig
+#typev CPU 10           "%15!s! :: CPU # %11!d!, Speed %10!d!Mhz, Memory %12!d!K, PageSize %13!d!K, AllocationGranularity %14!d!"
+{
+    MHz, ItemULong                      // 10
+    NumberOfProcessors, ItemULong       // 11
+    MemSize, ItemULong                  // 12
+    PageSize, ItemULong                 // 13
+    AllocationGranularity, ItemULong    // 14
+    ComputerName, ItemWString           // 15
+}
+#typev PhyDisk 11 "Phsical Disk %10!d!(%19!s!), SectorSize: %11!d!, SectorsperTrack: %12!d!, TracksPerCylinder %13!d! Cylinders %14!d!, SCSI (Port=%15!d!, Path %16!d!, Target=%17!d!, Lun=%18!d!)"
+{
+    DiskNumber, ItemULong               // 10
+    BytesPerSector, ItemULong           // 11
+    SectorsPerTrack, ItemULong          // 12
+    TracksPerCylinder, ItemULong        // 13
+    Cylinders, ItemULongLong            // 14
+    SCSIPort, ItemULong                 // 15
+    SCSIPath, ItemULong                 // 16
+    SCSITarget, ItemULong               // 17
+    SCSILun, ItemULong                  // 18
+    Manufacturer, ItemWString           // 19
+}
+#typev LogDisk 12   "Logical Disk %10!d! StartOffset: %11!d!, Size: %12!d!"
+{
+    DiskNumber, ItemULong               // 10
+    Pad, ItemULong                      // 11
+    StartOffset, ItemULongLong          // 12
+    PartitionSize, ItemULongLong        // 13
+}
+#typev NIC 13   "NIC %10!s!"
+{
+    NICName, ItemWString                // 10
+}
+
+b4955bf0-3af1-4740-b475-99055d3fe9aa  CSharp
+#typev CSharp1 14  "%0:%10!s!"
+{
+    dummyarg,ItemWString
+}
