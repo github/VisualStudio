@@ -122,21 +122,19 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
-        [Test]
-        public async Task CleansDirectoryOnCloneFailed()
+        [TestCase("https://github.com/failing/url", @"c:\dev\bar")]
+        public async Task CleansDirectoryOnCloneFailed(string cloneUrl, string clonePath)
         {
             var serviceProvider = Substitutes.GetServiceProvider();
             var operatingSystem = serviceProvider.GetOperatingSystem();
             var vsGitServices = serviceProvider.GetVSGitServices();
             var cloneService = CreateRepositoryCloneService(serviceProvider);
 
-            Assert.ThrowsAsync<Exception>(async () => {
-                await cloneService.CloneRepository("https://github.com/failing/url", @"c:\dev\bar");
-            });
+            Assert.ThrowsAsync<Exception>(() => cloneService.CloneRepository(cloneUrl, clonePath));
 
-            operatingSystem.Directory.Received().CreateDirectory(@"c:\dev\bar");
-            operatingSystem.Directory.Received().DeleteDirectory(@"c:\dev\bar");
-            await vsGitServices.Received().Clone("https://github.com/failing/url", @"c:\dev\bar", true);
+            operatingSystem.Directory.Received().CreateDirectory(clonePath);
+            operatingSystem.Directory.Received().DeleteDirectory(clonePath);
+            await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
         }
 
         static RepositoryCloneService CreateRepositoryCloneService(IGitHubServiceProvider sp)
