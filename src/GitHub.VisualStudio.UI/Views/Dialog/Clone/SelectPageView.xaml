@@ -23,7 +23,7 @@
     <DockPanel>
         <ghfvs:PromptTextBox DockPanel.Dock="Top"
                              Margin="0,4"
-                             PromptText="Filter"
+                             PromptText="Search or enter a URL"
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
 
         <Grid>

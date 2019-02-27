@@ -74,11 +74,6 @@ namespace GitHub.Services
                     Direction = OrderDirection.Desc
                 };
 
-                var affiliation = new RepositoryAffiliation?[]
-                {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
-                };
-
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
                     "repository",
                     repo => new RepositoryListItemModel
@@ -95,7 +90,7 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, affiliation, null, null, order, affiliation, null)
+                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
                         ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
@@ -119,7 +114,8 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public async Task CloneOrOpenRepository(
             CloneDialogResult cloneDialogResult,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
 
@@ -152,7 +148,7 @@ namespace GitHub.Services
             else
             {
                 var cloneUrl = repositoryUrl.ToString();
-                await CloneRepository(cloneUrl, repositoryPath, progress).ConfigureAwait(true);
+                await CloneRepository(cloneUrl, repositoryPath, progress, cancellationToken).ConfigureAwait(true);
 
                 if (isDotCom)
                 {
@@ -202,7 +198,8 @@ namespace GitHub.Services
         public async Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
@@ -215,7 +212,7 @@ namespace GitHub.Services
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
                 if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))

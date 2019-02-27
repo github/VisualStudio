@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 
@@ -20,13 +21,15 @@ namespace GitHub.Services
         /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
         /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
         /// </param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         /// <seealso cref="System.IProgress{T}"/>
         /// <seealso cref="Microsoft.VisualStudio.Shell.ServiceProgressData"/>
         Task Clone(
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null);
+            object progress = null,
+            CancellationToken? cancellationToken = null);
 
         string GetActiveRepoPath();
         LibGit2Sharp.IRepository GetActiveRepo();

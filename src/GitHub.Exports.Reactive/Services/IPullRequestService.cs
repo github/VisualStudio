@@ -9,7 +9,7 @@ using LibGit2Sharp;
 
 namespace GitHub.Services
 {
-    public interface IPullRequestService
+    public interface IPullRequestService : IIssueishService
     {
         /// <summary>
         /// Reads a page of pull request items.
@@ -26,7 +26,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states);
+            PullRequestState[] states);
 
         /// <summary>
         /// Clears the cache for <see cref="ReadPullRequests"/>.
@@ -77,6 +77,15 @@ namespace GitHub.Services
         /// <param name="localBranchName">The name of the local branch.</param>
         /// <returns></returns>
         IObservable<Unit> Checkout(LocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName);
+
+        /// <summary>
+        /// Checks if a commit is available and if not tries to fetch the commit.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepository">The remote repository.</param>
+        /// <param name="sha">The SHA of the commit.</param>
+        /// <returns>True if the commit was found, otherwise false.</returns>
+        Task<bool> FetchCommit(LocalRepositoryModel localRepository, RepositoryModel remoteRepository, string sha);
 
         /// <summary>
         /// Carries out a pull on the current branch.

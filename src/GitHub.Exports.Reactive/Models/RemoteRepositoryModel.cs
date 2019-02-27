@@ -28,7 +28,6 @@ namespace GitHub.Models
             : base(name, cloneUrl)
         {
             Guard.ArgumentNotEmptyString(name, nameof(name));
-            Guard.ArgumentNotNull(ownerAccount, nameof(ownerAccount));
 
             Id = id;
             OwnerAccount = ownerAccount;
