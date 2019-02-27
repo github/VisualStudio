@@ -1,206 +1,206 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="it-IT" original="../GitHub.VisualStudio.vsct">
+  <file datatype="xml" source-language="en" target-language="it" original="../GitHub.VisualStudio.vsct">
     <body>
-      <trans-unit id="addConnectionCommand|ButtonText">
+      <trans-unit id="addConnectionCommand|ButtonText" approved="yes">
         <source>&amp;Connect to GitHub</source>
-        <target xml:lang="de" state="translated">&amp;Connetti a GitHub</target>
-        <note />
+        <target state="translated">&amp;Connetti a GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="addConnectionCommand|LocCanonicalName">
         <source>.GitHub.ConnectToGitHub</source>
-        <target xml:lang="de" state="translated">.GitHub.ConnectToGitHub</target>
-        <note />
+        <target state="needs-translation">.GitHub.ConnectToGitHub</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="backCommand|ButtonText">
+      <trans-unit id="backCommand|ButtonText" approved="yes">
         <source>Back</source>
-        <target xml:lang="de" state="translated">Indietro</target>
-        <note />
+        <target state="translated">Indietro</target>
+        <note/>
       </trans-unit>
       <trans-unit id="backCommand|LocCanonicalName">
         <source>.GitHub.Back</source>
-        <target xml:lang="de" state="translated">.GitHub.Back</target>
-        <note />
+        <target state="needs-translation">.GitHub.Back</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="copyLinkCommand|ButtonText">
+      <trans-unit id="copyLinkCommand|ButtonText" approved="yes">
         <source>Copy link to clipboard</source>
-        <target xml:lang="de" state="translated">Copia il collegamento negli Appunti</target>
-        <note />
+        <target state="translated">Copia il collegamento negli Appunti</target>
+        <note/>
       </trans-unit>
       <trans-unit id="copyLinkCommand|LocCanonicalName">
         <source>.GitHub.CopyLink</source>
-        <target xml:lang="de" state="translated">.GitHub.CopyLink</target>
-        <note />
+        <target state="needs-translation">.GitHub.CopyLink</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="forwardCommand|ButtonText">
+      <trans-unit id="forwardCommand|ButtonText" approved="yes">
         <source>Forward</source>
-        <target xml:lang="de" state="translated">Avanti</target>
-        <note />
+        <target state="translated">Avanti</target>
+        <note/>
       </trans-unit>
       <trans-unit id="forwardCommand|LocCanonicalName">
         <source>.GitHub.Forward</source>
-        <target xml:lang="de" state="translated">.GitHub.Forward</target>
-        <note />
+        <target state="needs-translation">.GitHub.Forward</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="githubCommand|ButtonText">
+      <trans-unit id="githubCommand|ButtonText" approved="yes">
         <source>View on GitHub</source>
-        <target xml:lang="de" state="translated">Visualizza in GitHub</target>
-        <note />
+        <target state="translated">Visualizza in GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="githubCommand|LocCanonicalName">
         <source>.GitHub.ViewOnGitHub</source>
-        <target xml:lang="de" state="translated">.GitHub.ViewOnGitHub</target>
-        <note />
+        <target state="needs-translation">.GitHub.ViewOnGitHub</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText" approved="yes">
         <source>Go To Solution/PR File</source>
-        <target xml:lang="de" state="translated">Passa a soluzione/file di richiesta pull</target>
-        <note />
+        <target state="translated">Passa a soluzione/file di richiesta pull</target>
+        <note/>
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
         <source>.GitHub.GoToSolutionOrPRFile</source>
-        <target xml:lang="de" state="translated">.GitHub.GoToSolutionOrPRFile</target>
-        <note />
+        <target state="needs-translation">.GitHub.GoToSolutionOrPRFile</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="helpCommand|ButtonText">
+      <trans-unit id="helpCommand|ButtonText" approved="yes">
         <source>Help</source>
-        <target xml:lang="de" state="translated">?</target>
-        <note />
+        <target state="translated">?</target>
+        <note/>
       </trans-unit>
       <trans-unit id="helpCommand|LocCanonicalName">
         <source>.GitHub.Help</source>
-        <target xml:lang="de" state="translated">.GitHub.Help</target>
-        <note />
+        <target state="needs-translation">.GitHub.Help</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="idBlameCommand|ButtonText">
+      <trans-unit id="idBlameCommand|ButtonText" approved="yes">
         <source>Blame</source>
-        <target xml:lang="de" state="translated">Segnala errore</target>
-        <note />
+        <target state="translated">Segnala errore</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idBlameCommand|LocCanonicalName">
         <source>.GitHub.Blame</source>
-        <target xml:lang="de" state="translated">.GitHub.Blame</target>
-        <note />
+        <target state="needs-translation">.GitHub.Blame</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="idCreateGistCommand|ButtonText">
+      <trans-unit id="idCreateGistCommand|ButtonText" approved="yes">
         <source>Create a GitHub Gist</source>
-        <target xml:lang="de" state="translated">Crea un gist GitHub</target>
-        <note />
+        <target state="translated">Crea un gist GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idCreateGistCommand|LocCanonicalName">
         <source>.GitHub.CreateGist</source>
-        <target xml:lang="de" state="translated">.GitHub.CreateGist</target>
-        <note />
+        <target state="needs-translation">.GitHub.CreateGist</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
+      <trans-unit id="idCreateGistEnterpriseCommand|ButtonText" approved="yes">
         <source>Create an Enterprise Gist</source>
-        <target xml:lang="de" state="translated">Crea un gist Enterprise</target>
-        <note />
+        <target state="translated">Crea un gist Enterprise</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
         <source>.GitHub.CreateGistEnterprise</source>
-        <target xml:lang="de" state="translated">.GitHub.CreateGistEnterprise</target>
-        <note />
+        <target state="needs-translation">.GitHub.CreateGistEnterprise</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idGitHubContextMenu|ButtonText">
         <source>GitHub</source>
-        <target xml:lang="de" state="translated">GitHub</target>
-        <note />
+        <target state="needs-translation">GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idGitHubContextMenu|CommandName">
         <source>GitHub</source>
-        <target xml:lang="de" state="translated">GitHub</target>
-        <note />
+        <target state="needs-translation">GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idGitHubToolbar|ButtonText">
         <source>WindowToolBar</source>
-        <target xml:lang="de" state="translated">WindowToolBar</target>
-        <note />
+        <target state="needs-translation">WindowToolBar</target>
+        <note/>
       </trans-unit>
       <trans-unit id="idGitHubToolbar|CommandName">
         <source>Window Toolbar</source>
-        <target xml:lang="de" state="translated">Barra degli strumenti finestra</target>
-        <note />
+        <target state="needs-translation">Window Toolbar</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="openFromClipboardCommand|ButtonText">
+      <trans-unit id="openFromClipboardCommand|ButtonText" approved="yes">
         <source>Open from clipboard</source>
-        <target xml:lang="de" state="translated">Apri dagli Appunti</target>
-        <note />
+        <target state="translated">Apri dagli Appunti</target>
+        <note/>
       </trans-unit>
       <trans-unit id="openFromClipboardCommand|LocCanonicalName">
         <source>.GitHub.OpenFromClipboard</source>
-        <target xml:lang="de" state="translated">.GitHub.OpenFromClipboard</target>
-        <note />
+        <target state="needs-translation">.GitHub.OpenFromClipboard</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="openFromUrlCommand|ButtonText">
+      <trans-unit id="openFromUrlCommand|ButtonText" approved="yes">
         <source>Open from GitHub...</source>
-        <target xml:lang="de" state="translated">Apri da GitHub...</target>
-        <note />
+        <target state="translated">Apri da GitHub...</target>
+        <note/>
       </trans-unit>
       <trans-unit id="openFromUrlCommand|LocCanonicalName">
         <source>.GitHub.OpenFromUrl</source>
-        <target xml:lang="de" state="translated">.GitHub.OpenFromUrl</target>
-        <note />
+        <target state="needs-translation">.GitHub.OpenFromUrl</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="openLinkCommand|ButtonText">
+      <trans-unit id="openLinkCommand|ButtonText" approved="yes">
         <source>Open on GitHub</source>
-        <target xml:lang="de" state="translated">Apri in GitHub</target>
-        <note />
+        <target state="translated">Apri in GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="openLinkCommand|LocCanonicalName">
         <source>.GitHub.OpenLink</source>
-        <target xml:lang="de" state="translated">.GitHub.OpenLink</target>
-        <note />
+        <target state="needs-translation">.GitHub.OpenLink</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="pullRequestCommand|ButtonText">
+      <trans-unit id="pullRequestCommand|ButtonText" approved="yes">
         <source>Pull Requests</source>
-        <target xml:lang="de" state="translated">Richieste pull</target>
-        <note />
+        <target state="translated">Richieste pull</target>
+        <note/>
       </trans-unit>
       <trans-unit id="pullRequestCommand|LocCanonicalName">
         <source>.GitHub.PullRequests</source>
-        <target xml:lang="de" state="translated">.GitHub.PullRequests</target>
-        <note />
+        <target state="needs-translation">.GitHub.PullRequests</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="refreshCommand|ButtonText">
+      <trans-unit id="refreshCommand|ButtonText" approved="yes">
         <source>Refresh</source>
-        <target xml:lang="de" state="translated">Aggiorna</target>
-        <note />
+        <target state="translated">Aggiorna</target>
+        <note/>
       </trans-unit>
       <trans-unit id="refreshCommand|LocCanonicalName">
         <source>.GitHub.Refresh</source>
-        <target xml:lang="de" state="translated">.GitHub.Refresh</target>
-        <note />
+        <target state="needs-translation">.GitHub.Refresh</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="showCurrentPullRequestCommand|ButtonText">
+      <trans-unit id="showCurrentPullRequestCommand|ButtonText" approved="yes">
         <source>Show Current Pull Request</source>
-        <target xml:lang="de" state="translated">Mostra la richiesta pull corrente</target>
-        <note />
+        <target state="translated">Mostra la richiesta pull corrente</target>
+        <note/>
       </trans-unit>
       <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
         <source>.GitHub.ShowCurrentPullRequest</source>
-        <target xml:lang="de" state="translated">.GitHub.ShowCurrentPullRequest</target>
-        <note />
+        <target state="needs-translation">.GitHub.ShowCurrentPullRequest</target>
+        <note/>
       </trans-unit>
       <trans-unit id="showGitHubPaneCommand|ButtonText">
         <source>GitHub</source>
-        <target xml:lang="de" state="translated">GitHub</target>
-        <note />
+        <target state="needs-translation">GitHub</target>
+        <note/>
       </trans-unit>
       <trans-unit id="showGitHubPaneCommand|LocCanonicalName">
         <source>.GitHub.ShowGitHubPane</source>
-        <target xml:lang="de" state="translated">.GitHub.ShowGitHubPane</target>
-        <note />
+        <target state="needs-translation">.GitHub.ShowGitHubPane</target>
+        <note/>
       </trans-unit>
-      <trans-unit id="syncSubmodulesCommand|ButtonText">
+      <trans-unit id="syncSubmodulesCommand|ButtonText" approved="yes">
         <source>Sync Submodules</source>
-        <target xml:lang="de" state="translated">Sincronizza moduli secondari</target>
-        <note />
+        <target state="translated">Sincronizza moduli secondari</target>
+        <note/>
       </trans-unit>
       <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
         <source>.GitHub.SyncSubmodules</source>
-        <target xml:lang="de" state="translated">.GitHub.SyncSubmodules</target>
-        <note />
+        <target state="needs-translation">.GitHub.SyncSubmodules</target>
+        <note/>
       </trans-unit>
     </body>
   </file>
