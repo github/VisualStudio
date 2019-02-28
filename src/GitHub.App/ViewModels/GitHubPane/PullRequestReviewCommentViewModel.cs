@@ -3,9 +3,11 @@ using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using Serilog;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -14,6 +16,8 @@ namespace GitHub.ViewModels.GitHubPane
     /// </summary>
     public class PullRequestReviewCommentViewModel : IPullRequestReviewFileCommentViewModel
     {
+        static readonly ILogger log = LogManager.ForContext<PullRequestReviewCommentViewModel>();
+
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSession session;
         readonly PullRequestReviewCommentModel model;
@@ -62,9 +66,10 @@ namespace GitHub.ViewModels.GitHubPane
                         var file = await session.GetFile(RelativePath, model.Thread.CommitSha);
                         thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
 
-                        // Fall back to opening outdated file if we can't find a line number for the comment
                         if(thread?.LineNumber == -1)
                         {
+                            log.Warning("Couldn't find line number for comment on {RelativePath} @ {CommitSha}", RelativePath, model.Thread.CommitSha);
+                            // Fall back to opening outdated file if we can't find a line number for the comment
                             file = await session.GetFile(RelativePath, model.Thread.OriginalCommitSha);
                             thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
                         }
@@ -76,9 +81,9 @@ namespace GitHub.ViewModels.GitHubPane
                     await editorService.OpenDiff(session, RelativePath, thread);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // TODO: Show error.
+                log.Error(e, nameof(DoOpen));
             }
         }
     }
