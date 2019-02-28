@@ -410,7 +410,7 @@ namespace GitHub.InlineReviews.Services
                 async () => await apiClient.GetPullRequestFiles(owner, name, number).ToList());
 
             var lastCommitModel = await log.TimeAsync(nameof(GetPullRequestLastCommitAdapter),
-                () => GetPullRequestLastCommitAdapter(address, owner, name, number));
+                () => GetPullRequestLastCommitAdapter(address, owner, name, number, refresh));
 
             result.Statuses = (IReadOnlyList<StatusModel>)lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
 
@@ -820,7 +820,7 @@ namespace GitHub.InlineReviews.Services
             return Task.Run(() => gitService.GetRepository(repository.LocalPath));
         }
 
-        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number)
+        async Task<LastCommitAdapter> GetPullRequestLastCommitAdapter(HostAddress address, string owner, string name, int number, bool refresh)
         {
             ICompiledQuery<IEnumerable<LastCommitAdapter>> query;
             if (address.IsGitHubDotCom())
@@ -911,7 +911,7 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(query, vars);
+            var result = await connection.Run(query, vars, refresh);
             return result.First();
         }
 
