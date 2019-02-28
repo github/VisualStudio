@@ -52,7 +52,8 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (thread == null)
                 {
-                    var file = await session.GetFile(RelativePath, model.Thread.CommitSha);
+                    var sha = model.Thread.IsOutdated ? model.Thread.OriginalCommitSha : model.Thread.CommitSha;
+                    var file = await session.GetFile(RelativePath, sha);
                     thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
                 }
 
