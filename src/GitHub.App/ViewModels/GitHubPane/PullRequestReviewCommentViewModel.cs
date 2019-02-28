@@ -52,9 +52,23 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (thread == null)
                 {
-                    var sha = model.Thread.IsOutdated ? model.Thread.OriginalCommitSha : model.Thread.CommitSha;
-                    var file = await session.GetFile(RelativePath, sha);
-                    thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
+                    if(model.Thread.IsOutdated)
+                    {
+                        var file = await session.GetFile(RelativePath, model.Thread.OriginalCommitSha);
+                        thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
+                    }
+                    else
+                    {
+                        var file = await session.GetFile(RelativePath, model.Thread.CommitSha);
+                        thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
+
+                        // Fall back to opening outdated file if we can't find a line number for the comment
+                        if(thread?.LineNumber == -1)
+                        {
+                            file = await session.GetFile(RelativePath, model.Thread.OriginalCommitSha);
+                            thread = file.InlineCommentThreads.FirstOrDefault(t => t.Comments.Any(c => c.Comment.Id == model.Id));
+                        }
+                    }
                 }
 
                 if (thread != null && thread.LineNumber != -1)
