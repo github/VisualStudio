@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask
+    TaskName="GenerateVersion"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+
+    <ParameterGroup>
+      <SolutionInfoFile ParameterType="System.String" Required="true" />
+      <GeneratedVersion ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            var str = File.ReadAllText(this.SolutionInfoFile);
+            var regex = new Regex(@"Version = ""([\d]+\.[\d]+\.[\d]+.[\d]+)""");
+            var v = Version.Parse(regex.Match(str).Groups[1].Value);
+            this.GeneratedVersion = String.Format("{0}.{1}.{2}.{3}", v.Major, v.Minor, v.Build, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+	<Target Name="GenerateVersionFile"
+      Condition="$(SkipPackage) != 'Skip'"
+      AfterTargets="CoreCompile"
+      Inputs="$(SolutionDir)\src\common\SolutionInfo.cs"
+      Outputs="$(SolutionDir)\build\version">
+    <GenerateVersion SolutionInfoFile="$(SolutionDir)\src\common\SolutionInfo.cs">
+      <Output TaskParameter="GeneratedVersion" PropertyName="GeneratedVersion" />
+    </GenerateVersion>
+
+    <Message Text="Generating file '$(SolutionDir)\build\version' with version '$(GeneratedVersion)'" />
+
+    <WriteLinesToFile File="$(SolutionDir)\build\version" Lines="$(GeneratedVersion)" Overwrite="True" />
+	</Target>
+
+  <Target Name="GetBuildVersion" Returns="$(BuildVersion)" DependsOnTargets="GenerateVersionFile">
+    <ReadLinesFromFile File="$(SolutionDir)\build\version">
+      <Output TaskParameter="Lines" PropertyName="BuildVersion" />
+    </ReadLinesFromFile>
+  </Target>
+</Project>
