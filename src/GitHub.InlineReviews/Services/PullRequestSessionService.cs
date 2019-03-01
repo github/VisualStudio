@@ -327,19 +327,9 @@ namespace GitHub.InlineReviews.Services
                             DatabaseId = comment.DatabaseId.Value,
                             Url = comment.Url,
                         }).ToList(),
-                        Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
+                        Threads = pr.ReviewThreads(null, null, null, null).AllPages().Select(thread => new PullRequestReviewThreadModel
                         {
-                            Id = review.Id.Value,
-                            Body = review.Body,
-                            CommitId = review.Commit.Oid,
-                            State = review.State.FromGraphQl(),
-                            SubmittedAt = review.SubmittedAt,
-                            Author = new ActorModel
-                            {
-                                Login = review.Author.Login,
-                                AvatarUrl = review.Author.AvatarUrl(null),
-                            },
-                            Comments = review.Comments(null, null, null, null).AllPages().Select(comment => new CommentAdapter
+                            Comments = thread.Comments(null, null, null, null).AllPages().Select(comment => new CommentAdapter
                             {
                                 Id = comment.Id.Value,
                                 PullRequestId = comment.PullRequest.Number,
@@ -357,9 +347,23 @@ namespace GitHub.InlineReviews.Services
                                 OriginalPosition = comment.OriginalPosition,
                                 OriginalCommitId = comment.OriginalCommit.Oid,
                                 ReplyTo = comment.ReplyTo != null ? comment.ReplyTo.Id.Value : null,
+                                PullRequestReviewId = comment.PullRequestReview != null ? comment.PullRequestReview.Id.Value : null,
                                 CreatedAt = comment.CreatedAt,
-                                Url = comment.Url,
-                            }).ToList(),
+                                Url = comment.Url
+                            }).ToList()
+                        }).ToList(),
+                        Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
+                        {
+                            Id = review.Id.Value,
+                            Body = review.Body,
+                            CommitId = review.Commit.Oid,
+                            State = review.State.FromGraphQl(),
+                            SubmittedAt = review.SubmittedAt,
+                            Author = new ActorModel
+                            {
+                                Login = review.Author.Login,
+                                AvatarUrl = review.Author.AvatarUrl(null)
+                            }
                         }).ToList(),
                         Timeline = pr.Timeline(null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
                             when.Commit(commit => new CommitModel
@@ -912,61 +916,34 @@ namespace GitHub.InlineReviews.Services
 
         static void BuildPullRequestThreads(PullRequestDetailModel model)
         {
-            var commentsByReplyId = new Dictionary<string, List<CommentAdapter>>();
-
-            // Get all comments that are not replies.
-            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments))
+            foreach (var thread in model.Threads)
             {
-                if (comment.ReplyTo == null)
+                if (thread.Comments.Count > 0 && thread.Comments[0] is CommentAdapter adapter)
                 {
-                    commentsByReplyId.Add(comment.Id, new List<CommentAdapter> { comment });
-                }
-            }
+                    thread.CommitSha = adapter.CommitSha;
+                    thread.DiffHunk = adapter.DiffHunk;
+                    thread.Id = adapter.Id;
+                    thread.IsOutdated = adapter.Position == null;
+                    thread.OriginalCommitSha = adapter.OriginalCommitId;
+                    thread.OriginalPosition = adapter.OriginalPosition;
+                    thread.Path = adapter.Path;
+                    thread.Position = adapter.Position;
 
-            // Get the comments that are replies and place them into the relevant list.
-            foreach (CommentAdapter comment in model.Reviews.SelectMany(x => x.Comments).OrderBy(x => x.CreatedAt))
-            {
-                if (comment.ReplyTo != null)
-                {
-                    List<CommentAdapter> thread = null;
-
-                    if (commentsByReplyId.TryGetValue(comment.ReplyTo, out thread))
+                    foreach (var comment in thread.Comments)
                     {
-                        thread.Add(comment);
+                        comment.Thread = thread;
                     }
                 }
             }
 
-            // Build a collection of threads for the information collected above.
-            var threads = new List<PullRequestReviewThreadModel>();
-
-            foreach (var threadSource in commentsByReplyId)
+            foreach(var review in  model.Reviews)
             {
-                var adapter = threadSource.Value[0];
-
-                var thread = new PullRequestReviewThreadModel
-                {
-                    Comments = threadSource.Value,
-                    CommitSha = adapter.CommitSha,
-                    DiffHunk = adapter.DiffHunk,
-                    Id = adapter.Id,
-                    IsOutdated = adapter.Position == null,
-                    OriginalCommitSha = adapter.OriginalCommitId,
-                    OriginalPosition = adapter.OriginalPosition,
-                    Path = adapter.Path,
-                    Position = adapter.Position,
-                };
-
-                // Set a reference to the thread in the comment.
-                foreach (var comment in threadSource.Value)
-                {
-                    comment.Thread = thread;
-                }
-
-                threads.Add(thread);
+                review.Comments = model.Threads
+                    .SelectMany(t => t.Comments)
+                    .Cast<CommentAdapter>()
+                    .Where(c => c.PullRequestReviewId == review.Id)
+                    .ToList();
             }
-
-            model.Threads = threads;
         }
 
         static Octokit.GraphQL.Model.PullRequestReviewEvent ToGraphQl(Octokit.PullRequestReviewEvent e)
@@ -993,6 +970,7 @@ namespace GitHub.InlineReviews.Services
             public int OriginalPosition { get; set; }
             public string OriginalCommitId { get; set; }
             public string ReplyTo { get; set; }
+            public string PullRequestReviewId { get; set; }
         }
 
         class LastCommitAdapter
