@@ -277,7 +277,7 @@
     <value>推送至 {0} 分支 {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>遠端</value>
+    <value>遠端存放庫</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>重新命名</value>
@@ -490,7 +490,7 @@ https://git-scm.com/download/win</value>
     <value>儲存機制名稱</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>此存放庫沒有遠端。請填寫表單以將其發佈至 GitHub。</value>
+    <value>此存放庫沒有遠端存放庫。請填寫表單以將其發佈至 GitHub。</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>發行</value>
@@ -508,7 +508,7 @@ https://git-scm.com/download/win</value>
     <value>名稱</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>私用存放庫</value>
+    <value>私人存放庫</value>
   </data>
   <data name="localPathText" xml:space="preserve">
     <value>本機路徑</value>
@@ -837,10 +837,10 @@ https://git-scm.com/download/win</value>
     <value>找不到存放庫的 GitHub URL</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>存放庫必須定義名為 "origin" 的遠端，才能尋找其 GitHub URL。</value>
+    <value>存放庫必須定義名為 "origin" 的遠端存放庫，才能尋找其 GitHub URL。</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>請將其中一個現有的遠端重新命名為 'origin'，或新增名為 'origin' 的遠端並擷取。此作業可從命令列或按一下下方的按鈕完成。</value>
+    <value>請將其中一個現有的遠端存放庫重新命名為 'origin'，或新增名為 'origin' 的遠端並擷取。此作業可從命令列或按一下下方的按鈕完成。</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>找不到存放庫中對應 '{0}' 的檔案。請執行 'git fetch' 或簽出目標提取要求。</value>
@@ -849,33 +849,33 @@ https://git-scm.com/download/win</value>
     <value>{0} 最近一次推送</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>註解</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
+    <value>關閉提取要求</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
+    <value>關閉問題</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
+    <value>關閉並加上註解</value>
   </data>
   <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
+    <value>重新開啟並加上註解</value>
   </data>
   <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
+    <value>重新開啟問題</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
+    <value>重新開啟提取要求</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
+    <value>{0} 項認可</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
+    <value>已新增一些認可</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>及其他</value>
   </data>
 </root>

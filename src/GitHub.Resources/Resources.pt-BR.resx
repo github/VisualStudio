@@ -256,19 +256,19 @@
     <value>Você deve efetuar pull antes de poder enviar por push</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>Não há confirmações para efetuar pull</value>
+    <value>Não há commits dos quais efetuar pull</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>Não há confirmações para enviar por push</value>
+    <value>Não há commits a serem enviados por push</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*Nenhuma descrição fornecida.*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>Finalizar compra {0}</value>
+    <value>Fazer check-out de {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>Finalizar compra para {0}</value>
+    <value>Fazer check-out para {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
     <value>Efetuar pull de {0} branch {1}</value>
@@ -286,7 +286,7 @@
     <value>O repositório de origem não está mais disponível.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Não é possível finalizar compra, pois o seu diretório de trabalho tem alterações não confirmadas.</value>
+    <value>Não é possível fazer check-out, pois o seu diretório de trabalho tem alterações cujo commit não foi feito.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Sincronizar {0} submódulos</value>
@@ -313,10 +313,10 @@ https://git-scm.com/download/win</value>
     <value>Pressione Enter para navegar para o Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>Finalizar compra de branch PR antes de navegar para o Editor</value>
+    <value>Fazer check-out do branch de PR antes de navegar para o Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Pressione Enter para navegar para o Editor (é necessário fazer o check-out do branch PR)</value>
+    <value>Pressione Enter para navegar para o Editor (é necessário fazer o check-out do branch de PR)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
     <value>Repositório de Bifurcação</value>
@@ -535,7 +535,7 @@ https://git-scm.com/download/win</value>
     <value>Endereço do servidor do GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>O host não está disponível ou não é um servidor do GitHub Entreprise. Verifique o endereço e tente novamente.</value>
+    <value>O host não está disponível ou não é um servidor do GitHub Enterprise. Verifique o endereço e tente novamente.</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
     <value>Nome de usuário ou email</value>
@@ -630,7 +630,7 @@ https://git-scm.com/download/win</value>
     <value>Atualizado</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>Mostrar comentários PR na margem do editor</value>
+    <value>Mostrar comentários de PR na margem do editor</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
     <value>Recursos experimentais</value>
@@ -687,7 +687,7 @@ https://git-scm.com/download/win</value>
     <value>Iniciar uma revisão</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Você precisa confirmar as alterações e enviá-las por push para adicionar um comentário aqui.</value>
+    <value>Você precisa fazer commit das alterações e enviá-las por push para adicionar um comentário aqui.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Comentário Anterior</value>
@@ -807,7 +807,7 @@ https://git-scm.com/download/win</value>
     <value>Não há nenhum repositório ativo para navegar</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>O arquivo de trabalho é diferente do arquivo em '{0}'. Faça o check-out do branch, da solicitação pull ou da confirmação correspondente.</value>
+    <value>O arquivo de trabalho é diferente do arquivo em '{0}'. Faça o check-out do branch, da solicitação pull ou do commit correspondente.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Abra o repositório '{0}' e tente novamente</value>
@@ -849,33 +849,33 @@ https://git-scm.com/download/win</value>
     <value>{0} mais recentemente pressionado</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>Comentário</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
+    <value>Fechar solicitação de pull</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
+    <value>Fechar problema</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
+    <value>Fechar e comentar</value>
   </data>
   <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
+    <value>Reabrir e comentar</value>
   </data>
   <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
+    <value>Reabrir problema</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
+    <value>Reabrir solicitação de pull</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
+    <value>{0} confirma</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
+    <value>adicionou algumas confirmações</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>e outros</value>
   </data>
 </root>

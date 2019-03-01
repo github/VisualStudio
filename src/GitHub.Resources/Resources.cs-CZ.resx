@@ -256,10 +256,10 @@
     <value>Před nasdílením změn musíte napřed přijmout změny.</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>Žádná potvrzení k přijetí</value>
+    <value>Žádné zápisy k přijetí</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>Žádná potvrzení k nasdílení</value>
+    <value>Žádné zápisy k nasdílení</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*Není zadaný žádný popis.*</value>
@@ -286,7 +286,7 @@
     <value>Úložiště zdrojového kódu už není k dispozici.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Nelze rezervovat, protože pracovní adresář obsahuje nepotvrzené změny.</value>
+    <value>Nelze rezervovat, protože pracovní adresář obsahuje nezapsané změny.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Synchronizovat dílčí moduly {0}</value>
@@ -406,7 +406,7 @@ https://git-scm.com/download/win</value>
     <value>Otevřít v prohlížeči</value>
   </data>
   <data name="CancelLink" xml:space="preserve">
-    <value>Storno</value>
+    <value>Zrušit</value>
   </data>
   <data name="gistCreatedMessage" xml:space="preserve">
     <value>Gist se vytvořil.</value>
@@ -687,7 +687,7 @@ https://git-scm.com/download/win</value>
     <value>Zahájit revizi</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Pokud sem chcete přidat komentář, musíte potvrdit a nasdílet změny.</value>
+    <value>Pokud sem chcete přidat komentář, musíte zapsat a nasdílet změny.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Předchozí komentář</value>
@@ -807,7 +807,7 @@ https://git-scm.com/download/win</value>
     <value>Není k dispozici žádné aktivní úložiště, do kterého by bylo možné přejít.</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>Pracovní soubor je jiný než soubor v {0}. Rezervujte si prosím odpovídající větev, žádost o přijetí změn nebo potvrzení.</value>
+    <value>Pracovní soubor je jiný než soubor v {0}. Rezervujte si prosím odpovídající větev, žádost o přijetí změn nebo zápis.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Otevřete prosím úložiště {0} a zkuste to znovu.</value>
@@ -849,33 +849,33 @@ https://git-scm.com/download/win</value>
     <value>{0} – naposledy nasdíleno</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>Komentář</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
+    <value>Zavřít žádost o přijetí změn</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
+    <value>Zavřít problém</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
+    <value>Zavřít a okomentovat</value>
   </data>
   <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
+    <value>Znovu otevřít a okomentovat</value>
   </data>
   <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
+    <value>Znovu otevřít problém</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
+    <value>Znovu otevřít žádost o přijetí změn</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
+    <value>{0} – potvrzení</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
+    <value>přidala se nějaká potvrzení</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>a další</value>
   </data>
 </root>

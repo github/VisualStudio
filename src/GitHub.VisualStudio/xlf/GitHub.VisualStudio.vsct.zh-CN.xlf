@@ -54,7 +54,7 @@
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
         <source>Go To Solution/PR File</source>
-        <target state="translated">转到解决方案/拉取请求文件</target>
+        <target state="translated">转到解决方案/PR 文件</target>
         <note />
       </trans-unit>
       <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
