@@ -365,11 +365,11 @@ namespace GitHub.InlineReviews.Services
                             when.Commit(commit => new CommitModel
                             {
                                 AbbreviatedOid = commit.AbbreviatedOid,
-                                // TODO: commit.Author.User can be null
+
                                 Author = new ActorModel
                                 {
-                                    Login = commit.Author.User.Login,
-                                    AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                    Login = commit.Author.User == null ? commit.Committer.Name : commit.Author.User.Login,
+                                    AvatarUrl = commit.Author.User == null ? "" : commit.Author.User.AvatarUrl(null),
                                 },
                                 MessageHeadline = commit.MessageHeadline,
                                 Oid = commit.Oid,
