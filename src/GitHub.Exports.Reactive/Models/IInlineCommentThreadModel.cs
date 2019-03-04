@@ -51,7 +51,7 @@ namespace GitHub.Models
         string RelativePath { get; }
 
         /// <summary>
-        /// A value indicating whether the thread is resolved.
+        /// Gets a value indicating whether comment thread has been marked as resolved by a user.
         /// </summary>
         bool IsResolved { get; }
     }
