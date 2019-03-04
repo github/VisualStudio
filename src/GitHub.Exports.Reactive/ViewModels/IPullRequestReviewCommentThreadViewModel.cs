@@ -37,6 +37,11 @@ namespace GitHub.ViewModels
         DiffSide Side { get; }
 
         /// <summary>
+        /// Gets a value indicating whether comment thread has been marked as resolved by a user.
+        /// </summary>
+        bool IsResolved { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the thread is a new thread being authored, that is not
         /// yet present on the server.
         /// </summary>
