@@ -145,6 +145,7 @@ namespace GitHub.InlineReviews.Services
                         Comment = c,
                         Review = pullRequest.Reviews.FirstOrDefault(x => x.Comments.Contains(c)),
                     })),
+                    reviewThread.IsOutdated,
                     reviewThread.IsResolved);
                 threads.Add(inlineThread);
             }

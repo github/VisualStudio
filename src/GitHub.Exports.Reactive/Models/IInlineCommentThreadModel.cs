@@ -51,6 +51,11 @@ namespace GitHub.Models
         string RelativePath { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the thread is outdated.
+        /// </summary>
+        bool IsOutdated { get; }
+
+        /// <summary>
         /// Gets a value indicating whether comment thread has been marked as resolved by a user.
         /// </summary>
         bool IsResolved { get; }

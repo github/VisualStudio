@@ -71,6 +71,9 @@ namespace GitHub.ViewModels
         public DiffSide Side { get; private set; }
 
         /// <inheritdoc/>
+        public bool IsOutdated { get; private set; }
+
+        /// <inheritdoc/>
         public bool IsResolved { get; private set; }
 
         public bool IsNewThread
@@ -101,6 +104,7 @@ namespace GitHub.ViewModels
             LineNumber = thread.LineNumber;
             Side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
             IsResolved = thread.IsResolved;
+            IsOutdated = thread.IsOutdated;
 
             foreach (var comment in thread.Comments)
             {

@@ -884,4 +884,7 @@ https://git-scm.com/download/win</value>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
     <value>This conversation was marked as resolved</value>
   </data>
+  <data name="YouAreViewingAnOutdatedVersionOfThisFile" xml:space="preserve">
+    <value>You are viewing an outdated version of this file</value>
+  </data>
 </root>

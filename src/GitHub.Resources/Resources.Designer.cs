@@ -2325,6 +2325,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are viewing an outdated version of this file.
+        /// </summary>
+        public static string YouAreViewingAnOutdatedVersionOfThisFile {
+            get {
+                return ResourceManager.GetString("YouAreViewingAnOutdatedVersionOfThisFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have already cloned to this location. Click &apos;Open&apos; to open the local repository..
         /// </summary>
         public static string YouHaveAlreadyClonedToThisLocation {
