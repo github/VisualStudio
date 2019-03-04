@@ -350,7 +350,8 @@ namespace GitHub.InlineReviews.Services
                                 PullRequestReviewId = comment.PullRequestReview != null ? comment.PullRequestReview.Id.Value : null,
                                 CreatedAt = comment.CreatedAt,
                                 Url = comment.Url
-                            }).ToList()
+                            }).ToList(),
+                            IsResolved = thread.IsResolved
                         }).ToList(),
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
