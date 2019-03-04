@@ -49,5 +49,10 @@ namespace GitHub.Models
         /// Gets the relative path to the file that the thread is on.
         /// </summary>
         string RelativePath { get; }
+
+        /// <summary>
+        /// A value indicating whether the thread is resolved.
+        /// </summary>
+        bool IsResolved { get; }
     }
 }

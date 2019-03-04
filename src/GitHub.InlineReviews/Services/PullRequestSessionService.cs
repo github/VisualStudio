@@ -123,7 +123,8 @@ namespace GitHub.InlineReviews.Services
 
             foreach (var thread in threadsByPosition)
             {
-                var hunk = thread.First().DiffHunk;
+                var reviewThread = thread.First();
+                var hunk = reviewThread.DiffHunk;
                 var chunks = DiffUtilities.ParseFragment(hunk);
                 var chunk = chunks.Last();
                 var diffLines = chunk.Lines.Reverse().Take(5).ToList();
@@ -142,7 +143,8 @@ namespace GitHub.InlineReviews.Services
                     {
                         Comment = c,
                         Review = pullRequest.Reviews.FirstOrDefault(x => x.Comments.Contains(c)),
-                    })));
+                    })),
+                    reviewThread.IsResolved);
                 threads.Add(inlineThread);
             }
 
