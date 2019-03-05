@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
+             xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
@@ -23,23 +24,23 @@
 
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
-            <ghfvs:OcticonCircleButton
-                                   Margin="12"
-                                   HorizontalAlignment="Center"
-                                   Icon="check"
-                                   IsDefault="True"
-                                   Command="{Binding Clone}"
-                                   Content="Clone"
-                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+            <Button
+                Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                Margin="12"
+                HorizontalAlignment="Center"
+                IsDefault="True"
+                Command="{Binding Clone}"
+                Content="Clone"
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
 
-            <ghfvs:OcticonCircleButton
-                                   Margin="12"
-                                   HorizontalAlignment="Center"
-                                   Icon="check"
-                                   IsDefault="True"
-                                   Command="{Binding Open}"
-                                   Content="Open"
-                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+            <Button
+                Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                Margin="12"
+                HorizontalAlignment="Center"
+                IsDefault="True"
+                Command="{Binding Open}"
+                Content="Open"
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
         </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom"
