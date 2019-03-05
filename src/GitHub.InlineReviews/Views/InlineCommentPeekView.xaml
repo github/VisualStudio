@@ -104,10 +104,9 @@
         </Border>
 
         <Border DockPanel.Dock="Top"
-                Background="{DynamicResource GitHubPeekViewBackground}"
-                BorderBrush="{DynamicResource GitHubButtonBorderBrush}"
-                BorderThickness="0 0 0 1"
-                Padding="8">
+                Background="{DynamicResource VsBrush.InfoBackground}"
+                BorderThickness="1 0 0 1"
+                Padding="4">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -119,8 +118,8 @@
                 </Style>
             </Border.Style>
             <DockPanel>
-                <imaging:CrispImage  Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
-                <TextBlock TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.ThisConversationWasMarkedAsResolved}"/>
+                <imaging:CrispImage Margin="4 0" Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                <TextBlock Foreground="{DynamicResource VsBrush.InfoText}"  TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.ThisConversationWasMarkedAsResolved}"/>
             </DockPanel>
         </Border>
 
