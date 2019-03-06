@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
   
   <Control.Resources>
@@ -30,13 +31,13 @@
            FontSize="16"
            Content="You need to sign out and back in." />
       
-    <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
-                               Command="{Binding LogOut}"
-                               Content="Sign out"
-                               Icon="check"
-                               IsDefault="True"
-                               Margin="0 16"
-                               HorizontalAlignment="Center"/>
+    <Button Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+            DockPanel.Dock="Bottom"
+            Command="{Binding LogOut}"
+            Content="Sign out"
+            IsDefault="True"
+            Margin="0 16"
+            HorizontalAlignment="Center"/>
 
     <TextBlock TextWrapping="Wrap"
                 TextAlignment="Center"
