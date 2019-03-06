@@ -7,6 +7,8 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
              xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource VsBrush.Window}"
+             Foreground="{DynamicResource VsBrush.WindowText}"             
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
@@ -45,14 +47,17 @@
 
         <DockPanel DockPanel.Dock="Bottom"
                    Margin="16">
-            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
+            <Label Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogLabelStyleKey}}"
+                   DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
                     Style="{DynamicResource GitHubBlueLinkButton}"
                     VerticalContentAlignment="Center">
                 Browse
             </Button>
-            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox
+                Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogTextBoxStyleKey}}"
+                Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
 
         <uic:InfoPanel Message="{Binding PathWarning}"
