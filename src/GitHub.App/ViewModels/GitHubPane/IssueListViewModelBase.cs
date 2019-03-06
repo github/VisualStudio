@@ -286,13 +286,6 @@ namespace GitHub.ViewModels.GitHubPane
                 }
             }
 
-            if (result && AuthorFilter.Selected != null)
-            {
-                result = item.Author.Login.Equals(
-                    AuthorFilter.Selected.Login,
-                    StringComparison.CurrentCultureIgnoreCase);
-            }
-
             return result;
         }
 

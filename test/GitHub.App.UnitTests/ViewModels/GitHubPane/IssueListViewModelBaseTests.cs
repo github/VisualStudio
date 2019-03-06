@@ -118,7 +118,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         protected static IPullRequestService CreatePullRequestService(int itemCount = 10)
         {
             var result = Substitute.For<IPullRequestService>();
-            result.ReadPullRequests(null, null, null, null, null).ReturnsForAnyArgs(
+            result.ReadPullRequests(null, null, null, null, null, null).ReturnsForAnyArgs(
                 new Page<PullRequestListItemModel>
                 {
                     Items = Enumerable.Range(0, itemCount).Select(x => new PullRequestListItemModel

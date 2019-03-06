@@ -30,6 +30,7 @@ using static System.FormattableString;
 using static Octokit.GraphQL.Variable;
 using CheckConclusionState = GitHub.Models.CheckConclusionState;
 using CheckStatusState = GitHub.Models.CheckStatusState;
+using PullRequestState = GitHub.Models.PullRequestState;
 using StatusState = GitHub.Models.StatusState;
 
 namespace GitHub.Services
@@ -84,15 +85,15 @@ namespace GitHub.Services
             this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public async Task<Page<PullRequestListItemModel>> ReadPullRequests(
-            HostAddress address,
+        public async Task<Page<PullRequestListItemModel>> ReadPullRequests(HostAddress address,
             string owner,
             string name,
             string after,
-            Models.PullRequestState[] states)
+            PullRequestState[] states, string author)
         {
-
+            string filter = null;
             ICompiledQuery<Page<PullRequestListItemModel>> query;
+            ICompiledQuery<Page<PullRequestListItemModel>> query2;
 
             if (address.IsGitHubDotCom())
             {
@@ -154,6 +155,56 @@ namespace GitHub.Services
                 }
 
                 query = readPullRequests;
+
+                query2 = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
+                    .Select(page => new Page<PullRequestListItemModel>
+                    {
+                        EndCursor = page.PageInfo.EndCursor,
+                        HasNextPage = page.PageInfo.HasNextPage,
+                        TotalCount = page.IssueCount,
+                        Items = page.Nodes.Select(issueOrPr => issueOrPr
+                            .Switch<PullRequestListItemModel>(when => when.PullRequest(pr => new ListItemAdapter
+                            {
+                                Id = pr.Id.Value,
+                                LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                    new LastCommitSummaryAdapter
+                                    {
+                                        CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                            .Select(suite => new CheckSuiteSummaryModel
+                                            {
+                                                CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                                    .Select(run => new CheckRunSummaryModel
+                                                    {
+                                                        Conclusion = run.Conclusion.FromGraphQl(),
+                                                        Status = run.Status.FromGraphQl()
+                                                    }).ToList(),
+                                            }).ToList(),
+                                        Statuses = commit.Commit.Status
+                                                .Select(context =>
+                                                    context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                    {
+                                                        State = statusContext.State.FromGraphQl(),
+                                                    }).ToList()
+                                                ).SingleOrDefault()
+                                    }).ToList().FirstOrDefault(),
+                                Author = new ActorModel
+                                {
+                                    Login = pr.Author.Login,
+                                    AvatarUrl = pr.Author.AvatarUrl(null),
+                                },
+                                CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                Number = pr.Number,
+                                Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                {
+                                    Body = review.Body,
+                                    CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                }).ToList(),
+                                State = pr.State.FromGraphQl(),
+                                Title = pr.Title,
+                                UpdatedAt = pr.UpdatedAt,
+                            }))).ToList()
+                    })
+                    .Compile();
             }
             else
             {
@@ -207,6 +258,48 @@ namespace GitHub.Services
                 }
 
                 query = readPullRequestsEnterprise;
+
+                query2 = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
+                    .Select(page => new Page<PullRequestListItemModel>
+                    {
+                        EndCursor = page.PageInfo.EndCursor,
+                        HasNextPage = page.PageInfo.HasNextPage,
+                        TotalCount = page.IssueCount,
+                        Items = page.Nodes.Select(issueOrPr => issueOrPr
+                            .Switch<PullRequestListItemModel>(when => when.PullRequest(pr => new ListItemAdapter
+                            {
+                                Id = pr.Id.Value,
+                                LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                    new LastCommitSummaryAdapter
+                                    {
+                                        Statuses = commit.Commit.Status.Select(context =>
+                                                    context == null
+                                                        ? null
+                                                        : context.Contexts
+                                                            .Select(statusContext => new StatusSummaryModel
+                                                            {
+                                                                State = statusContext.State.FromGraphQl()
+                                                            }).ToList()
+                                                ).SingleOrDefault()
+                                    }).ToList().FirstOrDefault(),
+                                Author = new ActorModel
+                                {
+                                    Login = pr.Author.Login,
+                                    AvatarUrl = pr.Author.AvatarUrl(null),
+                                },
+                                CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                Number = pr.Number,
+                                Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                {
+                                    Body = review.Body,
+                                    CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                }).ToList(),
+                                State = pr.State.FromGraphQl(),
+                                Title = pr.Title,
+                                UpdatedAt = pr.UpdatedAt,
+                            }))).ToList()
+                    })
+                    .Compile();
             }
 
             var graphql = await graphqlFactory.CreateConnection(address);
@@ -219,6 +312,35 @@ namespace GitHub.Services
             };
 
             var result = await graphql.Run(query, vars);
+
+            filter = $"type:pr repo:{owner}/{name}";
+            if (states.Any())
+            {
+                var filterState = states.First();
+                switch (filterState)
+                {
+                    case PullRequestState.Open:
+                        filter += " is:open";
+                        break;
+                    case PullRequestState.Closed:
+                        filter += " is:unmerged is:closed";
+                        break;
+                    case PullRequestState.Merged:
+                        filter += " is:merged is:closed";
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(filterState));
+                }
+            }
+
+            var vars2 = new Dictionary<string, object>
+            {
+                { nameof(filter), filter },
+                { nameof(after), after },
+            };
+
+            var result2 = await graphql.Run(query2, vars2);
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {

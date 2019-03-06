@@ -141,12 +141,15 @@ namespace GitHub.ViewModels.GitHubPane
                         break;
                 }
 
+                var authorLogin = owner.AuthorFilter.Selected?.Login;
+
                 var result = await owner.service.ReadPullRequests(
                     HostAddress.Create(owner.RemoteRepository.CloneUrl),
                     owner.RemoteRepository.Owner,
                     owner.RemoteRepository.Name,
                     after,
-                    states).ConfigureAwait(false);
+                    states,
+                    authorLogin).ConfigureAwait(false);
                 return result;
             }
         }

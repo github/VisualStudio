@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GitHub.Models
 {
+    public class PullRequestSearchItemModel
+    {
+        public IReadOnlyList<PullRequestListItemModel> Result { get; set; }
+    }
+
     /// <summary>
     /// Holds an overview of a pull request for display in the PR list.
     /// </summary>
