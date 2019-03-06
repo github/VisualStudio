@@ -42,7 +42,6 @@ namespace GitHub.VisualStudio.Views.Dialog
                 d(this.OneWayBind(ViewModel, vm => vm.BaseRepositoryPathValidator, v => v.pathValidationMessage.ReactiveValidator));
 
                 d(this.BindCommand(ViewModel, vm => vm.CreateRepository, v => v.createRepositoryButton));
-                d(this.OneWayBind(ViewModel, vm => vm.IsCreating, v => v.createRepositoryButton.ShowSpinner));
 
                 d(this.BindCommand(ViewModel, vm => vm.BrowseForDirectory, v => v.browsePathButton));
 

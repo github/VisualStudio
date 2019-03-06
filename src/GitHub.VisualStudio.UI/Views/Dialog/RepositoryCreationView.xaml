@@ -9,6 +9,7 @@
                                      d:DesignWidth="414"
                                      Style="{DynamicResource DialogUserControl}"
                                      mc:Ignorable="d"
+                                     xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
   <d:DesignProperties.DataContext>
     <Binding>
@@ -34,15 +35,15 @@
                      Icon="logo_github"
                      Style="{DynamicResource GitHubLogo}" />
 
-    <ghfvs:OcticonCircleButton x:Name="createRepositoryButton"
+    <Button x:Name="createRepositoryButton"
+                            Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                             Margin="0"
                             HorizontalAlignment="Center"
                             DockPanel.Dock="Bottom"
-                            Icon="check"
                             IsDefault="True"
+                            Content="{x:Static ghfvs:Resources.CreateLink}"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryButton}" >
-      <TextBlock Text="{x:Static ghfvs:Resources.CreateLink}" />
-    </ghfvs:OcticonCircleButton>
+    </Button>
 
     <StackPanel>
       <StackPanel.Resources>
