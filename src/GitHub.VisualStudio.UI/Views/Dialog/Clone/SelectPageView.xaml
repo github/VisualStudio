@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
-             xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="400">
     <d:DesignData.DataContext>
         <ghfvs:SelectPageViewModelDesigner/>
@@ -22,15 +21,13 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <ghfvs:PromptTextBox Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogTextBoxStyleKey}}"
-                             DockPanel.Dock="Top"
+        <ghfvs:PromptTextBox DockPanel.Dock="Top"
                              Margin="0,4"
                              PromptText="Search or enter a URL"
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
 
         <Grid>
             <ListView BorderThickness="0"
-                      Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogListViewStyleKey}}"
                       ItemsSource="{Binding ItemsView}"
                       SelectedItem="{Binding SelectedItem}"
                       VirtualizingPanel.IsVirtualizing="True"

@@ -24,10 +24,15 @@
                    UseLayoutRounding="True"
                    WindowStartupLocation="CenterOwner"
                    Content="{Binding Content}">
-  <Window.Resources>
-    <local:ViewLocator x:Key="viewLocator"/>
-    <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
-      <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
-    </DataTemplate>
-  </Window.Resources>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:ViewLocator x:Key="viewLocator"/>
+            <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
+                <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
 </pfui:DialogWindow>
