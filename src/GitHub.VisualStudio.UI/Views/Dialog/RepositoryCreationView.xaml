@@ -9,7 +9,6 @@
                                      d:DesignWidth="414"
                                      Style="{DynamicResource DialogUserControl}"
                                      mc:Ignorable="d"
-                                     xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
   <d:DesignProperties.DataContext>
     <Binding>
@@ -36,7 +35,6 @@
                      Style="{DynamicResource GitHubLogo}" />
 
     <Button x:Name="createRepositoryButton"
-                            Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                             Margin="0"
                             HorizontalAlignment="Center"
                             DockPanel.Dock="Bottom"
@@ -65,8 +63,7 @@
             <Setter Property="Margin" Value="0,3,0,3" />
           </Style>
 
-          <Style TargetType="{x:Type Label}">
-            <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource ThemedDialogLabelStyleKey}">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="Margin" Value="0,0,10,0" />
@@ -243,7 +240,6 @@
                   Grid.Column="1"
                   Content="{x:Static ghfvs:Resources.makePrivateContent}"
                   Padding="8,0,0,0"
-                  Style="{DynamicResource BlueRoundedCheckBox}" 
                   IsChecked="{Binding KeepPrivate}"
                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateRepositoryCheckBox}" />
             </Grid>
