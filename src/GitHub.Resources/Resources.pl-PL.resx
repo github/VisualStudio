@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Gałąź źródłowa nie istnieje zdalnie. Czy została wypchnięta?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Nie wybrano żadnego repozytorium.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Wprowadź ścieżkę repozytorium</value>
   </data>

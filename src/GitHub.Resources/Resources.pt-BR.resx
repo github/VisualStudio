@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>O branch de origem não existe remotamente. Você o enviou por push?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Nenhum repositório selecionado.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Insira um caminho de repositório</value>
   </data>

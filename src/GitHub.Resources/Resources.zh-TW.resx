@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>遠端不存在來源分支，您有推送它嗎?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>未選取任何存放庫。</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>請輸入存放庫路徑</value>
   </data>

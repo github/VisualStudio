@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Исходная ветвь не существует удаленно, вы отправили ее?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Нет выбранного репозитория.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Введите путь к репозиторию</value>
   </data>

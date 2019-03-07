@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>ソース ブランチがリモートに存在しません。ブランチをプッシュしましたか?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>リポジトリが選択されていません。</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>リポジトリのパスを入力してください</value>
   </data>

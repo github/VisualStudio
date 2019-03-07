@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>소스 분기가 원격으로 존재하지 않습니다. 소스 분기를 푸시하셨습니까?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>선택한 리포지토리가 없습니다.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>리포지토리 경로를 입력하세요.</value>
   </data>

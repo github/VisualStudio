@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Der Quellpfad ist im Remoterepository nicht vorhanden, haben Sie ihn mithilfe von Push übertragen?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Kein Repository ausgewählt.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Geben Sie einen Repositorypfad ein.</value>
   </data>

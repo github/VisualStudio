@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Zdrojová větev neexistuje vzdáleně, nasdíleli jste ji?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Není vybrané žádné úložiště.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Zadejte prosím cestu k úložišti.</value>
   </data>

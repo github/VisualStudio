@@ -174,9 +174,6 @@
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>La rama de origen no existe en la ubicación remota. ¿La ha insertado?</value>
   </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No hay ningún repositorio seleccionado.</value>
-  </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Escriba una ruta de acceso de repositorio.</value>
   </data>
