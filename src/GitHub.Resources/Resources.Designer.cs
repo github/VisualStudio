@@ -1288,15 +1288,6 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Conversation.
-        /// </summary>
-        public static string OpenConversation {
-            get {
-                return ResourceManager.GetString("OpenConversation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Open File as Default Action.
         /// </summary>
         public static string OpenFileAsDefaultAction {
