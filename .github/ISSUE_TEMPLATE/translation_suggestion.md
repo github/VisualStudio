@@ -4,9 +4,7 @@ about: Suggest an improvement to our translations
 labels: translation, bug
 
 ---
-
 <!-- Hello! Please read the [Contributing Guidelines](https://github.com/github/VisualStudio/blob/master/CONTRIBUTING.md) before submitting an issue regarding the GitHub Extension for Visual Studio. -->
-
 ## Language
 <!-- Czech -->
 <!-- German -->
