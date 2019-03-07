@@ -41,7 +41,6 @@ namespace GitHub.VisualStudio
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideOptionPage(typeof(OptionsPage), "GitHub for Visual Studio", "General", 0, 0, supportsAutomation: true)]
-    [ProvideToolWindow(typeof(IssueDetailPane), DocumentLikeTool = true)]
     public class GitHubPackage : AsyncPackage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubPackage>();

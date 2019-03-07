@@ -148,7 +148,6 @@
     <Compile Include="Services\GitHubServiceProvider.cs" />
     <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
-    <Compile Include="UI\IssueDetailPane.cs" />
     <Compile Include="UI\IssueishDocumentPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
