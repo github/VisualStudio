@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>为新存储库选择包含文件夹。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>克隆存储库</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>从 GitHub 打开</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>已成功创建分支 **{0}** 的拉取请求，创建时间为 [{1}] ({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>发布存储库</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>将存储库发布到 {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>请输入拉取请求标题</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>源分支在远程不存在，是否已推送该分支?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>没有选择任何存储库。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>请输入存储库路径</value>

@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Seleccione una carpeta contenedora para el nuevo repositorio.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Clonar un repositorio</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Abrir desde GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>La solicitud de incorporación de cambios para la rama **{0}** se creó correctamente a las [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publicar repositorio</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publicar el repositorio en {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Escriba un título para la solicitud de incorporación de cambios</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>La rama de origen no existe en la ubicación remota. ¿La ha insertado?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No hay ningún repositorio seleccionado.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Escriba una ruta de acceso de repositorio.</value>

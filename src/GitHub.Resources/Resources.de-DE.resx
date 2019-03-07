@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Wählen Sie einen enthaltenden Ordner für Ihr neues Repository aus.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Repository klonen</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Aus GitHub öffnen</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pull Request für Branch **{0}** wurde unter [{1}]({2}) erfolgreich erstellt.</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Repository veröffentlichen</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Repository in "{0}" veröffentlichen</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Geben Sie einen Titel für den Pull Request ein.</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Der Quellpfad ist im Remoterepository nicht vorhanden, haben Sie ihn mithilfe von Push übertragen?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Kein Repository ausgewählt.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Geben Sie einen Repositorypfad ein.</value>

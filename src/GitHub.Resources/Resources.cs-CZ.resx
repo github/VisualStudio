@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Vyberte nadřazenou složku pro nové úložiště.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Klonovat úložiště</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Otevřít z GitHubu</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Žádost o přijetí změn pro větev **{0}** se úspěšně vytvořila v [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publikovat úložiště</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publikovat úložiště na {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Zadejte prosím název žádosti o přijetí změn.</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Zdrojová větev neexistuje vzdáleně, nasdíleli jste ji?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Není vybrané žádné úložiště.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Zadejte prosím cestu k úložišti.</value>

@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Yeni deponuzu içerecek klasörü seçin.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Depo Kopyala</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub'dan Aç</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>**{0}** dalı için Çekme İsteği [{1}] ({2}) konumunda başarıyla oluşturuldu</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Depoyu yayımla</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Depoyu {0} konumunda yayımla</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Lütfen Çekme İsteği için bir başlık girin</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Kaynak dal uzak depoda yok, kaynak dalı gönderdiniz mi?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Seçili depo yok.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Lütfen bir depo yolu girin</value>

@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>為新的存放庫選取包含資料夾。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>複製存放庫</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>從 GitHub 開啟</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>已成功於 [{1}]({2}) 建立分支 **{0}** 的提取要求</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>發佈存放庫</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>將存放庫發佈至 {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>請輸入提取要求的標題</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>遠端不存在來源分支，您有推送它嗎?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>未選取任何存放庫。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>請輸入存放庫路徑</value>

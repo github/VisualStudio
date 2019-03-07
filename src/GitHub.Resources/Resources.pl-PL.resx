@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Wybierz folder zawierający dla nowego repozytorium.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Klonuj repozytorium</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Otwórz z witryny GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pomyślnie utworzono żądanie ściągnięcia dla gałęzi **{0}**: [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium w: {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Wprowadź tytuł żądania ściągnięcia</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Gałąź źródłowa nie istnieje zdalnie. Czy została wypchnięta?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Nie wybrano żadnego repozytorium.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Wprowadź ścieżkę repozytorium</value>

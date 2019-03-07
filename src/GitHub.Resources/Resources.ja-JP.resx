@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>新しいリポジトリを含んでいるフォルダーを選択します。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>リポジトリを複製</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub から開く</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>ブランチの Pull Request **{0}** が [{1}]({2}) に正常に作成されました</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>リポジトリの発行</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>リポジトリを {0} に発行</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Pull Request のタイトルを入力してください</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>ソース ブランチがリモートに存在しません。ブランチをプッシュしましたか?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>リポジトリが選択されていません。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>リポジトリのパスを入力してください</value>

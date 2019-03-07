@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>새 리포지토리의 포함 폴더를 선택합니다.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>리포지토리 복제</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub에서 열기</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>분기 **{0}**에 대한 끌어오기 요청이 [{1}]({2})에 생성됨</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>리포지토리 게시</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>{0}에 리포지토리 게시</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>끌어오기 요청의 제목을 입력하세요.</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>소스 분기가 원격으로 존재하지 않습니다. 소스 분기를 푸시하셨습니까?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>선택한 리포지토리가 없습니다.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>리포지토리 경로를 입력하세요.</value>
