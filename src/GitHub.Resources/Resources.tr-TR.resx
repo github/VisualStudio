@@ -878,7 +878,4 @@ https://git-scm.com/download/win</value>
   <data name="AndOthers" xml:space="preserve">
     <value>and others</value>
   </data>
-  <data name="OpenConversation" xml:space="preserve">
-    <value>Open Conversation</value>
-  </data>
 </root>

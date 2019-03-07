@@ -848,9 +848,6 @@ https://git-scm.com/download/win</value>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} most recently pushed</value>
   </data>
-  <data name="OpenConversation" xml:space="preserve">
-    <value>Open Conversation</value>
-  </data>
   <data name="Comment" xml:space="preserve">
     <value>Comment</value>
   </data>
