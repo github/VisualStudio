@@ -1,7 +1,7 @@
 ---
 name: Translation suggestion
 about: Suggest an improvement to our translations
-labels: translation
+labels: translation, bug
 
 ---
 
