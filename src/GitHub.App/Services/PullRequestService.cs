@@ -265,8 +265,8 @@ namespace GitHub.Services
                         EndCursor = page.PageInfo.EndCursor,
                         HasNextPage = page.PageInfo.HasNextPage,
                         TotalCount = page.IssueCount,
-                        Items = page.Nodes.Select(issueOrPr => issueOrPr
-                            .Switch<PullRequestListItemModel>(when => when.PullRequest(pr => new ListItemAdapter
+                        Items = page.Nodes.Select(issueOrPr => issueOrPr.Switch<PullRequestListItemModel>(when =>
+                            when.PullRequest(pr => new ListItemAdapter
                             {
                                 Id = pr.Id.Value,
                                 LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
@@ -297,7 +297,8 @@ namespace GitHub.Services
                                 State = pr.State.FromGraphQl(),
                                 Title = pr.Title,
                                 UpdatedAt = pr.UpdatedAt,
-                            }))).ToList()
+                            }))
+                        ).ToList()
                     })
                     .Compile();
             }
