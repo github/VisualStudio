@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
@@ -11,6 +12,6 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Gets a command that will log out the user.
         /// </summary>
-        ReactiveCommand<object> LogOut { get; }
+        ReactiveCommand<Unit, Unit> LogOut { get; }
     }
 }

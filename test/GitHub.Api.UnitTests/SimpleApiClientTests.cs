@@ -236,8 +236,8 @@ public class SimpleApiClientTests
     private static Repository CreateRepository(int id, bool hasWiki)
     {
         return new Repository("", "", "", "", "", "", "",
-            id, new User(), "", "", "", "", "", false, false, 0, 0, "",
+            id, null, new User(), "", "", "", "", "", false, false, 0, 0, "",
             0, null, DateTimeOffset.Now, DateTimeOffset.Now, new RepositoryPermissions(), null, null, null, false,
-            hasWiki, false, false, 0, 0, null, null, null);
+            hasWiki, false, false, 0, 0, null, null, null, false);
     }
 }

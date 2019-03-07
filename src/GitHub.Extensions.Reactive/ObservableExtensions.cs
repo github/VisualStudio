@@ -53,6 +53,17 @@ namespace GitHub.Extensions.Reactive
         }
 
         /// <summary>
+        /// Helper method to transform an IObservable{Unit} to IObservable{object} with a null value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <returns></returns>
+        public static IObservable<object> SelectNull(this IObservable<Unit> observable)
+        {
+            return observable.Select(_ => (object)null);
+        }
+
+        /// <summary>
         /// Helper method to transform an IObservable{T} to IObservable{Unit}.
         /// </summary>
         /// <typeparam name="T"></typeparam>

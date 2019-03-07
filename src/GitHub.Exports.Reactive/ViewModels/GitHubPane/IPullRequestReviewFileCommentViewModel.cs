@@ -22,6 +22,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which opens the comment in a diff view.
         /// </summary>
-        ReactiveCommand<Unit> Open { get; }
+        ReactiveCommand<Unit, Unit> Open { get; }
     }
 }

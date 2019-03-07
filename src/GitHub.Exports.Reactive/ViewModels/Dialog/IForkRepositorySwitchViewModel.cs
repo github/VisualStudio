@@ -1,4 +1,5 @@
-﻿using GitHub.Models;
+﻿using System.Reactive;
+using GitHub.Models;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog
@@ -8,14 +9,14 @@ namespace GitHub.ViewModels.Dialog
     /// </summary>
     public interface IForkRepositorySwitchViewModel : IDialogContentViewModel
     {
-        IRepositoryModel SourceRepository { get; }
+        RepositoryModel SourceRepository { get; }
 
-        IRepositoryModel DestinationRepository { get; }
+        RepositoryModel DestinationRepository { get; }
 
         /// <summary>
         /// Gets a command that is executed when the user clicks the "Fork" button.
         /// </summary>
-        IReactiveCommand<object> SwitchFork { get; }
+        ReactiveCommand<Unit, Unit> SwitchFork { get; }
 
         bool ResetMasterTracking { get; set; }
 
@@ -28,6 +29,6 @@ namespace GitHub.ViewModels.Dialog
         /// </summary>
         /// <param name="sourceRepository">The repository to fork.</param>
         /// <param name="remoteRepository"></param>
-        void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository);
+        void Initialize(LocalRepositoryModel sourceRepository, RemoteRepositoryModel remoteRepository);
     }
 }

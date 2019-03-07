@@ -45,20 +45,19 @@ namespace GitHub.ViewModels.GitHubPane
 
             this.service = service;
 
-            DiffFile = ReactiveCommand.CreateAsyncTask(x =>
-                (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, "HEAD"));
-            ViewFile = ReactiveCommand.CreateAsyncTask(x =>
-                (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, false));
-            DiffFileWithWorkingDirectory = ReactiveCommand.CreateAsyncTask(
-                isBranchCheckedOut,
-                x => (Task)editorService.OpenDiff(pullRequestSession, ((IPullRequestFileNode)x).RelativePath));
-            OpenFileInWorkingDirectory = new NonDeletedFileCommand(
-                isBranchCheckedOut,
-                x => (Task)editorService.OpenFile(pullRequestSession, ((IPullRequestFileNode)x).RelativePath, true));
+            DiffFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
+                editorService.OpenDiff(pullRequestSession, x.RelativePath, "HEAD"));
+            ViewFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
+                editorService.OpenFile(pullRequestSession, x.RelativePath, false));
+            DiffFileWithWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                x => editorService.OpenDiff(pullRequestSession, x.RelativePath),
+                isBranchCheckedOut);
+            OpenFileInWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                x => editorService.OpenFile(pullRequestSession, x.RelativePath, true),
+                isBranchCheckedOut);
 
-            OpenFirstComment = ReactiveCommand.CreateAsyncTask(async x =>
+            OpenFirstComment = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(async file =>
             {
-                var file = (IPullRequestFileNode)x;
                 var thread = await GetFirstCommentThread(file);
 
                 if (thread != null)
@@ -66,6 +65,29 @@ namespace GitHub.ViewModels.GitHubPane
                     await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
+
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice));
+
+            OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
+
+            OpenFirstAnnotationFailure = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
+        }
+
+        private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
+            CheckAnnotationLevel checkAnnotationLevel)
+        {
+            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel);
+
+            if (annotationModel != null)
+            {
+                //AnnotationModel.EndLine is a 1-based number
+                //EditorService.OpenDiff takes a 0-based line number to start searching AFTER and will open the next tag
+                var nextInlineCommentFromLine = annotationModel.EndLine - 2;
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
+            }
         }
 
         /// <inheritdoc/>
@@ -123,6 +145,18 @@ namespace GitHub.ViewModels.GitHubPane
                     {
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineCommentThreads)
                             .Subscribe(x => node.CommentCount = CountComments(x, filter)));
+
+                        subscriptions.Add(file.WhenAnyValue(x => x.InlineAnnotations)
+                            .Subscribe(x =>
+                            {
+                                var noticeCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Notice);
+                                var warningCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                var failureCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+
+                                node.AnnotationNoticeCount = noticeCount;
+                                node.AnnotationWarningCount = warningCount;
+                                node.AnnotationFailureCount = failureCount;
+                            }));
                     }
 
                     var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
@@ -135,19 +169,28 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> DiffFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFile { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> ViewFile { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> ViewFile { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> DiffFileWithWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> DiffFileWithWorkingDirectory { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFileInWorkingDirectory { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFileInWorkingDirectory { get; }
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenFirstComment { get; }
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         static int CountComments(
             IEnumerable<IInlineCommentThreadModel> thread,
@@ -201,6 +244,15 @@ namespace GitHub.ViewModels.GitHubPane
             return threads.FirstOrDefault();
         }
 
+        async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
+            CheckAnnotationLevel annotationLevel)
+        {
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var annotations = sessionFile.InlineAnnotations;
+
+            return annotations.OrderBy(model => model.EndLine).FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
+        }
+
         /// <summary>
         /// Implements the <see cref="OpenFileInWorkingDirectory"/> command.
         /// </summary>
@@ -210,12 +262,12 @@ namespace GitHub.ViewModels.GitHubPane
         /// state depending on the parameter, so we override 
         /// <see cref="ICommand.CanExecute(object)"/> to do this ourselves.
         /// </remarks>
-        class NonDeletedFileCommand : ReactiveCommand<Unit>, ICommand
+        class NonDeletedFileCommand : ReactiveCommand<Unit, Unit>, ICommand
         {
             public NonDeletedFileCommand(
                 IObservable<bool> canExecute,
                 Func<object, Task> executeAsync)
-                : base(canExecute, x => executeAsync(x).ToObservable())
+                : base(x => executeAsync(x).ToObservable(), canExecute, null)
             {
             }
 
@@ -229,7 +281,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                 }
 
-                return CanExecute(parameter);
+                return true; ////CanExecute(parameter);
             }
         }
     }

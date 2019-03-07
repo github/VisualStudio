@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -24,6 +25,7 @@ using ReactiveUI;
 using Rothko;
 using Serilog;
 using IConnection = GitHub.Models.IConnection;
+using UserError = ReactiveUI.Legacy.UserError;
 
 namespace GitHub.ViewModels.Dialog
 {
@@ -33,11 +35,10 @@ namespace GitHub.ViewModels.Dialog
     {
         static readonly ILogger log = LogManager.ForContext<RepositoryCreationViewModel>();
 
-        readonly ReactiveCommand<object> browseForDirectoryCommand = ReactiveCommand.Create();
+        readonly ReactiveCommand<Unit, Unit> browseForDirectoryCommand = ReactiveCommand.Create(() => { });
         readonly IModelServiceFactory modelServiceFactory;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
-        readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
         readonly IUsageTracker usageTracker;
         ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
@@ -94,10 +95,6 @@ namespace GitHub.ViewModels.Dialog
 
             CreateRepository = InitializeCreateRepositoryCommand();
 
-            canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
-                (canKeep, publishing) => canKeep && !publishing)
-                .ToProperty(this, x => x.CanKeepPrivate);
-
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
 
@@ -119,17 +116,12 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Fires up a file dialog to select the directory to clone into
         /// </summary>
-        public ICommand BrowseForDirectory { get { return browseForDirectoryCommand; } }
+        public ReactiveCommand<Unit, Unit> BrowseForDirectory { get { return browseForDirectoryCommand; } }
 
         /// <summary>
         /// Is running the creation process
         /// </summary>
         public bool IsCreating { get { return isCreating.Value; } }
-
-        /// <summary>
-        /// If the repo can be made private (depends on the user plan)
-        /// </summary>
-        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
         IReadOnlyList<GitIgnoreItem> gitIgnoreTemplates;
         public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates
@@ -169,39 +161,53 @@ namespace GitHub.ViewModels.Dialog
         /// <summary>
         /// Fires off the process of creating the repository remotely and then cloning it locally
         /// </summary>
-        public IReactiveCommand<Unit> CreateRepository { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRepository { get; private set; }
 
         public IObservable<object> Done => CreateRepository.Select(_ => (object)null);
 
         public async Task InitializeAsync(IConnection connection)
         {
-            modelService = await modelServiceFactory.CreateAsync(connection);
+            modelService = await modelServiceFactory.CreateAsync(connection).ConfigureAwait(true);
 
             Title = string.Format(CultureInfo.CurrentCulture, Resources.CreateTitle, connection.HostAddress.Title);
 
             accounts = modelService.GetAccounts()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(new IAccount[] { }));
+                .ToProperty(this, vm => vm.Accounts, initialValue: new ReadOnlyCollection<IAccount>(Array.Empty<IAccount>()));
 
             this.WhenAny(x => x.Accounts, x => x.Value)
                 .Select(accts => accts?.FirstOrDefault())
                 .WhereNotNull()
                 .Subscribe(a => SelectedAccount = a);
 
-            GitIgnoreTemplates = TrackingCollection.CreateListenerCollectionAndRun(
-                modelService.GetGitIgnoreTemplates(),
-                new[] { GitIgnoreItem.None },
-                OrderedComparer<GitIgnoreItem>.OrderByDescending(item => GitIgnoreItem.IsRecommended(item.Name)).Compare,
-                x =>
+            modelService.GetGitIgnoreTemplates()
+                .Where(x => x != null)
+                .ToList()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
                 {
-                    if (x.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase))
-                        SelectedGitIgnoreTemplate = x;
+                    var sorted = x
+                        .Distinct()
+                        .OrderByDescending(item => item.Recommended)
+                        .ThenBy(item => item.Name);
+                    GitIgnoreTemplates = new[] { GitIgnoreItem.None }.Concat(sorted).ToList();
+
+                    SelectedGitIgnoreTemplate = GitIgnoreTemplates
+                        .FirstOrDefault(i => i?.Name.Equals("VisualStudio", StringComparison.OrdinalIgnoreCase) == true);
                 });
 
-            Licenses = TrackingCollection.CreateListenerCollectionAndRun(
-                modelService.GetLicenses(),
-                new[] { LicenseItem.None },
-                OrderedComparer<LicenseItem>.OrderByDescending(item => LicenseItem.IsRecommended(item.Name)).Compare);
+            modelService.GetLicenses()
+                .Where(x => x != null)
+                .ToList()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    var sorted = x
+                        .Distinct()
+                        .OrderByDescending(item => item.Recommended)
+                        .ThenBy(item => item.Key);
+                    Licenses = new[] { LicenseItem.None }.Concat(sorted).ToList();
+                });
         }
 
         protected override NewRepository GatherRepositoryInfo()
@@ -267,7 +273,7 @@ namespace GitHub.ViewModels.Dialog
             return isAlreadyRepoAtPath;
         }
 
-        IObservable<Unit> OnCreateRepository(object state)
+        IObservable<Unit> OnCreateRepository()
         {
             var newRepository = GatherRepositoryInfo();
 
@@ -279,19 +285,21 @@ namespace GitHub.ViewModels.Dialog
                 .Do(_ => usageTracker.IncrementCounter(x => x.NumberOfReposCreated).Forget());
         }
 
-        ReactiveCommand<Unit> InitializeCreateRepositoryCommand()
+        ReactiveCommand<Unit, Unit> InitializeCreateRepositoryCommand()
         {
             var canCreate = this.WhenAny(
                 x => x.RepositoryNameValidator.ValidationResult.IsValid,
                 x => x.BaseRepositoryPathValidator.ValidationResult.IsValid,
                 (x, y) => x.Value && y.Value);
-            var createCommand = ReactiveCommand.CreateAsyncObservable(canCreate, OnCreateRepository);
+            var createCommand = ReactiveCommand.CreateFromObservable(OnCreateRepository, canCreate);
             createCommand.ThrownExceptions.Subscribe(ex =>
             {
                 if (!Extensions.ExceptionExtensions.IsCriticalException(ex))
                 {
                     log.Error(ex, "Error creating repository");
+#pragma warning disable CS0618 // Type or member is obsolete
                     UserError.Throw(TranslateRepositoryCreateException(ex));
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
             });
 

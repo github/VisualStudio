@@ -84,7 +84,7 @@ public class VSServicesTests
             directoryInfo.Received().Delete(true);
         }
 
-        VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null, bool repoDirExists = true, ILogger log = null)
+        static VSServices CreateVSServices(string repoDir, IOperatingSystem os = null, DTE dte = null, bool repoDirExists = true, ILogger log = null)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             dte = dte ?? Substitute.For<DTE>();
@@ -92,9 +92,10 @@ public class VSServicesTests
 
             if (repoDir != null)
             {
+                var gitDir = Path.Combine(repoDir, ".git");
                 var directoryInfo = Substitute.For<IDirectoryInfo>();
                 directoryInfo.Exists.Returns(repoDirExists);
-                os.Directory.GetDirectory(repoDir).Returns(directoryInfo);
+                os.Directory.GetDirectory(gitDir).Returns(directoryInfo);
             }
 
             var provider = Substitute.For<IGitHubServiceProvider>();

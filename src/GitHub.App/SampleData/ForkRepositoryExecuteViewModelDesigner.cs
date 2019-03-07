@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -30,19 +31,19 @@ namespace GitHub.SampleData
 
         public IObservable<object> Done => null;
 
-        public IObservable<object> Back => null;
+        public IObservable<Unit> Back => null;
 
         public string Title => null;
 
-        public IRepositoryModel SourceRepository { get; set; }
+        public RepositoryModel SourceRepository { get; set; }
 
-        public IRepositoryModel DestinationRepository { get; set; }
+        public RepositoryModel DestinationRepository { get; set; }
 
         public IAccount DestinationAccount { get; }
 
-        public IReactiveCommand<Repository> CreateFork => null;
+        public ReactiveCommand<Unit, Repository> CreateFork => null;
 
-        public IReactiveCommand<object> BackCommand => null;
+        public ReactiveCommand<Unit, Unit> BackCommand => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 
@@ -56,7 +57,7 @@ namespace GitHub.SampleData
 
         public string Error { get; } = "I AM ERROR";
 
-        public Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             return Task.CompletedTask;
         }

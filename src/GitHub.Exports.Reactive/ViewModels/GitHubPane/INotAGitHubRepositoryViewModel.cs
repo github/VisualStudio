@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Reactive;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -10,6 +11,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the command executed when the user clicks the "Publish to GitHub" link.
         /// </summary>
-        IReactiveCommand<object> Publish { get; }
+        ReactiveCommand<Unit, Unit> Publish { get; }
     }
 }

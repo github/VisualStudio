@@ -18,8 +18,6 @@ namespace GitHub.InlineReviews.UnitTests.Services
     public class PullRequestSessionTests
     {
         const int PullRequestNumber = 5;
-        const string PullRequestNodeId = "pull_request_id";
-        const string RepoUrl = "https://foo.bar/owner/repo";
         const string FilePath = "test.cs";
 
         public class TheHasPendingReviewProperty
@@ -31,7 +29,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -50,7 +48,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -68,7 +66,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -86,7 +84,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -150,7 +148,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     service,
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -172,7 +170,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -187,7 +185,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -203,7 +201,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath, "123");
@@ -219,7 +217,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var sessionService = CreateRealSessionService();
 
                 sessionService.Diff(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "MERGE_BASE",
                     "HEAD_SHA",
                     FilePath).Returns(diff);
@@ -228,7 +226,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     sessionService,
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file = await target.GetFile(FilePath);
@@ -266,7 +264,7 @@ Line 4";
                         service,
                         CreateActor(),
                         pullRequest,
-                        Substitute.For<ILocalRepositoryModel>(),
+                        Substitute.For<LocalRepositoryModel>(),
                         "owner",
                         true);
 
@@ -283,7 +281,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file1 = await target.GetFile(FilePath, "123");
@@ -299,7 +297,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
                 var file1 = await target.GetFile(FilePath, "123");
@@ -318,7 +316,7 @@ Line 4";
                     CreateRealSessionService(),
                     CreateActor(),
                     CreatePullRequest(),
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
 
@@ -336,7 +334,7 @@ Line 4";
                 await target.CancelReview();
 
                 await service.Received(1).CancelPendingReview(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "review1");
             }
 
@@ -367,7 +365,7 @@ Line 4";
                     service,
                     currentUser,
                     pr,
-                    Substitute.For<ILocalRepositoryModel>(),
+                    Substitute.For<LocalRepositoryModel>(),
                     "owner",
                     true);
             }
@@ -418,7 +416,7 @@ Line 4";
                 var target = CreateTarget(service, "fork", "owner", false);
 
                 service.PostStandaloneReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
-                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", Array.Empty<DiffChunk>(), 1);
 
                 await service.Received(1).PostStandaloneReviewComment(
                     target.LocalRepository,
@@ -452,7 +450,7 @@ Line 4";
                 var target = CreateTarget(service, "fork", "owner", true);
 
                 service.PostPendingReviewComment(null, null, null, null, null, 0).ReturnsForAnyArgs(CreatePullRequest());
-                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", new DiffChunk[0], 1);
+                await target.PostReviewComment("New Comment", "COMMIT_ID", "file.cs", Array.Empty<DiffChunk>(), 1);
 
                 await service.Received(1).PostPendingReviewComment(
                     target.LocalRepository,
@@ -646,9 +644,7 @@ Line 4";
             return new ActorModel { Login = login ?? "Viewer" };
         }
 
-        static PullRequestReviewCommentModel CreateComment(
-            string id = "comment1",
-            string body = "body")
+        static PullRequestReviewCommentModel CreateComment(string body = "body")
         {
             return new PullRequestReviewCommentModel
             {
@@ -689,7 +685,7 @@ Line 4";
 
         static PullRequestDetailModel CreatePullRequest()
         {
-            return CreatePullRequest(new PullRequestReviewModel[0]);
+            return CreatePullRequest(Array.Empty<PullRequestReviewModel>());
         }
 
         static PullRequestDetailModel CreatePullRequest(params PullRequestReviewModel[] reviews)
@@ -749,11 +745,12 @@ Line 4";
             };
         }
 
-        static ILocalRepositoryModel CreateLocalRepository()
+        static LocalRepositoryModel CreateLocalRepository()
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString("https://github.com/owner/repo"));
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString("https://github.com/owner/repo")
+            };
         }
 
         static IPullRequestSessionService CreateMockSessionService()
@@ -772,8 +769,8 @@ Line 4";
                 Substitute.For<IGraphQLClientFactory>(),
                 Substitute.For<IUsageTracker>());
 
-            result.GetTipSha(Arg.Any<ILocalRepositoryModel>()).Returns("BRANCH_TIP");
-            result.GetPullRequestMergeBase(Arg.Any<ILocalRepositoryModel>(), Arg.Any<PullRequestDetailModel>())
+            result.GetTipSha(Arg.Any<LocalRepositoryModel>()).Returns("BRANCH_TIP");
+            result.GetPullRequestMergeBase(Arg.Any<LocalRepositoryModel>(), Arg.Any<PullRequestDetailModel>())
                 .Returns("MERGE_BASE");
             return result;
         }
@@ -784,11 +781,11 @@ Line 4";
             string remoteRepositoryOwner,
             bool hasPendingReview)
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
-
-            repository.CloneUrl.Returns(new UriString($"https://github.com/{localRepositoryOwner}/reop"));
-            repository.Owner.Returns(localRepositoryOwner);
-            repository.Name.Returns("repo");
+            var repository = new LocalRepositoryModel
+            {
+                CloneUrl = $"https://github.com/{localRepositoryOwner}/repo",
+                Name = "repo"
+            };
 
             var pr = CreatePullRequest();
             var user = CreateActor();

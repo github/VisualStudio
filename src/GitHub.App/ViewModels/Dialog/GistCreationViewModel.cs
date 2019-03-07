@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -54,7 +55,7 @@ namespace GitHub.ViewModels.Dialog
                 x => x.FileName,
                 fileName => !String.IsNullOrEmpty(fileName.Value));
 
-            CreateGist = ReactiveCommand.CreateAsyncObservable(canCreateGist, OnCreateGist);
+            CreateGist = ReactiveCommand.CreateFromObservable(OnCreateGist, canCreateGist);
         }
 
         public async Task InitializeAsync(IConnection connection)
@@ -70,7 +71,7 @@ namespace GitHub.ViewModels.Dialog
                 .ToProperty(this, vm => vm.Account);
         }
 
-        IObservable<Gist> OnCreateGist(object unused)
+        IObservable<Gist> OnCreateGist()
         {
             var newGist = new NewGist
             {
@@ -96,7 +97,7 @@ namespace GitHub.ViewModels.Dialog
 
         public string Title => Resources.CreateGistTitle;
 
-        public IReactiveCommand<Gist> CreateGist { get; }
+        public ReactiveCommand<Unit, Gist> CreateGist { get; }
 
         public IAccount Account
         {

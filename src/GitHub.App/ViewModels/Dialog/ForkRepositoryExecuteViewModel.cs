@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Api;
@@ -44,27 +45,27 @@ namespace GitHub.ViewModels.Dialog
             this.WhenAnyValue(model => model.UpdateOrigin, model => model.AddUpstream)
                 .Subscribe(tuple => CanResetMasterTracking = tuple.Item1 && tuple.Item2);
 
-            CreateFork = ReactiveCommand.CreateAsyncObservable(OnCreateFork);
-            BackCommand = ReactiveCommand.Create();
+            CreateFork = ReactiveCommand.CreateFromObservable(OnCreateFork);
+            BackCommand = ReactiveCommand.Create(() => { });
         }
 
-        public IRepositoryModel SourceRepository { get; private set; }
+        public RepositoryModel SourceRepository { get; private set; }
 
         public IAccount DestinationAccount { get; private set; }
 
-        public IRepositoryModel DestinationRepository { get; private set; }
+        public RepositoryModel DestinationRepository { get; private set; }
 
-        public IReactiveCommand<Repository> CreateFork { get; }
+        public ReactiveCommand<Unit, Repository> CreateFork { get; }
 
-        public IReactiveCommand<object> BackCommand { get; }
+        public ReactiveCommand<Unit, Unit> BackCommand { get; }
 
         public string Title => Resources.ForkRepositoryTitle;
 
         public IObservable<object> Done => CreateFork.Where(repository => repository != null);
 
-        public IObservable<object> Back => BackCommand.AsObservable();
+        public IObservable<Unit> Back => BackCommand;
 
-        public async Task InitializeAsync(ILocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel sourceRepository, IAccount destinationAccount, IConnection connection)
         {
             var modelService = await modelServiceFactory.CreateAsync(connection);
             apiClient = modelService.ApiClient;
@@ -89,7 +90,7 @@ namespace GitHub.ViewModels.Dialog
             return new UriString(forkUri);
         }
 
-        IObservable<Repository> OnCreateFork(object o)
+        IObservable<Repository> OnCreateFork()
         {
             var newRepositoryFork = new NewRepositoryFork
             {

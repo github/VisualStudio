@@ -14,6 +14,8 @@ using GitHub.ViewModels.GitHubPane;
 using LibGit2Sharp;
 using NSubstitute;
 using NUnit.Framework;
+using System.Windows.Input;
+using System.Reactive.Threading.Tasks;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
@@ -28,7 +30,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             {
                 var target = CreateTarget();
 
-                await target.Load(CreatePullRequestModel(body: string.Empty));
+                await target.Load(CreatePullRequestModel());
 
                 Assert.That("*No description provided.*", Is.EqualTo(target.Body));
             }
@@ -192,7 +194,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Checkout.CanExecute(null));
+                Assert.False(((ICommand)target.Checkout).CanExecute(null));
                 Assert.That(target.CheckoutState, Is.Null);
             }
 
@@ -205,7 +207,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Checkout.CanExecute(null));
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
                 Assert.True(target.CheckoutState.IsEnabled);
                 Assert.That("Checkout pr/123", Is.EqualTo(target.CheckoutState.ToolTip));
             }
@@ -220,7 +222,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Checkout.CanExecute(null));
+                Assert.False(((ICommand)target.Checkout).CanExecute(null));
                 Assert.That("Cannot checkout as your working directory has uncommitted changes.", Is.EqualTo(target.CheckoutState.ToolTip));
             }
 
@@ -233,7 +235,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel(number: 123));
 
-                Assert.True(target.Checkout.CanExecute(null));
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
                 Assert.That("Checkout pr/123", Is.EqualTo(target.CheckoutState.Caption));
             }
 
@@ -245,7 +247,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel(number: 123));
 
-                Assert.True(target.Checkout.CanExecute(null));
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
                 Assert.That("Checkout to pr/123", Is.EqualTo(target.CheckoutState.Caption));
             }
 
@@ -261,7 +263,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(pr);
 
-                Assert.False(target.Checkout.CanExecute(null));
+                Assert.False(((ICommand)target.Checkout).CanExecute(null));
                 Assert.That("The source repository is no longer available.", Is.EqualTo(target.CheckoutState.ToolTip));
             }
 
@@ -274,9 +276,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Checkout.CanExecute(null));
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
 
-                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.Execute());
 
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
             }
@@ -290,11 +292,11 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Checkout.CanExecute(null));
-                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.Execute());
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
-                await target.Checkout.ExecuteAsync();
+                await target.Checkout.Execute();
                 Assert.That(target.OperationError, Is.Null);
             }
 
@@ -307,8 +309,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Checkout.CanExecute(null));
-                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.ExecuteAsyncTask());
+                Assert.True(((ICommand)target.Checkout).CanExecute(null));
+                Assert.ThrowsAsync<FileNotFoundException>(async () => await target.Checkout.Execute());
                 Assert.That("Switch threw", Is.EqualTo(target.OperationError));
 
                 await target.Refresh();
@@ -327,7 +329,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Pull.CanExecute(null));
+                Assert.False(((ICommand)target.Pull).CanExecute(null));
                 Assert.That(target.UpdateState, Is.Null);
             }
 
@@ -340,7 +342,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Pull.CanExecute(null));
+                Assert.False(((ICommand)target.Pull).CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("No commits to pull", Is.EqualTo(target.UpdateState.PullToolTip));
@@ -356,7 +358,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Pull.CanExecute(null));
+                Assert.True(((ICommand)target.Pull).CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("Pull from remote branch baz", Is.EqualTo(target.UpdateState.PullToolTip));
@@ -373,7 +375,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Pull.CanExecute(null));
+                Assert.True(((ICommand)target.Pull).CanExecute(null));
                 Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("Pull from remote branch baz", Is.EqualTo(target.UpdateState.PullToolTip));
@@ -390,7 +392,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Pull.CanExecute(null));
+                Assert.True(((ICommand)target.Pull).CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("Pull from fork branch foo:baz", Is.EqualTo(target.UpdateState.PullToolTip));
@@ -405,7 +407,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.ExecuteAsyncTask(null));
+                Assert.ThrowsAsync<FileNotFoundException>(() => target.Pull.Execute().ToTask());
                 Assert.That("Pull threw", Is.EqualTo(target.OperationError));
             }
         }
@@ -421,7 +423,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Push.CanExecute(null));
+                Assert.False(((ICommand)target.Push).CanExecute(null));
                 Assert.That(target.UpdateState, Is.Null);
             }
 
@@ -434,7 +436,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Push.CanExecute(null));
+                Assert.False(((ICommand)target.Push).CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("No commits to push", Is.EqualTo(target.UpdateState.PushToolTip));
@@ -450,7 +452,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Push.CanExecute(null));
+                Assert.True(((ICommand)target.Push).CanExecute(null));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("Push to remote branch baz", Is.EqualTo(target.UpdateState.PushToolTip));
@@ -466,7 +468,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Push.CanExecute(null));
+                Assert.False(((ICommand)target.Push).CanExecute(null));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("No commits to push", Is.EqualTo(target.UpdateState.PushToolTip));
@@ -483,7 +485,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.False(target.Push.CanExecute(null));
+                Assert.False(((ICommand)target.Push).CanExecute(null));
                 Assert.That(3, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("You must pull before you can push", Is.EqualTo(target.UpdateState.PushToolTip));
@@ -500,7 +502,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.True(target.Push.CanExecute(null));
+                Assert.True(((ICommand)target.Push).CanExecute(null));
                 Assert.That(2, Is.EqualTo(target.UpdateState.CommitsAhead));
                 Assert.That(0, Is.EqualTo(target.UpdateState.CommitsBehind));
                 Assert.That("Push to fork branch foo:baz", Is.EqualTo(target.UpdateState.PushToolTip));
@@ -515,7 +517,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
                 await target.Load(CreatePullRequestModel());
 
-                Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.ExecuteAsyncTask(null));
+                Assert.ThrowsAsync<FileNotFoundException>(() => target.Push.Execute().ToTask());
                 Assert.That("Push threw", Is.EqualTo(target.OperationError));
             }
         }
@@ -548,12 +550,16 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             int behindBy = 0,
             IPullRequestSessionManager sessionManager = null)
         {
-            var repository = Substitute.For<ILocalRepositoryModel>();
+            var repository = new LocalRepositoryModel
+            {
+                CloneUrl = new UriString(Uri.ToString()),
+                LocalPath = @"C:\projects\ThisRepo",
+                Name = "repo"
+            };
+
             var currentBranchModel = new BranchModel(currentBranch, repository);
-            repository.CurrentBranch.Returns(currentBranchModel);
-            repository.CloneUrl.Returns(new UriString(Uri.ToString()));
-            repository.LocalPath.Returns(@"C:\projects\ThisRepo");
-            repository.Name.Returns("repo");
+            var gitService = Substitute.For<IGitService>();
+            gitService.GetBranch(repository).Returns(currentBranchModel);
 
             var pullRequestService = Substitute.For<IPullRequestService>();
 
@@ -566,7 +572,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             else
             {
                 pullRequestService.GetLocalBranches(repository, Arg.Any<PullRequestDetailModel>())
-                    .Returns(Observable.Empty<IBranch>());
+                    .Returns(Observable.Empty<BranchModel>());
             }
 
             pullRequestService.Checkout(repository, Arg.Any<PullRequestDetailModel>(), Arg.Any<string>()).Returns(x => Throws("Checkout threw"));
@@ -605,7 +611,9 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<ITeamExplorerContext>(),
                 Substitute.For<IPullRequestFilesViewModel>(),
                 Substitute.For<ISyncSubmodulesCommand>(),
-                Substitute.For<IViewViewModelFactory>());
+                Substitute.For<IViewViewModelFactory>(),
+                gitService,
+                Substitute.For<IOpenIssueishDocumentCommand>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
@@ -613,19 +621,18 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static PullRequestDetailModel CreatePullRequestModel(
             int number = 1,
-            string body = "PR Body",
             IEnumerable<PullRequestReviewModel> reviews = null)
         {
             var author = Substitute.For<IAccount>();
 
-            reviews = reviews ?? new PullRequestReviewModel[0];
+            reviews = reviews ?? Array.Empty<PullRequestReviewModel>();
 
             return new PullRequestDetailModel
             {
                 Number = number,
                 Title = "PR 1",
                 Author = new ActorModel(),
-                State = PullRequestStateEnum.Open,
+                State = PullRequestState.Open,
                 Body = string.Empty,
                 BaseRefName = "master",
                 BaseRefSha = "BASE_REF",

@@ -7,6 +7,8 @@ using GitHub.InlineReviews.Glyph;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
 using GitHub.InlineReviews.Services;
+using GitHub.Models;
+using GitHub.Services;
 
 namespace GitHub.InlineReviews.Tags
 {
@@ -54,12 +56,25 @@ namespace GitHub.InlineReviews.Tags
             {
                 return new AddInlineCommentGlyph();
             }
-            else if (showTag != null)
+
+            if (showTag != null)
             {
-                return new ShowInlineCommentGlyph()
+                if (showTag.Thread != null && showTag.Annotations != null)
                 {
-                    Opacity = showTag.Thread.IsStale ? 0.5 : 1,
-                };
+                    return new ShowInlineCommentAnnotationGlyph();
+                }
+
+                if (showTag.Thread != null)
+                {
+                    return new ShowInlineCommentGlyph();
+                }
+
+                if (showTag.Annotations != null)
+                {
+                    return new ShowInlineAnnotationGlyph();
+                }
+
+                throw new ArgumentException($"{nameof(showTag)} does not have a thread or annotations");
             }
 
             throw new ArgumentException($"Unknown 'InlineCommentTag' type '{tag}'");
@@ -72,12 +87,14 @@ namespace GitHub.InlineReviews.Tags
 
             if (addTag != null)
             {
-                peekService.Show(textView, addTag);
+                var side = addTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, addTag.LineNumber);
                 return true;
             }
             else if (showTag != null)
             {
-                peekService.Show(textView, showTag);
+                var side = showTag.DiffChangeType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+                peekService.Show(textView, side, showTag.LineNumber);
                 return true;
             }
 

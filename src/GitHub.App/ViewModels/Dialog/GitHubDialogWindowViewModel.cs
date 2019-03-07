@@ -81,7 +81,7 @@ namespace GitHub.ViewModels.Dialog
             }
         }
 
-        public async Task StartWithLogout<T>(T viewModel, IConnection connection)
+        public Task StartWithLogout<T>(T viewModel, IConnection connection)
             where T : IDialogContentViewModel, IConnectionInitializedViewModel
         {
             var logout = factory.CreateViewModel<ILogOutRequiredViewModel>();
@@ -101,6 +101,7 @@ namespace GitHub.ViewModels.Dialog
             });
 
             Content = logout;
+            return Task.CompletedTask;
         }
 
         async Task<IConnection> ShowLogin()

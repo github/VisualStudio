@@ -1,4 +1,6 @@
-﻿using ReactiveUI;
+﻿using System.Reactive;
+using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -15,7 +17,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which opens the Team Explorer Connect page.
         /// </summary>
-        ReactiveCommand<object> OpenTeamExplorer { get; }
+        ReactiveCommand<Unit, Unit> OpenTeamExplorer { get; }
 
         /// <summary>
         /// Initializes the view model with an error.

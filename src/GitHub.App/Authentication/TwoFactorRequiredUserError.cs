@@ -2,9 +2,11 @@
 using GitHub.Extensions;
 using Octokit;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.Authentication
 {
+#pragma warning disable CS0618 // Type or member is obsolete
     public class TwoFactorRequiredUserError : UserError
     {
         public TwoFactorRequiredUserError(TwoFactorAuthorizationException exception)
@@ -32,4 +34,5 @@ namespace GitHub.Authentication
             return Throw(this);
         }
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

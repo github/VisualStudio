@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj" />

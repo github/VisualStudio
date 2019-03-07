@@ -13,6 +13,6 @@ namespace GitHub.ViewModels.Dialog
         /// Gets a command which, when invoked, directs the user to
         /// a GitHub.com lost password flow.
         /// </summary>
-        IReactiveCommand<Unit> NavigatePricing { get; }
+        ReactiveCommand<Unit, Unit> NavigatePricing { get; }
     }
 }

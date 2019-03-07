@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
@@ -22,7 +23,7 @@ namespace GitHub.ViewModels.GitHubPane
     {
         static readonly IReadOnlyList<string> states = new[] { "Open", "Closed", "All" };
         readonly IIssueService service;
-        readonly IShowIssueDetailsCommand showIssueDetails;
+        readonly IOpenIssueishDocumentCommand showIssueDetails;
         ObservableAsPropertyHelper<Uri> webUrl;
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace GitHub.ViewModels.GitHubPane
         public IssueListViewModel(
             IRepositoryService repositoryService,
             IIssueService service,
-            IShowIssueDetailsCommand showIssueDetails)
+            IOpenIssueishDocumentCommand showIssueDetails)
             : base(repositoryService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
@@ -46,7 +47,7 @@ namespace GitHub.ViewModels.GitHubPane
             webUrl = this.WhenAnyValue(x => x.RemoteRepository)
                 .Select(x => x?.CloneUrl?.ToRepositoryUrl().Append("issue"))
                 .ToProperty(this, x => x.WebUrl);
-            OpenItemInBrowser = ReactiveCommand.Create();
+            OpenItemInBrowser = ReactiveCommand.Create<IIssueListItemViewModel, IIssueListItemViewModel>(x => x);
         }
 
         /// <inheritdoc/>
@@ -56,7 +57,7 @@ namespace GitHub.ViewModels.GitHubPane
         public Uri WebUrl => webUrl.Value;
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenItemInBrowser { get; }
+        public ReactiveCommand<IIssueListItemViewModel, IIssueListItemViewModel> OpenItemInBrowser { get; }
 
         /// <inheritdoc/>
         protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
@@ -68,7 +69,7 @@ namespace GitHub.ViewModels.GitHubPane
         protected override Task DoOpenItem(IIssueListItemViewModelBase item)
         {
             var i = (IIssueListItemViewModel)item;
-            return showIssueDetails.Execute(new ShowIssueDetailsParams(
+            return showIssueDetails.Execute(new OpenIssueishParams(
                 HostAddress.Create(LocalRepository.CloneUrl),
                 RemoteRepository.Owner,
                 RemoteRepository.Name,

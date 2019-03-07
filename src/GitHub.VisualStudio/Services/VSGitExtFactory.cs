@@ -1,12 +1,8 @@
-﻿extern alias TF14;
-extern alias TF15;
-
-using System;
+﻿using System;
+using System.Reflection;
 using GitHub.Logging;
+using GitHub.VisualStudio.Base;
 using Serilog;
-using Microsoft.VisualStudio.Shell;
-using VSGitExt14 = TF14.GitHub.VisualStudio.Base.VSGitExt;
-using VSGitExt15 = TF15.GitHub.VisualStudio.Base.VSGitExt;
 
 namespace GitHub.Services
 {
@@ -15,31 +11,28 @@ namespace GitHub.Services
         static readonly ILogger log = LogManager.ForContext<VSGitExtFactory>();
 
         readonly int vsVersion;
-        readonly IAsyncServiceProvider asyncServiceProvider;
+        readonly IServiceProvider serviceProvider;
+        readonly IGitService gitService;
 
-        public VSGitExtFactory(int vsVersion, IAsyncServiceProvider asyncServiceProvider)
+        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService)
         {
             this.vsVersion = vsVersion;
-            this.asyncServiceProvider = asyncServiceProvider;
+            this.serviceProvider = serviceProvider;
+            this.gitService = gitService;
         }
 
+        // The GitHub.TeamFoundation.* assemblies target different .NET and Visual Studio versions.
+        // We can't reference all of their projects directly, so instead we use reflection to retrieve
+        // and instantiate the correct implementation.
         public IVSGitExt Create()
         {
-            switch (vsVersion)
+            if(Type.GetType($"GitHub.VisualStudio.Base.VSGitExt, GitHub.TeamFoundation.{vsVersion}", false) is Type type)
             {
-                case 14:
-                    return Create(() => new VSGitExt14(asyncServiceProvider));
-                case 15:
-                case 16:
-                    return Create(() => new VSGitExt15(asyncServiceProvider));
-                default:
-                    log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
-                    return null;
+                return (IVSGitExt)Activator.CreateInstance(type, serviceProvider, gitService);
             }
-        }
 
-        // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
-        // This ensures that only the type that's compatible with the running DTE version is loaded.
-        static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
+            log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
+            return null;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.Info;
 using GitHub.Services;
@@ -25,17 +26,17 @@ namespace GitHub.ViewModels.GitHubPane
         {
             this.dialogService = dialogService;
             this.browser = browser;
-            SignIn = ReactiveCommand.Create();
+            SignIn = ReactiveCommand.Create(() => { });
             SignIn.Subscribe(_ => OnSignIn());
-            Register = ReactiveCommand.Create();
+            Register = ReactiveCommand.Create(() => { });
             Register.Subscribe(_ => OnRegister());
         }
 
         /// <inheritdoc/>
-        public IReactiveCommand<object> SignIn { get; }
+        public ReactiveCommand<Unit, Unit> SignIn { get; }
 
         /// <inheritdoc/>
-        public IReactiveCommand<object> Register { get; }
+        public ReactiveCommand<Unit, Unit> Register { get; }
 
         /// <summary>
         /// Called when the <see cref="SignIn"/> command is executed.

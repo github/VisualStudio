@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.Text.Projection;
 using ReactiveUI;
 using Serilog;
 
+#pragma warning disable CA1308 // Normalize strings to uppercase
+
 namespace GitHub.InlineReviews.Services
 {
     /// <summary>
@@ -35,7 +37,7 @@ namespace GitHub.InlineReviews.Services
             new Dictionary<Tuple<string, int>, WeakReference<PullRequestSession>>();
         TaskCompletionSource<object> initialized;
         IPullRequestSession currentSession;
-        ILocalRepositoryModel repository;
+        LocalRepositoryModel repository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionManager"/> class.
@@ -182,7 +184,7 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        async Task RepoChanged(ILocalRepositoryModel localRepositoryModel)
+        async Task RepoChanged(LocalRepositoryModel localRepositoryModel)
         {
             repository = localRepositoryModel;
             CurrentSession = null;
@@ -192,6 +194,10 @@ namespace GitHub.InlineReviews.Services
             {
                 await StatusChanged();
             }
+            else
+            {
+                initialized.TrySetResult(null);
+            }
         }
 
         async Task StatusChanged()
@@ -199,7 +205,7 @@ namespace GitHub.InlineReviews.Services
             var session = CurrentSession;
 
             var pr = await service.GetPullRequestForCurrentBranch(repository).FirstOrDefaultAsync();
-            if (pr != null)
+            if (pr != default)
             {
                 var changePR =
                     pr.Item1 != (session?.PullRequest.BaseRepositoryOwner) ||
@@ -223,6 +229,13 @@ namespace GitHub.InlineReviews.Services
 
         async Task<PullRequestSession> GetSessionInternal(string owner, string name, int number)
         {
+            var cloneUrl = repository.CloneUrl;
+            if (cloneUrl == null)
+            {
+                // Can't create a session from a repository with no origin
+                return null;
+            }
+
             PullRequestSession session = null;
             WeakReference<PullRequestSession> weakSession;
             var key = Tuple.Create(owner.ToLowerInvariant(), number);
@@ -234,7 +247,7 @@ namespace GitHub.InlineReviews.Services
 
             if (session == null)
             {
-                var address = HostAddress.Create(repository.CloneUrl);
+                var address = HostAddress.Create(cloneUrl);
                 var pullRequest = await sessionService.ReadPullRequestDetail(address, owner, name, number);
 
                 session = new PullRequestSession(

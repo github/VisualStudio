@@ -10,10 +10,12 @@ using GitHub.VisualStudio.Base;
 using NUnit.Framework;
 using NSubstitute;
 using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 using static Microsoft.VisualStudio.VSConstants;
+using GitHub.Primitives;
+using LibGit2Sharp;
+using System.Threading.Tasks;
 
 public class VSGitExtTests
 {
@@ -25,11 +27,11 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenGitSccProviderIsActive(bool isActive, string contextGuidString, int expectCalls)
         {
             var context = CreateVSUIContext(isActive);
-            var sp = Substitute.For<IAsyncServiceProvider>();
+            var sp = Substitute.For<IServiceProvider>();
 
             var target = CreateVSGitExt(context, sp: sp, contextGuidString: contextGuidString);
 
-            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
+            sp.Received(expectCalls).GetService(typeof(IGitExt));
         }
 
         [TestCase(true, 1)]
@@ -37,13 +39,13 @@ public class VSGitExtTests
         public void GetServiceIGitExt_WhenUIContextChanged(bool activated, int expectCalls)
         {
             var context = CreateVSUIContext(false);
-            var sp = Substitute.For<IAsyncServiceProvider>();
+            var sp = Substitute.For<IServiceProvider>();
             var target = CreateVSGitExt(context, sp: sp);
 
             context.IsActive = activated;
             target.JoinTillEmpty();
 
-            sp.Received(expectCalls).GetServiceAsync(typeof(IGitExt));
+            sp.Received(expectCalls).GetService(typeof(IGitExt));
         }
 
         [Test]
@@ -54,7 +56,7 @@ public class VSGitExtTests
             gitExt.ActiveRepositories.Returns(x =>
             {
                 threadPool = Thread.CurrentThread.IsThreadPoolThread;
-                return new IGitRepositoryInfo[0];
+                return Array.Empty<IGitRepositoryInfo>();
             });
 
             var target = CreateVSGitExt(gitExt: gitExt);
@@ -149,32 +151,32 @@ public class VSGitExtTests
         public void RepositoryOpenIsActive_InitializeWithActiveRepositories()
         {
             var repoPath = "repoPath";
-            var repoFactory = Substitute.For<ILocalRepositoryModelFactory>();
+            var gitService = Substitute.For<IGitService>();
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
-            var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
+            var target = CreateVSGitExt(context, gitExt, gitService: gitService);
             target.JoinTillEmpty();
 
             var activeRepositories = target.ActiveRepositories;
 
             Assert.That(activeRepositories.Count, Is.EqualTo(1));
-            repoFactory.Received(1).Create(repoPath);
+            gitService.Received(1).CreateLocalRepositoryModel(repoPath);
         }
 
         [Test]
         public void ExceptionRefreshingRepositories_ReturnsEmptyList()
         {
             var repoPath = "repoPath";
-            var repoFactory = Substitute.For<ILocalRepositoryModelFactory>();
-            repoFactory.Create(repoPath).ReturnsForAnyArgs(x => { throw new Exception("Boom!"); });
+            var gitService = Substitute.For<IGitService>();
+            gitService.CreateLocalRepositoryModel(repoPath).ReturnsForAnyArgs(x => { throw new Exception("Boom!"); });
             var context = CreateVSUIContext(true);
             var gitExt = CreateGitExt(new[] { repoPath });
-            var target = CreateVSGitExt(context, gitExt, repoFactory: repoFactory);
+            var target = CreateVSGitExt(context, gitExt, gitService: gitService);
             target.JoinTillEmpty();
 
             var activeRepositories = target.ActiveRepositories;
 
-            repoFactory.Received(1).Create(repoPath);
+            gitService.Received(1).CreateLocalRepositoryModel(repoPath);
             Assert.That(activeRepositories.Count, Is.EqualTo(0));
         }
 
@@ -182,8 +184,8 @@ public class VSGitExtTests
         public async Task ActiveRepositoriesChangedOrderingShouldBeCorrectAcrossThreads()
         {
             var gitExt = new MockGitExt();
-            var repoFactory = new MockRepositoryFactory();
-            var target = CreateVSGitExt(gitExt: gitExt, repoFactory: repoFactory);
+            var gitService = new MockGitService();
+            var target = CreateVSGitExt(gitExt: gitExt, gitService: gitService);
             var activeRepositories1 = CreateActiveRepositories("repo1");
             var activeRepositories2 = CreateActiveRepositories("repo2");
             var task1 = Task.Run(() => gitExt.ActiveRepositories = activeRepositories1);
@@ -210,19 +212,19 @@ public class VSGitExtTests
         return repositories.AsReadOnly();
     }
 
-    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IAsyncServiceProvider sp = null,
-        ILocalRepositoryModelFactory repoFactory = null, JoinableTaskContext joinableTaskContext = null, string contextGuidString = null)
+    static VSGitExt CreateVSGitExt(IVSUIContext context = null, IGitExt gitExt = null, IServiceProvider sp = null,
+        IGitService gitService = null, JoinableTaskContext joinableTaskContext = null, string contextGuidString = null)
     {
         context = context ?? CreateVSUIContext(true);
         gitExt = gitExt ?? CreateGitExt();
         var contextGuid = new Guid(contextGuidString ?? Guids.GitSccProviderId);
-        sp = sp ?? Substitute.For<IAsyncServiceProvider>();
-        repoFactory = repoFactory ?? Substitute.For<ILocalRepositoryModelFactory>();
+        sp = sp ?? Substitute.For<IServiceProvider>();
+        gitService = gitService ?? Substitute.For<IGitService>();
         joinableTaskContext = joinableTaskContext ?? new JoinableTaskContext();
         var factory = Substitute.For<IVSUIContextFactory>();
         factory.GetUIContext(contextGuid).Returns(context);
-        sp.GetServiceAsync(typeof(IGitExt)).Returns(gitExt);
-        var vsGitExt = new VSGitExt(sp, factory, repoFactory, joinableTaskContext);
+        sp.GetService(typeof(IGitExt)).Returns(gitExt);
+        var vsGitExt = new VSGitExt(sp, factory, gitService, joinableTaskContext);
         vsGitExt.JoinTillEmpty();
         return vsGitExt;
     }
@@ -273,7 +275,7 @@ public class VSGitExtTests
 
     class MockGitExt : IGitExt
     {
-        IReadOnlyList<IGitRepositoryInfo> activeRepositories = new IGitRepositoryInfo[0];
+        IReadOnlyList<IGitRepositoryInfo> activeRepositories = Array.Empty<IGitRepositoryInfo>();
 
         public IReadOnlyList<IGitRepositoryInfo> ActiveRepositories
         {
@@ -291,12 +293,14 @@ public class VSGitExtTests
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    class MockRepositoryFactory : ILocalRepositoryModelFactory
+    class MockGitService : IGitService
     {
-        public ILocalRepositoryModel Create(string localPath)
+        public LocalRepositoryModel CreateLocalRepositoryModel(string localPath)
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
-            result.LocalPath.Returns(localPath);
+            var result = new LocalRepositoryModel
+            {
+                LocalPath = localPath
+            };
 
             if (localPath == "repo1")
             {
@@ -308,5 +312,12 @@ public class VSGitExtTests
 
             return result;
         }
+
+        public BranchModel GetBranch(LocalRepositoryModel model) => throw new NotImplementedException();
+        public Task<string> GetLatestPushedSha(string path, string remote = "origin") => throw new NotImplementedException();
+        public UriString GetRemoteUri(IRepository repo, string remote = "origin") => throw new NotImplementedException();
+        public IRepository GetRepository(string path) => throw new NotImplementedException();
+        public UriString GetUri(IRepository repository, string remote = "origin") => throw new NotImplementedException();
+        public UriString GetUri(string path, string remote = "origin") => throw new NotImplementedException();
     }
 }

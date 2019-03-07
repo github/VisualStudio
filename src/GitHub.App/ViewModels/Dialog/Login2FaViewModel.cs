@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.Reactive;
 using System.Reactive.Linq;
 using GitHub.App;
 using GitHub.Authentication;
@@ -36,11 +37,11 @@ namespace GitHub.ViewModels.Dialog
                 x => x.IsBusy,
                 (code, busy) => !string.IsNullOrEmpty(code.Value) && code.Value.Length == 6 && !busy.Value);
 
-            OkCommand = ReactiveCommand.Create(canVerify);
-            NavigateLearnMore = ReactiveCommand.Create();
+            OkCommand = ReactiveCommand.Create(() => { }, canVerify);
+            NavigateLearnMore = ReactiveCommand.Create(() => { });
             NavigateLearnMore.Subscribe(x => browser.OpenUrl(GitHubUrls.TwoFactorLearnMore));
             //TODO: ShowHelpCommand.Subscribe(x => browser.OpenUrl(twoFactorHelpUri));
-            ResendCodeCommand = ReactiveCommand.Create();
+            ResendCodeCommand = ReactiveCommand.Create(() => { });
 
             showErrorMessage = this.WhenAny(
                 x => x.IsAuthenticationCodeSent,
@@ -71,7 +72,8 @@ namespace GitHub.ViewModels.Dialog
                 .ToProperty(this, x => x.IsSms);
         }
 
-        public IObservable<TwoFactorChallengeResult> Show(UserError userError)
+#pragma warning disable CS0618 // Type or member is obsolete
+        public IObservable<TwoFactorChallengeResult> Show(ReactiveUI.Legacy.UserError userError)
         {
             Guard.ArgumentNotNull(userError, nameof(userError));
 
@@ -95,7 +97,7 @@ namespace GitHub.ViewModels.Dialog
                 .Select(_ => AuthenticationCode == null
                     ? null
                     : new TwoFactorChallengeResult(AuthenticationCode));
-            var resend = ResendCodeCommand.Select(_ => RecoveryOptionResult.RetryOperation)
+            var resend = ResendCodeCommand.Select(_ => ReactiveUI.Legacy.RecoveryOptionResult.RetryOperation)
                 .Select(_ => TwoFactorChallengeResult.RequestResendCode)
                 .Do(_ => IsAuthenticationCodeSent = true);
             var cancel = this.WhenAnyValue(x => x.TwoFactorType)
@@ -104,6 +106,7 @@ namespace GitHub.ViewModels.Dialog
                 .Select(_ => default(TwoFactorChallengeResult));
             return Observable.Merge(ok, cancel, resend).Take(1);
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         public string Title => Resources.TwoFactorTitle;
 
@@ -139,9 +142,9 @@ namespace GitHub.ViewModels.Dialog
         }
 
         public IObservable<object> Done => null;
-        public ReactiveCommand<object> OkCommand { get; private set; }
-        public ReactiveCommand<object> NavigateLearnMore { get; private set; }
-        public ReactiveCommand<object> ResendCodeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NavigateLearnMore { get; private set; }
+        public ReactiveCommand<Unit, Unit> ResendCodeCommand { get; private set; }
         public ReactivePropertyValidator AuthenticationCodeValidator { get; private set; }
 
         public bool InvalidAuthenticationCode

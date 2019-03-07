@@ -1,4 +1,5 @@
-﻿using GitHub.Extensions;
+﻿using System.Reactive;
+using GitHub.Extensions;
 using GitHub.Models;
 using ReactiveUI;
 
@@ -16,7 +17,7 @@ namespace GitHub.ViewModels.TeamExplorer
         /// <summary>
         /// Command that creates the repository.
         /// </summary>
-        IReactiveCommand<ProgressState> PublishRepository { get; }
+        ReactiveCommand<Unit, ProgressState> PublishRepository { get; }
 
         /// <summary>
         /// Determines whether the host combo box is visible. Only true if the user is logged into more than one host.

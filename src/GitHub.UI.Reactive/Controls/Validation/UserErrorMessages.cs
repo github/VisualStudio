@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.UI
 {
     public class UserErrorMessages : UserControl
     {
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IDisposable whenAnyShowingMessage;
+
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly IDisposable whenAnyDataContext;
 
         public UserErrorMessages()
@@ -33,7 +35,7 @@ namespace GitHub.UI
                 });
         }
 
-        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0,0,8,0)));
+        public static readonly DependencyProperty IconMarginProperty = DependencyProperty.Register("IconMargin", typeof(Thickness), typeof(UserErrorMessages), new PropertyMetadata(new Thickness(0, 0, 8, 0)));
         public Thickness IconMargin
         {
             get { return (Thickness)GetValue(IconMarginProperty); }
@@ -75,6 +77,7 @@ namespace GitHub.UI
             private set { SetValue(IsShowingMessageProperty, value); }
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         public static readonly DependencyProperty UserErrorProperty = DependencyProperty.Register("UserError", typeof(UserError), typeof(UserErrorMessages));
         public UserError UserError
         {
@@ -95,5 +98,6 @@ namespace GitHub.UI
                     .Select(x => RecoveryOptionResult.CancelOperation);
             });
         }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

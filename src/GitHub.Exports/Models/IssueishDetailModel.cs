@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace GitHub.Models
 {
     /// <summary>
-    /// Holds the details of an issue or pull request.
+    /// Base class for issue and pull request detail models.
     /// </summary>
     public class IssueishDetailModel
     {
@@ -29,7 +29,7 @@ namespace GitHub.Models
         public string Title { get; set; }
 
         /// <summary>
-        /// Gets or sets the issue or pull request body markdown.
+        /// Gets or sets the issue or pull request body.
         /// </summary>
         public string Body { get; set; }
 
@@ -37,5 +37,15 @@ namespace GitHub.Models
         /// Gets or sets the date/time at which the issue or pull request was last updated.
         /// </summary>
         public DateTimeOffset UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the comments on the issue or pull request.
+        /// </summary>
+        public IReadOnlyList<CommentModel> Comments { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of comments on the issue or pull request.
+        /// </summary>
+        public int CommentCount { get; set; }
     }
 }

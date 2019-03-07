@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using ReactiveUI;
@@ -13,7 +14,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -47,7 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that navigates to the parent pull request in the GitHub pane.
         /// </summary>
-        ReactiveCommand<object> NavigateToPullRequest { get; }
+        ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
         /// Initializes the view model, loading data from the API.
@@ -59,7 +60,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="pullRequestNumber">The pull request number.</param>
         /// <param name="login">The user's login.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

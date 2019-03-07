@@ -27,7 +27,6 @@ namespace GitHub.VisualStudio.Views.GitHubPane
 
             this.WhenActivated(d =>
             {
-                infoPanel.Visibility = Visibility.Collapsed;
                 d(notifications.Listen()
                     .ObserveOnDispatcher(DispatcherPriority.Normal)
                     .Subscribe(n =>

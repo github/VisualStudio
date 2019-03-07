@@ -114,8 +114,10 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller, [bool]$Deploy = $false) {
-        Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [bool]$Deploy = $false) {
+        $msbuild = Find-MSBuild
+
+        Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed -MSBuildPath (Split-Path -parent $msbuild) }
         $flag1 = ""
         $flag2 = ""
         if ($ForVSInstaller) {
@@ -127,10 +129,8 @@ New-Module -ScriptBlock {
             $flag1 = "/p:Package=Skip"
         }
 
-        $msbuild = Find-MSBuild
-
-        Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 $flag1 $flag2"
-        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 $flag1 $flag2 }
+        Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 /bl:output.binlog $flag1 $flag2"
+        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=15.0 /bl:output.binlog $flag1 $flag2 }
     }
 
     Export-ModuleMember -Function Find-MSBuild,Build-Solution
@@ -185,7 +185,7 @@ New-Module -ScriptBlock {
 
 New-Module -ScriptBlock {
     function Write-Manifest([string]$directory) {
-        Add-Type -Path (Join-Path $rootDirectory packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll)
+        Add-Type -Path (Join-Path $rootDirectory build\Release\Newtonsoft.Json.dll)
 
         $manifest = @{
             NewestExtension = @{

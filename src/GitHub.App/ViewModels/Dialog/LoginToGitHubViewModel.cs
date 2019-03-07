@@ -24,7 +24,7 @@ namespace GitHub.ViewModels.Dialog
         {
             BaseUri = HostAddress.GitHubDotComHostAddress.WebUri;
 
-            NavigatePricing = ReactiveCommand.CreateAsyncObservable(_ =>
+            NavigatePricing = ReactiveCommand.CreateFromObservable(() =>
             {
                 browser.OpenUrl(GitHubUrls.Pricing);
                 return Observable.Return(Unit.Default);
@@ -32,16 +32,16 @@ namespace GitHub.ViewModels.Dialog
             });
         }
 
-        public IReactiveCommand<Unit> NavigatePricing { get; }
+        public ReactiveCommand<Unit, Unit> NavigatePricing { get; }
 
         protected override Uri BaseUri { get; }
 
-        protected override Task<IConnection> LogIn(object args)
+        protected override Task<IConnection> LogIn()
         {
             return LogInToHost(HostAddress.GitHubDotComHostAddress);
         }
 
-        protected override Task<IConnection> LogInViaOAuth(object args)
+        protected override Task<IConnection> LogInViaOAuth()
         {
             return LoginToHostViaOAuth(HostAddress.GitHubDotComHostAddress);
         }

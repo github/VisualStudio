@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog;
@@ -28,11 +29,11 @@ namespace GitHub.SampleData
 
         public IObservable<object> Done => null;
 
-        public IRepositoryModel SourceRepository { get; }
+        public RepositoryModel SourceRepository { get; }
 
-        public IRepositoryModel DestinationRepository { get; }
+        public RepositoryModel DestinationRepository { get; }
 
-        public IReactiveCommand<object> SwitchFork => null;
+        public ReactiveCommand<Unit, Unit> SwitchFork => null;
 
         public bool ResetMasterTracking { get; set; } = true;
 
@@ -40,7 +41,7 @@ namespace GitHub.SampleData
 
         public bool UpdateOrigin { get; set; } = true;
 
-        public void Initialize(ILocalRepositoryModel sourceRepository, IRemoteRepositoryModel remoteRepository)
+        public void Initialize(LocalRepositoryModel sourceRepository, RemoteRepositoryModel remoteRepository)
         {
         }
     }

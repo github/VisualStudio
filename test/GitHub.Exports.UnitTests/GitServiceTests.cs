@@ -1,14 +1,46 @@
-﻿using System;
-using GitHub.Services;
-using LibGit2Sharp;
+﻿using GitHub.Services;
 using NSubstitute;
 using NUnit.Framework;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
+using IRepository = LibGit2Sharp.IRepository;
+using Remote = LibGit2Sharp.Remote;
 
-public class GitServiceTests : TestBaseClass
+public class GitServiceTests
 {
+    public class CreateLocalRepositoryModelTests : TestBaseClass
+    {
+        [Test]
+        public void NoRemoteUrl()
+        {
+            using (var temp = new TempDirectory())
+            {
+                var repositoryFacade = Substitute.For<IRepositoryFacade>();
+                var gitService = new GitService(repositoryFacade);
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+
+                var model = gitService.CreateLocalRepositoryModel(path.FullName);
+
+                Assert.That(model.Name, Is.EqualTo("repo-name"));
+            }
+        }
+
+        [Test]
+        public void WithRemoteUrl()
+        {
+            using (var temp = new TempDirectory())
+            {
+                var path = temp.Directory.CreateSubdirectory("repo-name");
+                var repository = CreateRepositoryWithOrigin("https://github.com/user/repo-name");
+                var repositoryFacade = CreateRepositoryFacade(path.FullName, repository);
+                var gitService = new GitService(repositoryFacade);
+
+                var model = gitService.CreateLocalRepositoryModel(path.FullName);
+
+                Assert.That(model.Name, Is.EqualTo("repo-name"));
+                Assert.That(model.Owner, Is.EqualTo("user"));
+            }
+        }
+    }
+
     [TestCase("asdf", null)]
     [TestCase("", null)]
     [TestCase(null, null)]
@@ -27,10 +59,36 @@ public class GitServiceTests : TestBaseClass
     {
         var origin = Substitute.For<Remote>();
         origin.Url.Returns(url);
-        var repository = Substitute.For<IRepository>();
+        var path = "path";
+        var repository = CreateRepository();
         repository.Network.Remotes["origin"].Returns(origin);
+        var repositoryFacade = CreateRepositoryFacade(path, repository);
+        var target = new GitService(repositoryFacade);
 
-        var gitservice = new GitService();
-        Assert.That(expected, Is.EqualTo(gitservice.GetUri(repository)?.ToString()));
+        var repositoryUrl = target.GetUri(repository)?.ToString();
+
+        Assert.That(expected, Is.EqualTo(repositoryUrl));
+    }
+
+    static IRepositoryFacade CreateRepositoryFacade(string path, IRepository repo)
+    {
+        var repositoryFacade = Substitute.For<IRepositoryFacade>();
+        repositoryFacade.Discover(path).Returns(path);
+        repositoryFacade.NewRepository(path).Returns(repo);
+        return repositoryFacade;
+    }
+
+    static IRepository CreateRepositoryWithOrigin(string originUrl)
+    {
+        var repo = CreateRepository();
+        var origin = Substitute.For<Remote>();
+        origin.Url.Returns(originUrl);
+        repo.Network.Remotes["origin"].Returns(origin);
+        return repo;
+    }
+
+    static IRepository CreateRepository()
+    {
+        return Substitute.For<IRepository>();
     }
 }

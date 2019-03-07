@@ -10,7 +10,7 @@ coverage:
   status:
     project: yes
     patch: yes
-    changes: yes
+    changes: no
 
 parsers:
   gcov:
@@ -21,9 +21,15 @@ parsers:
       macro: no
 
 comment:
-  layout: "header, reach, diff, files"
-  behavior: new
+  layout: "header, diff, files"
+  behavior: once
   require_changes: no
   
 fixes:
   - "/C/projects/visualstudio/::"
+
+ignore:
+  - "*.xaml"
+  - "*.xaml.cs"
+  - "**/SampleData/*"
+  - "src/GitHub.App/sqlite-net/*"

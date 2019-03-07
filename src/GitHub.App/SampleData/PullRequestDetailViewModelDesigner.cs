@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.SampleData;
+using ReactiveUI.Legacy;
 
 namespace GitHub.SampleData
 {
@@ -96,12 +97,12 @@ This requires that errors be propagated from the viewmodel to the view and from 
 
             Files = new PullRequestFilesViewModelDesigner();
 
-            Checks = new PullRequestCheckViewModelDesigner[0];
+            Checks = Array.Empty<PullRequestCheckViewModelDesigner>();
         }
 
         public PullRequestDetailModel Model { get; }
         public IPullRequestSession Session { get; }
-        public ILocalRepositoryModel LocalRepository { get; }
+        public LocalRepositoryModel LocalRepository { get; }
         public string RemoteRepositoryOwner { get; }
         public int Number { get; set; }
         public IActorViewModel Author { get; set; }
@@ -119,15 +120,18 @@ This requires that errors be propagated from the viewmodel to the view and from 
         public string ErrorMessage { get; set; }
         public Uri WebUrl { get; set; }
 
-        public ReactiveCommand<Unit> Checkout { get; }
-        public ReactiveCommand<Unit> Pull { get; }
-        public ReactiveCommand<Unit> Push { get; }
-        public ReactiveCommand<object> OpenOnGitHub { get; }
-        public ReactiveCommand<object> ShowReview { get; }
+        public ReactiveCommand<Unit, Unit> Checkout { get; }
+        public ReactiveCommand<Unit, Unit> Pull { get; }
+        public ReactiveCommand<Unit, Unit> Push { get; }
+        public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
+        public ReactiveCommand<Unit, Unit> OpenConversation { get; }
+        public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
+        public ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
+        public ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
 
         public IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
+        public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int number) => Task.CompletedTask;
 
         public string GetLocalFilePath(IPullRequestFileNode file)
         {

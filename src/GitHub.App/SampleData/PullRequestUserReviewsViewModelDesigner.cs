@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.ViewModels;
@@ -26,7 +27,7 @@ namespace GitHub.SampleData
                 {
                     IsExpanded = true,
                     HasDetails = true,
-                    FileComments = new IPullRequestReviewFileCommentViewModel[0],
+                    FileComments = Array.Empty<IPullRequestReviewFileCommentViewModel>(),
                     StateDisplay = "approved",
                     Model = new PullRequestReviewModel
                     {
@@ -62,15 +63,15 @@ namespace GitHub.SampleData
             };
         }
 
-        public ILocalRepositoryModel LocalRepository { get; set; }
+        public LocalRepositoryModel LocalRepository { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public int PullRequestNumber { get; set; }
         public IActorViewModel User { get; set; }
         public IReadOnlyList<IPullRequestReviewViewModel> Reviews { get; set; }
         public string PullRequestTitle { get; set; }
-        public ReactiveCommand<object> NavigateToPullRequest { get; }
+        public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
+        public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
         {
             return Task.CompletedTask;
         }

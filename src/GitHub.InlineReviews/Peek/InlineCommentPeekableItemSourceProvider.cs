@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using GitHub.Commands;
 using GitHub.Factories;
-using GitHub.InlineReviews.Commands;
 using GitHub.InlineReviews.Services;
 using GitHub.Services;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -20,7 +18,7 @@ namespace GitHub.InlineReviews.Peek
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
-        readonly ICommentService commentService;
+        readonly IViewViewModelFactory factory;
 
         [ImportingConstructor]
         public InlineCommentPeekableItemSourceProvider(
@@ -28,13 +26,13 @@ namespace GitHub.InlineReviews.Peek
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
-            ICommentService commentService)
+            IViewViewModelFactory factory)
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;
             this.previousCommentCommand = previousCommentCommand;
-            this.commentService = commentService;
+            this.factory = factory;
         }
 
         public IPeekableItemSource TryCreatePeekableItemSource(ITextBuffer textBuffer)
@@ -44,7 +42,7 @@ namespace GitHub.InlineReviews.Peek
                 sessionManager,
                 nextCommentCommand,
                 previousCommentCommand,
-                commentService);
+                factory);
         }
     }
 }

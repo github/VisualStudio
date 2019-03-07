@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -31,8 +32,8 @@ namespace GitHub.ViewModels.GitHubPane
         ICollectionView itemsView;
         IDisposable subscription;
         IssueListMessage message;
-        IRepositoryModel remoteRepository;
-        IReadOnlyList<IRepositoryModel> forks;
+        RepositoryModel remoteRepository;
+        IReadOnlyList<RepositoryModel> forks;
         string searchQuery;
         string selectedState;
         ObservableAsPropertyHelper<string> stateCaption;
@@ -47,7 +48,7 @@ namespace GitHub.ViewModels.GitHubPane
         public IssueListViewModelBase(IRepositoryService repositoryService)
         {
             this.repositoryService = repositoryService;
-            OpenItem = ReactiveCommand.CreateAsyncTask(OpenItemImpl);
+            OpenItem = ReactiveCommand.CreateFromTask<IIssueListItemViewModelBase>(OpenItemImpl);
             stateCaption = this.WhenAnyValue(
                 x => x.Items.Count,
                 x => x.SelectedState,
@@ -65,7 +66,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<IRepositoryModel> Forks
+        public IReadOnlyList<RepositoryModel> Forks
         {
             get { return forks; }
             set { this.RaiseAndSetIfChanged(ref forks, value); }
@@ -86,7 +87,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public IssueListMessage Message
@@ -96,7 +97,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public IRepositoryModel RemoteRepository
+        public RepositoryModel RemoteRepository
         {
             get { return remoteRepository; }
             set { this.RaiseAndSetIfChanged(ref remoteRepository, value); }
@@ -123,10 +124,10 @@ namespace GitHub.ViewModels.GitHubPane
         public string StateCaption => stateCaption.Value;
 
         /// <inheritdoc/>
-        public ReactiveCommand<Unit> OpenItem { get; }
+        public ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             try
             {
@@ -151,7 +152,7 @@ namespace GitHub.ViewModels.GitHubPane
                         repository.Name,
                         UriString.ToUriString(repository.CloneUrl.ToRepositoryUrl(parent.Value.owner)));
 
-                    Forks = new IRepositoryModel[]
+                    Forks = new RepositoryModel[]
                     {
                     RemoteRepository,
                     repository,
@@ -252,7 +253,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (numberFilter == 0)
                 {
-                    stringFilter = SearchQuery.ToUpper();
+                    stringFilter = SearchQuery.ToUpperInvariant();
                 }
             }
             else
@@ -280,7 +281,7 @@ namespace GitHub.ViewModels.GitHubPane
                     }
                     else
                     {
-                        result = item.Title.ToUpper().Contains(stringFilter);
+                        result = item.Title.ToUpperInvariant().Contains(stringFilter);
                     }
                 }
             }
@@ -295,9 +296,8 @@ namespace GitHub.ViewModels.GitHubPane
             return result;
         }
 
-        async Task OpenItemImpl(object i)
+        async Task OpenItemImpl(IIssueListItemViewModelBase item)
         {
-            var item = i as IIssueListItemViewModelBase;
             if (item != null) await DoOpenItem(item);
         }
 

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
@@ -34,21 +35,30 @@ namespace GitHub.Services
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
         readonly IVSGitServices vsGitServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly IGraphQLClientFactory graphqlFactory;
+        readonly IGitHubContextService gitHubContextService;
         readonly IUsageTracker usageTracker;
+        readonly Lazy<EnvDTE.DTE> dte;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
         [ImportingConstructor]
         public RepositoryCloneService(
             IOperatingSystem operatingSystem,
             IVSGitServices vsGitServices,
+            ITeamExplorerServices teamExplorerServices,
             IGraphQLClientFactory graphqlFactory,
-            IUsageTracker usageTracker)
+            IGitHubContextService gitHubContextService,
+            IUsageTracker usageTracker,
+            IGitHubServiceProvider sp)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.graphqlFactory = graphqlFactory;
+            this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
+            dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -60,13 +70,8 @@ namespace GitHub.Services
             {
                 var order = new RepositoryOrder
                 {
-                    Field = RepositoryOrderField.Name,
-                    Direction = OrderDirection.Asc
-                };
-
-                var affiliation = new RepositoryAffiliation?[]
-                {
-                    RepositoryAffiliation.Owner, RepositoryAffiliation.Collaborator
+                    Field = RepositoryOrderField.PushedAt,
+                    Direction = OrderDirection.Desc
                 };
 
                 var repositorySelection = new Fragment<Repository, RepositoryListItemModel>(
@@ -85,14 +90,17 @@ namespace GitHub.Services
                     .Select(viewer => new ViewerRepositoriesModel
                     {
                         Owner = viewer.Login,
-                        Repositories = viewer.Repositories(null, null, null, null, null, order, affiliation, null, null)
+                        Repositories = viewer.Repositories(null, null, null, null, null, null, null, order, null, null)
                             .AllPages()
                             .Select(repositorySelection).ToList(),
-                        OrganizationRepositories = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
+                        ContributedToRepositories = viewer.RepositoriesContributedTo(100, null, null, null, null, null, null, order, null)
+                            .Nodes
+                            .Select(repositorySelection).ToList(),
+                        Organizations = viewer.Organizations(null, null, null, null).AllPages().Select(org => new
                         {
                             org.Login,
-                            Repositories = org.Repositories(null, null, null, null, null, order, null, null, null)
-                                .AllPages()
+                            Repositories = org.Repositories(100, null, null, null, null, null, null, order, null, null)
+                                .Nodes
                                 .Select(repositorySelection).ToList()
                         }).ToDictionary(x => x.Login, x => (IReadOnlyList<RepositoryListItemModel>)x.Repositories),
                     }).Compile();
@@ -104,10 +112,94 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
+        public async Task CloneOrOpenRepository(
+            CloneDialogResult cloneDialogResult,
+            object progress = null,
+            CancellationToken? cancellationToken = null)
+        {
+            Guard.ArgumentNotNull(cloneDialogResult, nameof(cloneDialogResult));
+
+            var repositoryPath = cloneDialogResult.Path;
+            var url = cloneDialogResult.Url;
+
+            if (DestinationFileExists(repositoryPath))
+            {
+                throw new InvalidOperationException("Can't clone or open a repository because a file exists at: " + repositoryPath);
+            }
+
+            var repositoryUrl = url.ToRepositoryUrl();
+            var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
+            if (DestinationDirectoryExists(repositoryPath))
+            {
+                if (!IsSolutionInRepository(repositoryPath))
+                {
+                    teamExplorerServices.OpenRepository(repositoryPath);
+                }
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubOpens);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseOpens);
+                }
+            }
+            else
+            {
+                var cloneUrl = repositoryUrl.ToString();
+                await CloneRepository(cloneUrl, repositoryPath, progress, cancellationToken).ConfigureAwait(true);
+
+                if (isDotCom)
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
+                }
+                else
+                {
+                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                }
+            }
+
+            // Give user a chance to choose a solution
+            teamExplorerServices.ShowHomePage();
+
+            // Navigate to context for supported URL types (e.g. /blob/ URLs)
+            var context = gitHubContextService.FindContextFromUrl(url);
+            if (context != null)
+            {
+                gitHubContextService.TryNavigateToContext(repositoryPath, context);
+            }
+        }
+
+        bool IsSolutionInRepository(string repositoryPath)
+        {
+            var solutionPath = dte.Value.Solution.FileName;
+            if (string.IsNullOrEmpty(solutionPath))
+            {
+                return false;
+            }
+
+            var isFolder = operatingSystem.Directory.DirectoryExists(solutionPath);
+            var solutionDir = isFolder ? solutionPath : Path.GetDirectoryName(solutionPath);
+            if (string.Equals(repositoryPath, solutionDir, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (solutionDir.StartsWith(repositoryPath + '\\', StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc/>
         public async Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
@@ -120,31 +212,28 @@ namespace GitHub.Services
 
             try
             {
-                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress);
-
+                await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
-                var repositoryUrl = new UriString(cloneUrl).ToRepositoryUrl();
-                var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-                if (isDotCom)
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
                 {
-                    await usageTracker.IncrementCounter(x => x.NumberOfGitHubClones);
-                }
-                else
-                {
-                    // If it isn't a GitHub URL, assume it's an Enterprise URL
-                    await usageTracker.IncrementCounter(x => x.NumberOfEnterpriseClones);
+                    // Count the number of times users clone into the Default Repository Location
+                    await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, repositoryPath);
+                operatingSystem.Directory.DeleteDirectory(repositoryPath);
                 throw;
             }
         }
 
         /// <inheritdoc/>
-        public bool DestinationExists(string path) => Directory.Exists(path) || File.Exists(path);
+        public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {

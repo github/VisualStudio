@@ -21,7 +21,7 @@ public class LoginManagerTests
         {
             var client = CreateClient();
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
-                .Returns(new ApplicationAuthorization("123abc"));
+                .Returns(CreateApplicationAuthorization("123abc"));
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
@@ -39,7 +39,7 @@ public class LoginManagerTests
             var user = new User();
             var client = CreateClient(user);
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
-                .Returns(new ApplicationAuthorization("123abc"));
+                .Returns(CreateApplicationAuthorization("123abc"));
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
@@ -61,8 +61,8 @@ public class LoginManagerTests
             var user = new User();
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns(
-                    new ApplicationAuthorization(string.Empty),
-                    new ApplicationAuthorization("123abc"));
+                    CreateApplicationAuthorization(string.Empty),
+                    CreateApplicationAuthorization("123abc"));
             client.User.Current().Returns(user);
 
             var keychain = Substitute.For<IKeychain>();
@@ -86,7 +86,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns<ApplicationAuthorization>(_ => { throw exception; });
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "123456")
-                .Returns(new ApplicationAuthorization("123abc"));
+                .Returns(CreateApplicationAuthorization("123abc"));
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
@@ -114,7 +114,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "111111")
                 .Returns<ApplicationAuthorization>(_ => { throw exception; });
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "123456")
-                .Returns(new ApplicationAuthorization("123abc"));
+                .Returns(CreateApplicationAuthorization("123abc"));
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
@@ -180,7 +180,7 @@ public class LoginManagerTests
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
                 .Returns<ApplicationAuthorization>(_ => { throw exception; });
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>(), "123456")
-                .Returns(new ApplicationAuthorization("456def"));
+                .Returns(CreateApplicationAuthorization("456def"));
             client.User.Current().Returns(user);
 
             var keychain = Substitute.For<IKeychain>();
@@ -287,7 +287,7 @@ public class LoginManagerTests
         {
             var client = CreateClient(responseScopes: new[] { "user", "repo" });
             client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
-                .Returns(new ApplicationAuthorization("123abc"));
+                .Returns(CreateApplicationAuthorization("123abc"));
 
             var keychain = Substitute.For<IKeychain>();
             var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
@@ -309,6 +309,11 @@ public class LoginManagerTests
             userResponse.Body.Returns(user ?? new User());
             result.Connection.Get<User>(new Uri("user", UriKind.Relative), null, null).Returns(userResponse);
             return result;
+        }
+
+        static ApplicationAuthorization CreateApplicationAuthorization(string token)
+        {
+            return new ApplicationAuthorization(0, null, null, null, null, null, null, null, default, default, null, token);
         }
     }
 }

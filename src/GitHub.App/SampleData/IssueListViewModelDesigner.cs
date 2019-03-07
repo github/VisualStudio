@@ -52,18 +52,18 @@ namespace GitHub.SampleData
         public IUserFilterViewModel AuthorFilter { get; set; }
         public IReadOnlyList<IIssueListItemViewModelBase> Items { get; }
         public ICollectionView ItemsView { get; }
-        public ILocalRepositoryModel LocalRepository { get; set; }
+        public LocalRepositoryModel LocalRepository { get; set; }
         public IssueListMessage Message { get; set; }
-        public IRepositoryModel RemoteRepository { get; set; }
-        public IReadOnlyList<IRepositoryModel> Forks { get; }
+        public RepositoryModel RemoteRepository { get; set; }
+        public IReadOnlyList<RepositoryModel> Forks { get; }
         public string SearchQuery { get; set; }
         public string SelectedState { get; set; }
         public string StateCaption { get; set; }
         public IReadOnlyList<string> States { get; }
         public Uri WebUrl => null;
-        public ReactiveCommand<Unit> OpenItem { get; }
-        public ReactiveCommand<object> OpenItemInBrowser { get; }
+        public ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
+        public ReactiveCommand<IIssueListItemViewModel, IIssueListItemViewModel> OpenItemInBrowser { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
+        public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
 }

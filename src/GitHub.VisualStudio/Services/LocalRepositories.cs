@@ -37,10 +37,10 @@ namespace GitHub.Services
             list.Except(repositories).ToList().ForEach(x => repositories.Add(x));
         }
 
-        readonly ObservableCollectionEx<ILocalRepositoryModel> repositories
-            = new ObservableCollectionEx<ILocalRepositoryModel>();
+        readonly ObservableCollectionEx<LocalRepositoryModel> repositories
+            = new ObservableCollectionEx<LocalRepositoryModel>();
 
         /// <inheritdoc/>
-        public IReadOnlyObservableCollection<ILocalRepositoryModel> Repositories => repositories;
+        public IReadOnlyObservableCollection<LocalRepositoryModel> Repositories => repositories;
     }
 }

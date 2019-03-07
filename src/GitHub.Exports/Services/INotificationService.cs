@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Input;
+#pragma warning disable CA1720 // Identifier contains type name
 
 namespace GitHub.Services
 {

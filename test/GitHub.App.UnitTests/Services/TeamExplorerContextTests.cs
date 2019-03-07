@@ -151,45 +151,21 @@ namespace GitHub.App.UnitTests.Services
 
         public class TheStatusChangedEvent
         {
-            [TestCase(false, "name1", "sha1", "name1", "sha1", false)]
-            [TestCase(false, "name1", "sha1", "name2", "sha1", true)]
-            [TestCase(false, "name1", "sha1", "name1", "sha2", true)]
-            [TestCase(false, "name1", "sha1", "name2", "sha2", true)]
-            [TestCase(true, "name1", "sha1", "name1", "sha1", false)]
-            [TestCase(true, "name1", "sha1", "name2", "sha2", false)]
-            public void SameActiveRepository_ExpectWasRaised(bool changePath, string name1, string sha1, string name2, string sha2, bool expectWasRaised)
+            [TestCase("path", "path", true)]
+            [TestCase("path1", "path2", false)]
+            [TestCase(null, null, false)]
+            public void AlwaysFireWhenNoLocalPathChange(string path1, string path2, bool expectWasRaised)
             {
                 var gitExt = CreateGitExt();
                 var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
-                var path1 = Directory.GetCurrentDirectory();
-                var path2 = changePath ? Path.GetTempPath() : path1;
-                var repoInfo1 = CreateRepositoryModel(path1, name1, sha1);
-                var repoInfo2 = CreateRepositoryModel(path2, name2, sha2);
+                var repoInfo1 = CreateRepositoryModel(path1);
+                var repoInfo2 = CreateRepositoryModel(path2);
 
                 var target = CreateTeamExplorerContext(gitExt);
-                var eventWasRaised = false;
-                target.StatusChanged += (s, e) => eventWasRaised = true;
 
-                SetActiveRepository(gitExt, repoInfo1);
-                SetActiveRepository(gitExt, repoInfo2);
-
-                Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
-            }
-
-            [TestCase("trackedSha", "trackedSha", false)]
-            [TestCase("trackedSha1", "trackedSha2", true)]
-            public void TrackedShaChanges_CheckWasRaised(string trackedSha1, string trackedSha2, bool expectWasRaised)
-            {
-                var gitExt = CreateGitExt();
-                var repositoryPaths = new[] { Directory.GetCurrentDirectory(), Path.GetTempPath() };
-                var repoPath = Directory.GetCurrentDirectory();
-                var repoInfo1 = CreateRepositoryModel(repoPath, "name", "sha", trackedSha1);
-                var repoInfo2 = CreateRepositoryModel(repoPath, "name", "sha", trackedSha2);
-                var target = CreateTeamExplorerContext(gitExt);
                 SetActiveRepository(gitExt, repoInfo1);
                 var eventWasRaised = false;
                 target.StatusChanged += (s, e) => eventWasRaised = true;
-
                 SetActiveRepository(gitExt, repoInfo2);
 
                 Assert.That(eventWasRaised, Is.EqualTo(expectWasRaised));
@@ -200,7 +176,7 @@ namespace GitHub.App.UnitTests.Services
             {
                 var gitExt = CreateGitExt();
                 var path = Directory.GetCurrentDirectory();
-                var repoInfo1 = CreateRepositoryModel(path, "name", "sha");
+                var repoInfo1 = CreateRepositoryModel(path);
                 var repoInfo2 = CreateRepositoryModel(null);
                 var target = CreateTeamExplorerContext(gitExt);
                 SetActiveRepository(gitExt, repoInfo1);
@@ -226,16 +202,12 @@ namespace GitHub.App.UnitTests.Services
             return new TeamExplorerContext(gitExt, new AsyncLazy<DTE>(() => Task.FromResult(dte)), pullRequestService, joinableTaskContext);
         }
 
-        static ILocalRepositoryModel CreateRepositoryModel(string path, string branchName = null, string headSha = null, string trackedSha = null)
+        static LocalRepositoryModel CreateRepositoryModel(string path)
         {
-            var repo = Substitute.For<ILocalRepositoryModel>();
-            repo.LocalPath.Returns(path);
-            var currentBranch = Substitute.For<IBranch>();
-            currentBranch.Name.Returns(branchName);
-            currentBranch.Sha.Returns(headSha);
-            currentBranch.TrackedSha.Returns(trackedSha);
-            repo.CurrentBranch.Returns(currentBranch);
-            return repo;
+            return new LocalRepositoryModel
+            {
+                LocalPath = path
+            };
         }
 
         static IVSGitExt CreateGitExt()
@@ -243,9 +215,9 @@ namespace GitHub.App.UnitTests.Services
             return Substitute.For<IVSGitExt>();
         }
 
-        static void SetActiveRepository(IVSGitExt gitExt, ILocalRepositoryModel repo)
+        static void SetActiveRepository(IVSGitExt gitExt, LocalRepositoryModel repo)
         {
-            var repos = repo != null ? new[] { repo } : new ILocalRepositoryModel[0];
+            var repos = repo != null ? new[] { repo } : Array.Empty<LocalRepositoryModel>();
             gitExt.ActiveRepositories.Returns(repos);
             gitExt.ActiveRepositoriesChanged += Raise.Event<Action>();
         }

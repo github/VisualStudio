@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using GitHub.Commands;
 using GitHub.Exports;
 using GitHub.Services;
 using GitHub.Services.Vssdk.Commands;
-using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -13,11 +13,10 @@ namespace GitHub.VisualStudio.Commands
     [Export(typeof(IOpenFromClipboardCommand))]
     public class OpenFromClipboardCommand : VsCommand<string>, IOpenFromClipboardCommand
     {
-      
-
         readonly Lazy<IGitHubContextService> gitHubContextService;
         readonly Lazy<ITeamExplorerContext> teamExplorerContext;
         readonly Lazy<IVSServices> vsServices;
+        readonly Lazy<IGitService> gitService;
         readonly Lazy<UIContext> uiContext;
 
         /// <summary>
@@ -34,18 +33,20 @@ namespace GitHub.VisualStudio.Commands
         public OpenFromClipboardCommand(
             Lazy<IGitHubContextService> gitHubContextService,
             Lazy<ITeamExplorerContext> teamExplorerContext,
-            Lazy<IVSServices> vsServices)
+            Lazy<IVSServices> vsServices,
+            Lazy<IGitService> gitService)
             : base(CommandSet, CommandId)
         {
             this.gitHubContextService = gitHubContextService;
             this.teamExplorerContext = teamExplorerContext;
             this.vsServices = vsServices;
+            this.gitService = gitService;
 
             // See https://code.msdn.microsoft.com/windowsdesktop/AllowParams-2005-9442298f
             ParametersDescription = "u";    // accept a single url
 
             // This command is only visible when in the context of a Git repository
-            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.UIContext_Git)));
+            uiContext = new Lazy<UIContext>(() => UIContext.FromUIContextGuid(new Guid(Guids.GitContextPkgString)));
         }
 
         public override async Task Execute(string url)
@@ -59,7 +60,7 @@ namespace GitHub.VisualStudio.Commands
 
             if (context.LinkType != LinkType.Blob)
             {
-                var message = string.Format(Resources.UnknownLinkTypeMessage, context.Url);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.UnknownLinkTypeMessage, context.Url);
                 vsServices.Value.ShowMessageBoxInfo(message);
                 return;
             }
@@ -74,7 +75,11 @@ namespace GitHub.VisualStudio.Commands
 
             if (!string.Equals(activeRepository.Name, context.RepositoryName, StringComparison.OrdinalIgnoreCase))
             {
-                vsServices.Value.ShowMessageBoxInfo(string.Format(Resources.DifferentRepositoryMessage, context.RepositoryName));
+                vsServices.Value.ShowMessageBoxInfo(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.DifferentRepositoryMessage,
+                        context.RepositoryName));
                 return;
             }
 
@@ -96,9 +101,11 @@ namespace GitHub.VisualStudio.Commands
             var hasChanges = gitHubContextService.Value.HasChangesInWorkingDirectory(repositoryDir, commitish, path);
             if (hasChanges)
             {
-                // AnnotateFile expects a branch name so we use the current branch
-                var branchName = activeRepository.CurrentBranch.Name;
+                // TODO: What if this returns null because we're not on a branch?
+                var currentBranch = gitService.Value.GetBranch(activeRepository);
+                var branchName = currentBranch.Name;
 
+                // AnnotateFile expects a branch name so we use the current branch
                 if (await gitHubContextService.Value.TryAnnotateFile(repositoryDir, branchName, context))
                 {
                     return;

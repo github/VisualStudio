@@ -20,10 +20,8 @@ public class PullRequestEditorServiceTests
         public void FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line,
             int expectNearestLine, int expectMatchingLines)
         {
-            var target = CreateNavigationService();
-
             int matchedLines;
-            var nearestLine = target.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
+            var nearestLine = PullRequestEditorService.FindNearestMatchingLine(fromLines, toLines, line, out matchedLines);
 
             Assert.That(nearestLine, Is.EqualTo(expectNearestLine));
             Assert.That(matchedLines, Is.EqualTo(expectMatchingLines));
@@ -56,6 +54,8 @@ public class PullRequestEditorServiceTests
         var statusBar = Substitute.For<IStatusBarNotificationService>();
         var openFileInSolutionCommand = Substitute.For<IGoToSolutionOrPullRequestFileCommand>();
         var editorOptionsFactoryService = Substitute.For<IEditorOptionsFactoryService>();
+        var draftStore = Substitute.For<IMessageDraftStore>();
+        var peekService = Substitute.For<IInlineCommentPeekService>();
         var usageTracker = Substitute.For<IUsageTracker>();
         return new PullRequestEditorService(
             sp,
@@ -64,6 +64,8 @@ public class PullRequestEditorServiceTests
             statusBar,
             openFileInSolutionCommand,
             editorOptionsFactoryService,
+            draftStore,
+            peekService,
             usageTracker);
     }
 }

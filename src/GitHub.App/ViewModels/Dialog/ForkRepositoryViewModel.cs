@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
@@ -29,22 +30,22 @@ namespace GitHub.ViewModels.Dialog
             this.executePage = executePage;
             this.switchPage = switchPage;
 
-            Completed = ReactiveCommand.Create();
+            Completed = ReactiveCommand.Create(() => { });
 
-            selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
+            //selectPage.SwitchOrigin.Subscribe(x => ShowSwitchRepositoryPath((IRemoteRepositoryModel)x));
             selectPage.Done.Subscribe(x => ShowExecutePage((IAccount)x).Forget());
             executePage.Back.Subscribe(x => ShowSelectPage().Forget());
         }
 
-        public ILocalRepositoryModel Repository { get; private set; }
+        public LocalRepositoryModel Repository { get; private set; }
 
         public IConnection Connection { get; private set; }
 
-        private ReactiveCommand<object> Completed { get; }
+        private ReactiveCommand<Unit, Unit> Completed { get; }
 
         public override IObservable<object> Done => executePage.Done;
 
-        public async Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection)
+        public async Task InitializeAsync(LocalRepositoryModel repository, IConnection connection)
         {
             Repository = repository;
             Connection = connection;
@@ -63,7 +64,7 @@ namespace GitHub.ViewModels.Dialog
             Content = executePage;
         }
 
-        void ShowSwitchRepositoryPath(IRemoteRepositoryModel remoteRepository)
+        void ShowSwitchRepositoryPath(RemoteRepositoryModel remoteRepository)
         {
             switchPage.Initialize(Repository, remoteRepository);
             Content = switchPage;

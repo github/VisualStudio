@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Windows.Input;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
 using NUnit.Framework;
@@ -91,8 +92,8 @@ public class NavigationViewModelTests
         {
             var target = new NavigationViewModel();
 
-            Assert.False(target.NavigateBack.CanExecute(null));
-            Assert.False(target.NavigateForward.CanExecute(null));
+            Assert.False(((ICommand)target.NavigateBack).CanExecute(null));
+            Assert.False(((ICommand)target.NavigateForward).CanExecute(null));
         }
 
         [Test]
@@ -103,8 +104,8 @@ public class NavigationViewModelTests
 
             target.NavigateTo(first);
 
-            Assert.False(target.NavigateBack.CanExecute(null));
-            Assert.False(target.NavigateForward.CanExecute(null));
+            Assert.False(((ICommand)target.NavigateBack).CanExecute(null));
+            Assert.False(((ICommand)target.NavigateForward).CanExecute(null));
         }
 
         [Test]
@@ -117,8 +118,8 @@ public class NavigationViewModelTests
             target.NavigateTo(first);
             target.NavigateTo(second);
 
-            Assert.True(target.NavigateBack.CanExecute(null));
-            Assert.False(target.NavigateForward.CanExecute(null));
+            Assert.True(((ICommand)target.NavigateBack).CanExecute(null));
+            Assert.False(((ICommand)target.NavigateForward).CanExecute(null));
         }
 
         [Test]
@@ -132,8 +133,8 @@ public class NavigationViewModelTests
             target.NavigateTo(second);
             target.Back();
 
-            Assert.False(target.NavigateBack.CanExecute(null));
-            Assert.True(target.NavigateForward.CanExecute(null));
+            Assert.False(((ICommand)target.NavigateBack).CanExecute(null));
+            Assert.True(((ICommand)target.NavigateForward).CanExecute(null));
         }
 
         [Test]
@@ -277,8 +278,8 @@ public class NavigationViewModelTests
             target.Clear();
 
             Assert.That(target.Content, Is.Null);
-            Assert.False(target.NavigateBack.CanExecute(null));
-            Assert.False(target.NavigateForward.CanExecute(null));
+            Assert.False(((ICommand)target.NavigateBack).CanExecute(null));
+            Assert.False(((ICommand)target.NavigateForward).CanExecute(null));
         }
 
         [Test]

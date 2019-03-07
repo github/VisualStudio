@@ -11,7 +11,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets or sets the pull request state (open, closed, merged).
         /// </summary>
-        public PullRequestStateEnum State { get; set; }
+        public PullRequestState State { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the base branch (e.g. "master").
@@ -42,11 +42,21 @@ namespace GitHub.Models
         /// Gets or sets the owner login of the repository containing the head branch.
         /// </summary>
         public string HeadRepositoryOwner { get; set; }
-
+        
         /// <summary>
         /// Gets or sets a collection of files changed by the pull request.
         /// </summary>
         public IReadOnlyList<PullRequestFileModel> ChangedFiles { get; set; }
+
+        /// <summary>
+        /// Gets or sets a collection of pull request Checks Suites.
+        /// </summary>
+        public IReadOnlyList<CheckSuiteModel> CheckSuites { get; set; }
+
+        /// <summary>
+        /// Gets or sets a collection of pull request Statuses
+        /// </summary>
+        public IReadOnlyList<StatusModel> Statuses { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of pull request reviews.
@@ -63,13 +73,8 @@ namespace GitHub.Models
         public IReadOnlyList<PullRequestReviewThreadModel> Threads { get; set; }
 
         /// <summary>
-        /// Gets or sets a collection of pull request Checks Suites
+        /// Gets or sets the pull request timeline entries.
         /// </summary>
-        public IReadOnlyList<CheckSuiteModel> CheckSuites { get; set; }
-
-        /// <summary>
-        /// Gets or sets a collection of pull request Statuses
-        /// </summary>
-        public IReadOnlyList<StatusModel> Statuses { get; set; }
+        public IReadOnlyList<object> Timeline { get; set; }
     }
 }

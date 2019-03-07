@@ -11,8 +11,8 @@ namespace GitHub.ViewModels
         Placeholder,
     }
 
-	/// <summary>
-    /// View model for an issue or pull request comment.
+    /// <summary>
+    /// View model for an issue, pull request or pull request review comment.
     /// </summary>
     public interface ICommentViewModel : IViewModel
     {
@@ -30,6 +30,11 @@ namespace GitHub.ViewModels
         /// The pull request id of the comment
         /// </summary>
         int PullRequestId { get; }
+
+        /// <summary>
+        /// Gets the author of the comment.
+        /// </summary>
+        IActorViewModel Author { get; }
 
         /// <summary>
         /// Gets or sets the body of the comment.
@@ -58,19 +63,27 @@ namespace GitHub.ViewModels
         bool IsSubmitting { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the comment can be edited or deleted by the current user
+        /// Gets a value indicating whether the comment edit state can be canceled.
+        /// </summary>
+        bool CanCancel { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the comment can be edited or deleted by the current user.
         /// </summary>
         bool CanDelete { get; }
 
         /// <summary>
-        /// Gets the modified date of the comment.
+        /// Gets the creation date of the comment.
         /// </summary>
-        DateTimeOffset UpdatedAt { get; }
+        DateTimeOffset CreatedAt { get; }
 
         /// <summary>
-        /// Gets the author of the comment.
+        /// Gets the caption for the "Commit" button.
         /// </summary>
-        IActorViewModel Author { get; }
+        /// <remarks>
+        /// This will be "Comment" when editing a new comment and "Update" when editing an existing comment.
+        /// </remarks>
+        string CommitCaption { get; }
 
         /// <summary>
         /// Gets the thread that the comment is a part of.
@@ -85,26 +98,26 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets a command which will begin editing of the comment.
         /// </summary>
-        ReactiveCommand<object> BeginEdit { get; }
+        ReactiveCommand<Unit, Unit> BeginEdit { get; }
 
         /// <summary>
         /// Gets a command which will cancel editing of the comment.
         /// </summary>
-        ReactiveCommand<object> CancelEdit { get; }
+        ReactiveCommand<Unit, Unit> CancelEdit { get; }
 
         /// <summary>
         /// Gets a command which will commit edits to the comment.
         /// </summary>
-        ReactiveCommand<Unit> CommitEdit { get; }
+        ReactiveCommand<Unit, Unit> CommitEdit { get; }
 
         /// <summary>
         /// Gets a command to open the comment in a browser.
         /// </summary>
-        ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Deletes a comment.
         /// </summary>
-        ReactiveCommand<Unit> Delete { get; }
+        ReactiveCommand<Unit, Unit> Delete { get; }
     }
 }

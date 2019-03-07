@@ -20,6 +20,8 @@ using NSubstitute;
 using NUnit.Framework;
 using System.ComponentModel;
 using GitHub.Api;
+using System.Reactive.Concurrency;
+using ReactiveUI.Testing;
 
 namespace GitHub.InlineReviews.UnitTests.Services
 {
@@ -39,7 +41,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var sessionService = CreateSessionService();
 
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(
-                    Observable.Return(Tuple.Create("fork", CurrentBranchPullRequestNumber)));
+                    Observable.Return(("fork", CurrentBranchPullRequestNumber)));
 
                 var connectionManager = CreateConnectionManager();
                 var target = CreateTarget(
@@ -78,7 +80,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
             public void CurrentSessionIsNullIfNoPullRequestForCurrentBranch()
             {
                 var service = CreatePullRequestService();
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<(string, int)>());
 
                 var target = CreateTarget(service: service);
 
@@ -96,7 +98,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
 
                 var session = target.CurrentSession;
 
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("foo", 22)));
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(("foo", 22)));
                 teamExplorerContext.StatusChanged += Raise.Event();
 
                 Assert.That(session, Is.Not.SameAs(target.CurrentSession));
@@ -122,7 +124,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                     teamExplorerContext: teamExplorerContext);
                 Assert.That(target.CurrentSession, Is.Not.Null);
 
-                Tuple<string, int> newPullRequest = null;
+                (string owner, int number) newPullRequest = default;
                 service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(newPullRequest));
                 teamExplorerContext.StatusChanged += Raise.Event();
 
@@ -235,7 +237,7 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.GetContents(textView.TextBuffer).Returns(contents);
                 sessionService.GetPullRequestMergeBase(null, null).ReturnsForAnyArgs("MERGE_BASE");
                 sessionService.Diff(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     "MERGE_BASE",
                     "HEADSHA",
                     FilePath,
@@ -273,10 +275,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 var textView = CreateTextView();
                 var sessionService = CreateSessionService();
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -337,10 +339,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(rebuild);
 
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
 
@@ -376,10 +378,10 @@ namespace GitHub.InlineReviews.UnitTests.Services
                 sessionService.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
 
                 var threads = new List<IInlineCommentThreadModel>
-                        {
-                            CreateInlineCommentThreadModel(1),
-                            CreateInlineCommentThreadModel(2),
-                        };
+                    {
+                        CreateInlineCommentThreadModel(1),
+                        CreateInlineCommentThreadModel(2),
+                    };
 
                 var target = CreateTarget(sessionService: sessionService);
                 var file = (PullRequestSessionLiveFile)await target.GetLiveFile(FilePath, textView, textView.TextBuffer);
@@ -443,6 +445,7 @@ Line 4";
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task UpdatesInlineCommentThreadsFromEditorContent()
             {
                 var baseContents = @"Line 1
@@ -490,14 +493,15 @@ Line 4";
                     Assert.That(
                         new[]
                         {
-                                    Tuple.Create(2, DiffSide.Right),
-                                    Tuple.Create(4, DiffSide.Right),
+                                Tuple.Create(2, DiffSide.Right),
+                                Tuple.Create(4, DiffSide.Right),
                         },
                         Is.EqualTo(linesChanged.ToArray()));
                 }
             }
 
             [Test, NUnit.Framework.Category("CodeCoverageFlake")]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task UpdatesReviewCommentWithNewBody()
             {
                 var baseContents = @"Line 1
@@ -550,7 +554,8 @@ Line 4";
                 }
             }
 
-            [Test, Ignore("Flaky test, see https://github.com/github/VisualStudio/issues/1795")]
+            [Test]
+            [Ignore("This test sometimes hangs, see https://github.com/github/VisualStudio/issues/2221")]
             public async Task AddsNewReviewCommentToThread()
             {
                 var baseContents = @"Line 1
@@ -675,7 +680,7 @@ Line 4";
                 return thread;
             }
 
-            IPullRequestSessionService CreateRealSessionService(
+            static IPullRequestSessionService CreateRealSessionService(
                 IDiffService diff,
                 PullRequestDetailModel pullRequest)
             {
@@ -688,7 +693,7 @@ Line 4";
                     Substitute.For<IUsageTracker>());
                 result.CreateRebuildSignal().Returns(new Subject<ITextSnapshot>());
                 result.GetPullRequestMergeBase(
-                    Arg.Any<ILocalRepositoryModel>(),
+                    Arg.Any<LocalRepositoryModel>(),
                     Arg.Any<PullRequestDetailModel>()).Returns("MERGE_BASE");
                 result.ReadPullRequestDetail(
                     Arg.Any<HostAddress>(),
@@ -811,14 +816,14 @@ Line 4";
                 var model = CreatePullRequestModel();
                 var sessionService = CreateSessionService(model);
 
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<Tuple<string, int>>());
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Empty<(string, int)>());
 
                 var target = CreateTarget(service: service, sessionService: sessionService);
 
                 Assert.That(target.CurrentSession, Is.Null);
 
-                service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<ILocalRepositoryModel>(), model).Returns(Observable.Return(true));
-                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create("owner", CurrentBranchPullRequestNumber)));
+                service.EnsureLocalBranchesAreMarkedAsPullRequests(Arg.Any<LocalRepositoryModel>(), model).Returns(Observable.Return(true));
+                service.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(("owner", CurrentBranchPullRequestNumber)));
 
                 var session = await target.GetSession("owner", "name", CurrentBranchPullRequestNumber);
 
@@ -870,7 +875,7 @@ Line 4";
             }
             else
             {
-                result.Reviews = new PullRequestReviewModel[0];
+                result.Reviews = Array.Empty<PullRequestReviewModel>();
             }
 
             return result;
@@ -879,7 +884,7 @@ Line 4";
         IPullRequestService CreatePullRequestService(string owner = "owner")
         {
             var result = Substitute.For<IPullRequestService>();
-            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return(Tuple.Create(owner, CurrentBranchPullRequestNumber)));
+            result.GetPullRequestForCurrentBranch(null).ReturnsForAnyArgs(Observable.Return((owner, CurrentBranchPullRequestNumber)));
             return result;
         }
 
@@ -910,24 +915,24 @@ Line 4";
             return sessionService;
         }
 
-        ILocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
+        LocalRepositoryModel CreateRepositoryModel(string cloneUrl = OwnerCloneUrl)
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
-            var uriString = new UriString(cloneUrl);
-            result.CloneUrl.Returns(uriString);
-            result.Name.Returns(uriString.RepositoryName);
-            result.Owner.Returns(uriString.Owner);
-            return result;
+            var cloneUrlString = new UriString(cloneUrl);
+            return new LocalRepositoryModel
+            {
+                CloneUrl = cloneUrlString,
+                Name = cloneUrlString.RepositoryName
+            };
         }
 
-        static ITeamExplorerContext CreateTeamExplorerContext(ILocalRepositoryModel repo)
+        static ITeamExplorerContext CreateTeamExplorerContext(LocalRepositoryModel repo)
         {
             var teamExplorerContext = Substitute.For<ITeamExplorerContext>();
             teamExplorerContext.ActiveRepository.Returns(repo);
             return teamExplorerContext;
         }
 
-        static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, ILocalRepositoryModel localRepositoryModel)
+        static void SetActiveRepository(ITeamExplorerContext teamExplorerContext, LocalRepositoryModel localRepositoryModel)
         {
             teamExplorerContext.ActiveRepository.Returns(localRepositoryModel);
             var eventArgs = new PropertyChangedEventArgs(nameof(teamExplorerContext.ActiveRepository));

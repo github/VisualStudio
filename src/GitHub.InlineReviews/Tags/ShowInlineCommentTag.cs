@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Services;
@@ -14,20 +15,26 @@ namespace GitHub.InlineReviews.Tags
         /// Initializes a new instance of the <see cref="ShowInlineCommentTag"/> class.
         /// </summary>
         /// <param name="session">The pull request session.</param>
-        /// <param name="thread">A model holding the details of the thread.</param>
-        public ShowInlineCommentTag(
-            IPullRequestSession session,
-            IInlineCommentThreadModel thread)
-            : base(session, thread.LineNumber, thread.DiffLineType)
+        /// <param name="lineNumber">0-based index of the inline tag</param>
+        /// <param name="diffLineType">The diff type for the inline comment</param>
+        public ShowInlineCommentTag(IPullRequestSession session, int lineNumber, DiffChangeType diffLineType)
+            : base(session, lineNumber, diffLineType)
         {
-            Guard.ArgumentNotNull(thread, nameof(thread));
-
-            Thread = thread;
         }
 
         /// <summary>
         /// Gets a model holding details of the thread at the tagged line.
         /// </summary>
-        public IInlineCommentThreadModel Thread { get; }
+        public IInlineCommentThreadModel Thread { get; set; }
+
+        /// <summary>
+        /// Gets a list of models holding details of the annotations at the tagged line.
+        /// </summary>
+        public IReadOnlyList<InlineAnnotationModel> Annotations { get; set; }
+
+        /// <summary>
+        /// Gets a summary annotation level is Annotations are present
+        /// </summary>
+        public CheckAnnotationLevel? SummaryAnnotationLevel { get; set; }
     }
 }

@@ -69,7 +69,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             {
                 IsVisible = true;
                 ShowGetStarted = true;
-                loggedIn = await connectionManager.IsLoggedIn();
+                loggedIn = await ConnectionManager.IsLoggedIn();
                 ShowLogin = !loggedIn;
                 ShowSignup = !loggedIn;
             }
@@ -83,16 +83,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
             Setup();
         }
 
-        protected override void RepoChanged(bool changed)
+        protected override void RepoChanged()
         {
-            base.RepoChanged(changed);
+            base.RepoChanged();
             Setup();
             InitializeSectionView();
         }
 
         public async Task Connect()
         {
-            loggedIn = await connectionManager.IsLoggedIn();
+            loggedIn = await ConnectionManager.IsLoggedIn();
             if (loggedIn)
                 ShowPublish();
             else
@@ -132,14 +132,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
                 });
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        void HandleCreatedRepo(LocalRepositoryModel newrepo)
         {
             var msg = String.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
             msg += " " + String.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
             ShowNotification(newrepo, msg);
         }
 
-        private void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        private void ShowNotification(LocalRepositoryModel newrepo, string msg)
         {
             var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
 
@@ -176,7 +176,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Sync
         async Task Login()
         {
             await dialogService.ShowLoginDialog();
-            loggedIn = await connectionManager.IsLoggedIn();
+            loggedIn = await ConnectionManager.IsLoggedIn();
             if (loggedIn)
                 ShowPublish();
         }

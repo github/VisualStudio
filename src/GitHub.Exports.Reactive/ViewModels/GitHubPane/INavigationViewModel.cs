@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
@@ -27,12 +28,12 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Gets a command that navigates back in the history.
         /// </summary>
-        ReactiveCommand<object> NavigateBack { get; }
+        ReactiveCommand<Unit, Unit> NavigateBack { get; }
 
         /// <summary>
         /// Gets a command that navigates forwards in the history.
         /// </summary>
-        ReactiveCommand<object> NavigateForward { get; }
+        ReactiveCommand<Unit, Unit> NavigateForward { get; }
 
         /// <summary>
         /// Navigates back if possible.

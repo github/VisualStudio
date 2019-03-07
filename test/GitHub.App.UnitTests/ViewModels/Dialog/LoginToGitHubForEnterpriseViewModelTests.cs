@@ -8,6 +8,9 @@ using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Octokit;
 using NUnit.Framework;
+using System.Windows.Input;
+using ReactiveUI.Testing;
+using ReactiveUI;
 
 public class LoginToGitHubForEnterpriseViewModelTests
 {
@@ -27,6 +30,8 @@ public class LoginToGitHubForEnterpriseViewModelTests
         [Test]
         public async Task ReturnsCheckingWhenProbeNotFinished()
         {
+            Console.WriteLine(RxApp.MainThreadScheduler.GetType().Name);
+
             var scheduler = new TestScheduler();
             var caps = Substitute.For<IEnterpriseCapabilitiesService>();
             var task = new TaskCompletionSource<EnterpriseProbeResult>();
@@ -162,7 +167,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             target.Password = "pass";
 
-            Assert.False(target.Login.CanExecute(null));
+            Assert.False(((ICommand)target.Login).CanExecute(null));
         }
 
         [Test]
@@ -176,7 +181,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             target.UsernameOrEmail = "user";
 
-            Assert.False(target.Login.CanExecute(null));
+            Assert.False(((ICommand)target.Login).CanExecute(null));
         }
 
         [Test]
@@ -191,7 +196,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             target.UsernameOrEmail = "user";
             target.Password = "pass";
 
-            Assert.True(target.Login.CanExecute(null));
+            Assert.True(((ICommand)target.Login).CanExecute(null));
         }
 
         [Test]
@@ -205,7 +210,7 @@ public class LoginToGitHubForEnterpriseViewModelTests
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(500).Ticks);
             target.Password = "pass";
 
-            Assert.True(target.Login.CanExecute(null));
+            Assert.True(((ICommand)target.Login).CanExecute(null));
         }
     }
 

@@ -516,4 +516,7 @@
   <data name="TwoFactorAuthenticationInputStackPanel" xml:space="preserve">
     <value>TwoFactorAuthenticationInputStackPanel</value>
   </data>
+  <data name="OpenRepositoryButton" xml:space="preserve">
+    <value>OpenRepositoryButton</value>
+  </data>
 </root>

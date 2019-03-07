@@ -17,11 +17,11 @@ using Rothko;
 using UnitTests;
 using NUnit.Framework;
 using IConnection = GitHub.Models.IConnection;
+using System.Windows.Input;
+using System.Reactive.Concurrency;
 
 public class RepositoryCreationViewModelTests
 {
-    static object DefaultInstance = new object();
-
     static IRepositoryCreationViewModel GetMeAViewModel(
         IServiceProvider provider = null,
         IRepositoryCreationService creationService = null,
@@ -99,7 +99,7 @@ public class RepositoryCreationViewModelTests
 
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
-            await vm.BrowseForDirectory.ExecuteAsync();
+            await vm.BrowseForDirectory.Execute();
 
             Assert.That(@"c:\fake\foo", Is.EqualTo(vm.BaseRepositoryPath));
         }
@@ -114,7 +114,7 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel(provider);
             vm.BaseRepositoryPath = @"c:\fake\dev";
 
-            await vm.BrowseForDirectory.ExecuteAsync();
+            await vm.BrowseForDirectory.Execute();
 
             Assert.That(@"c:\fake\dev", Is.EqualTo(vm.BaseRepositoryPath));
         }
@@ -270,7 +270,7 @@ public class RepositoryCreationViewModelTests
             vm.BaseRepositoryPath = @"c:\fake\";
             vm.RepositoryName = "repo";
 
-            Assert.True(vm.CreateRepository.CanExecute(null));
+            Assert.True(((ICommand)vm.CreateRepository).CanExecute(null));
             Assert.True(vm.RepositoryNameValidator.ValidationResult.IsValid);
             Assert.That(vm.RepositoryNameValidator.ValidationResult.Message, Is.Empty);
 
@@ -361,7 +361,7 @@ public class RepositoryCreationViewModelTests
     public class TheGitIgnoreTemplatesProperty : TestBaseClass
     {
         [Test]
-        public async Task IsPopulatedByTheApiAndSortedWithRecommendedFirstAsync()
+        public void IsPopulatedByTheApiAndSortedWithRecommendedFirstAsync()
         {
             var gitIgnoreTemplates = new[]
             {
@@ -376,18 +376,14 @@ public class RepositoryCreationViewModelTests
                 .GetGitIgnoreTemplates()
                 .Returns(gitIgnoreTemplates.ToObservable());
             var vm = GetMeAViewModel(provider, modelService: modelService);
-
-            // this is how long the default collection waits to process about 5 things with the default UI settings
-            await Task.Delay(100);
-
             var result = vm.GitIgnoreTemplates;
 
             Assert.That(5, Is.EqualTo(result.Count));
             Assert.That("None", Is.EqualTo(result[0].Name));
             Assert.True(result[0].Recommended);
-            Assert.That("VisualStudio", Is.EqualTo(result[1].Name));
+            Assert.That("Node", Is.EqualTo(result[1].Name));
             Assert.True(result[1].Recommended);
-            Assert.That("Node", Is.EqualTo(result[2].Name));
+            Assert.That("VisualStudio", Is.EqualTo(result[2].Name));
             Assert.True(result[2].Recommended);
             Assert.That("Waf", Is.EqualTo(result[3].Name));
             Assert.False(result[3].Recommended);
@@ -399,7 +395,7 @@ public class RepositoryCreationViewModelTests
     public class TheLicensesProperty : TestBaseClass
     {
         [Test]
-        public async Task IsPopulatedByTheModelServiceAsync()
+        public void IsPopulatedByTheModelServiceAsync()
         {
             var licenses = new[]
             {
@@ -414,9 +410,6 @@ public class RepositoryCreationViewModelTests
                 .GetLicenses()
                 .Returns(licenses.ToObservable());
             var vm = GetMeAViewModel(provider, modelService: modelService);
-
-            // this is how long the default collection waits to process about 5 things with the default UI settings
-            await Task.Delay(100);
 
             var result = vm.Licenses;
 
@@ -496,7 +489,7 @@ public class RepositoryCreationViewModelTests
 
             using (var handlers = ReactiveTestHelper.OverrideHandlersForTesting())
             {
-                await vm.CreateRepository.ExecuteAsync().Catch(Observable.Return(Unit.Default));
+                await vm.CreateRepository.Execute().Catch(Observable.Return(Unit.Default));
 
                 Assert.That("Could not create a repository on GitHub", Is.EqualTo(handlers.LastError.ErrorMessage));
             }
@@ -517,7 +510,7 @@ public class RepositoryCreationViewModelTests
             vm.SelectedAccount = account;
             vm.KeepPrivate = true;
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -547,7 +540,7 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedLicense = new LicenseItem("mit", "MIT");
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -577,7 +570,7 @@ public class RepositoryCreationViewModelTests
             vm.KeepPrivate = false;
             vm.SelectedGitIgnoreTemplate = GitIgnoreItem.Create("VisualStudio");
 
-            vm.CreateRepository.Execute(null);
+            vm.CreateRepository.Execute();
 
             creationService
                 .Received()
@@ -604,35 +597,10 @@ public class RepositoryCreationViewModelTests
             var vm = GetMeAViewModel();
             vm.RepositoryName = repositoryName;
             vm.BaseRepositoryPath = baseRepositoryPath;
-            var reactiveCommand = vm.CreateRepository as ReactiveUI.ReactiveCommand<Unit>;
 
-            bool result = reactiveCommand.CanExecute(null);
+            bool result = ((ICommand)vm.CreateRepository).CanExecute(null);
 
             Assert.That(expected, Is.EqualTo(result));
-        }
-    }
-
-    public class TheCanKeepPrivateProperty : TestBaseClass
-    {
-        [TestCase(true, false, false, false)]
-        [TestCase(true, false, true, false)]
-        [TestCase(false, false, true, false)]
-        [TestCase(true, true, true, true)]
-        [TestCase(false, false, false, true)]
-        public void IsOnlyTrueWhenUserIsEntepriseOrNotOnFreeAccountThatIsNotMaxedOut(
-            bool isFreeAccount,
-            bool isEnterprise,
-            bool isMaxedOut,
-            bool expected)
-        {
-            var selectedAccount = Substitute.For<IAccount>();
-            selectedAccount.IsOnFreePlan.Returns(isFreeAccount);
-            selectedAccount.IsEnterprise.Returns(isEnterprise);
-            selectedAccount.HasMaximumPrivateRepositories.Returns(isMaxedOut);
-            var vm = GetMeAViewModel();
-            vm.SelectedAccount = selectedAccount;
-
-            Assert.That(expected, Is.EqualTo(vm.CanKeepPrivate));
         }
     }
 }

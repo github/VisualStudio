@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using GitHub.Services;
 using ReactiveUI;
 
@@ -21,14 +22,14 @@ namespace GitHub.ViewModels.GitHubPane
         public NotAGitHubRepositoryViewModel(ITeamExplorerServices teamExplorerServices)
         {
             this.teamExplorerServices = teamExplorerServices;
-            Publish = ReactiveCommand.Create();
+            Publish = ReactiveCommand.Create(() => { });
             Publish.Subscribe(_ => OnPublish());
         }
 
         /// <summary>
         /// Gets the command executed when the user clicks the "Publish to GitHub" link.
         /// </summary>
-        public IReactiveCommand<object> Publish { get; }
+        public ReactiveCommand<Unit, Unit> Publish { get; }
 
         /// <summary>
         /// Called when the <see cref="Publish"/> command is executed.

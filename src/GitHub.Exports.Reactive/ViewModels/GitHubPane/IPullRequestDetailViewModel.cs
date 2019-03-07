@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
 using ReactiveUI;
+using ReactiveUI.Legacy;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -62,7 +63,7 @@ namespace GitHub.ViewModels.GitHubPane
     }
 
     /// <summary>
-    /// Represents a view model for displaying details of a pull request.
+    /// A view model which displays the details of a pull request.
     /// </summary>
     public interface IPullRequestDetailViewModel : IPanePageViewModel, IOpenInBrowser
     {
@@ -79,7 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -153,30 +154,45 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command that checks out the pull request locally.
         /// </summary>
-        ReactiveCommand<Unit> Checkout { get; }
+        ReactiveCommand<Unit, Unit> Checkout { get; }
 
         /// <summary>
         /// Gets a command that pulls changes to the current branch.
         /// </summary>
-        ReactiveCommand<Unit> Pull { get; }
+        ReactiveCommand<Unit, Unit> Pull { get; }
 
         /// <summary>
         /// Gets a command that pushes changes from the current branch.
         /// </summary>
-        ReactiveCommand<Unit> Push { get; }
+        ReactiveCommand<Unit, Unit> Push { get; }
+
+        /// <summary>
+        /// Sync submodules for PR branch.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
+
+        /// <summary>
+        /// Gets a command that opens the pull request conversation in a document pane.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> OpenConversation { get; }
 
         /// <summary>
         /// Gets a command that opens the pull request on GitHub.
         /// </summary>
-        ReactiveCommand<object> OpenOnGitHub { get; }
+        ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <summary>
         /// Gets a command that navigates to a pull request review.
         /// </summary>
-        ReactiveCommand<object> ShowReview { get; }
+        ReactiveCommand<IPullRequestReviewSummaryViewModel, Unit> ShowReview { get; }
 
         /// <summary>
-        /// Gets the latest pull request Checks & Statuses
+        /// Gets a command that navigates to a pull request's check run annotation list.
+        /// </summary>
+        ReactiveCommand<IPullRequestCheckViewModel, Unit> ShowAnnotations { get; }
+
+        /// <summary>
+        /// Gets the latest pull request checks & statuses.
         /// </summary>
         IReadOnlyList<IPullRequestCheckViewModel> Checks { get; }
 
@@ -189,7 +205,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="number">The pull request number.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

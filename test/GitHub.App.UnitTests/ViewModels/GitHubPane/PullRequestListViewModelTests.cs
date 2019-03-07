@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using GitHub.Commands;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
@@ -21,7 +23,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var uri = (Uri)null;
             target.NavigationRequested.Subscribe(x => uri = x);
 
-            target.OpenItem.Execute(target.Items[1]);
+            await target.OpenItem.Execute(target.Items[1]);
 
             Assert.That(uri, Is.EqualTo(new Uri("github://pane/owner/name/pull/2")));
         }
@@ -45,7 +47,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager = null,
             IRepositoryService repositoryService = null,
             IPullRequestService service = null,
-            ILocalRepositoryModel repository = null,
+            LocalRepositoryModel repository = null,
             IConnection connection = null)
         {
             var result = CreateTarget(sessionManager, repositoryService, service);

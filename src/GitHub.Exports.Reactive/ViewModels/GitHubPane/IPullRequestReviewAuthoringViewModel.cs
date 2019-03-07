@@ -16,7 +16,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -65,27 +65,27 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets a command which navigates to the parent pull request.
         /// </summary>
-        ReactiveCommand<object> NavigateToPullRequest { get; }
+        ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
         /// <summary>
         /// Gets a command which submits the review as an approval.
         /// </summary>
-        ReactiveCommand<Unit> Approve { get; }
+        ReactiveCommand<Unit, Unit> Approve { get; }
 
         /// <summary>
         /// Gets a command which submits the review as a comment.
         /// </summary>
-        ReactiveCommand<Unit> Comment { get; }
+        ReactiveCommand<Unit, Unit> Comment { get; }
 
         /// <summary>
         /// Gets a command which submits the review requesting changes.
         /// </summary>
-        ReactiveCommand<Unit> RequestChanges { get; }
+        ReactiveCommand<Unit, Unit> RequestChanges { get; }
 
         /// <summary>
         /// Gets a command which cancels the review.
         /// </summary>
-        ReactiveCommand<Unit> Cancel { get; }
+        ReactiveCommand<Unit, Unit> Cancel { get; }
 
         /// <summary>
         /// Initializes the view model for creating a new review.
@@ -96,7 +96,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="pullRequestNumber">The pull request number.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

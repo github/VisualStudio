@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" Link="SplatModeDetectorSetUp.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSubstitute" Version="3.1.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+</Project>

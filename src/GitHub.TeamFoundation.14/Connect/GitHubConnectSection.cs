@@ -2,9 +2,9 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Api;
@@ -14,7 +14,6 @@ using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.Settings;
-using GitHub.UI;
 using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI;
@@ -29,8 +28,10 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
     public class GitHubConnectSection : TeamExplorerSectionBase, IGitHubConnectSection
     {
         static readonly ILogger log = LogManager.ForContext<GitHubConnectSection>();
+        readonly ISimpleApiClientFactory apiFactory;
+        readonly ITeamExplorerServiceHolder holder;
         readonly IPackageSettings packageSettings;
-        readonly IVSServices vsServices;
+        readonly ITeamExplorerServices teamExplorerServices;
         readonly int sectionIndex;
         readonly ILocalRepositories localRepositories;
         readonly IUsageTracker usageTracker;
@@ -86,15 +87,15 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             private set { showRetry = value; this.RaisePropertyChange(); }
         }
 
-        IReactiveDerivedList<ILocalRepositoryModel> repositories;
-        public IReactiveDerivedList<ILocalRepositoryModel> Repositories
+        IReactiveDerivedList<LocalRepositoryModel> repositories;
+        public IReactiveDerivedList<LocalRepositoryModel> Repositories
         {
             get { return repositories; }
             private set { repositories = value; this.RaisePropertyChange(); }
         }
 
-        ILocalRepositoryModel selectedRepository;
-        public ILocalRepositoryModel SelectedRepository
+        LocalRepositoryModel selectedRepository;
+        public LocalRepositoryModel SelectedRepository
         {
             get { return selectedRepository; }
             set { selectedRepository = value; this.RaisePropertyChange(); }
@@ -102,14 +103,12 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public ICommand Clone { get; }
 
-        internal ITeamExplorerServiceHolder Holder => holder;
-
         public GitHubConnectSection(IGitHubServiceProvider serviceProvider,
             ISimpleApiClientFactory apiFactory,
             ITeamExplorerServiceHolder holder,
             IConnectionManager manager,
             IPackageSettings packageSettings,
-            IVSServices vsServices,
+            ITeamExplorerServices teamExplorerServices,
             ILocalRepositories localRepositories,
             IUsageTracker usageTracker,
             int index)
@@ -119,7 +118,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             Guard.ArgumentNotNull(holder, nameof(holder));
             Guard.ArgumentNotNull(manager, nameof(manager));
             Guard.ArgumentNotNull(packageSettings, nameof(packageSettings));
-            Guard.ArgumentNotNull(vsServices, nameof(vsServices));
+            Guard.ArgumentNotNull(teamExplorerServices, nameof(teamExplorerServices));
             Guard.ArgumentNotNull(localRepositories, nameof(localRepositories));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
 
@@ -128,14 +127,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             IsVisible = false;
             sectionIndex = index;
 
+            this.apiFactory = apiFactory;
+            this.holder = holder;
             this.packageSettings = packageSettings;
-            this.vsServices = vsServices;
+            this.teamExplorerServices = teamExplorerServices;
             this.localRepositories = localRepositories;
             this.usageTracker = usageTracker;
 
-            Clone = CreateAsyncCommandHack(DoClone);
+            Clone = ReactiveCommand.CreateFromTask(DoClone);
 
-            connectionManager.Connections.CollectionChanged += RefreshConnections;
+            ConnectionManager.Connections.CollectionChanged += RefreshConnections;
             PropertyChanged += OnPropertyChange;
             UpdateConnection();
         }
@@ -151,16 +152,14 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 {
                     ServiceProvider.GitServiceProvider = TEServiceProvider;
                     var cloneService = ServiceProvider.GetService<IRepositoryCloneService>();
-                    await cloneService.CloneRepository(
-                        result.Repository.CloneUrl,
-                        result.Path);
+                    await cloneService.CloneOrOpenRepository(result);
 
                     usageTracker.IncrementCounter(x => x.NumberOfGitHubConnectSectionClones).Forget();
                 }
                 catch (Exception e)
                 {
                     var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.ClonedFailed, result.Repository.Name));
+                    teServices.ShowError(e.GetUserFriendlyErrorMessage(ErrorType.CloneOrOpenFailed, result.Url.RepositoryName));
                 }
             }
         }
@@ -170,13 +169,13 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (connectionManager.Connections.Count > sectionIndex)
-                        Refresh(connectionManager.Connections[sectionIndex]);
+                    if (ConnectionManager.Connections.Count > sectionIndex)
+                        Refresh(ConnectionManager.Connections[sectionIndex]);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    Refresh(connectionManager.Connections.Count <= sectionIndex
+                    Refresh(ConnectionManager.Connections.Count <= sectionIndex
                         ? null
-                        : connectionManager.Connections[sectionIndex]);
+                        : ConnectionManager.Connections[sectionIndex]);
                     break;
             }
         }
@@ -277,8 +276,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         void UpdateConnection()
         {
-            Refresh(connectionManager.Connections.Count > sectionIndex
-                ? connectionManager.Connections[sectionIndex]
+            Refresh(ConnectionManager.Connections.Count > sectionIndex
+                ? ConnectionManager.Connections[sectionIndex]
                 : SectionConnection);
         }
 
@@ -315,7 +314,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 // so we can handle just one new entry separately
                 if (isCloning || isCreating)
                 {
-                    var newrepo = e.NewItems.Cast<ILocalRepositoryModel>().First();
+                    var newrepo = e.NewItems.Cast<LocalRepositoryModel>().First();
 
                     SelectedRepository = newrepo;
                     if (isCreating)
@@ -328,7 +327,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                     try
                     {
                         // TODO: Cache the icon state.
-                        var api = await ApiFactory.Create(newrepo.CloneUrl);
+                        var api = await apiFactory.Create(newrepo.CloneUrl);
                         var repo = await api.GetRepository();
                         newrepo.SetIcon(repo.Private, repo.Fork);
                     }
@@ -344,16 +343,16 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
                 else
                 {
                     e.NewItems
-                        .Cast<ILocalRepositoryModel>()
+                        .Cast<LocalRepositoryModel>()
                         .ForEach(async r =>
                     {
-                        if (Equals(Holder.ActiveRepo, r))
+                        if (Equals(holder.TeamExplorerContext.ActiveRepository, r))
                             SelectedRepository = r;
 
                         try
                         {
                             // TODO: Cache the icon state.
-                            var api = await ApiFactory.Create(r.CloneUrl);
+                            var api = await apiFactory.Create(r.CloneUrl);
                             var repo = await api.GetRepository();
                             r.SetIcon(repo.Private, repo.Fork);
                         }
@@ -369,7 +368,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             }
         }
 
-        void HandleCreatedRepo(ILocalRepositoryModel newrepo)
+        void HandleCreatedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -378,7 +377,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void HandleClonedRepo(ILocalRepositoryModel newrepo)
+        void HandleClonedRepo(LocalRepositoryModel newrepo)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -390,7 +389,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             ShowNotification(newrepo, msg);
         }
 
-        void ShowNotification(ILocalRepositoryModel newrepo, string msg)
+        void ShowNotification(LocalRepositoryModel newrepo, string msg)
         {
             Guard.ArgumentNotNull(newrepo, nameof(newrepo));
 
@@ -432,7 +431,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             // TODO: This is wasteful as we can be calling it multiple times for a single changed
             // signal, once from each section. Needs refactoring.
             await localRepositories.Refresh();
-            RaisePropertyChanged("Repositories"); // trigger a re-check of the visibility of the listview based on item count
+            RaisePropertyChanged(nameof(Repositories)); // trigger a re-check of the visibility of the listview based on item count
         }
 
         public void DoCreate()
@@ -444,7 +443,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void SignOut()
         {
-            connectionManager.LogOut(SectionConnection.HostAddress);
+            ConnectionManager.LogOut(SectionConnection.HostAddress);
         }
 
         public void Login()
@@ -455,23 +454,35 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
 
         public void Retry()
         {
-            connectionManager.Retry(SectionConnection);
+            ConnectionManager.Retry(SectionConnection);
         }
 
         public bool OpenRepository()
         {
-            var old = Repositories.FirstOrDefault(x => x.Equals(Holder.ActiveRepo));
+            var old = Repositories.FirstOrDefault(x => x.Equals(holder.TeamExplorerContext.ActiveRepository));
             if (!Equals(SelectedRepository, old))
             {
-                var opened = vsServices.TryOpenRepository(SelectedRepository.LocalPath);
-                if (!opened)
+                try
                 {
-                    // TryOpenRepository might fail because dir no longer exists. Let user find solution themselves.
-                    opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
-                    if (!opened)
+                    var repositoryPath = SelectedRepository.LocalPath;
+                    if (Directory.Exists(repositoryPath))
                     {
-                        return false;
+                        teamExplorerServices.OpenRepository(SelectedRepository.LocalPath);
                     }
+                    else
+                    {
+                        // If directory no longer exists, let user find solution themselves
+                        var opened = ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(SelectedRepository.LocalPath, 1));
+                        if (!opened)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.Error(e, nameof(OpenRepository));
+                    return false;
                 }
             }
 
@@ -487,7 +498,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
             {
                 if (!disposed)
                 {
-                    connectionManager.Connections.CollectionChanged -= RefreshConnections;
+                    ConnectionManager.Connections.CollectionChanged -= RefreshConnections;
                     if (Repositories != null)
                         Repositories.CollectionChanged -= UpdateRepositoryList;
                     disposed = true;
@@ -510,20 +521,20 @@ namespace GitHub.VisualStudio.TeamExplorer.Connect
         /// <see cref="ReactiveCommand.CreateAsyncTask"/> causes a weird UI hang in this situation
         /// where the UI runs but WhenAny no longer responds to property changed notifications.
         /// </remarks>
-        static ReactiveCommand<object> CreateAsyncCommandHack(Func<Task> executeAsync)
-        {
-            Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
+        ////static ReactiveCommand<Unit,Unit> CreateAsyncCommandHack(Func<Task> executeAsync)
+        ////{
+        ////    Guard.ArgumentNotNull(executeAsync, nameof(executeAsync));
 
-            var enabled = new BehaviorSubject<bool>(true);
-            var command = ReactiveCommand.Create(enabled);
-            command.Subscribe(async _ =>
-            {
-                enabled.OnNext(false);
-                try { await executeAsync(); }
-                finally { enabled.OnNext(true); }
-            });
-            return command;
-        }
+        ////    var enabled = new BehaviorSubject<bool>(true);
+        ////    var command = ReactiveCommand.Create(enabled);
+        ////    command.Subscribe(async _ =>
+        ////    {
+        ////        enabled.OnNext(false);
+        ////        try { await executeAsync(); }
+        ////        finally { enabled.OnNext(true); }
+        ////    });
+        ////    return command;
+        ////}
 
         class SectionStateTracker
         {

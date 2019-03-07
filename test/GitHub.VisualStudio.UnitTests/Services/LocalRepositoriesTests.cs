@@ -32,7 +32,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo1", "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo1", "repo2", "new" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "a", "b", "c" },
-			Is.EqualTo(result.Select(x => x.Name).ToList()));
+            Is.EqualTo(result.Select(x => x.Name).ToList()));
     }
 
     static IVSGitServices CreateVSGitServices(params string[] names)
@@ -116,21 +116,22 @@ public class LocalRepositoriesTests : TestBaseClass
     static IVSGitServices CreateVSGitServices(params Tuple<string, string>[] namesAndAddresses)
     {
         var result = Substitute.For<IVSGitServices>();
-        var repositories = new List<ILocalRepositoryModel>(namesAndAddresses.Select(CreateRepository));
+        var repositories = new List<LocalRepositoryModel>(namesAndAddresses.Select(CreateRepository));
         result.GetKnownRepositories().Returns(repositories);
         return result;
     }
 
-    static ILocalRepositoryModel CreateRepository(string name)
+    static LocalRepositoryModel CreateRepository(string name)
     {
         return CreateRepository(Tuple.Create(name, "https://github.com"));
     }
 
-    static ILocalRepositoryModel CreateRepository(Tuple<string, string> nameAndAddress)
+    static LocalRepositoryModel CreateRepository(Tuple<string, string> nameAndAddress)
     {
-        var result = Substitute.For<ILocalRepositoryModel>();
-        result.Name.Returns(nameAndAddress.Item1);
-        result.CloneUrl.Returns(new UriString(nameAndAddress.Item2));
-        return result;
+        return new LocalRepositoryModel
+        {
+            Name = nameAndAddress.Item1,
+            CloneUrl = new UriString(nameAndAddress.Item2)
+        };
     }
 }

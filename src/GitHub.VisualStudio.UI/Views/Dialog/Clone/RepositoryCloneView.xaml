@@ -10,7 +10,7 @@
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
     </d:DesignData.DataContext>
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -22,9 +22,8 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <uic:InfoPanel Message="{Binding PathError}"/>
-
-        <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <ghfvs:OcticonCircleButton
                                    Margin="12"
                                    HorizontalAlignment="Center"
                                    Icon="check"
@@ -32,6 +31,16 @@
                                    Command="{Binding Clone}"
                                    Content="Clone"
                                    AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+
+            <ghfvs:OcticonCircleButton
+                                   Margin="12"
+                                   HorizontalAlignment="Center"
+                                   Icon="check"
+                                   IsDefault="True"
+                                   Command="{Binding Open}"
+                                   Content="Open"
+                                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+        </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom"
                    Margin="16">
@@ -45,6 +54,10 @@
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"/>
         </DockPanel>
 
+        <uic:InfoPanel Message="{Binding PathWarning}"
+                       DockPanel.Dock="Bottom"
+                       Margin="0"/>
+
         <TabControl SelectedIndex="{Binding SelectedTabIndex}"
                     Style="{StaticResource LightModalViewTabControl}">
             <TabItem Header="GitHub.com"
@@ -56,21 +69,6 @@
                      Style="{DynamicResource LightModalViewTabItem}"
                      Visibility="{Binding EnterpriseTab.IsEnabled, Converter={ghfvs:BooleanToVisibilityConverter}}">
                 <local:SelectPageView DataContext="{Binding EnterpriseTab}"/>
-            </TabItem>
-            <TabItem Header="URL" Style="{DynamicResource LightModalViewTabItem}">
-                <DockPanel DataContext="{Binding UrlTab}"
-                           LastChildFill="False"
-                           Margin="8">
-                    <TextBlock DockPanel.Dock="Top">
-                        Repository URL or GitHub username and repository
-                        <LineBreak/>
-                        (<Run Background="#66d3d3d3" FontFamily="Consolas">hubot/cool-repo</Run>)
-                    </TextBlock>
-                    <ghfvs:PromptTextBox DockPanel.Dock="Top"
-                                         Margin="0 4"
-                                         PromptText="URL or username/repository"
-                                         Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"/>
-                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

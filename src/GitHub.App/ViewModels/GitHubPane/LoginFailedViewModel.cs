@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Reactive;
 using GitHub.Services;
 using ReactiveUI;
+using UserError = ReactiveUI.Legacy.UserError;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -22,7 +24,7 @@ namespace GitHub.ViewModels.GitHubPane
         public LoginFailedViewModel(ITeamExplorerServices teServices)
         {
             this.teServices = teServices;
-            OpenTeamExplorer = ReactiveCommand.Create().OnExecuteCompleted(_ => DoOpenTeamExplorer());
+            OpenTeamExplorer = ReactiveCommand.Create(DoOpenTeamExplorer);
         }
 
         /// <inheritdoc/>
@@ -33,7 +35,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ReactiveCommand<object> OpenTeamExplorer { get; }
+        public ReactiveCommand<Unit, Unit> OpenTeamExplorer { get; }
 
         public void Initialize(UserError error)
         {

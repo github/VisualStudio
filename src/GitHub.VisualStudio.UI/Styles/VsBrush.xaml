@@ -17,6 +17,10 @@
 
   <SolidColorBrush x:Key="GitHubGlyphMarginCommentableBackground" Color="{DynamicResource VsColor.SearchBoxBackground}" />
 
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerInfoFill" Color="#23a1d0" />
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerWarningFill" Color="#ffc806" />
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerFailureFill" Color="#d53243" />
+
   <!-- Team Foundation Colors -->
   <SolidColorBrush x:Key="TFRequiredTextBoxBorderBrushKey" Color="{Binding Source={x:Static vsui:TeamFoundationColors.Instance}, Path=RequiredTextBoxBorderColor, Mode=OneWay}" />
   <SolidColorBrush x:Key="TFTextBoxBorderBrushKey" Color="{Binding Source={x:Static vsui:TeamFoundationColors.Instance}, Path=TextBoxBorderColor, Mode=OneWay}" />
