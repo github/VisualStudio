@@ -32,6 +32,9 @@ title: 'Translation: '
 
 ```
 
+## Screenshots
+<!-- Translations are sometimes provided by vendors that do not have access to the UI. Providing screenshots can give them a lot of context. -->
+
 ## Notes
 <!-- If you can, please explain what is incorrect about the translation. -->
 
