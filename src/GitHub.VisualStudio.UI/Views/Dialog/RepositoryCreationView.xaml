@@ -59,18 +59,18 @@
             FocusVisualStyle="{x:Null}">
 
         <Grid.Resources>
-          <Style TargetType="{x:Type TextBlock}">
+          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource ThemedDialogTextBoxStyleKey}">
             <Setter Property="Margin" Value="0,3,0,3" />
           </Style>
 
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource ThemedDialogLabelStyleKey}">
+          <Style TargetType="{x:Type Label}" BasedOn="{StaticResource ThemedDialogLabelStyleKey}">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="Margin" Value="0,0,10,0" />
             <Setter Property="Padding" Value="0" />
           </Style>
 
-          <Style BasedOn="{StaticResource RoundedPromptTextBox}" TargetType="{x:Type ghfvs:PromptTextBox}">
+          <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource ThemedDialogTextBoxStyleKey}">
             <Setter Property="Margin" Value="0,5" />
           </Style>
 
@@ -174,7 +174,7 @@
                                Grid.Column="1"
                                ItemsSource="{Binding GitIgnoreTemplates}"
                                SelectedItem="{Binding SelectedGitIgnoreTemplate}"
-                               Style="{StaticResource GitHubFilterComboBox}"
+                               Style="{StaticResource ThemedDialogComboBoxStyleKey}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitignoreComboBox}" >
           <ComboBox.ItemTemplate>
             <DataTemplate>
@@ -195,7 +195,7 @@
         <ghfvs:FilteredComboBox x:Name="licenseList"
                                Grid.Row="6"
                                Grid.Column="1"
-                               Style="{StaticResource GitHubFilterComboBox}"
+                               Style="{StaticResource ThemedDialogComboBoxStyleKey}"
                                ItemsSource="{Binding Licenses}"
                                SelectedItem="{Binding SelectedLicense}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.LicenseComboBox}" >
@@ -219,7 +219,7 @@
                            Margin="0,0,0,8"
                            ItemsSource="{Binding Accounts}"
                            SelectedItem="{Binding SelectedAccount}"
-                           Style="{StaticResource GitHubComboBox}"
+                           Style="{StaticResource ThemedDialogComboBoxStyleKey}"
                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.AccountComboBox}" >
           <ComboBox.ItemTemplate>
             <DataTemplate>
