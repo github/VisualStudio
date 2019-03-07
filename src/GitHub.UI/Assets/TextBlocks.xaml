@@ -153,13 +153,6 @@
     <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource GitHubPasswordBox}" />
     <!-- End PasswordBox -->
 
-    <!-- Label -->
-    <Style x:Key="GitHubLabel" TargetType="{x:Type Label}">
-        <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
-    </Style>
-    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource GitHubLabel}" />
-    <!-- End Label -->
-
     <!-- Textblock -->
     <Style x:Key="GitHubTextBlock" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
