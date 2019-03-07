@@ -139,13 +139,13 @@
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>Wprowadź adres URL przedsiębiorstwa</value>
+    <value>Wprowadź adres URL usługi Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Wprowadź prawidłowy adres URL przedsiębiorstwa</value>
+    <value>Wprowadź prawidłowy adres URL usługi Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>To nie jest serwer przedsiębiorstwa. Wprowadź adres URL przedsiębiorstwa</value>
+    <value>To nie jest serwer usługi Enterprise. Wprowadź adres URL usługi Enterprise</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(Nie pamiętasz hasła?)</value>
@@ -277,7 +277,7 @@
     <value>Wypchnij do {0} gałęzi {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>zdalny</value>
+    <value>repozytorium zdalne</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>zmień nazwę</value>
@@ -319,7 +319,7 @@ https://git-scm.com/download/win</value>
     <value>Naciśnij klawisz Enter, aby przejść do edytora (gałąź żądania ściągnięcia musi zostać wyewidencjonowana)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Repozytorium rozwidlenia</value>
+    <value>Utwórz rozwidlenie repozytorium</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>Przełącz źródło</value>
@@ -490,7 +490,7 @@ https://git-scm.com/download/win</value>
     <value>Nazwa repozytorium</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>To repozytorium nie ma elementu zdalnego. Wypełnij formularz, aby opublikować je w witrynie GitHub.</value>
+    <value>To repozytorium nie ma repozytorium zdalnego. Wypełnij formularz, aby opublikować je w witrynie GitHub.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Publikuj</value>
@@ -532,10 +532,10 @@ https://git-scm.com/download/win</value>
     <value>Wystąpił błąd podczas ładowania repozytoriów</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>Adres serwera systemu GitHub Enterprise</value>
+    <value>Adres serwera usługi GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>Host jest niedostępna lub nie jest serwerem systemu GitHub Enterprise. Sprawdź adres i spróbuj ponownie.</value>
+    <value>Host jest niedostępny lub nie jest serwerem usługi GitHub Enterprise. Sprawdź adres i spróbuj ponownie.</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
     <value>Nazwa użytkownika lub adres e-mail</value>
@@ -550,7 +550,7 @@ https://git-scm.com/download/win</value>
     <value>Sprawdź połączenie internetowe i spróbuj ponownie.</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Nie masz systemu GitHub Enterprise? </value>
+    <value>Nie masz usługi GitHub Enterprise? </value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
     <value>Nie masz konta? </value>
@@ -622,9 +622,9 @@ https://git-scm.com/download/win</value>
     <value>Wyświetl żądanie ściągnięcia w witrynie GitHub</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>Witamy w usłudze GitHub dla programu Visual! Zapoznaj się naszym [szkoleniem](pokaż szkolenie) lub [dokumentacją](pokaż dokumenty).
+    <value>Witamy w usłudze GitHub for Visual Studio! Zapoznaj się naszym [szkoleniem](show-training) lub [dokumentacją](show-docs).
 
-[Nie pokazuj ponownie](nie pokazuj ponownie)</value>
+[Nie pokazuj ponownie](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
     <value>Zaktualizowane</value>
@@ -702,7 +702,7 @@ https://git-scm.com/download/win</value>
     <value>Wstecz</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Repozytorium rozwidlenia</value>
+    <value>Utwórz rozwidlenie repozytorium</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
     <value>Utwórz rozwidlenie repozytorium</value>
@@ -825,10 +825,10 @@ https://git-scm.com/download/win</value>
     <value>W tej lokalizacji istnieje już katalog, ale nie zawiera on repozytorium.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma w niej elementu zdalnego o nazwie „origin”.</value>
+    <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma zdalnego repozytorium o nazwie „origin”.</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Repozytorium już istnieje w tej lokalizacji, ale zawiera element zdalny {0}.</value>
+    <value>Repozytorium już istnieje w tej lokalizacji, ale ma repozytorium zdalne {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Sklonowano już zawartość do tej lokalizacji. Kliknij pozycję „Otwórz”, aby otworzyć repozytorium lokalne.</value>
@@ -837,10 +837,10 @@ https://git-scm.com/download/win</value>
     <value>Nie można odnaleźć adresu URL repozytorium w usłudze GitHub</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Repozytoria muszą mieć zdefiniowany element zdalny o nazwie „origin” w celu zlokalizowania ich adresu URL usługi GitHub.</value>
+    <value>Repozytoria muszą mieć zdefiniowane repozytorium zdalne o nazwie „origin” w celu zlokalizowania ich adresu URL usługi GitHub.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Zmień nazwę jednego z istniejących elementów zdalnych na „origin” lub dodaj nowy element zdalny o nazwie „origin” i pobierz. Można to zrobić z poziomu wiersza polecenia lub przez kliknięcie przycisku poniżej.</value>
+    <value>Zmień nazwę jednego z istniejących repozytoriów zdalnych na „origin” lub dodaj nowe repozytorium zdalne o nazwie „origin” i pobierz. Można to zrobić z poziomu wiersza polecenia lub przez kliknięcie przycisku poniżej.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Nie można odnaleźć pliku odpowiadającego elementowi „{0}” w repozytorium. Wykonaj polecenie pobierania danych Git lub wyewidencjonuj docelowe żądanie ściągnięcia.</value>
@@ -849,33 +849,33 @@ https://git-scm.com/download/win</value>
     <value>Ostatnio wypchnięte ({0})</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>Komentarz</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
+    <value>Zamknij żądanie ściągnięcia</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
+    <value>Zamknij problem</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
+    <value>Zamknij i skomentuj</value>
   </data>
   <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
+    <value>Otwórz ponownie i skomentuj</value>
   </data>
   <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
+    <value>Otwórz ponownie problem</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
+    <value>Otwórz ponownie żądanie ściągnięcia</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
+    <value>Zatwierdzenia w {0}</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
+    <value>— użytkownik dodał zatwierdzenia</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>i inni</value>
   </data>
 </root>

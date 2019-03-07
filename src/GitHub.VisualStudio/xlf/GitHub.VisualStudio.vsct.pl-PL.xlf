@@ -94,7 +94,7 @@
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
         <source>Create an Enterprise Gist</source>
-        <target state="translated">Utwórz gist przedsiębiorstwa</target>
+        <target state="translated">Utwórz gist usługi Enterprise</target>
         <note />
       </trans-unit>
       <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">

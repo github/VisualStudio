@@ -181,7 +181,7 @@
     <value>Quell- und Zielbranch dürfen nicht identisch sein.</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>Der Quellpfad ist am Remoteort nicht vorhanden, haben Sie ihn mithilfe von Push übertragen?</value>
+    <value>Der Quellpfad ist im Remoterepository nicht vorhanden, haben Sie ihn mithilfe von Push übertragen?</value>
   </data>
   <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
     <value>Kein Repository ausgewählt.</value>
@@ -277,7 +277,7 @@
     <value>Per Push zu {0}-Branch "{1}" übertragen</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>Remoteelement</value>
+    <value>Remoterepository</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>umbenennen</value>
@@ -490,7 +490,7 @@ https://git-scm.com/download/win</value>
     <value>Repositoryname</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>Dieses Repository weist kein Remoteelement auf. Füllen Sie das Formular aus, um es in GitHub zu veröffentlichen.</value>
+    <value>Dieses Repository weist kein Remoterepository auf. Füllen Sie das Formular aus, um es in GitHub zu veröffentlichen.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Veröffentlichen</value>
@@ -825,10 +825,10 @@ https://git-scm.com/download/win</value>
     <value>An diesem Speicherort liegt bereits ein Verzeichnis vor, aber es enthält kein Repository.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber kein Remoteelement namens "origin" aufweist.</value>
+    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber kein Remoterepository namens "origin" aufweist.</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber ein Remoteelement "{0}" aufweist.</value>
+    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber ein Remoterepository "{0}" aufweist.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Sie haben bereits einen Klonvorgang in diesen Speicherort durchgeführt. Klicken Sie auf "Öffnen", um das lokale Repository zu öffnen.</value>
@@ -837,10 +837,10 @@ https://git-scm.com/download/win</value>
     <value>Die GitHub-URL für das Repository wurde nicht gefunden.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Für Repositorys muss ein Remoteelement namens "origin" definiert sein, damit die entsprechende GitHub-URL gefunden wird.</value>
+    <value>Für Repositorys muss ein Remoterepository namens "origin" definiert sein, damit die entsprechende GitHub-URL gefunden wird.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Benennen Sie eines der vorhandenen Remoteelemente in "origin" um, oder fügen Sie ein neues Remoteelement namens "origin" hinzu, und führen Sie einen Abrufvorgang (fetch) durch. Dies kann über die Befehlszeile oder durch Klicken auf die untenstehende Schaltfläche erfolgen.</value>
+    <value>Benennen Sie eines der vorhandenen Remoterepositorys in "origin" um, oder fügen Sie ein neues Remoterepository namens "origin" hinzu, und führen Sie einen Abrufvorgang (fetch) durch. Dies kann über die Befehlszeile oder durch Klicken auf die untenstehende Schaltfläche erfolgen.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Die entsprechende Datei für "{0}" wurde im Repository nicht gefunden. Führen Sie "git fetch" aus, oder checken Sie den Ziel-Pull Request aus.</value>
@@ -849,33 +849,33 @@ https://git-scm.com/download/win</value>
     <value>Letzte {0} mithilfe von Push übertragene Elemente</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Comment</value>
+    <value>Kommentar</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Close pull request</value>
+    <value>Pull Request schließen</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Close issue</value>
+    <value>Issue schließen</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
-    <value>Close and comment</value>
+    <value>Schließen und kommentieren</value>
   </data>
   <data name="ReopenAndComment" xml:space="preserve">
-    <value>Reopen and comment</value>
+    <value>Erneut öffnen und kommentieren</value>
   </data>
   <data name="ReopenIssue" xml:space="preserve">
-    <value>Reopen issue</value>
+    <value>Issue öffnen</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reopen pull request</value>
+    <value>Pull Request erneut öffnen</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} commits</value>
+    <value>{0} Commits</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>added some commits</value>
+    <value>Einige Commits hinzugefügt</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
-    <value>and others</value>
+    <value>und weitere</value>
   </data>
 </root>
