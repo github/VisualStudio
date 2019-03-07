@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Demande de tirage (pull request) pour la branche **{0}** créée à l'emplacement [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publier le dépôt</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publier le dépôt sur {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Entrez un titre pour la demande de tirage (pull request)</value>
   </data>

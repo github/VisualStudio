@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>**{0}** dalı için Çekme İsteği [{1}] ({2}) konumunda başarıyla oluşturuldu</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Depoyu yayımla</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Depoyu {0} konumunda yayımla</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Lütfen Çekme İsteği için bir başlık girin</value>
   </data>

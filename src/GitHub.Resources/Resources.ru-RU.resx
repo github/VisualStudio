@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Запрос на вытягивание для ветви **{0}** успешно создан в [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Опубликовать репозиторий</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Опубликовать репозиторий в {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Введите заголовок для запроса на вытягивание</value>
   </data>

@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>분기 **{0}**에 대한 끌어오기 요청이 [{1}]({2})에 생성됨</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>리포지토리 게시</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>{0}에 리포지토리 게시</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>끌어오기 요청의 제목을 입력하세요.</value>
   </data>

@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pomyślnie utworzono żądanie ściągnięcia dla gałęzi **{0}**: [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium w: {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Wprowadź tytuł żądania ściągnięcia</value>
   </data>

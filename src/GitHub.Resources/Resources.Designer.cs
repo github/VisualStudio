@@ -1504,29 +1504,11 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Publish repository.
-        /// </summary>
-        public static string PublishTitle {
-            get {
-                return ResourceManager.GetString("PublishTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Publish to GitHub.
         /// </summary>
         public static string PublishToGitHubButton {
             get {
                 return ResourceManager.GetString("PublishToGitHubButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Publish repository to {0}.
-        /// </summary>
-        public static string PublishToTitle {
-            get {
-                return ResourceManager.GetString("PublishToTitle", resourceCulture);
             }
         }
         

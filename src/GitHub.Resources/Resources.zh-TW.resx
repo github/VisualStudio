@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>已成功於 [{1}]({2}) 建立分支 **{0}** 的提取要求</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>發佈存放庫</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>將存放庫發佈至 {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>請輸入提取要求的標題</value>
   </data>

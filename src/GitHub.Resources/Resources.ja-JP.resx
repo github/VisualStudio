@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>ブランチの Pull Request **{0}** が [{1}]({2}) に正常に作成されました</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>リポジトリの発行</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>リポジトリを {0} に発行</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Pull Request のタイトルを入力してください</value>
   </data>

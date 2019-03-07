@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pull Request für Branch **{0}** wurde unter [{1}]({2}) erfolgreich erstellt.</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Repository veröffentlichen</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Repository in "{0}" veröffentlichen</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Geben Sie einen Titel für den Pull Request ein.</value>
   </data>

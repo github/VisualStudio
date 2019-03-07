@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Žádost o přijetí změn pro větev **{0}** se úspěšně vytvořila v [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publikovat úložiště</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publikovat úložiště na {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Zadejte prosím název žádosti o přijetí změn.</value>
   </data>

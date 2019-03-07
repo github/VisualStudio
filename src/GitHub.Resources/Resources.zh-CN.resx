@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>已成功创建分支 **{0}** 的拉取请求，创建时间为 [{1}] ({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>发布存储库</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>将存储库发布到 {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>请输入拉取请求标题</value>
   </data>

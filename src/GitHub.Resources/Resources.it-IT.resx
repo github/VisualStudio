@@ -165,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>La richiesta pull per il ramo **{0}** è stata creata in [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Pubblica il repository</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Pubblica il repository in {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Immettere un titolo per la richiesta pull</value>
   </data>
