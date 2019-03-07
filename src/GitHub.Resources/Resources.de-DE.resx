@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Wählen Sie einen enthaltenden Ordner für Ihr neues Repository aus.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Repository klonen</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Aus GitHub öffnen</value>
   </data>

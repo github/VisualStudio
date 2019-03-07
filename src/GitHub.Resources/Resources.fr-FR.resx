@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Sélectionnez un dossier conteneur pour votre nouveau dépôt.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Cloner un dépôt</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Ouvrir à partir de GitHub</value>
   </data>

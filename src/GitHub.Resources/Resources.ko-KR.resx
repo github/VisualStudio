@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>새 리포지토리의 포함 폴더를 선택합니다.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>리포지토리 복제</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub에서 열기</value>
   </data>

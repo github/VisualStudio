@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Выберите папку для нового репозитория.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Клонировать репозиторий</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Открыть из GitHub</value>
   </data>

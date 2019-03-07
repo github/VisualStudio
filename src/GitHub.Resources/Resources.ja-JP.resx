@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>新しいリポジトリを含んでいるフォルダーを選択します。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>リポジトリを複製</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub から開く</value>
   </data>

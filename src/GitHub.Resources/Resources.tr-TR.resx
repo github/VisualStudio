@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Yeni deponuzu içerecek klasörü seçin.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Depo Kopyala</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub'dan Aç</value>
   </data>

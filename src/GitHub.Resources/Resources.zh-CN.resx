@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>为新存储库选择包含文件夹。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>克隆存储库</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>从 GitHub 打开</value>
   </data>

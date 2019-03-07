@@ -322,15 +322,6 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clone a Repository.
-        /// </summary>
-        public static string CloneTitle {
-            get {
-                return ResourceManager.GetString("CloneTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Close and comment.
         /// </summary>
         public static string CloseAndComment {

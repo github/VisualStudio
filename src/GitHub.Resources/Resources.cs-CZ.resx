@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Vyberte nadřazenou složku pro nové úložiště.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Klonovat úložiště</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Otevřít z GitHubu</value>
   </data>

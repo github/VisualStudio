@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Selezionare una cartella contenitore per il nuovo repository.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Clona un repository</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Apri da GitHub</value>
   </data>

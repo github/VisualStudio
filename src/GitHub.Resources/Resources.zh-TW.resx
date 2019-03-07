@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>為新的存放庫選取包含資料夾。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>複製存放庫</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>從 GitHub 開啟</value>
   </data>
