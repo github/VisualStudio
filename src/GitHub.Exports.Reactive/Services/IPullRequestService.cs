@@ -25,7 +25,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestState[] states, 
+            PullRequestState[] states,
             string author);
 
         /// <summary>

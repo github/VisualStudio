@@ -45,8 +45,8 @@ namespace GitHub.Services
         static readonly Regex InvalidBranchCharsRegex = new Regex(@"[^0-9A-Za-z\-]", RegexOptions.ECMAScript);
         static readonly Regex BranchCapture = new Regex(@"branch\.(?<branch>.+)\.ghfvs-pr", RegexOptions.ECMAScript);
         static ICompiledQuery<Page<ActorModel>> readAssignableUsers;
-        static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequests;
-        static ICompiledQuery<Page<PullRequestListItemModel>> readPullRequestsEnterprise;
+        static ICompiledQuery<Page<SearchItemAdapter>> readPullRequests;
+        static ICompiledQuery<Page<SearchItemAdapter>> readPullRequestsEnterprise;
 
         static readonly string[] TemplatePaths = new[]
         {
@@ -92,227 +92,121 @@ namespace GitHub.Services
             PullRequestState[] states, string author)
         {
             string filter = null;
-            ICompiledQuery<Page<PullRequestListItemModel>> query;
-            ICompiledQuery<Page<PullRequestListItemModel>> query2;
+            ICompiledQuery<Page<SearchItemAdapter>> query;
+
+
 
             if (address.IsGitHubDotCom())
             {
                 if (readPullRequests == null)
                 {
-                    readPullRequests = new Query()
-                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                          .PullRequests(
-                              first: 100,
-                              after: Var(nameof(after)),
-                              orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
-                              states: Var(nameof(states)))
-                          .Select(page => new Page<PullRequestListItemModel>
-                          {
-                              EndCursor = page.PageInfo.EndCursor,
-                              HasNextPage = page.PageInfo.HasNextPage,
-                              TotalCount = page.TotalCount,
-                              Items = page.Nodes.Select(pr => new ListItemAdapter
-                              {
-                                  Id = pr.Id.Value,
-                                  LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                      new LastCommitSummaryAdapter
-                                      {
-                                          CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-                                              .Select(suite => new CheckSuiteSummaryModel
-                                              {
-                                                  CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
-                                                      .Select(run => new CheckRunSummaryModel
-                                                      {
-                                                          Conclusion = run.Conclusion.FromGraphQl(),
-                                                          Status = run.Status.FromGraphQl()
-                                                      }).ToList(),
-                                              }).ToList(),
-                                          Statuses = commit.Commit.Status
-                                                  .Select(context =>
-                                                      context.Contexts.Select(statusContext => new StatusSummaryModel
-                                                      {
-                                                          State = statusContext.State.FromGraphQl(),
-                                                      }).ToList()
-                                                  ).SingleOrDefault()
-                                      }).ToList().FirstOrDefault(),
-                                  Author = new ActorModel
-                                  {
-                                      Login = pr.Author.Login,
-                                      AvatarUrl = pr.Author.AvatarUrl(null),
-                                  },
-                                  CommentCount = pr.Comments(0, null, null, null).TotalCount,
-                                  Number = pr.Number,
-                                  Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
-                                  {
-                                      Body = review.Body,
-                                      CommentCount = review.Comments(null, null, null, null).TotalCount,
-                                  }).ToList(),
-                                  State = pr.State.FromGraphQl(),
-                                  Title = pr.Title,
-                                  UpdatedAt = pr.UpdatedAt,
-                              }).ToList(),
-                          }).Compile();
+                    readPullRequests = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
+                        .Select(page => new Page<SearchItemAdapter>
+                        {
+                            EndCursor = page.PageInfo.EndCursor,
+                            HasNextPage = page.PageInfo.HasNextPage,
+                            TotalCount = page.IssueCount,
+                            Items = page.Nodes.Select(issueOrPr => new SearchItemAdapter
+                            {
+                                Result = issueOrPr.Switch<ListItemAdapter>(when => when.PullRequest(pr => new ListItemAdapter
+                                {
+                                    Id = pr.Id.Value,
+                                    LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                        new LastCommitSummaryAdapter
+                                        {
+                                            CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
+                                                .Select(suite => new CheckSuiteSummaryModel
+                                                {
+                                                    CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
+                                                        .Select(run => new CheckRunSummaryModel
+                                                        {
+                                                            Conclusion = run.Conclusion.FromGraphQl(),
+                                                            Status = run.Status.FromGraphQl()
+                                                        }).ToList(),
+                                                }).ToList(),
+                                            Statuses = commit.Commit.Status
+                                                    .Select(context =>
+                                                        context.Contexts.Select(statusContext => new StatusSummaryModel
+                                                        {
+                                                            State = statusContext.State.FromGraphQl(),
+                                                        }).ToList()
+                                                    ).SingleOrDefault()
+                                        }).ToList().FirstOrDefault(),
+                                    Author = new ActorModel
+                                    {
+                                        Login = pr.Author.Login,
+                                        AvatarUrl = pr.Author.AvatarUrl(null),
+                                    },
+                                    CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                    Number = pr.Number,
+                                    Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                    {
+                                        Body = review.Body,
+                                        CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                    }).ToList(),
+                                    State = pr.State.FromGraphQl(),
+                                    Title = pr.Title,
+                                    UpdatedAt = pr.UpdatedAt,
+                                }))
+                            }).ToList()
+                        })
+                        .Compile();
                 }
 
                 query = readPullRequests;
-
-                query2 = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
-                    .Select(page => new Page<PullRequestListItemModel>
-                    {
-                        EndCursor = page.PageInfo.EndCursor,
-                        HasNextPage = page.PageInfo.HasNextPage,
-                        TotalCount = page.IssueCount,
-                        Items = page.Nodes.Select(issueOrPr => issueOrPr
-                            .Switch<PullRequestListItemModel>(when => when.PullRequest(pr => new ListItemAdapter
-                            {
-                                Id = pr.Id.Value,
-                                LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                    new LastCommitSummaryAdapter
-                                    {
-                                        CheckSuites = commit.Commit.CheckSuites(null, null, null, null, null).AllPages(10)
-                                            .Select(suite => new CheckSuiteSummaryModel
-                                            {
-                                                CheckRuns = suite.CheckRuns(null, null, null, null, null).AllPages(10)
-                                                    .Select(run => new CheckRunSummaryModel
-                                                    {
-                                                        Conclusion = run.Conclusion.FromGraphQl(),
-                                                        Status = run.Status.FromGraphQl()
-                                                    }).ToList(),
-                                            }).ToList(),
-                                        Statuses = commit.Commit.Status
-                                                .Select(context =>
-                                                    context.Contexts.Select(statusContext => new StatusSummaryModel
-                                                    {
-                                                        State = statusContext.State.FromGraphQl(),
-                                                    }).ToList()
-                                                ).SingleOrDefault()
-                                    }).ToList().FirstOrDefault(),
-                                Author = new ActorModel
-                                {
-                                    Login = pr.Author.Login,
-                                    AvatarUrl = pr.Author.AvatarUrl(null),
-                                },
-                                CommentCount = pr.Comments(0, null, null, null).TotalCount,
-                                Number = pr.Number,
-                                Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
-                                {
-                                    Body = review.Body,
-                                    CommentCount = review.Comments(null, null, null, null).TotalCount,
-                                }).ToList(),
-                                State = pr.State.FromGraphQl(),
-                                Title = pr.Title,
-                                UpdatedAt = pr.UpdatedAt,
-                            }))).ToList()
-                    })
-                    .Compile();
             }
             else
             {
                 if (readPullRequestsEnterprise == null)
                 {
-                    readPullRequestsEnterprise = new Query()
-                          .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                          .PullRequests(
-                              first: 100,
-                              after: Var(nameof(after)),
-                              orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
-                              states: Var(nameof(states)))
-                          .Select(page => new Page<PullRequestListItemModel>
-                          {
-                              EndCursor = page.PageInfo.EndCursor,
-                              HasNextPage = page.PageInfo.HasNextPage,
-                              TotalCount = page.TotalCount,
-                              Items = page.Nodes.Select(pr => new ListItemAdapter
-                              {
-                                  Id = pr.Id.Value,
-                                  LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                      new LastCommitSummaryAdapter
-                                      {
-                                          Statuses = commit.Commit.Status.Select(context =>
-                                                      context == null
-                                                          ? null
-                                                          : context.Contexts
-                                                              .Select(statusContext => new StatusSummaryModel
-                                                              {
-                                                                  State = statusContext.State.FromGraphQl()
-                                                              }).ToList()
-                                                  ).SingleOrDefault()
-                                      }).ToList().FirstOrDefault(),
-                                  Author = new ActorModel
-                                  {
-                                      Login = pr.Author.Login,
-                                      AvatarUrl = pr.Author.AvatarUrl(null),
-                                  },
-                                  CommentCount = pr.Comments(0, null, null, null).TotalCount,
-                                  Number = pr.Number,
-                                  Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
-                                  {
-                                      Body = review.Body,
-                                      CommentCount = review.Comments(null, null, null, null).TotalCount,
-                                  }).ToList(),
-                                  State = pr.State.FromGraphQl(),
-                                  Title = pr.Title,
-                                  UpdatedAt = pr.UpdatedAt,
-                              }).ToList(),
-                          }).Compile();
+                    readPullRequestsEnterprise = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
+                        .Select(page => new Page<SearchItemAdapter>
+                        {
+                            EndCursor = page.PageInfo.EndCursor,
+                            HasNextPage = page.PageInfo.HasNextPage,
+                            TotalCount = page.IssueCount,
+                            Items = page.Nodes.Select(issueOrPr => new SearchItemAdapter()
+                            {
+                                Result = issueOrPr.Switch<ListItemAdapter>(when =>
+                                    when.PullRequest(pr => new ListItemAdapter
+                                    {
+                                        Id = pr.Id.Value,
+                                        LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
+                                            new LastCommitSummaryAdapter
+                                            {
+                                                Statuses = commit.Commit.Status.Select(context =>
+                                                            context == null
+                                                                ? null
+                                                                : context.Contexts
+                                                                    .Select(statusContext => new StatusSummaryModel
+                                                                    {
+                                                                        State = statusContext.State.FromGraphQl()
+                                                                    }).ToList()
+                                                        ).SingleOrDefault()
+                                            }).ToList().FirstOrDefault(),
+                                        Author = new ActorModel
+                                        {
+                                            Login = pr.Author.Login,
+                                            AvatarUrl = pr.Author.AvatarUrl(null),
+                                        },
+                                        CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                                        Number = pr.Number,
+                                        Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
+                                        {
+                                            Body = review.Body,
+                                            CommentCount = review.Comments(null, null, null, null).TotalCount,
+                                        }).ToList(),
+                                        State = pr.State.FromGraphQl(),
+                                        Title = pr.Title,
+                                        UpdatedAt = pr.UpdatedAt,
+                                    }))
+                            }).ToList()
+                        })
+                        .Compile();
                 }
 
                 query = readPullRequestsEnterprise;
-
-                query2 = new Query().Search(Var(nameof(filter)), first: 100, after: Var(nameof(after)), type: SearchType.Issue)
-                    .Select(page => new Page<PullRequestListItemModel>
-                    {
-                        EndCursor = page.PageInfo.EndCursor,
-                        HasNextPage = page.PageInfo.HasNextPage,
-                        TotalCount = page.IssueCount,
-                        Items = page.Nodes.Select(issueOrPr => issueOrPr.Switch<PullRequestListItemModel>(when =>
-                            when.PullRequest(pr => new ListItemAdapter
-                            {
-                                Id = pr.Id.Value,
-                                LastCommit = pr.Commits(null, null, 1, null).Nodes.Select(commit =>
-                                    new LastCommitSummaryAdapter
-                                    {
-                                        Statuses = commit.Commit.Status.Select(context =>
-                                                    context == null
-                                                        ? null
-                                                        : context.Contexts
-                                                            .Select(statusContext => new StatusSummaryModel
-                                                            {
-                                                                State = statusContext.State.FromGraphQl()
-                                                            }).ToList()
-                                                ).SingleOrDefault()
-                                    }).ToList().FirstOrDefault(),
-                                Author = new ActorModel
-                                {
-                                    Login = pr.Author.Login,
-                                    AvatarUrl = pr.Author.AvatarUrl(null),
-                                },
-                                CommentCount = pr.Comments(0, null, null, null).TotalCount,
-                                Number = pr.Number,
-                                Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new ReviewAdapter
-                                {
-                                    Body = review.Body,
-                                    CommentCount = review.Comments(null, null, null, null).TotalCount,
-                                }).ToList(),
-                                State = pr.State.FromGraphQl(),
-                                Title = pr.Title,
-                                UpdatedAt = pr.UpdatedAt,
-                            }))
-                        ).ToList()
-                    })
-                    .Compile();
             }
-
-            var graphql = await graphqlFactory.CreateConnection(address);
-            var vars = new Dictionary<string, object>
-            {
-                { nameof(owner), owner },
-                { nameof(name), name },
-                { nameof(after), after },
-                { nameof(states), states.Select(x => (Octokit.GraphQL.Model.PullRequestState)x).ToList() },
-            };
-
-            var result = await graphql.Run(query, vars);
 
             filter = $"type:pr repo:{owner}/{name}";
             if (states.Any())
@@ -335,85 +229,99 @@ namespace GitHub.Services
                 }
             }
 
-            var vars2 = new Dictionary<string, object>
+            var graphql = await graphqlFactory.CreateConnection(address);
+            var vars = new Dictionary<string, object>
             {
                 { nameof(filter), filter },
                 { nameof(after), after },
             };
 
-            var result2 = await graphql.Run(query2, vars2);
+            var result = await graphql.Run(query, vars);
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
-                item.CommentCount += item.Reviews.Sum(x => x.Count);
-                item.Reviews = null;
-
-                var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
-                var statuses = item.LastCommit?.Statuses;
-
-                var totalCount = 0;
-                var pendingCount = 0;
-                var successCount = 0;
-                var errorCount = 0;
-
-                if (checkRuns != null)
-                {
-                    totalCount += checkRuns.Length;
-
-                    pendingCount += checkRuns.Count(model => model.Status != CheckStatusState.Completed);
-
-                    successCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
-                                                                        model.Conclusion.HasValue &&
-                                                                        (model.Conclusion == CheckConclusionState.Success ||
-                                                                         model.Conclusion == CheckConclusionState.Neutral));
-                    errorCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
-                                                                        model.Conclusion.HasValue &&
-                                                                        !(model.Conclusion == CheckConclusionState.Success ||
-                                                                         model.Conclusion == CheckConclusionState.Neutral));
-                }
-
-                if (statuses != null)
-                {
-                    totalCount += statuses.Count;
-
-                    pendingCount += statuses.Count(model =>
-                        model.State == StatusState.Pending || model.State == StatusState.Expected);
-
-                    successCount += statuses.Count(model => model.State == StatusState.Success);
-
-                    errorCount += statuses.Count(model =>
-                        model.State == StatusState.Error || model.State == StatusState.Failure);
-                }
-
-                item.ChecksPendingCount = pendingCount;
-                item.ChecksSuccessCount = successCount;
-                item.ChecksErrorCount = errorCount;
-
-                if (totalCount == 0)
-                {
-                    item.ChecksSummary = PullRequestChecksSummaryState.None;
-                }
-                else if (totalCount == pendingCount)
-                {
-                    item.ChecksSummary = PullRequestChecksSummaryState.Pending;
-                }
-                else if (totalCount == successCount)
-                {
-                    item.ChecksSummary = PullRequestChecksSummaryState.Success;
-                }
-                else if (totalCount == errorCount)
-                {
-                    item.ChecksSummary = PullRequestChecksSummaryState.Failure;
-                }
-                else
-                {
-                    item.ChecksSummary = PullRequestChecksSummaryState.Mixed;
-                }
-
-                item.LastCommit = null;
+                ConvertItemAdapterToListItem(item);
             }
 
-            return result;
+            return new Page<PullRequestListItemModel>()
+            {
+                EndCursor = result.EndCursor,
+                HasNextPage = result.HasNextPage,
+                TotalCount = result.TotalCount,
+                Items = new List<PullRequestListItemModel>(result.Items.Select(model => ConvertItemAdapterToListItem(model.Result)))
+            };
+        }
+
+        static PullRequestListItemModel ConvertItemAdapterToListItem(ListItemAdapter item)
+        {
+            item.CommentCount += item.Reviews.Sum(x => x.Count);
+            item.Reviews = null;
+
+            var checkRuns = item.LastCommit?.CheckSuites?.SelectMany(model => model.CheckRuns).ToArray();
+            var statuses = item.LastCommit?.Statuses;
+
+            var totalCount = 0;
+            var pendingCount = 0;
+            var successCount = 0;
+            var errorCount = 0;
+
+            if (checkRuns != null)
+            {
+                totalCount += checkRuns.Length;
+
+                pendingCount += checkRuns.Count(model => model.Status != CheckStatusState.Completed);
+
+                successCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                         model.Conclusion.HasValue &&
+                                                         (model.Conclusion == CheckConclusionState.Success ||
+                                                          model.Conclusion == CheckConclusionState.Neutral));
+                errorCount += checkRuns.Count(model => model.Status == CheckStatusState.Completed &&
+                                                       model.Conclusion.HasValue &&
+                                                       !(model.Conclusion == CheckConclusionState.Success ||
+                                                         model.Conclusion == CheckConclusionState.Neutral));
+            }
+
+            if (statuses != null)
+            {
+                totalCount += statuses.Count;
+
+                pendingCount += statuses.Count(model =>
+                    model.State == StatusState.Pending || model.State == StatusState.Expected);
+
+                successCount += statuses.Count(model => model.State == StatusState.Success);
+
+                errorCount += statuses.Count(model =>
+                    model.State == StatusState.Error || model.State == StatusState.Failure);
+            }
+
+            item.ChecksPendingCount = pendingCount;
+            item.ChecksSuccessCount = successCount;
+            item.ChecksErrorCount = errorCount;
+
+            if (totalCount == 0)
+            {
+                item.ChecksSummary = PullRequestChecksSummaryState.None;
+            }
+            else if (totalCount == pendingCount)
+            {
+                item.ChecksSummary = PullRequestChecksSummaryState.Pending;
+            }
+            else if (totalCount == successCount)
+            {
+                item.ChecksSummary = PullRequestChecksSummaryState.Success;
+            }
+            else if (totalCount == errorCount)
+            {
+                item.ChecksSummary = PullRequestChecksSummaryState.Failure;
+            }
+            else
+            {
+                item.ChecksSummary = PullRequestChecksSummaryState.Mixed;
+            }
+
+            item.LastCommit = null;
+
+            return item;
         }
 
         public async Task<Page<ActorModel>> ReadAssignableUsers(
@@ -1186,6 +1094,11 @@ namespace GitHub.Services
         {
             localPath = localPath.Replace("\\\\", "\\");
             return Path.GetFullPath(localPath);
+        }
+
+        class SearchItemAdapter
+        {
+            public ListItemAdapter Result { get; set; }
         }
 
         class ListItemAdapter : PullRequestListItemModel
