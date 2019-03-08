@@ -23,6 +23,7 @@
   <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
       </ResourceDictionary.MergedDictionaries>
