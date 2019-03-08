@@ -334,7 +334,7 @@ namespace GitHub.Services
                 { nameof(after), after },
             };
 
-            return await graphql.Run(readAssignableUsers, vars);
+            return await graphql.Run(readAssignableUsers, vars, cacheDuration: TimeSpan.FromHours(1));
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
