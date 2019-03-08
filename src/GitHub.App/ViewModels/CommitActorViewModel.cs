@@ -7,8 +7,6 @@ namespace GitHub.ViewModels
         public CommitActorViewModel(CommitActorModel model)
             :base(model.User)
         {
-//            Initialize(model.User);
-
             Name = model.Name;
             Email = model.Email;
             HasLogin = model.User != null;
