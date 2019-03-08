@@ -25,6 +25,7 @@ namespace GitHub.ViewModels.Documents
 
             Commits = commits;
             Author = Commits[0].Author;
+            AuthorName = GetAuthorDisplayName(Commits[0].Author);
             AuthorCaption = BuildAuthorCaption();
         }
 
@@ -42,12 +43,15 @@ namespace GitHub.ViewModels.Documents
             }
 
             Author = Commits[0].Author;
+            AuthorName = GetAuthorDisplayName(Commits[0].Author);
             AuthorCaption = BuildAuthorCaption();
         }
 
         /// <inheritdoc/>
-        public IActorViewModel Author { get; }
+        public ICommitActorViewModel Author { get; }
 
+        public string AuthorName { get; }
+       
         /// <inheritdoc/>
         public string AuthorCaption { get; }
 
@@ -58,7 +62,7 @@ namespace GitHub.ViewModels.Documents
         {
             var result = new StringBuilder();
 
-            if (Commits.Any(x => x.Author.Login != Author.Login))
+            if (Commits.Any(x => GetAuthorDisplayName(x.Author) != GetAuthorDisplayName(Author)))
             {
                 result.Append(Resources.AndOthers);
                 result.Append(' ');
@@ -66,6 +70,11 @@ namespace GitHub.ViewModels.Documents
 
             result.Append(Resources.AddedSomeCommits);
             return result.ToString();
+        }
+
+        string GetAuthorDisplayName(ICommitActorViewModel commitActorViewModel)
+        {
+            return commitActorViewModel.HasLogin ? commitActorViewModel.Login : commitActorViewModel.Name;
         }
     }
 }
