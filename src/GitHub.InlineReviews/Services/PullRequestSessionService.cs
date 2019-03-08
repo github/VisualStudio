@@ -116,7 +116,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             var threadsByPosition = pullRequest.Threads
-                .Where(x => x.Path == relativePath && !x.IsOutdated)
+                .Where(x => x.Path == relativePath)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitSha, x.OriginalPosition));
             var threads = new List<IInlineCommentThreadModel>();
