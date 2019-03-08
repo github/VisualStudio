@@ -11,7 +11,7 @@ namespace GitHub.ViewModels.Documents
         /// <summary>
         /// Gets the first author of the commits in the list.
         /// </summary>
-        IActorViewModel Author { get; }
+        ICommitActorViewModel Author { get; }
 
         /// <summary>
         /// Gets a string to display next to the author in the view.
@@ -22,5 +22,7 @@ namespace GitHub.ViewModels.Documents
         /// Gets the commits.
         /// </summary>
         IReadOnlyList<ICommitSummaryViewModel> Commits { get; }
+
+        string AuthorName { get; }
     }
 }

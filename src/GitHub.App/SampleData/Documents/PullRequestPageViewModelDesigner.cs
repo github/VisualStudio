@@ -59,13 +59,13 @@ Fixes #1905";
                 new CommitListViewModel(
                     new CommitSummaryViewModel(new CommitModel
                     {
-                        Author = new ActorModel { Login = "grokys" },
+                        Author = new CommitActorModel { User = new ActorModel{ Login = "grokys" }},
                         AbbreviatedOid = "c7c7d25",
                         MessageHeadline = "Refactor comment view models."
                     }),
                     new CommitSummaryViewModel(new CommitModel
                     {
-                        Author = new ActorModel { Login = "shana" },
+                        Author = new CommitActorModel { User = new ActorModel{ Login = "shana" }},
                         AbbreviatedOid = "04e6a90",
                         MessageHeadline = "Refactor comment view models.",
                     })),
