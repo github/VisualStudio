@@ -50,6 +50,7 @@ namespace GitHub.ViewModels.Documents
         /// <inheritdoc/>
         public ICommitActorViewModel Author { get; }
 
+        /// <inheritdoc/>
         public string AuthorName { get; }
        
         /// <inheritdoc/>
