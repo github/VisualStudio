@@ -63,7 +63,7 @@ namespace GitHub.ViewModels.Documents
         {
             var result = new StringBuilder();
 
-            if (Commits.Any(x => GetAuthorDisplayName(x.Author) != GetAuthorDisplayName(Author)))
+            if (Commits.Any(x => GetAuthorDisplayName(x.Author) != AuthorName))
             {
                 result.Append(Resources.AndOthers);
                 result.Append(' ');
