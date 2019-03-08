@@ -26,6 +26,9 @@
                    Content="{Binding Content}">
     <Window.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+            </ResourceDictionary.MergedDictionaries>
             <local:ViewLocator x:Key="viewLocator"/>
             <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
                 <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
