@@ -10,6 +10,7 @@
                                      Style="{DynamicResource DialogUserControl}"
                                      mc:Ignorable="d"
                                      xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+                                     Background="{DynamicResource VsBrush.Window}"
                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
   <d:DesignProperties.DataContext>
     <Binding>

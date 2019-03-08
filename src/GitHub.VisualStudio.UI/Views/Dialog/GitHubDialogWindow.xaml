@@ -13,7 +13,6 @@
                    MinWidth="414"
                    MinHeight="460"
                    Background="{DynamicResource VsBrush.Window}"
-                   Foreground="{DynamicResource VsBrush.WindowText}"             
                    FontFamily="Segoe UI"
                    FontSize="12"
                    FontStretch="Normal"
