@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Sélectionnez un dossier conteneur pour votre nouveau dépôt.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Cloner un dépôt</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Ouvrir à partir de GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Demande de tirage (pull request) pour la branche **{0}** créée à l'emplacement [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publier le dépôt</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publier le dépôt sur {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Entrez un titre pour la demande de tirage (pull request)</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>La branche source n'existe pas à distance. L'avez-vous envoyée (push) ?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Aucun dépôt sélectionné.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Entrez un chemin de dépôt</value>
@@ -256,10 +244,10 @@
     <value>Vous devez effectuer un tirage (pull) avant un envoi (push)</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>Aucune validation à tirer (pull)</value>
+    <value>Aucun commit à tirer (pull)</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>Aucune validation à envoyer (push)</value>
+    <value>Aucun commit à envoyer (push)</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*Aucune description fournie.*</value>
@@ -286,7 +274,7 @@
     <value>Le dépôt source n'est plus disponible.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Extraction impossible car votre répertoire de travail contient des changements non validés.</value>
+    <value>Extraction impossible car votre répertoire de travail contient des changements non commités.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Synchroniser {0} sous-modules</value>
@@ -322,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>Dupliquer (fork) le dépôt</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Changer d'origine</value>
+    <value>Changer de dépôt origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>Voulez-vous vraiment annuler cette revue ? Vous allez perdre tous vos commentaires en attente.</value>
@@ -412,7 +400,7 @@ https://git-scm.com/download/win</value>
     <value>Gist créé</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>Échec de création de gist</value>
+    <value>Échec de création de Gist</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
     <value>par</value>
@@ -454,7 +442,7 @@ https://git-scm.com/download/win</value>
     <value>Questions</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
-    <value>Graphiques</value>
+    <value>Graphes</value>
   </data>
   <data name="GitHubPublishSectionTitle" xml:space="preserve">
     <value>Publier sur GitHub</value>
@@ -687,7 +675,7 @@ https://git-scm.com/download/win</value>
     <value>Commencer une revue</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Vous devez valider et envoyer (push) vos changements pour ajouter un commentaire ici.</value>
+    <value>Vous devez commiter et envoyer (push) vos changements pour ajouter un commentaire ici.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Commentaire précédent</value>
@@ -807,7 +795,7 @@ https://git-scm.com/download/win</value>
     <value>Aucun dépôt actif n'est accessible à la navigation</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>Le fichier de travail est différent du fichier à l'emplacement « {0} ». Extrayez la branche, demande de tirage (pull request) ou validation correspondante.</value>
+    <value>Le fichier de travail est différent du fichier à l'emplacement « {0} ». Extrayez la branche, la demande de tirage (pull request) ou le commit correspondant.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Ouvrez le dépôt « {0} », puis réessayez</value>
@@ -847,5 +835,35 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} envoyé (push) le plus récemment</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Commentaire</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Fermer la demande de tirage</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Fermer le problème</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Fermer et commenter</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Rouvrir et commenter</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Rouvrir le problème</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Rouvrir la demande de tirage</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} validations</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>commits ajoutés</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>et autres</value>
   </data>
 </root>

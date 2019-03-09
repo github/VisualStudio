@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="110">
         <source>GitHub.VisualStudio</source>
-        <target xml:lang="de" state="translated">GitHub.VisualStudio</target>
+        <target state="translated">GitHub.VisualStudio</target>
         <note />
       </trans-unit>
       <trans-unit id="112">
         <source>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</source>
-        <target xml:lang="de" state="translated">将 GitHub 流引入 Visual Studio 中的 Visual Studio 扩展。</target>
+        <target state="translated">将 GitHub 流引入 Visual Studio 中的 Visual Studio 扩展。</target>
         <note />
       </trans-unit>
     </body>
