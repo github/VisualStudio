@@ -49,5 +49,15 @@ namespace GitHub.Models
         /// Gets the relative path to the file that the thread is on.
         /// </summary>
         string RelativePath { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the thread is outdated.
+        /// </summary>
+        bool IsOutdated { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether comment thread has been marked as resolved by a user.
+        /// </summary>
+        bool IsResolved { get; }
     }
 }

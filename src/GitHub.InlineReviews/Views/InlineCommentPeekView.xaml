@@ -64,6 +64,44 @@
         </Border>
 
         <Border DockPanel.Dock="Top"
+                Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
+                Padding="8">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Thread.IsResolved}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <DockPanel>
+                <ui:OcticonImage DockPanel.Dock="Left" Icon="info" Margin="0 0 8 0"/>
+                <TextBlock TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.ThisConversationWasMarkedAsResolved}"/>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
+                Padding="8">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Thread.IsOutdated}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <DockPanel>
+                <ui:OcticonImage DockPanel.Dock="Left" Icon="alert" Margin="0 0 8 0"/>
+                <TextBlock TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.YouAreViewingAnOutdatedVersionOfThisFile}"/>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Top"
                 BorderThickness="0 0 0 1"
                 Background="{DynamicResource VsBrush.CommandBarOptionsBackground}"
                 BorderBrush="{DynamicResource GitHubVsBrandedUIBorder}">

@@ -19,7 +19,7 @@ namespace GitHub {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -2037,6 +2037,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This conversation was marked as resolved.
+        /// </summary>
+        public static string ThisConversationWasMarkedAsResolved {
+            get {
+                return ResourceManager.GetString("ThisConversationWasMarkedAsResolved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Title (required).
         /// </summary>
         public static string TitleRequired {
@@ -2267,6 +2276,15 @@ namespace GitHub {
         public static string years {
             get {
                 return ResourceManager.GetString("years", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are viewing an outdated version of this file.
+        /// </summary>
+        public static string YouAreViewingAnOutdatedVersionOfThisFile {
+            get {
+                return ResourceManager.GetString("YouAreViewingAnOutdatedVersionOfThisFile", resourceCulture);
             }
         }
         
