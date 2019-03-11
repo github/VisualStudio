@@ -10,6 +10,7 @@
                                      Style="{DynamicResource DialogUserControl}"
                                      mc:Ignorable="d"
                                      Background="{DynamicResource VsBrush.Window}"
+                                     Foreground="{DynamicResource VsBrush.WindowText}"
                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
   <d:DesignProperties.DataContext>
     <Binding>
@@ -66,7 +67,7 @@
             FocusVisualStyle="{x:Null}">
 
         <Grid.Resources>
-          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBox}}">
+          <Style TargetType="{x:Type TextBlock}">
             <Setter Property="Margin" Value="0,3,0,3" />
           </Style>
 

@@ -8,6 +8,8 @@
                                mc:Ignorable="d"
                                d:DesignWidth="414"
                                d:DesignHeight="440"
+                               Background="{DynamicResource VsBrush.Window}"
+                               Foreground="{DynamicResource VsBrush.WindowText}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
         <ResourceDictionary>

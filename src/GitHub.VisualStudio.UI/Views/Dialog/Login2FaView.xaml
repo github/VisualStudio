@@ -9,6 +9,8 @@
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
+    Background="{DynamicResource VsBrush.Window}"
+    Foreground="{DynamicResource VsBrush.WindowText}"
     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>
@@ -18,6 +20,15 @@
             <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
           </ResourceDictionary.MergedDictionaries>
+          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
+          </Style>
+          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource GitHubH1TextBlock}">
+              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
+          </Style>
+          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource GitHubDescriptionTextBlock}">
+              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
+          </Style>
         </ResourceDictionary>
     </Control.Resources>
 
@@ -30,8 +41,7 @@
                 Text="{x:Static ghfvs:Resources.twoFactorAuthText}" 
                 Padding="0" 
                 Margin="0,0,12,0"
-                Style="{DynamicResource GitHubH1TextBlock}"
-                Foreground="{DynamicResource GHTextBrush}" />
+                Style="{DynamicResource GitHubH1TextBlock}" />
         </WrapPanel>
 
         <ghfvs:HorizontalShadowDivider />
