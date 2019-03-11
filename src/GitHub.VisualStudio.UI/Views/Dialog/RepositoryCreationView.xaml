@@ -9,7 +9,6 @@
                                      d:DesignWidth="414"
                                      Style="{DynamicResource DialogUserControl}"
                                      mc:Ignorable="d"
-                                     xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                      Background="{DynamicResource VsBrush.Window}"
                                      AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
   <d:DesignProperties.DataContext>
@@ -23,10 +22,17 @@
   <Control.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+        <ResourceDictionary>
+            <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
+            <Style TargetType="{x:Type ghfvs:GitHubComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
+        </ResourceDictionary>
       </ResourceDictionary.MergedDictionaries>
+      <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
+      <Style TargetType="{x:Type ghfvs:SecurePasswordBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
     </ResourceDictionary>
   </Control.Resources>
 
@@ -62,18 +68,18 @@
             FocusVisualStyle="{x:Null}">
 
         <Grid.Resources>
-                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogTextBoxStyleKey}}">
+          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0,3,0,3" />
           </Style>
 
-                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogLabelStyleKey}}">
+          <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="Margin" Value="0,0,10,0" />
             <Setter Property="Padding" Value="0" />
           </Style>
 
-                    <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogTextBoxStyleKey}}">
+          <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource {x:Type ghfvs:PromptTextBox}}">
             <Setter Property="Margin" Value="0,5" />
           </Style>
 
@@ -177,7 +183,6 @@
                                Grid.Column="1"
                                ItemsSource="{Binding GitIgnoreTemplates}"
                                SelectedItem="{Binding SelectedGitIgnoreTemplate}"
-                               Style="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogComboBoxStyleKey}}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitignoreComboBox}" >
           <ComboBox.ItemTemplate>
             <DataTemplate>
@@ -198,7 +203,6 @@
         <ghfvs:FilteredComboBox x:Name="licenseList"
                                Grid.Row="6"
                                Grid.Column="1"
-                               Style="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogComboBoxStyleKey}}"
                                ItemsSource="{Binding Licenses}"
                                SelectedItem="{Binding SelectedLicense}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.LicenseComboBox}" >
@@ -222,7 +226,6 @@
                            Margin="0,0,0,8"
                            ItemsSource="{Binding Accounts}"
                            SelectedItem="{Binding SelectedAccount}"
-                           Style="{StaticResource ThemedDialogComboBoxStyleKey}"
                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.AccountComboBox}" >
           <ComboBox.ItemTemplate>
             <DataTemplate>

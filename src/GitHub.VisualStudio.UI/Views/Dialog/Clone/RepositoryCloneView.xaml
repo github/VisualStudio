@@ -6,7 +6,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
-             xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
              Background="{DynamicResource VsBrush.Window}"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
@@ -16,14 +15,11 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <Style TargetType="{x:Type TextBox}"
-                   BasedOn="{StaticResource {x:Static ui:VsResourceKeys.ThemedDialogTextBoxStyleKey}}" />
         </ResourceDictionary>
     </UserControl.Resources>
 

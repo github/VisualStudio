@@ -9,7 +9,6 @@
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
-    xmlns:ui="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>
@@ -17,6 +16,7 @@
           <ResourceDictionary.MergedDictionaries>
             <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
             <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+            <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
           </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
@@ -68,14 +68,12 @@
             HorizontalAlignment="Center"
             Margin="0,18,0,60">
             <Button
-                Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                 x:Name="okButton"
                 TabIndex="2"
                 IsDefault="True"
                 Content="{x:Static ghfvs:Resources.verifyText}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticatonVerifyButton}" />
             <Button 
-                Style="{DynamicResource {x:Static ui:VsResourceKeys.ThemedDialogButtonStyleKey}}"
                 x:Name="resendCodeButton"
                 TabIndex="3"
                 ToolTip="{x:Static ghfvs:Resources.resendCodeButtonToolTip}"
