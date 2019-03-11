@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>为新存储库选择包含文件夹。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>克隆存储库</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>从 GitHub 打开</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>已成功创建分支 **{0}** 的拉取请求，创建时间为 [{1}] ({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>发布存储库</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>将存储库发布到 {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>请输入拉取请求标题</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>源分支在远程不存在，是否已推送该分支?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>没有选择任何存储库。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>请输入存储库路径</value>
@@ -277,7 +265,7 @@
     <value>推送到 {0} 分支 {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>远程</value>
+    <value>远程库</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>重命名</value>
@@ -313,10 +301,10 @@ https://git-scm.com/download/win</value>
     <value>按 Enter 以导航到编辑器</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>请先签出拉取请求分支，然后再导航到编辑器</value>
+    <value>请先签出 PR 分支，然后再导航到编辑器</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>按 Enter 以导航到编辑器(必须签出拉取请求分支)</value>
+    <value>按 Enter 以导航到编辑器(必须签出 PR 分支)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
     <value>分叉存储库</value>
@@ -412,7 +400,7 @@ https://git-scm.com/download/win</value>
     <value>已创建 Gist</value>
   </data>
   <data name="gistCreationFailedMessage" xml:space="preserve">
-    <value>未能创建 gist</value>
+    <value>未能创建 Gist</value>
   </data>
   <data name="prUpdatedByText" xml:space="preserve">
     <value>依据</value>
@@ -490,7 +478,7 @@ https://git-scm.com/download/win</value>
     <value>存储库名称</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>此存储库没有远程。填写此表单以将其发布到 GitHub。</value>
+    <value>此存储库没有远程库。填写此表单以将其发布到 GitHub。</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>发布</value>
@@ -630,7 +618,7 @@ https://git-scm.com/download/win</value>
     <value>更新</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>在编辑器边距上显示拉取请求注释</value>
+    <value>在编辑器边距上显示 PR 注释</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
     <value>实验性功能</value>
@@ -825,10 +813,10 @@ https://git-scm.com/download/win</value>
     <value>在此位置已存在一个目录，但它不包含存储库。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程。</value>
+    <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程库。</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>此位置已存在一个存储库，但该存储库具有名为 {0} 的远程。</value>
+    <value>此位置已存在一个存储库，但该存储库具有名为 {0} 的远程库。</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>已克隆到此位置。单击“打开”打开本地存储库。</value>
@@ -837,15 +825,45 @@ https://git-scm.com/download/win</value>
     <value>找不到存储库的 GitHub URL</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>存储库必须定义名为 "origin" 的远程才能找到其 GitHub URL。</value>
+    <value>存储库必须定义名为 "origin" 的远程库才能找到其 GitHub URL。</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>请将其中一个现有远程重命名为 "origin" 或添加一个名为 "origin" 的新远程并提取。可从命令行或通过单击下面的按钮完成此操作。</value>
+    <value>请将其中一个现有远程库重命名为 "origin" 或添加一个名为 "origin" 的新远程库并提取。可从命令行或通过单击下面的按钮完成此操作。</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>在存储库中找不到对应于 {0} 的文件。请执行 "git fetch" 或签出目标拉取请求。</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>最近已推送 {0}</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>注释</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>关闭拉取请求</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>关闭问题</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>关闭并注释</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>重新打开并注释</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>重新打开问题</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>重新打开拉取请求</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} 个提交</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>已添加部分提交</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>以及其他</value>
   </data>
 </root>
