@@ -92,7 +92,6 @@
                     Grid.Column="1"
                     Grid.Row="3"
                     Content="{x:Static ghfvs:Resources.makePrivateGist}"
-                    Padding="8,4,0,4" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateGistCheckBox}" />
 
                 <ghfvs:ErrorMessageDisplay
