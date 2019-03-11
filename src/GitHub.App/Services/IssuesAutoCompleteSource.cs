@@ -9,6 +9,7 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit.GraphQL;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -18,6 +19,7 @@ namespace GitHub.Services
     {
         readonly ITeamExplorerContext teamExplorerContext;
         readonly IGraphQLClientFactory graphqlFactory;
+        ICompiledQuery<List<SuggestionItem>> query;
 
         [ImportingConstructor]
         public IssuesAutoCompleteSource(ITeamExplorerContext teamExplorerContext, IGraphQLClientFactory graphqlFactory)
@@ -32,17 +34,32 @@ namespace GitHub.Services
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
             var localRepositoryModel = teamExplorerContext.ActiveRepository;
-            var query = new Query().Repository(owner: localRepositoryModel.Owner, name: localRepositoryModel.Name)
-                .Select(repository =>
-                    repository.Issues(null, null, null, null, null, null, null)
-                        .AllPages()
-                        .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title))
-                        .ToList());
+
+            var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl.Host);
+            var owner = localRepositoryModel.Owner;
+            var name = localRepositoryModel.Name;
+
+            if (query == null)
+            {
+                query = new Query().Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
+                    .Select(repository =>
+                        repository.Issues(null, null, null, null, null, null, null)
+                            .AllPages()
+                            .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title))
+                            .ToList())
+                    .Compile();
+            }
+
+            var variables = new Dictionary<string, object>
+            {
+                {nameof(owner), owner },
+                {nameof(name), name },
+            };
 
             return Observable.FromAsync(async () =>
                 {
-                    var connection = await graphqlFactory.CreateConnection(HostAddress.Create(localRepositoryModel.CloneUrl.Host));
-                    var suggestions = await connection.Run(query);
+                    var connection = await graphqlFactory.CreateConnection(hostAddress);
+                    var suggestions = await connection.Run(query, variables);
                     return suggestions.Select(suggestion => new IssueAutoCompleteSuggestion(suggestion, Prefix));
                 }).SelectMany(enumerable => enumerable);
         }

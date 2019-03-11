@@ -17,7 +17,6 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> Cancel { get; }
         string PRTitle { get; set; }
         ReactivePropertyValidator TitleValidator { get; }
-        IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         Task InitializeAsync(LocalRepositoryModel repository, IConnection connection);
     }
