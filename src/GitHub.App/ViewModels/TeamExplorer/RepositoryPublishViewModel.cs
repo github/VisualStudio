@@ -31,7 +31,6 @@ namespace GitHub.ViewModels.TeamExplorer
         readonly IModelServiceFactory modelServiceFactory;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
-        readonly ObservableAsPropertyHelper<string> title;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -51,14 +50,6 @@ namespace GitHub.ViewModels.TeamExplorer
             this.notificationService = notificationService;
             this.usageTracker = usageTracker;
             this.modelServiceFactory = modelServiceFactory;
-
-            title = this.WhenAny(
-                x => x.SelectedConnection,
-                x => x.Value != null ?
-                    string.Format(CultureInfo.CurrentCulture, Resources.PublishToTitle, x.Value.HostAddress.Title) :
-                    Resources.PublishTitle
-            )
-            .ToProperty(this, x => x.Title);
 
             Connections = connectionManager.Connections;
             this.repositoryPublishService = repositoryPublishService;
@@ -108,8 +99,6 @@ namespace GitHub.ViewModels.TeamExplorer
                     RepositoryName = name;
                 });
         }
-
-        public string Title { get { return title.Value; } }
 
         public ReactiveCommand<Unit, ProgressState> PublishRepository { get; private set; }
         public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }

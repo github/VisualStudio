@@ -19,7 +19,6 @@ Official builds of this extension are available at [the official website](https:
 
 [![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
 [![Build Status](https://github-editor-tools.visualstudio.com/VisualStudio/_apis/build/status/github.VisualStudio?branchName=master)](https://github-editor-tools.visualstudio.com/VisualStudio/_build/latest?definitionId=4&branchName=master)
-[![Crowdin](https://d322cqt584bo4o.cloudfront.net/github-visual-studio/localized.svg)](https://crowdin.com/project/github-visual-studio)
 [![codecov](https://codecov.io/gh/GitHub/VisualStudio/branch/master/graph/badge.svg)](https://codecov.io/gh/GitHub/VisualStudio)
 
 [![Follow GitHub for Visual Studio](https://img.shields.io/twitter/follow/GitHubVS.svg?style=social "Follow GitHubVS")](https://twitter.com/githubvs?ref_src=twsrc%5Etfw) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

@@ -224,6 +224,7 @@ namespace GitHub.Services
             catch (Exception ex)
             {
                 log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, repositoryPath);
+                operatingSystem.Directory.DeleteDirectory(repositoryPath);
                 throw;
             }
         }
