@@ -20,15 +20,9 @@
             <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
             <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
           </ResourceDictionary.MergedDictionaries>
-          <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
-          </Style>
-          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource GitHubH1TextBlock}">
-              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
-          </Style>
-          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource GitHubDescriptionTextBlock}">
-              <Setter Property="Foreground" Value="{DynamicResource VsBrush.WindowText}" />
-          </Style>
+          <Style TargetType="{x:Type TextBlock}" />
+          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource TextBlockEnvironment200PercentFontSizeStyleKey}" />
+          <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource TextBlockEnvironment111PercentFontSizeStyleKey}" />
         </ResourceDictionary>
     </Control.Resources>
 
@@ -55,7 +49,8 @@
             <Run x:Name="description" Text="{x:Static ghfvs:Resources.openTwoFactorAuthAppText}"/>
             <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication" 
                        AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationLearnMoreHyperlink}">
-                <TextBlock Text="{x:Static ghfvs:Resources.learnMoreLink}"/></Hyperlink>
+                <Run Text="{x:Static ghfvs:Resources.learnMoreLink}"/>
+            </Hyperlink>
         </TextBlock>
         <ghfvs:TwoFactorInput
             x:Name="authenticationCode"
