@@ -813,7 +813,8 @@ Line 4";
                 Arg.Any<HostAddress>(),
                 Arg.Any<string>(),
                 Arg.Any<string>(),
-                Arg.Any<int>()).Returns(pullRequest);
+                Arg.Any<int>(),
+                Arg.Any<bool>()).Returns(pullRequest);
         }
     }
 }
