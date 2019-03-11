@@ -156,8 +156,14 @@ namespace GitHub.InlineReviews.Services
         /// <param name="owner">The repository owner.</param>
         /// <param name="name">The repository name.</param>
         /// <param name="number">The pull request number.</param>
+        /// <param name="refresh">Whether the data should be refreshed instead of read from the cache.</param>
         /// <returns>A task returning the pull request model.</returns>
-        Task<PullRequestDetailModel> ReadPullRequestDetail(HostAddress address, string owner, string name, int number);
+        Task<PullRequestDetailModel> ReadPullRequestDetail(
+            HostAddress address,
+            string owner,
+            string name,
+            int number,
+            bool refresh = false);
 
         /// <summary>
         /// Reads the current viewer for the specified address..
