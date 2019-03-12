@@ -19,13 +19,14 @@ namespace GitHub.Services
         /// <param name="name">The repository name.</param>
         /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
         /// <param name="states">The pull request states to filter by</param>
+        /// <param name="author"></param>
         /// <returns>A page of pull request item models.</returns>
-        Task<Page<PullRequestListItemModel>> ReadPullRequests(
-            HostAddress address,
+        Task<Page<PullRequestListItemModel>> ReadPullRequests(HostAddress address,
             string owner,
             string name,
             string after,
-            PullRequestState[] states);
+            PullRequestState[] states,
+            string author);
 
         /// <summary>
         /// Reads a page of users that can be assigned to pull requests.
