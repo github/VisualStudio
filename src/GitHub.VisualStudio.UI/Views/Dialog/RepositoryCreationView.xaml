@@ -21,18 +21,7 @@
   </d:DesignProperties.DataContext>
 
   <Control.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
-      </ResourceDictionary.MergedDictionaries>
-      <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
-      <Style TargetType="{x:Type ghfvs:GitHubComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
-      <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
-      <Style TargetType="{x:Type ghfvs:SecurePasswordBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
-    </ResourceDictionary>
+    <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
   </Control.Resources>
 
   <DockPanel Style="{DynamicResource DialogContainerDockPanel}">

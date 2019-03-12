@@ -8,18 +8,12 @@
              Background="{DynamicResource VsBrush.Window}"
              Foreground="{DynamicResource VsBrush.WindowText}"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
-  
-  <Control.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </Control.Resources>
 
-  <DockPanel Margin="10">
+    <Control.Resources>
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+    </Control.Resources>
+
+    <DockPanel Margin="10">
     <ghfvs:OcticonImage DockPanel.Dock="Top"
                         Icon="mark_github"
                         Foreground="{DynamicResource GitHubVsWindowText}"

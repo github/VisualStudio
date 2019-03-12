@@ -12,16 +12,9 @@
                                Foreground="{DynamicResource VsBrush.WindowText}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
-            </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
-        </ResourceDictionary>
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
     </Control.Resources>
+
     <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
         <ghfvs:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,10,0,-10" Panel.ZIndex="100" DockPanel.Dock="Top" />
 

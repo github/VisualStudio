@@ -10,17 +10,9 @@
         <ghfvs:SelectPageViewModelDesigner/>
     </d:DesignData.DataContext>
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
-            </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
-        </ResourceDictionary>
-    </UserControl.Resources>
+    <Control.Resources>
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+    </Control.Resources>
 
     <DockPanel>
         <ghfvs:PromptTextBox DockPanel.Dock="Top"
