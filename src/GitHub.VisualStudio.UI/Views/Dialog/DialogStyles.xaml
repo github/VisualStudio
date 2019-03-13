@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ghfvs="https://github.com/github/VisualStudio"
+                    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"                    
                     xmlns:local="clr-namespace:GitHub.VisualStudio.Styles">
 
     <ResourceDictionary.MergedDictionaries>
@@ -14,5 +15,7 @@
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource TextBlockEnvironment111PercentFontSizeStyleKey}" />
     <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
     <Style TargetType="{x:Type ghfvs:GitHubComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
-    <SolidColorBrush x:Key="GitHubAccentBrush" Color="{StaticResource VsColor.AccentPale}" />
+
+    <!--  HACK: Keep the focused text box border consistent -->
+    <SolidColorBrush x:Key="GitHubAccentBrush" Color="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBorderFocusedColorKey}}" />
 </ResourceDictionary>
