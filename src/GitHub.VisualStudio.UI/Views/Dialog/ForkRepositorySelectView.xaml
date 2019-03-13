@@ -14,7 +14,7 @@
              d:DesignHeight="414" d:DesignWidth="440">
 
   <Control.Resources>
-    <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+    <ResourceDictionary Source="DialogStyles.xaml" />
   </Control.Resources>
 
   <d:DesignProperties.DataContext>

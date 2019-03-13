@@ -12,7 +12,7 @@
                                Foreground="{DynamicResource VsBrush.WindowText}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+        <ResourceDictionary Source="DialogStyles.xaml" />
     </Control.Resources>
 
     <DockPanel Style="{DynamicResource DialogContainerDockPanel}">

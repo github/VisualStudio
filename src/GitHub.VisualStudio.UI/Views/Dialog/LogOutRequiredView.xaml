@@ -10,7 +10,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
     <Control.Resources>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+        <ResourceDictionary Source="DialogStyles.xaml" />
     </Control.Resources>
 
     <DockPanel Margin="10">

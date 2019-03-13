@@ -17,7 +17,7 @@
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+                <ResourceDictionary Source="DialogStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Disable links until we make them work-->

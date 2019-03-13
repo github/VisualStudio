@@ -14,4 +14,5 @@
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource TextBlockEnvironment111PercentFontSizeStyleKey}" />
     <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
     <Style TargetType="{x:Type ghfvs:GitHubComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
+    <SolidColorBrush x:Key="GitHubAccentBrush" Color="{StaticResource VsColor.AccentPale}" />
 </ResourceDictionary>

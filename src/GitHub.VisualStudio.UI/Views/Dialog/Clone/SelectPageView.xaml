@@ -11,7 +11,7 @@
     </d:DesignData.DataContext>
 
     <Control.Resources>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/VsDialog.xaml" />
+        <ResourceDictionary Source="../DialogStyles.xaml" />
     </Control.Resources>
 
     <DockPanel>
