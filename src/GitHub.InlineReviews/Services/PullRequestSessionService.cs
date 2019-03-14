@@ -455,7 +455,7 @@ namespace GitHub.InlineReviews.Services
             }
 
             var connection = await graphqlFactory.CreateConnection(address);
-            return await connection.Run(readViewer);
+            return await connection.Run(readViewer, cacheDuration: TimeSpan.FromMinutes(10));
         }
 
         public async Task<string> GetGraphQLPullRequestId(
