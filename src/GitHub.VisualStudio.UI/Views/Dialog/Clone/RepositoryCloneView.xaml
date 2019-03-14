@@ -6,8 +6,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
-             Background="{DynamicResource VsBrush.Window}"
-             Foreground="{DynamicResource VsBrush.WindowText}"
+             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>

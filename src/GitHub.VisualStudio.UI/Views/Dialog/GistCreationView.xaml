@@ -8,8 +8,9 @@
                                mc:Ignorable="d"
                                d:DesignWidth="414"
                                d:DesignHeight="440"
-                               Background="{DynamicResource VsBrush.Window}"
-                               Foreground="{DynamicResource VsBrush.WindowText}"
+                               xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+                               Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                               Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
         <ResourceDictionary Source="DialogStyles.xaml" />

@@ -9,9 +9,9 @@
              xmlns:ui="https://github.com/github/VisualStudio"
              VerticalAlignment="Top"
              Margin="8"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-             Background="{DynamicResource VsBrush.Window}"
-             Foreground="{DynamicResource VsBrush.WindowText}"
+             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
              mc:Ignorable="d" d:DesignWidth="300" Height="315.179">
 
     <Control.Resources>
