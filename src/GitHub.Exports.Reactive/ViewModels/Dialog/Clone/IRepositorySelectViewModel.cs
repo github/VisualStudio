@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog.Clone
 {
@@ -14,6 +16,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         IReadOnlyList<IRepositoryItemViewModel> Items { get; }
         ICollectionView ItemsView { get; }
         IRepositoryItemViewModel SelectedItem { get; set; }
+        ReactiveCommand<Unit, Unit> Refresh { get; }
 
         void Initialize(IConnection connection);
     }

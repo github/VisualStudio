@@ -64,7 +64,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address)
+        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address, bool refresh = false)
         {
             if (readViewerRepositories == null)
             {
@@ -107,7 +107,7 @@ namespace GitHub.Services
             }
 
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
-            var result = await graphql.Run(readViewerRepositories).ConfigureAwait(false);
+            var result = await graphql.Run(readViewerRepositories, cacheDuration: TimeSpan.FromHours(1), refresh: refresh).ConfigureAwait(false);
             return result;
         }
 

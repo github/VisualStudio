@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -30,7 +31,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         string filter;
         bool isEnabled;
         bool isLoading;
-        bool loadingStarted;
         IReadOnlyList<IRepositoryItemViewModel> items;
         ICollectionView itemsView;
         ObservableAsPropertyHelper<RepositoryModel> repository;
@@ -57,6 +57,12 @@ namespace GitHub.ViewModels.Dialog.Clone
                 .ToProperty(this, x => x.Repository);
 
             this.WhenAnyValue(x => x.Filter).Subscribe(_ => ItemsView?.Refresh());
+
+            Refresh = ReactiveCommand.CreateFromTask(async () =>
+            {
+                await this.LoadItems(true);
+                return Unit.Default;
+            });
         }
 
         public Exception Error
@@ -101,6 +107,8 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedItem, value);
         }
 
+        public ReactiveCommand<Unit, Unit> Refresh { get; }
+
         public RepositoryModel Repository => repository.Value;
 
         public void Initialize(IConnection connection)
@@ -111,18 +119,36 @@ namespace GitHub.ViewModels.Dialog.Clone
             IsEnabled = true;
         }
 
-        public async Task Activate()
+        public async Task Activate() => this.LoadItems(false);
+
+        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
         {
-            if (connection == null || loadingStarted) return;
+            var name = group.Key;
+            if (group.Value.Count == max)
+            {
+                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
+            }
+
+            return name;
+        }
+
+        async Task LoadItems(bool refresh)
+        {
+            if (connection == null && !IsLoading) return;
 
             Error = null;
             IsLoading = true;
-            loadingStarted = true;
 
             try
             {
+                if (refresh)
+                {
+                    Items = new List<IRepositoryItemViewModel>();
+                    ItemsView = CollectionViewSource.GetDefaultView(Items);
+                }
+
                 var results = await log.TimeAsync(nameof(service.ReadViewerRepositories),
-                    () => service.ReadViewerRepositories(connection.HostAddress));
+                    () => service.ReadViewerRepositories(connection.HostAddress, refresh));
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
@@ -161,17 +187,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             {
                 IsLoading = false;
             }
-        }
-
-        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
-        {
-            var name = group.Key;
-            if (group.Value.Count == max)
-            {
-                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
-            }
-
-            return name;
         }
 
         bool FilterItem(object obj)
