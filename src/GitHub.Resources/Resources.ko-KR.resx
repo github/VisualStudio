@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>새 리포지토리의 포함 폴더를 선택합니다.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>리포지토리 복제</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub에서 열기</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>분기 **{0}**에 대한 끌어오기 요청이 [{1}]({2})에 생성됨</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>리포지토리 게시</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>{0}에 리포지토리 게시</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>끌어오기 요청의 제목을 입력하세요.</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>소스 분기가 원격으로 존재하지 않습니다. 소스 분기를 푸시하셨습니까?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>선택한 리포지토리가 없습니다.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>리포지토리 경로를 입력하세요.</value>
@@ -205,7 +193,7 @@
     <value>리포지토리 이름을 변경하거나 다른 계정을 선택하고 다시 시도하세요.</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>개인 리포지토리 할당량을 초과했습니다.</value>
+    <value>비공개 리포지토리 할당량을 초과했습니다.</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
     <value>같은 이름을 가진 리포지토리가 이 위치에 이미 있습니다.</value>
@@ -322,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>리포지토리 포크</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>전환 원점</value>
+    <value>원점 전환</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>이 검토를 취소하시겠습니까? 보류 중인 모든 주석이 손실됩니다.</value>
@@ -508,7 +496,7 @@ https://git-scm.com/download/win</value>
     <value>이름</value>
   </data>
   <data name="makePrivateContent" xml:space="preserve">
-    <value>개인 리포지토리</value>
+    <value>비공개 리포지토리</value>
   </data>
   <data name="localPathText" xml:space="preserve">
     <value>로컬 경로</value>
@@ -847,5 +835,35 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0}이(가) 가장 최근 푸시됨</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>주석</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>끌어오기 요청 닫기</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>문제 닫기</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>닫기 및 주석 처리</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>다시 열기 및 주석 처리</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>문제 다시 열기</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>끌어오기 요청 다시 열기</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0}개 커밋</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>일부 커밋을 추가함</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>및 기타</value>
   </data>
 </root>

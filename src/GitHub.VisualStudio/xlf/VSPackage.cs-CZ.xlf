@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="110">
         <source>GitHub.VisualStudio</source>
-        <target xml:lang="de" state="translated">GitHub.VisualStudio</target>
+        <target state="translated">GitHub.VisualStudio</target>
         <note />
       </trans-unit>
       <trans-unit id="112">
         <source>A Visual Studio Extension that brings the GitHub Flow into Visual Studio.</source>
-        <target xml:lang="de" state="translated">Rozšíření sady Visual Studio, které do ní přináší tok GitHubu</target>
+        <target state="translated">Rozšíření sady Visual Studio, které do ní přináší tok GitHubu</target>
         <note />
       </trans-unit>
     </body>
