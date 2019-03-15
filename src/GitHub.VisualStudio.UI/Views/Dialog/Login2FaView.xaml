@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ghfvs="https://github.com/github/VisualStudio"
     xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
+    xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
@@ -30,7 +31,7 @@
                 Style="{DynamicResource GitHubH1TextBlock}" />
         </WrapPanel>
 
-        <ghfvs:HorizontalShadowDivider />
+        <controls:HorizontalShadowDivider />
 
         <TextBlock
             Margin="30,0,30,16"

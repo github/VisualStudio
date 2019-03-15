@@ -58,42 +58,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <Style x:Key="LightListBox" TargetType="{x:Type ListBox}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="ItemContainerStyle" Value="{StaticResource LightListItemContainerStyle}" />
-        <Setter Property="TextSearch.TextPath" Value="Name" />
-
-        <!-- Sane default -->
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
-        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
-        <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ListBox}">
-                    <ScrollViewer Style="{DynamicResource ScrollViewerWithShadow}">
-                        <ItemsPresenter />
-                    </ScrollViewer>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="ItemTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Grid Height="30">
-                        <TextBlock 
-                            VerticalAlignment="Center" 
-                            Margin="30,0,6,0" 
-                            Text="{Binding Name}" 
-                            TextTrimming="CharacterEllipsis" />
-                    </Grid>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 </ResourceDictionary>

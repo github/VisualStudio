@@ -3,6 +3,7 @@
                                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                      xmlns:ghfvs="https://github.com/github/VisualStudio"
+                                     xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
                                      xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
                                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                      d:DesignHeight="440"
@@ -50,7 +51,7 @@
           <Setter Property="Margin" Value="0,5,0,0" />
         </Style>
       </StackPanel.Resources>
-      <ghfvs:HorizontalShadowDivider />
+      <controls:HorizontalShadowDivider />
       <Grid x:Name="loginStackPanel"
             Margin="30,-10,30,10"
             FocusManager.IsFocusScope="True"
@@ -207,7 +208,7 @@
           </ComboBox.ItemTemplate>
         </ghfvs:FilteredComboBox>
 
-        <ghfvs:HorizontalShadowDivider Grid.Row="7" Grid.ColumnSpan="2" Margin="0,12" />
+        <controls:HorizontalShadowDivider Grid.Row="7" Grid.ColumnSpan="2" Margin="0,12" />
 
         <ghfvs:GitHubComboBox x:Name="accountsComboBox"
                            Grid.Row="8"

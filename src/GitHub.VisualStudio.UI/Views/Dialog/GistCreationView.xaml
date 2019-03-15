@@ -5,6 +5,7 @@
                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
                                xmlns:ghfvs="https://github.com/github/VisualStudio"
+                               xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
                                mc:Ignorable="d"
                                d:DesignWidth="414"
                                d:DesignHeight="440"
@@ -29,7 +30,7 @@
         </Button>
 
         <StackPanel>
-            <ghfvs:HorizontalShadowDivider />
+            <controls:HorizontalShadowDivider />
             <Grid
                 FocusManager.IsFocusScope="True"
                 Margin="30,-10,30,10"

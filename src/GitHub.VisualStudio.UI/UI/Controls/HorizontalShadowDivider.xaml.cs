@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace GitHub.UI
+namespace GitHub.VisualStudio.UI.Controls
 {
     public partial class HorizontalShadowDivider : UserControl
     {
