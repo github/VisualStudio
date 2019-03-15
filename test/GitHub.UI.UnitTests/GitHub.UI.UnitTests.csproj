@@ -2,11 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Helpers\AutoCompleteSourceTests.cs" />
-    <Compile Remove="Helpers\IssuesAutoCompleteSourceTests.cs" />
-    <Compile Remove="Helpers\MentionsAutoCompleteSourceTests.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Xaml" />
@@ -26,12 +21,6 @@
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />
     <Compile Include="..\Helpers\Urls.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="Helpers\AutoCompleteSourceTests.cs" />
-    <None Include="Helpers\IssuesAutoCompleteSourceTests.cs" />
-    <None Include="Helpers\MentionsAutoCompleteSourceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
