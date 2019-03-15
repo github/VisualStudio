@@ -22,6 +22,8 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class MentionsAutoCompleteSource : IAutoCompleteSource
     {
+        const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+
         readonly ITeamExplorerContext teamExplorerContext;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IAvatarProvider avatarProvider;
@@ -58,7 +60,7 @@ namespace GitHub.Services
                         .Select(sourceItem => 
                             new SuggestionItem(sourceItem.Login, 
                                 sourceItem.Name ?? "(unknown)", 
-                                GetUrlSafe(sourceItem.AvatarUrl(null))))
+                                sourceItem.AvatarUrl(null)))
                         .ToList())
                 .Compile();
             }
@@ -75,20 +77,21 @@ namespace GitHub.Services
                 var suggestions = await connection.Run(query, variables);
                 return suggestions.Select(suggestion => new AutoCompleteSuggestion(suggestion.Name,
                     suggestion.Description,
-                    ResolveImage(suggestion.IconKey.ToString()),
+                    ResolveImage(suggestion),
                     Prefix));
             }).SelectMany(enumerable => enumerable);
         }
 
-        private IObservable<BitmapSource> ResolveImage(string uri) => avatarProvider.GetAvatar(uri);
+        IObservable<BitmapSource> ResolveImage(SuggestionItem uri)
+        {
+            if (uri.ImageUrl != null)
+            {
+                return avatarProvider.GetAvatar(uri.ImageUrl);
+            }
+
+            return Observable.Return(AvatarProvider.CreateBitmapImage(DefaultAvatar));
+        }
 
         public string Prefix => "@";
-
-        static Uri GetUrlSafe(string url)
-        {
-            Uri uri;
-            Uri.TryCreate(url, UriKind.Absolute, out uri);
-            return uri;
-        }
     }
 }

@@ -10,19 +10,6 @@ namespace GitHub.Models
     /// </summary>
     public class SuggestionItem
     {
-        public SuggestionItem() // So this can be deserialized from cache
-        {
-        }
-
-        public SuggestionItem(string name, Uri iconCacheKey)
-        {
-            Guard.ArgumentNotEmptyString(name, "name");
-            Guard.ArgumentNotNull(iconCacheKey, "iconCacheKey");
-            
-            Name = name;
-            IconKey = iconCacheKey;
-        }
-
         public SuggestionItem(string name, string description)
         {
             Guard.ArgumentNotEmptyString(name, "name");
@@ -32,14 +19,13 @@ namespace GitHub.Models
             Description = description;
         }
 
-        public SuggestionItem(string name, string description, Uri iconCacheKey)
+        public SuggestionItem(string name, string description, string imageUrl)
         {
             Guard.ArgumentNotEmptyString(name, "name");
-            Guard.ArgumentNotNull(iconCacheKey, "iconCacheKey");
 
             Name = name;
             Description = description;
-            IconKey = iconCacheKey;
+            ImageUrl = imageUrl;
         }
 
         /// <summary>
@@ -53,9 +39,9 @@ namespace GitHub.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// A key to lookup when displaying the icon for this entry
+        /// An image url for this entry
         /// </summary>
-        public Uri IconKey { get; set; }
+        public string ImageUrl { get; set; }
 
         /// <summary>
         /// The date this suggestion was last modified according to the API.
