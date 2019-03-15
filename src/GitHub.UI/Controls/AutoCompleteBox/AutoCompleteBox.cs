@@ -620,7 +620,7 @@ namespace GitHub.UI
         /// Gets or sets the Text template part.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-        protected internal IAutoCompleteTextInput TextBox
+        public IAutoCompleteTextInput TextBox
         {
             get { return textInput; }
             set { UpdateTextBox(value); }
@@ -701,12 +701,12 @@ namespace GitHub.UI
         /// <value>The selection adapter used to populate the drop-down with a
         /// list of selectable items.</value>
         /// <remarks>
-        /// You can use this property when you create an automation peer to 
+        /// You can use this property when you create an automation peer to sw
         /// use with AutoCompleteBox or deriving from AutoCompleteBox to 
         /// create a custom control.
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
-        protected internal ISelectionAdapter SelectionAdapter
+        public ISelectionAdapter SelectionAdapter
         {
             get { return adapter; }
             set

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace GitHub.Extensions
 {
@@ -52,6 +53,21 @@ namespace GitHub.Extensions
 
             var value = propertyInfo.GetValue(attribute, null);
             return value.ToString();
+        }
+
+        public static T CreateUninitialized<T>()
+        {
+            // WARNING: THIS METHOD IS PURE EVIL!
+            // Only use this in cases where T is sealed and has an internal ctor and 
+            // you're SURE the API you're passing it into won't do anything interesting with it.
+            // Even then, consider refactoring.
+            return (T)FormatterServices.GetUninitializedObject(typeof(T));
+        }
+
+        public static void Invoke(object obj, string methodName, params object[] parameters)
+        {
+            var method = obj.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            method.Invoke(obj, parameters);
         }
     }
 }

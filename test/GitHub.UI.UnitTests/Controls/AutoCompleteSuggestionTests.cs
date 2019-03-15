@@ -1,58 +1,58 @@
 ﻿using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
-using GitHub.UI;
+using GitHub.Models;
 using NUnit.Framework;
-using Xunit;
 
-public class AutoCompleteSuggestionTests
+namespace GitHub.UI.UnitTests.Controls
 {
-    public class TheToStringMethod
+    public class AutoCompleteSuggestionTests
     {
-        [Theory]
-        [InlineData(":", ":", ":foo:")]
-        [InlineData("@", "", "@foo")]
-        [InlineData("#", "", "#foo")]
-        [InlineData("@", null, "@foo")]
-        public void ReturnsWordSurroundedByPrefixAndSuffix(string prefix, string suffix, string expected)
+        public class TheToStringMethod
         {
-            var obs = Observable.Return(new BitmapImage());
-            var suggestion = new AutoCompleteSuggestion("foo", obs, prefix, suffix);
-            Assert.Equal(expected, suggestion.ToString());
-        }
-    }
-
-    public class TheGetSortRankMethod
-    {
-        [Theory]
-        [InlineData("pat", "full name", 1)]
-        [InlineData("yosemite", "pat name", 0)]
-        [InlineData("minnie", "full pat", 0)]
-        [InlineData("patrick", "full name", 1)]
-        [InlineData("groot", "patrick name", 0)]
-        [InlineData("driver", "danica patrick", 0)]
-        [InlineData("patricka", "pat name", 1)]
-        [InlineData("nomatch", "full name", -1)]
-        public void ReturnsCorrectScoreForSuggestions(string login, string name, int expectedRank)
-        {
-            var obs = Observable.Return(new BitmapImage());
-
-            var suggestion = new AutoCompleteSuggestion(login, name, obs, "@", "");
-
-            int rank = suggestion.GetSortRank("pat");
-
-            Assert.Equal(expectedRank, rank);
+            [TestCase(":", ":", ":foo:")]
+            [TestCase("@", "", "@foo")]
+            [TestCase("#", "", "#foo")]
+            [TestCase("@", null, "@foo")]
+            public void ReturnsWordSurroundedByPrefixAndSuffix(string prefix, string suffix, string expected)
+            {
+                var obs = Observable.Return(new BitmapImage());
+                var suggestion = new AutoCompleteSuggestion("foo", obs, prefix, suffix);
+                Assert.AreEqual(expected, suggestion.ToString());
+            }
         }
 
-        [Fact]
-        public void ReturnsOneForEmptyString()
+        public class TheGetSortRankMethod
         {
-            var obs = Observable.Return(new BitmapImage());
+            [TestCase("pat", "full name", 1)]
+            [TestCase("yosemite", "pat name", 0)]
+            [TestCase("minnie", "full pat", 0)]
+            [TestCase("patrick", "full name", 1)]
+            [TestCase("groot", "patrick name", 0)]
+            [TestCase("driver", "danica patrick", 0)]
+            [TestCase("patricka", "pat name", 1)]
+            [TestCase("nomatch", "full name", -1)]
+            public void ReturnsCorrectScoreForSuggestions(string login, string name, int expectedRank)
+            {
+                var obs = Observable.Return(new BitmapImage());
 
-            var suggestion = new AutoCompleteSuggestion("joe", "namathe", obs, "@", "");
+                var suggestion = new AutoCompleteSuggestion(login, name, obs, "@", "");
 
-            int rank = suggestion.GetSortRank("");
+                int rank = suggestion.GetSortRank("pat");
 
-            Assert.Equal(1, rank);
+                Assert.AreEqual(expectedRank, rank);
+            }
+
+            [Test]
+            public void ReturnsOneForEmptyString()
+            {
+                var obs = Observable.Return(new BitmapImage());
+
+                var suggestion = new AutoCompleteSuggestion("joe", "namathe", obs, "@", "");
+
+                int rank = suggestion.GetSortRank("");
+
+                Assert.AreEqual(1, rank);
+            }
         }
     }
 }
