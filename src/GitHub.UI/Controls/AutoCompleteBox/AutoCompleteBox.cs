@@ -777,7 +777,7 @@ namespace GitHub.UI
         {
             if (TextBox != null)
             {
-//                UnsubscribeToEvent("PreviewKeyDown");
+                UnsubscribeToEvent("PreviewKeyDown");
             }
 
             if (DropDownPopup != null)
@@ -811,7 +811,7 @@ namespace GitHub.UI
 
             if (TextBox != null)
             {
-//                SubscribeToEvent("PreviewKeyDown", TextBox.PreviewKeyDown.Subscribe(OnTextBoxPreviewKeyDown));
+                SubscribeToEvent("PreviewKeyDown", TextBox.PreviewKeyDown.Subscribe(OnTextBoxPreviewKeyDown));
             }
 
             Interaction.OnApplyTemplateBase();
@@ -899,9 +899,9 @@ namespace GitHub.UI
         /// Handles the PreviewKeyDown event on the TextBox for WPF.
         /// </summary>
         /// <param name="e">The event data.</param>
-        private void OnTextBoxPreviewKeyDown(KeyEventArgs e)
+        private void OnTextBoxPreviewKeyDown(EventPattern<KeyEventArgs> e)
         {
-            OnKeyDown(e);
+            OnKeyDown(e.EventArgs);
         }
 
         /// <summary>
@@ -1521,10 +1521,10 @@ namespace GitHub.UI
             // Standard drop down navigation
             switch (e.Key)
             {
-                case Key.F4:
-                    IsDropDownOpen = !IsDropDownOpen;
-                    e.Handled = true;
-                    break;
+//                case Key.F4:
+//                    IsDropDownOpen = !IsDropDownOpen;
+//                    e.Handled = true;
+//                    break;
 
                 case Key.Enter:
                     if (IsDropDownOpen && SelectedItem != null)
