@@ -9,7 +9,8 @@
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
                                        Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                       d:DataContext="{d:DesignInstance Type=ghfvs:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
+                                       xmlns:sd="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                       d:DataContext="{d:DesignInstance Type=sd:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
                                        mc:Ignorable="d"
                                        AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerSyncGitHubRepositoryPublishCustom}" 
                                        IsEnabled="{Binding IsBusy, Converter={ghfvs:InverseBooleanConverter}}">
