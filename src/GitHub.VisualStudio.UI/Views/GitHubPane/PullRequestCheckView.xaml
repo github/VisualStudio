@@ -7,6 +7,8 @@
                                    xmlns:ghfvs="https://github.com/github/VisualStudio"
                                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
                                    d:DesignWidth="600"
+                                   Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                   Foreground="{DynamicResource GitHubVsWindowText}"
                                    mc:Ignorable="d">
 
     <d:DesignData.DataContext>

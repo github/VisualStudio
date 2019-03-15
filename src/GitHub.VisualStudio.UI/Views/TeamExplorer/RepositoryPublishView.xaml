@@ -9,6 +9,7 @@
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
                                        Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                       Foreground="{DynamicResource GitHubVsWindowText}"
                                        xmlns:sd="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
                                        d:DataContext="{d:DesignInstance Type=sd:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
                                        mc:Ignorable="d"
