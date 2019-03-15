@@ -69,6 +69,7 @@ for:
   branches:
     only:
       - master
+      - /releases/(?:(?!-vsinstaller).)*?/
   environment:
     matrix:
       - BUILD_TYPE: package
