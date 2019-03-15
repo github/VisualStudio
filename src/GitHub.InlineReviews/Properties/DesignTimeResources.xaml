@@ -13,6 +13,9 @@
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/CommonControlsComboboxStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/CommonControlsTextboxStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/ThemedDialogStyles.xaml" />
+
+        <!-- Set this theme to match the Visual Studio theme above -->
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDark.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <ResourceDictionary x:Key="ThemedDialogDefaultStylesKey" Source="/Themes/ThemedDialogDefaultStyles.xaml" />
 </ResourceDictionary>
