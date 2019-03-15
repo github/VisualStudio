@@ -2,8 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:theme="clr-namespace:GitHub.VisualStudio.UI.Helpers"
-                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI">
 
     <ResourceDictionary.MergedDictionaries>
         <theme:ThemeDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
