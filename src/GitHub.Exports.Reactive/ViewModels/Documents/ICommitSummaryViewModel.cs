@@ -13,7 +13,7 @@
         /// <summary>
         /// Gets the commit author.
         /// </summary>
-        IActorViewModel Author { get; }
+        ICommitActorViewModel Author { get; }
 
         /// <summary>
         /// Gets the commit message header.

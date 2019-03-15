@@ -10,7 +10,7 @@ namespace GitHub.Models
         /// <summary>
         /// Gets or sets the author of the commit.
         /// </summary>
-        public ActorModel Author { get; set; }
+        public CommitActorModel Author { get; set; }
 
         /// <summary>
         /// Gets or sets the abbreviated git object ID for the commit.
