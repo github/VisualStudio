@@ -45,7 +45,10 @@ namespace GitHub.Services
                     .Select(repository =>
                         repository.Issues(null, null, null, null, null, null, null)
                             .AllPages()
-                            .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title))
+                            .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title)
+                            {
+                                LastModifiedDate = issue.LastEditedAt
+                            })
                             .ToList())
                     .Compile();
             }
