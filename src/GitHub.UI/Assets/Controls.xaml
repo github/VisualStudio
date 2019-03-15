@@ -21,8 +21,8 @@
 
     <!-- ProgressBar -->
     <Style x:Key="GitHubProgressBar" TargetType="{x:Type ui:GitHubProgressBar}">
-        <Setter Property="Foreground" Value="#999999" />
-        <Setter Property="Background" Value="#DDDDDD" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubAccentBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Height" Value="4" />
         <Setter Property="IsHitTestVisible" Value="False" />
         <Setter Property="Focusable" Value="False" />

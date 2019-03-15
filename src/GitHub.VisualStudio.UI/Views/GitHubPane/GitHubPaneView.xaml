@@ -70,7 +70,6 @@
     <Grid>
       <DockPanel Visibility="{Binding ContentOverride, Converter={ghfvs:EqualsToVisibilityConverter None}}">
         <ghfvs:GitHubProgressBar DockPanel.Dock="Top"
-                             Foreground="{DynamicResource GitHubAccentBrush}"
                              IsIndeterminate="True"
                              Style="{DynamicResource GitHubProgressBar}"
                              Visibility="{Binding Content.Content.IsBusy, Converter={ghfvs:BooleanToHiddenVisibilityConverter}, FallbackValue=Hidden}"/>

@@ -28,7 +28,6 @@
     </TextBlock>
 
     <ui:GitHubProgressBar DockPanel.Dock="Top"
-                          Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
