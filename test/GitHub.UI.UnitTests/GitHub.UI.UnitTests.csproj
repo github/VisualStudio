@@ -3,8 +3,6 @@
     <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Controls\AutoCompleteTextInputExtensionsTests.cs" />
-    <Compile Remove="Helpers\AutoCompleteAdvisorTests.cs" />
     <Compile Remove="Helpers\AutoCompleteSourceTests.cs" />
     <Compile Remove="Helpers\IssuesAutoCompleteSourceTests.cs" />
     <Compile Remove="Helpers\MentionsAutoCompleteSourceTests.cs" />
@@ -31,11 +29,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="Controls\AutoCompleteTextInputExtensionsTests.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="Helpers\AutoCompleteAdvisorTests.cs" />
     <None Include="Helpers\AutoCompleteSourceTests.cs" />
     <None Include="Helpers\IssuesAutoCompleteSourceTests.cs" />
     <None Include="Helpers\MentionsAutoCompleteSourceTests.cs" />
