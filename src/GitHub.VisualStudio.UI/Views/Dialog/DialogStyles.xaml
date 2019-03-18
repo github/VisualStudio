@@ -5,6 +5,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ResourceDictionary Source="/Styles/TextBlocks.xaml" />
         <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
     </ResourceDictionary.MergedDictionaries>
     <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
