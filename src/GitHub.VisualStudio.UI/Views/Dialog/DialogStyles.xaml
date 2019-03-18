@@ -5,11 +5,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <ResourceDictionary Source="/Styles/TextBlocks.xaml" />
         <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
     </ResourceDictionary.MergedDictionaries>
-    <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
-    <Style TargetType="{x:Type ghfvs:SecurePasswordBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource TextBlockEnvironment200PercentFontSizeStyleKey}" />
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource TextBlockEnvironment111PercentFontSizeStyleKey}" />
     <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />

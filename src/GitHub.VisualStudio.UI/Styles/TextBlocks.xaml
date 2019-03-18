@@ -132,4 +132,7 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type ui:PromptTextBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
+    <Style TargetType="{x:Type ui:SecurePasswordBox}" BasedOn="{StaticResource GitHubVsPromptTextBox}" />
+
 </ResourceDictionary>
