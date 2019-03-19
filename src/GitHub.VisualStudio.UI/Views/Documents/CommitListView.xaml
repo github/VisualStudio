@@ -49,7 +49,7 @@
                     ViewModel="{Binding Author}"/>
 
                 <TextBlock Foreground="{DynamicResource VsBrush.WindowText}" VerticalAlignment="Center">
-                    <Run FontWeight="SemiBold" Text="{Binding Author.Login, Mode=OneWay}" />
+                    <Run FontWeight="SemiBold" Text="{Binding AuthorName, Mode=OneWay}" />
                     <Run Text="{Binding AuthorCaption, Mode=OneWay}" />
                 </TextBlock>
             </StackPanel>

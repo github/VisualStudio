@@ -116,7 +116,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             var threadsByPosition = pullRequest.Threads
-                .Where(x => x.Path == relativePath && !x.IsOutdated)
+                .Where(x => x.Path == relativePath)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitSha, x.OriginalPosition));
             var threads = new List<IInlineCommentThreadModel>();
@@ -365,11 +365,14 @@ namespace GitHub.InlineReviews.Services
                             when.Commit(commit => new CommitModel
                             {
                                 AbbreviatedOid = commit.AbbreviatedOid,
-                                // TODO: commit.Author.User can be null
-                                Author = new ActorModel
-                                {
-                                    Login = commit.Author.User.Login,
-                                    AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                Author = new CommitActorModel {
+                                    Name = commit.Author.Name,
+                                    Email = commit.Author.Email,
+                                    User = commit.Author.User != null ? new ActorModel
+                                    {
+                                        Login = commit.Author.User.Login,
+                                        AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                    } : null
                                 },
                                 MessageHeadline = commit.MessageHeadline,
                                 Oid = commit.Oid,
