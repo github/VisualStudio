@@ -22,8 +22,8 @@
   <SolidColorBrush x:Key="GitHubAnnotationMarkerWarningFill" Color="#ffc806" />
   <SolidColorBrush x:Key="GitHubAnnotationMarkerFailureFill" Color="#d53243" />
 
-    <!-- HACK: Use the same color as border of focused text box -->
-  <SolidColorBrush x:Key="GitHubAccentBrush" Color="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBorderFocusedColorKey}}" />
+    <!-- Button border is blue rather than yellow (like text box border) when using blue theme -->
+  <SolidColorBrush x:Key="GitHubAccentBrush" Color="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderFocusedColorKey}}" />
 
   <!-- Team Foundation Colors -->
   <SolidColorBrush x:Key="TFRequiredTextBoxBorderBrushKey" Color="{Binding Source={x:Static vsui:TeamFoundationColors.Instance}, Path=RequiredTextBoxBorderColor, Mode=OneWay}" />
