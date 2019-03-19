@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0080" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.1" />
     <PackageReference Include="Microsoft.VisualStudio.StaticReviews.Embeddable" Version="0.1.14-alpha" />
