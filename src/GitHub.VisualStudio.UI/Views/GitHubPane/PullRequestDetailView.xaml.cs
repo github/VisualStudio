@@ -26,7 +26,6 @@ namespace GitHub.VisualStudio.Views.GitHubPane
         {
             InitializeComponent();
 
-            bodyMarkdown.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
             changesSection.PreviewMouseWheel += ScrollViewerUtilities.FixMouseWheelScroll;
 
             this.WhenActivated(d =>

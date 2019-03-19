@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -23,6 +24,7 @@ namespace GitHub.ViewModels.Dialog.Clone
     {
         static readonly ILogger log = LogManager.ForContext<RepositorySelectViewModel>();
         readonly IRepositoryCloneService service;
+        readonly IGitHubContextService gitHubContextService;
         IConnection connection;
         Exception error;
         string filter;
@@ -35,15 +37,25 @@ namespace GitHub.ViewModels.Dialog.Clone
         IRepositoryItemViewModel selectedItem;
 
         [ImportingConstructor]
-        public RepositorySelectViewModel(IRepositoryCloneService service)
+        public RepositorySelectViewModel(IRepositoryCloneService service, IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(service, nameof(gitHubContextService));
 
             this.service = service;
+            this.gitHubContextService = gitHubContextService;
 
-            repository = this.WhenAnyValue(x => x.SelectedItem)
-                .Select(CreateRepository)
+            var selectedRepository = this.WhenAnyValue(x => x.SelectedItem)
+                .Select(CreateRepository);
+
+            var filterRepository = this.WhenAnyValue(x => x.Filter)
+                .Select(f => gitHubContextService.FindContextFromUrl(f))
+                .Select(CreateRepository);
+
+            repository = selectedRepository
+                .Merge(filterRepository)
                 .ToProperty(this, x => x.Repository);
+
             this.WhenAnyValue(x => x.Filter).Subscribe(_ => ItemsView?.Refresh());
         }
 
@@ -166,7 +178,21 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
             {
-                return item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                if (new UriString(Filter).IsHypertextTransferProtocol)
+                {
+                    var urlString = item.Url.ToString();
+                    var urlStringWithGit = urlString + ".git";
+                    var urlStringWithSlash = urlString + "/";
+                    return
+                        urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return
+                        item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                }
             }
 
             return true;
@@ -177,6 +203,18 @@ namespace GitHub.ViewModels.Dialog.Clone
             return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :
                 null;
+        }
+
+        RepositoryModel CreateRepository(GitHubContext context)
+        {
+            switch (context?.LinkType)
+            {
+                case LinkType.Repository:
+                case LinkType.Blob:
+                    return new RepositoryModel(context.RepositoryName, context.Url);
+            }
+
+            return null;
         }
     }
 }

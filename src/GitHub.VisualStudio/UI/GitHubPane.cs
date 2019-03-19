@@ -82,7 +82,9 @@ namespace GitHub.VisualStudio.UI
             // Using JoinableTaskFactory from parent AsyncPackage. That way if VS shuts down before this
             // work is done, we won't risk crashing due to arbitrary work going on in background threads.
             var asyncPackage = (AsyncPackage)Package;
-            viewModelTask = asyncPackage.JoinableTaskFactory.RunAsync(() => InitializeAsync(asyncPackage));
+            JoinableTaskFactory = asyncPackage.JoinableTaskFactory;
+
+            viewModelTask = JoinableTaskFactory.RunAsync(() => InitializeAsync(asyncPackage));
         }
 
         public Task<IGitHubPaneViewModel> GetViewModelAsync() => viewModelTask.JoinAsync();
@@ -123,7 +125,7 @@ namespace GitHub.VisualStudio.UI
 
             if (pane != null)
             {
-                return new SearchTask(pane, dwCookie, pSearchQuery, pSearchCallback);
+                return new SearchTask(JoinableTaskFactory, pane, dwCookie, pSearchQuery, pSearchCallback);
             }
 
             return null;
@@ -175,13 +177,8 @@ namespace GitHub.VisualStudio.UI
             {
                 SearchHost.IsEnabled = enabled;
 
-                var searchString = SearchHost.SearchQuery?.SearchString;
-                if (searchString?.Trim() != query?.Trim())
+                if (SearchHost.SearchQuery?.SearchString != query)
                 {
-                    // SearchAsync will crash the process if we send it a duplicate string.
-                    // There is a SearchTrimsWhitespace setting that makes searched with leading or trailing
-                    // white-space appear as duplicates. We compare the query with trimmed white-space to avoid this.
-                    // https://github.com/github/VisualStudio/issues/1948
                     SearchHost.SearchAsync(query != null ? new SearchQuery(query) : null);
                 }
             }
@@ -189,23 +186,29 @@ namespace GitHub.VisualStudio.UI
 
         class SearchTask : VsSearchTask
         {
+            readonly JoinableTaskFactory joinableTaskFactory;
             readonly IGitHubPaneViewModel viewModel;
 
             public SearchTask(
+                JoinableTaskFactory joinableTaskFactory,
                 IGitHubPaneViewModel viewModel,
                 uint dwCookie,
                 IVsSearchQuery pSearchQuery,
                 IVsSearchCallback pSearchCallback)
                 : base(dwCookie, pSearchQuery, pSearchCallback)
             {
+                this.joinableTaskFactory = joinableTaskFactory;
                 this.viewModel = viewModel;
             }
 
             protected override void OnStartSearch()
             {
-                ThreadHelper.ThrowIfNotOnUIThread();
+                joinableTaskFactory.RunAsync(async () =>
+                {
+                    await joinableTaskFactory.SwitchToMainThreadAsync();
+                    viewModel.SearchQuery = SearchQuery.SearchString;
+                });
 
-                viewModel.SearchQuery = SearchQuery.SearchString;
                 base.OnStartSearch();
             }
 
@@ -224,5 +227,7 @@ namespace GitHub.VisualStudio.UI
 
             public uint GetTokens(uint dwMaxTokens, IVsSearchToken[] rgpSearchTokens) => 0;
         }
+
+        public JoinableTaskFactory JoinableTaskFactory { get; private set; }
     }
 }

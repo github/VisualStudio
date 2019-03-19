@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -29,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Documents\IssueishCommentView.xaml.cs">
+      <DependentUpon>IssueishCommentView.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\GitHubPane\NoRemoteOriginView.xaml.cs">
       <DependentUpon>NoRemoteOriginView.xaml</DependentUpon>
     </Compile>

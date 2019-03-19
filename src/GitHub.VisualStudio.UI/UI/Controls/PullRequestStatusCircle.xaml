@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Controls.PullRequestStatusCircle"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="250">
+    <Grid>
+        <Polygon Grid.Row="0" Grid.Column="0" Name="PendingPolygon" 
+                     StrokeThickness="0" Fill="Yellow" 
+                     Points="0,0 250,0 250,250 0,250">
+            <Polygon.Clip>
+                <CombinedGeometry GeometryCombineMode="Exclude">
+                    <CombinedGeometry.Geometry1>
+                        <EllipseGeometry Center="125 125" RadiusX="125" RadiusY="125" />
+                    </CombinedGeometry.Geometry1>
+                    <CombinedGeometry.Geometry2>
+                        <EllipseGeometry Center="125 125" RadiusX="100" RadiusY="100" />
+                    </CombinedGeometry.Geometry2>
+                </CombinedGeometry>
+            </Polygon.Clip>
+        </Polygon>
+        <Polygon Grid.Row="0" Grid.Column="0" Name="SuccessPolygon"
+                     StrokeThickness="0" Fill="Green"
+                     Points="125,125 125,0 250,0 250,250 0,250 0,216.50635094611">
+            <Polygon.Clip>
+                <CombinedGeometry GeometryCombineMode="Exclude">
+                    <CombinedGeometry.Geometry1>
+                        <EllipseGeometry Center="125 125" RadiusX="125" RadiusY="125" />
+                    </CombinedGeometry.Geometry1>
+                    <CombinedGeometry.Geometry2>
+                        <EllipseGeometry Center="125 125" RadiusX="100" RadiusY="100" />
+                    </CombinedGeometry.Geometry2>
+                </CombinedGeometry>
+            </Polygon.Clip>
+        </Polygon>
+        <Polygon Grid.Row="0" Grid.Column="0" Name="ErrorPolygon"
+                     StrokeThickness="0" Fill="Red" 
+                     Points="125,125 125,0 250,0 250,197.168783648703">
+            <Polygon.Clip>
+                <CombinedGeometry GeometryCombineMode="Exclude">
+                    <CombinedGeometry.Geometry1>
+                        <EllipseGeometry Center="125 125" RadiusX="125" RadiusY="125" />
+                    </CombinedGeometry.Geometry1>
+                    <CombinedGeometry.Geometry2>
+                        <EllipseGeometry Center="125 125" RadiusX="100" RadiusY="100" />
+                    </CombinedGeometry.Geometry2>
+                </CombinedGeometry>
+            </Polygon.Clip>
+        </Polygon>
+    </Grid>
+</UserControl>

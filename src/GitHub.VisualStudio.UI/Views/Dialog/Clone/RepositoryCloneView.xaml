@@ -10,7 +10,7 @@
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
     </d:DesignData.DataContext>
-    
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -69,21 +69,6 @@
                      Style="{DynamicResource LightModalViewTabItem}"
                      Visibility="{Binding EnterpriseTab.IsEnabled, Converter={ghfvs:BooleanToVisibilityConverter}}">
                 <local:SelectPageView DataContext="{Binding EnterpriseTab}"/>
-            </TabItem>
-            <TabItem Header="URL" Style="{DynamicResource LightModalViewTabItem}">
-                <DockPanel DataContext="{Binding UrlTab}"
-                           LastChildFill="False"
-                           Margin="8">
-                    <TextBlock DockPanel.Dock="Top">
-                        Repository URL or GitHub username and repository
-                        <LineBreak/>
-                        (<Run Background="#66d3d3d3" FontFamily="Consolas">hubot/cool-repo</Run>)
-                    </TextBlock>
-                    <ghfvs:PromptTextBox DockPanel.Dock="Top"
-                                         Margin="0 4"
-                                         PromptText="URL or username/repository"
-                                         Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"/>
-                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Select a containing folder for your new repository.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a Repository</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Open from GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publish repository</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publish repository to {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Please enter a title for the Pull Request</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Source branch doesn't exist remotely, have you pushed it?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No selected repository.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Please enter a repository path</value>
@@ -847,5 +835,35 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} most recently pushed</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Close pull request</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Close issue</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Close and comment</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Reopen and comment</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Reopen issue</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Reopen pull request</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} commits</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>added some commits</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>and others</value>
   </data>
 </root>

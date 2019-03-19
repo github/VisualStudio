@@ -116,7 +116,7 @@ namespace GitHub.InlineReviews.Services
             relativePath = relativePath.Replace("\\", "/");
 
             var threadsByPosition = pullRequest.Threads
-                .Where(x => x.Path == relativePath && !x.IsOutdated)
+                .Where(x => x.Path == relativePath)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitSha, x.OriginalPosition));
             var threads = new List<IInlineCommentThreadModel>();
@@ -293,7 +293,7 @@ namespace GitHub.InlineReviews.Services
             {
                 readPullRequest = new Query()
                     .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                    .PullRequest(Var(nameof(number)))
+                    .PullRequest(number: Var(nameof(number)))
                     .Select(pr => new PullRequestDetailModel
                     {
                         Id = pr.Id.Value,
@@ -313,6 +313,20 @@ namespace GitHub.InlineReviews.Services
                         HeadRepositoryOwner = pr.HeadRepositoryOwner != null ? pr.HeadRepositoryOwner.Login : null,
                         State = pr.State.FromGraphQl(),
                         UpdatedAt = pr.UpdatedAt,
+                        CommentCount = pr.Comments(0, null, null, null).TotalCount,
+                        Comments = pr.Comments(null, null, null, null).AllPages().Select(comment => new CommentModel
+                        {
+                            Id = comment.Id.Value,
+                            Author = new ActorModel
+                            {
+                                Login = comment.Author.Login,
+                                AvatarUrl = comment.Author.AvatarUrl(null),
+                            },
+                            Body = comment.Body,
+                            CreatedAt = comment.CreatedAt,
+                            DatabaseId = comment.DatabaseId.Value,
+                            Url = comment.Url,
+                        }).ToList(),
                         Reviews = pr.Reviews(null, null, null, null, null, null).AllPages().Select(review => new PullRequestReviewModel
                         {
                             Id = review.Id.Value,
@@ -347,6 +361,34 @@ namespace GitHub.InlineReviews.Services
                                 Url = comment.Url,
                             }).ToList(),
                         }).ToList(),
+                        Timeline = pr.Timeline(null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                            when.Commit(commit => new CommitModel
+                            {
+                                AbbreviatedOid = commit.AbbreviatedOid,
+                                Author = new CommitActorModel {
+                                    Name = commit.Author.Name,
+                                    Email = commit.Author.Email,
+                                    User = commit.Author.User != null ? new ActorModel
+                                    {
+                                        Login = commit.Author.User.Login,
+                                        AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                    } : null
+                                },
+                                MessageHeadline = commit.MessageHeadline,
+                                Oid = commit.Oid,
+                            }).IssueComment(comment => new CommentModel
+                            {
+                                Author = new ActorModel
+                                {
+                                    Login = comment.Author.Login,
+                                    AvatarUrl = comment.Author.AvatarUrl(null),
+                                },
+                                Body = comment.Body,
+                                CreatedAt = comment.CreatedAt,
+                                DatabaseId = comment.DatabaseId.Value,
+                                Id = comment.Id.Value,
+                                Url = comment.Url,
+                            }))).ToList()
                     }).Compile();
             }
 
@@ -649,7 +691,6 @@ namespace GitHub.InlineReviews.Services
 
             var addReview = new AddPullRequestReviewInput
             {
-                Body = body,
                 CommitOID = commitId,
                 Event = Octokit.GraphQL.Model.PullRequestReviewEvent.Comment,
                 PullRequestId = new ID(pullRequestId),
@@ -786,7 +827,7 @@ namespace GitHub.InlineReviews.Services
                 {
                     readCommitStatuses = new Query()
                           .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                          .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                          .PullRequest(number: Var(nameof(number))).Commits(last: 1).Nodes.Select(
                               commit => new LastCommitAdapter
                               {
                                   HeadSha = commit.Commit.Oid,
@@ -838,7 +879,7 @@ namespace GitHub.InlineReviews.Services
                 {
                     readCommitStatusesEnterprise = new Query()
                      .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                     .PullRequest(Var(nameof(number))).Commits(last: 1).Nodes.Select(
+                     .PullRequest(number: Var(nameof(number))).Commits(last: 1).Nodes.Select(
                          commit => new LastCommitAdapter
                          {
                              Statuses = commit.Commit.Status == null ? null : commit.Commit.Status
