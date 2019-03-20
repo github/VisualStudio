@@ -7,6 +7,7 @@
     <ResourceDictionary.MergedDictionaries>
         <theme:ThemeDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ActionLinkButton.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/OcticonButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubComboBox.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Buttons.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubTabControl.xaml"/>
