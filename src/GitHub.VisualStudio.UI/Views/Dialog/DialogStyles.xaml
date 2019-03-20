@@ -9,6 +9,4 @@
     </ResourceDictionary.MergedDictionaries>
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource TextBlockEnvironment200PercentFontSizeStyleKey}" />
     <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource TextBlockEnvironment111PercentFontSizeStyleKey}" />
-    <Style TargetType="{x:Type ghfvs:FilteredComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
-    <Style TargetType="{x:Type ghfvs:GitHubComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}" />
 </ResourceDictionary>

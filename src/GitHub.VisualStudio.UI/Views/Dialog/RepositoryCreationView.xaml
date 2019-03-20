@@ -168,7 +168,7 @@
                Grid.Column="0"
                Content="{x:Static ghfvs:Resources.ignoreTemplateListText}"
                Target="{Binding ElementName=ignoreTemplateList}" />
-        <ghfvs:FilteredComboBox x:Name="ignoreTemplateList"
+        <ComboBox x:Name="ignoreTemplateList"
                                Grid.Row="5"
                                Grid.Column="1"
                                ItemsSource="{Binding GitIgnoreTemplates}"
@@ -184,13 +184,13 @@
               </DataTemplate.Triggers>
             </DataTemplate>
           </ComboBox.ItemTemplate>
-        </ghfvs:FilteredComboBox>
+        </ComboBox>
 
         <Label Grid.Row="6"
                Grid.Column="0"
                Content="{x:Static ghfvs:Resources.licenseListText}"
                Target="{Binding ElementName=licenseList}" />
-        <ghfvs:FilteredComboBox x:Name="licenseList"
+        <ComboBox x:Name="licenseList"
                                Grid.Row="6"
                                Grid.Column="1"
                                ItemsSource="{Binding Licenses}"
@@ -206,11 +206,11 @@
               </DataTemplate.Triggers>
             </DataTemplate>
           </ComboBox.ItemTemplate>
-        </ghfvs:FilteredComboBox>
+        </ComboBox>
 
         <controls:HorizontalShadowDivider Grid.Row="7" Grid.ColumnSpan="2" Margin="0,12" />
 
-        <ghfvs:GitHubComboBox x:Name="accountsComboBox"
+        <ComboBox x:Name="accountsComboBox"
                            Grid.Row="8"
                            Grid.Column="1"
                            Margin="0,0,0,8"
@@ -229,7 +229,7 @@
               </StackPanel>
             </DataTemplate>
           </ComboBox.ItemTemplate>
-        </ghfvs:GitHubComboBox>
+        </ComboBox>
 
                 <CheckBox x:Name="makePrivate"
                   Grid.Row="9"
