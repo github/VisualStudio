@@ -43,13 +43,11 @@
   </Style>
   <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.CodeBlockStyleKey}">
     <Setter Property="Foreground" Value="{DynamicResource VsBrush.Text}" />
-    <Setter Property="Background" Value="#66d3d3d3" />
     <Setter Property="Padding" Value="2" />
     <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
   </Style>
   <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
     <Setter Property="Foreground" Value="{DynamicResource VsBrush.Text}" />
-    <Setter Property="Background" Value="#66d3d3d3" />
     <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
   </Style>
 </ResourceDictionary>
