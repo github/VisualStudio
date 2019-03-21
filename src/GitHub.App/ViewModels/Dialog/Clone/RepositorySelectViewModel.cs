@@ -35,6 +35,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         ICollectionView itemsView;
         ObservableAsPropertyHelper<RepositoryModel> repository;
         IRepositoryItemViewModel selectedItem;
+        static bool firstLoad = true;
 
         [ImportingConstructor]
         public RepositorySelectViewModel(IRepositoryCloneService service, IGitHubContextService gitHubContextService)
@@ -119,7 +120,11 @@ namespace GitHub.ViewModels.Dialog.Clone
             IsEnabled = true;
         }
 
-        public async Task Activate() => this.LoadItems(false);
+        public async Task Activate()
+        {
+            await this.LoadItems(firstLoad);
+            firstLoad = false;
+        }
 
         static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
         {
