@@ -13,6 +13,7 @@
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
                 <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
