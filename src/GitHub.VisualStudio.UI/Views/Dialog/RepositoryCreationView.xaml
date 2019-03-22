@@ -155,7 +155,7 @@
                   VerticalContentAlignment="Center"
                   Content="{x:Static ghfvs:Resources.browsePathButtonContent}"
                   Padding="0"
-                  Style="{StaticResource GitHubBlueLinkButton}" 
+                  Style="{DynamicResource GitHubLinkButton}" 
                   AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathBrowseButton}" />
         </Grid>
 

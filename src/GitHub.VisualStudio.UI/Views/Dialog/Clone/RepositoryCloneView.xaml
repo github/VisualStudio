@@ -42,7 +42,7 @@
             <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
-                    Style="{DynamicResource GitHubBlueLinkButton}"
+                    Style="{DynamicResource GitHubLinkButton}"
                     VerticalContentAlignment="Center">
                 Browse
             </Button>

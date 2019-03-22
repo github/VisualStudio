@@ -10,6 +10,7 @@
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/OcticonButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubComboBox.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Buttons.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubLinkButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubTabControl.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/TextBlocks.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/FilterTextBox.xaml"/>
