@@ -7,8 +7,6 @@
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="300"
-             Background="{DynamicResource GitHubVsToolWindowBackground}"
-             Foreground="{DynamicResource GitHubVsWindowText}"
              Padding="0 4">
     <d:DesignData.DataContext>
         <ghfvs:PullRequestListItemViewModelDesigner Number="399"
