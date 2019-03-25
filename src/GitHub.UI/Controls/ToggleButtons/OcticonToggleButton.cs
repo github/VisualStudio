@@ -48,7 +48,7 @@ namespace GitHub.UI
         );
 
         public static readonly DependencyProperty IconRotationAngleProperty =
-            OcticonCircleButton.IconRotationAngleProperty.AddOwner(typeof(OcticonToggleButton));
+            OcticonButton.IconRotationAngleProperty.AddOwner(typeof(OcticonToggleButton));
 
         public Octicon IconChecked
         {

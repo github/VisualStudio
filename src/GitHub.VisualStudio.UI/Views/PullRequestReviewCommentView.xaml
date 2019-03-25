@@ -175,12 +175,9 @@
                               Loaded="body_Loaded"
                               SpellCheck.IsEnabled="True">
                 <ui:PromptTextBox.Style>
-                    <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource RoundedPromptTextBox}">
-                        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
-                        <Setter Property="Background" Value="{DynamicResource VsBrush.SearchBoxBackground}" />
+                    <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource GitHubVsPromptTextBox}">
                         <Setter Property="Height" Value="28"/>
                         <Setter Property="PromptText" Value="Reply..."/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource GitHubVsBrandedUIBorder}" />
 
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding EditState}" Value="Editing">

@@ -1,0 +1,374 @@
+﻿<ResourceDictionary
+    x:Uid="ResourceDictionary_1" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+    >
+
+    <Geometry x:Uid="Geometry_1" x:Key="DownArrowGeometry">M 0 0 L 3 3 L 6 0 Z</Geometry>
+
+    <ControlTemplate x:Uid="ControlTemplate_1" x:Key="ComboBoxItemTemplate" TargetType="{x:Type ComboBoxItem}">
+        <Border x:Uid="Bd" Name="Bd"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}"
+                SnapsToDevicePixels="true">
+            <ContentPresenter x:Uid="ContentPresenter_1" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger x:Uid="Trigger_1" Property="IsHighlighted" Value="true">
+                <Setter x:Uid="Setter_1" TargetName="Bd"
+                        Property="Background"
+                        Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListItemBackgroundHoverBrushKey}}"/>
+                <Setter x:Uid="Setter_2" TargetName="Bd"
+                        Property="BorderBrush"
+                        Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListItemBorderHoverBrushKey}}" />
+                <Setter x:Uid="Setter_3" TargetName="Bd"
+                        Property="TextElement.Foreground"
+                        Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListItemTextHoverBrushKey}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Uid="Style_1" x:Key="ComboBoxEditableTextBox" TargetType="{x:Type TextBox}">
+        <Setter x:Uid="Setter_4" Property="AllowDrop" Value="true"/>
+        <Setter x:Uid="Setter_5" Property="MinWidth" Value="0"/>
+        <Setter x:Uid="Setter_6" Property="MinHeight" Value="0"/>
+        <Setter x:Uid="Setter_7" Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter x:Uid="Setter_8" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_2" TargetType="{x:Type TextBox}">
+                    <ScrollViewer x:Uid="PART_ContentHost" x:Name="PART_ContentHost"
+                                  Focusable="false"
+                                  HorizontalScrollBarVisibility="Hidden"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  Background="Transparent"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Uid="Style_2" x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+        <Setter x:Uid="Setter_9" Property="IsTabStop" Value="false"/>
+        <Setter x:Uid="Setter_10" Property="Focusable" Value="false"/>
+        <Setter x:Uid="Setter_11" Property="ClickMode" Value="Press"/>
+        <Setter x:Uid="Setter_12" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_3" TargetType="{x:Type ToggleButton}">
+                    <Grid x:Uid="Grid_1" Background="Transparent">
+                        <Border x:Uid="Border" x:Name="Border"
+                                Width="13"
+                                HorizontalAlignment="Right"
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="1,0,0,0"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                SnapsToDevicePixels="True">
+                            <Path x:Uid="Arrow" Name="Arrow" Margin="0,1,0,0"
+                                  Fill="{TemplateBinding TextElement.Foreground}"
+                                  Data="{StaticResource DownArrowGeometry}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger x:Uid="Trigger_2" Property="IsChecked" Value="True">
+                            <Setter x:Uid="Setter_13" TargetName="Border"
+                                    Property="Background"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_14" TargetName="Border"
+                                    Property="BorderBrush"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_15" TargetName="Arrow"
+                                    Property="Fill"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphPressedBrushKey}}" />
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_3" Property="IsPressed" Value="True">
+                            <Setter x:Uid="Setter_16" TargetName="Border"
+                                    Property="Background"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_17" TargetName="Border"
+                                    Property="BorderBrush"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_18" TargetName="Arrow"
+                                    Property="Fill"
+                                    Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphPressedBrushKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Uid="ControlTemplate_4" x:Key="ComboBoxEditableTemplate" TargetType="{x:Type ComboBox}">
+        <Border x:Uid="Border_1" x:Name="Border"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderBrushKey}}"
+                Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundBrushKey}}">
+            <Grid x:Uid="Placement" Name="MainGrid" SnapsToDevicePixels="true">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Uid="ColumnDefinition_1" Width="*"/>
+                    <ColumnDefinition x:Uid="ColumnDefinition_2" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Popup x:Uid="PART_Popup" Name="PART_Popup"
+                        AllowsTransparency="true"
+                        Grid.ColumnSpan="2"
+                        PlacementTarget="{Binding ElementName=Border}"
+                        Placement="Bottom" 
+                        IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                        PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                    <vs:SystemDropShadowChrome x:Uid="Shdw" Name="Shdw" Color="Transparent"
+                                               MinWidth="{Binding ElementName=Border,Path=ActualWidth}"
+                                               MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <Border x:Uid="DropDownBorder" x:Name="DropDownBorder"
+                                BorderThickness="1"
+                                Margin="0,1,0,0"
+                                BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBorderBrushKey}}">
+                            <ScrollViewer x:Uid="ScrollViewer_1" >
+                                <!-- ScrollViewer creates an implicit Clip, and Clips reset RenderOptions.ClearTypeHint.  Thus, we need the
+                                  element with an opaque background to be inside the ScrollViewer for clear type hinting to work correctly -->
+                                <Grid x:Uid="Grid_2" Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBackgroundBrushKey}}"
+                                      RenderOptions.ClearTypeHint="Enabled">
+                                    <ItemsPresenter x:Uid="ItemsPresenter_1" KeyboardNavigation.DirectionalNavigation="Contained"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                </Grid>
+                            </ScrollViewer>
+                        </Border>
+                    </vs:SystemDropShadowChrome>
+                </Popup>
+
+                <TextBox x:Uid="PART_EditableTextBox" Name="PART_EditableTextBox"
+                          Grid.Column="0"
+                          Margin="{TemplateBinding Padding}"
+                          Style="{StaticResource ComboBoxEditableTextBox}"
+                          Foreground="{TemplateBinding Foreground}"
+                          SelectionBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextInputSelectionBrushKey}}"
+                          CaretBrush="{Binding RelativeSource={RelativeSource Self}, Path=Foreground}"
+                          IsReadOnly="{Binding Path=IsReadOnly,RelativeSource={RelativeSource TemplatedParent}}"
+                          VerticalAlignment="Center"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                          AutomationProperties.LabeledBy="{TemplateBinding AutomationProperties.LabeledBy}"/>
+
+                <ToggleButton x:Uid="ToggleButton" x:Name="ToggleButton" Grid.Column="1"
+                              Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundBrushKey}}"
+                              BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorBrushKey}}"
+                              TextElement.Foreground="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBrushKey}}"
+                              Style="{StaticResource ComboBoxToggleButton}"
+                              IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger x:Uid="Trigger_4" Property="IsKeyboardFocusWithin" Value="true">
+                <Setter x:Uid="Setter_19" TargetName="ToggleButton" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_20" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_21" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_22" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_23" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_24" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextFocusedBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_5" Property="IsMouseOver" Value="True">
+                <Setter x:Uid="Setter_25" TargetName="ToggleButton" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorHoverBrushKey}}" />
+                <Setter x:Uid="Setter_26" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundHoverBrushKey}}" />
+                <Setter x:Uid="Setter_27" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphHoverBrushKey}}" />
+                <Setter x:Uid="Setter_28" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundHoverBrushKey}}" />
+                <Setter x:Uid="Setter_29" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderHoverBrushKey}}"/>
+                <Setter x:Uid="Setter_30" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextHoverBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_6" Property="IsDropDownOpen" Value="true">
+                <Setter x:Uid="Setter_31" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundPressedBrushKey}}" />
+                <Setter x:Uid="Setter_32" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderPressedBrushKey}}" />
+                <Setter x:Uid="Setter_33" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextPressedBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_7" Property="HasItems" Value="false">
+                <Setter x:Uid="Setter_34" TargetName="DropDownBorder" Property="Height" Value="95"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_8" Property="IsEnabled" Value="false">
+                <Setter x:Uid="Setter_35" TargetName="ToggleButton" Property="BorderBrush" Value="Transparent" />
+                <Setter x:Uid="Setter_36" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundDisabledBrushKey}}" />
+                <Setter x:Uid="Setter_37" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphDisabledBrushKey}}" />
+                <Setter x:Uid="Setter_38" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderDisabledBrushKey}}"/>
+                <Setter x:Uid="Setter_39" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundDisabledBrushKey}}"/>
+                <Setter x:Uid="Setter_40" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextDisabledBrushKey}}"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_9" Property="IsGrouping" Value="true">
+                <Setter x:Uid="Setter_41" Property="ScrollViewer.CanContentScroll" Value="false"/>
+            </Trigger>
+            <MultiDataTrigger x:Uid="MultiDataTrigger_1" >
+                <MultiDataTrigger.Conditions>
+                    <Condition x:Uid="Condition_1" Binding="{Binding ElementName=PART_Popup, Path=(Popup.HasDropShadow)}"
+                               Value="True" />
+                    <Condition x:Uid="Condition_2" Binding="{Binding Source={x:Static vs:EnvironmentRenderCapabilities.Current}, Path=AreGradientsAllowed}"
+                               Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter x:Uid="Setter_42" TargetName="Shdw" Property="Margin" Value="0,0,5,5"/>
+                <Setter x:Uid="Setter_43" TargetName="Shdw" Property="Color" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBackgroundShadowColorKey}}"/>
+            </MultiDataTrigger>
+            <DataTrigger x:Uid="DataTrigger_1" Binding="{Binding Source={x:Static vs:EnvironmentRenderCapabilities.Current}, Path=AreAnimationsAllowed}"
+                         Value="False">
+                <Setter x:Uid="Setter_44" TargetName="PART_Popup" Property="PopupAnimation" Value="None"/>
+            </DataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Uid="Style_3" TargetType="{x:Type ComboBox}" x:Key="{x:Static vsfx:VsResourceKeys.ComboBoxStyleKey}">
+        <Setter x:Uid="Setter_45" Property="Background" Value="Transparent"/>
+        <Setter x:Uid="Setter_46" Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter x:Uid="Setter_47" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextBrushKey}}"/>
+        <Setter x:Uid="Setter_48" Property="BorderThickness" Value="1"/>
+        <Setter x:Uid="Setter_49" Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter x:Uid="Setter_50" Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter x:Uid="Setter_51" Property="VerticalContentAlignment" Value="Center" />
+
+        <!-- non-editable combos have their content offset by three pixels on the left/right, the template's ContentPresenter uses this Padding value for its Margin. -->
+        <Setter x:Uid="Setter_52" Property="Padding" Value="3,0,3,0"/>
+
+        <Setter x:Uid="Setter_53" Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style x:Uid="Style_4" TargetType="{x:Type ComboBoxItem}">
+                    <Setter x:Uid="Setter_54" Property="BorderThickness" Value="1" />
+                    <Setter x:Uid="Setter_55" Property="BorderBrush" Value="Transparent" />
+                    <Setter x:Uid="Setter_56" Property="Background" Value="Transparent" />
+                    <Setter x:Uid="Setter_57" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListItemTextBrushKey}}" />
+                    <Setter x:Uid="Setter_58" Property="AutomationProperties.Name" Value="{Binding Text}" />
+                    <Setter x:Uid="Setter_59" Property="AutomationProperties.AutomationId" Value="{Binding Text}"/>
+                    <Setter x:Uid="Setter_60" Property="Template" Value="{StaticResource ComboBoxItemTemplate}" />
+                    <Setter x:Uid="Setter_61" Property="Margin" Value="2,0,2,0" />
+                    <Setter x:Uid="Setter_62" Property="InputMethod.IsInputMethodSuspended" Value="True"/>
+                    <Setter x:Uid="Setter_63" Property="FocusVisualStyle" Value="{x:Null}"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter x:Uid="Setter_64" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_5" TargetType="{x:Type ComboBox}">
+                    <Border x:Uid="Border_2" x:Name="Border"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderBrushKey}}"
+                            Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundBrushKey}}">
+                        <Grid x:Uid="MainGrid" Name="MainGrid" SnapsToDevicePixels="true">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Uid="ColumnDefinition_3" Width="*"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_4" MinWidth="12" Width="0"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Popup x:Uid="Popup_1" Name="PART_Popup"
+                                    AllowsTransparency="true"
+                                    Grid.ColumnSpan="2"
+                                    Placement="Bottom"
+                                    PlacementTarget="{Binding ElementName=Border}"
+                                    IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                    PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                                <vs:SystemDropShadowChrome x:Uid="vs:SystemDropShadowChrome_1" Name="Shdw" Color="Transparent"
+                                                           MinWidth="{Binding ElementName=Border, Path=ActualWidth}"
+                                                           MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Uid="Border_3" x:Name="DropDownBorder"
+                                            BorderThickness="1"
+                                            Margin="0,1,0,0"
+                                            BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBorderBrushKey}}">
+                                        <ScrollViewer x:Uid="ScrollViewer_2" >
+                                            <!-- ScrollViewer creates an implicit Clip, and Clips reset RenderOptions.ClearTypeHint.  Thus, we need the
+                                                  element with an opaque background to be inside the ScrollViewer for clear type hinting to work correctly -->
+                                            <Grid x:Uid="Grid_3" Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBackgroundBrushKey}}"
+                                                  RenderOptions.ClearTypeHint="Enabled">
+                                                <ItemsPresenter x:Uid="ItemsPresenter_2" KeyboardNavigation.DirectionalNavigation="Contained"
+                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            </Grid>
+                                        </ScrollViewer>
+                                    </Border>
+                                </vs:SystemDropShadowChrome>
+                            </Popup>
+
+                            <ToggleButton x:Uid="ToggleButton_1" x:Name="ToggleButton"
+                                          Grid.Column="0"
+                                          Grid.ColumnSpan="2"
+                                          Background="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundBrushKey}}"
+                                          BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorBrushKey}}"
+                                          TextElement.Foreground="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBrushKey}}"
+                                          Style="{StaticResource ComboBoxToggleButton}"
+                                          IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                            <ContentPresenter x:Uid="ContentPresenter_2" Grid.Column="0"
+                                              IsHitTestVisible="false"
+                                              Margin="{TemplateBinding Padding}"
+                                              Content="{TemplateBinding SelectedItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger x:Uid="Trigger_10" Property="IsKeyboardFocusWithin" Value="true">
+                            <Setter x:Uid="Setter_65" TargetName="ToggleButton" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorFocusedBrushKey}}" />
+                            <Setter x:Uid="Setter_66" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundFocusedBrushKey}}" />
+                            <Setter x:Uid="Setter_67" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphFocusedBrushKey}}" />
+                            <Setter x:Uid="Setter_68" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundFocusedBrushKey}}" />
+                            <Setter x:Uid="Setter_69" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderFocusedBrushKey}}" />
+                            <Setter x:Uid="Setter_70" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextFocusedBrushKey}}" />
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_11" Property="IsMouseOver" Value="True">
+                            <Setter x:Uid="Setter_71" TargetName="ToggleButton" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxSeparatorHoverBrushKey}}" />
+                            <Setter x:Uid="Setter_72" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundHoverBrushKey}}" />
+                            <Setter x:Uid="Setter_73" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphHoverBrushKey}}" />
+                            <Setter x:Uid="Setter_74" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundHoverBrushKey}}" />
+                            <Setter x:Uid="Setter_75" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderHoverBrushKey}}"/>
+                            <Setter x:Uid="Setter_76" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextHoverBrushKey}}" />
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_12" Property="IsDropDownOpen" Value="true">
+                            <Setter x:Uid="Setter_77" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_78" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderPressedBrushKey}}" />
+                            <Setter x:Uid="Setter_79" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextPressedBrushKey}}" />
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_13" Property="HasItems" Value="false">
+                            <Setter x:Uid="Setter_80" TargetName="DropDownBorder" Property="Height" Value="95"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_14" Property="IsEnabled" Value="false">
+                            <Setter x:Uid="Setter_81" TargetName="ToggleButton" Property="BorderBrush" Value="Transparent" />
+                            <Setter x:Uid="Setter_82" TargetName="ToggleButton" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphBackgroundDisabledBrushKey}}" />
+                            <Setter x:Uid="Setter_83" TargetName="ToggleButton" Property="TextElement.Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxGlyphDisabledBrushKey}}" />
+                            <Setter x:Uid="Setter_84" TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBorderDisabledBrushKey}}"/>
+                            <Setter x:Uid="Setter_85" TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxBackgroundDisabledBrushKey}}"/>
+                            <Setter x:Uid="Setter_86" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxTextDisabledBrushKey}}"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_15" Property="IsGrouping" Value="true">
+                            <Setter x:Uid="Setter_87" Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </Trigger>
+                        <MultiDataTrigger x:Uid="MultiDataTrigger_2" >
+                            <MultiDataTrigger.Conditions>
+                                <Condition x:Uid="Condition_3" Binding="{Binding ElementName=PART_Popup, Path=(Popup.HasDropShadow)}"
+                                           Value="True" />
+                                <Condition x:Uid="Condition_4" Binding="{Binding Source={x:Static vs:EnvironmentRenderCapabilities.Current}, Path=AreGradientsAllowed}"
+                                           Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter x:Uid="Setter_88" TargetName="Shdw" Property="Margin" Value="0,0,5,5"/>
+                            <Setter x:Uid="Setter_89" TargetName="Shdw" Property="Color" Value="{DynamicResource {x:Static vs:CommonControlsColors.ComboBoxListBackgroundShadowColorKey}}"/>
+                        </MultiDataTrigger>
+                        <DataTrigger x:Uid="DataTrigger_2" Binding="{Binding Source={x:Static vs:EnvironmentRenderCapabilities.Current}, Path=AreAnimationsAllowed}"
+                                     Value="False">
+                            <Setter x:Uid="Setter_90" TargetName="PART_Popup" Property="PopupAnimation" Value="None"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_16" Property="IsEditable" Value="true">
+                <Setter x:Uid="Setter_91" Property="IsTabStop" Value="false"/>
+                <Setter x:Uid="Setter_92" Property="Template" Value="{StaticResource ComboBoxEditableTemplate}"/>
+                <Setter x:Uid="Setter_95" Property="Padding" Value="0"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_17" Property="IsEditable" Value="false">
+                <Setter x:Uid="Setter_96" Property="InputMethod.IsInputMethodSuspended" Value="True"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
