@@ -866,4 +866,7 @@ https://git-scm.com/download/win</value>
   <data name="AndOthers" xml:space="preserve">
     <value>und weitere</value>
   </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>This conversation was marked as resolved</value>
+  </data>
 </root>
