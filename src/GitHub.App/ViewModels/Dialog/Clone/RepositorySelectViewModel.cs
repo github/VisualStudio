@@ -35,7 +35,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         ICollectionView itemsView;
         ObservableAsPropertyHelper<RepositoryModel> repository;
         IRepositoryItemViewModel selectedItem;
-        static bool firstLoad = true;
 
         [ImportingConstructor]
         public RepositorySelectViewModel(IRepositoryCloneService service, IGitHubContextService gitHubContextService)
@@ -58,12 +57,6 @@ namespace GitHub.ViewModels.Dialog.Clone
                 .ToProperty(this, x => x.Repository);
 
             this.WhenAnyValue(x => x.Filter).Subscribe(_ => ItemsView?.Refresh());
-
-            Refresh = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await this.LoadItems(true);
-                return Unit.Default;
-            });
         }
 
         public Exception Error
@@ -108,8 +101,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             set => this.RaiseAndSetIfChanged(ref selectedItem, value);
         }
 
-        public ReactiveCommand<Unit, Unit> Refresh { get; }
-
         public RepositoryModel Repository => repository.Value;
 
         public void Initialize(IConnection connection)
@@ -122,8 +113,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public async Task Activate()
         {
-            await this.LoadItems(firstLoad);
-            firstLoad = false;
+            await this.LoadItems(true);
         }
 
         static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
