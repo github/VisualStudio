@@ -304,6 +304,7 @@
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
       <Version>14.1.24720</Version>
     </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

@@ -17,7 +17,6 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class GitClient : IGitClient
     {
-        const string defaultOriginName = "origin";
         static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly IGitService gitService;
         readonly PullOptions pullOptions;
@@ -44,12 +43,17 @@ namespace GitHub.Services
         public Task Pull(IRepository repository)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var signature = repository.Config.BuildSignature(DateTimeOffset.UtcNow);
-#pragma warning disable 0618 // TODO: Replace `Network.Pull` with `Commands.Pull`.
-                repository.Network.Pull(signature, pullOptions);
-#pragma warning restore 0618
+                if (repository is Repository repo)
+                {
+                    LibGit2Sharp.Commands.Pull(repo, signature, pullOptions);
+                }
+                else
+                {
+                    log.Error("Couldn't pull because {Variable} isn't an instance of {Type}", nameof(repository), typeof(Repository));
+                }
             });
         }
 
@@ -59,7 +63,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 if (repository.Head?.Commits != null && repository.Head.Commits.Any())
                 {
@@ -75,14 +79,11 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 try
                 {
-                    var remote = repository.Network.Remotes[remoteName];
-#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
-                    repository.Network.Fetch(remote, fetchOptions);
-#pragma warning restore 0618
+                    repository.Network.Fetch(remoteName, new[] { "+refs/heads/*:refs/remotes/origin/*" }, fetchOptions);
                 }
                 catch (Exception ex)
                 {
@@ -104,7 +105,7 @@ namespace GitHub.Services
                 }
             }
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 try
                 {
@@ -114,17 +115,15 @@ namespace GitHub.Services
                     var removeRemote = false;
                     if (repo.Network.Remotes[remoteName] != null)
                     {
-                        // If a remote with this neme already exists, use a unique name and remove remote afterwards
+                        // If a remote with this name already exists, use a unique name and remove remote afterwards
                         remoteName = cloneUrl.Owner + "-" + Guid.NewGuid();
                         removeRemote = true;
                     }
 
-                    var remote = repo.Network.Remotes.Add(remoteName, remoteUri.ToString());
+                    repo.Network.Remotes.Add(remoteName, remoteUri.ToString());
                     try
                     {
-#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
-                        repo.Network.Fetch(remote, refspecs, fetchOptions);
-#pragma warning restore 0618
+                        repo.Network.Fetch(remoteName, refspecs, fetchOptions);
                     }
                     finally
                     {
@@ -149,14 +148,11 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 try
                 {
-                    var remote = repository.Network.Remotes[remoteName];
-#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
-                    repository.Network.Fetch(remote, refspecs, fetchOptions);
-#pragma warning restore 0618
+                    repository.Network.Fetch(remoteName, refspecs, fetchOptions);
                 }
                 catch (Exception ex)
                 {
@@ -173,11 +169,16 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
-#pragma warning disable 0618 // TODO: Replace `IRepository.Checkout` with `Commands.Checkout`.
-                repository.Checkout(branchName);
-#pragma warning restore 0618
+                if (repository is Repository repo)
+                {
+                    LibGit2Sharp.Commands.Checkout(repo, branchName);
+                }
+                else
+                {
+                    log.Error("Couldn't checkout because {Variable} isn't an instance of {Type}", nameof(repository), typeof(Repository));
+                }
             });
         }
 
@@ -191,99 +192,9 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 repository.CreateBranch(branchName);
-            });
-        }
-
-        public Task<TreeChanges> Compare(
-            IRepository repository,
-            string sha1,
-            string sha2,
-            bool detectRenames)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
-            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
-
-            return Task.Factory.StartNew(() =>
-            {
-                var options = new CompareOptions
-                {
-                    Similarity = detectRenames ? SimilarityOptions.Renames : SimilarityOptions.None
-                };
-
-                var commit1 = repository.Lookup<Commit>(sha1);
-                var commit2 = repository.Lookup<Commit>(sha2);
-
-                if (commit1 != null && commit2 != null)
-                {
-                    return repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, options);
-                }
-                else
-                {
-                    return null;
-                }
-            });
-        }
-
-        public Task<Patch> Compare(
-            IRepository repository,
-            string sha1,
-            string sha2,
-            string path)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
-            Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
-
-            return Task.Factory.StartNew(() =>
-            {
-                var commit1 = repository.Lookup<Commit>(sha1);
-                var commit2 = repository.Lookup<Commit>(sha2);
-
-                if (commit1 != null && commit2 != null)
-                {
-                    return repository.Diff.Compare<Patch>(
-                        commit1.Tree,
-                        commit2.Tree,
-                        new[] { path });
-                }
-                else
-                {
-                    return null;
-                }
-            });
-        }
-
-        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
-            Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
-
-            return Task.Factory.StartNew(() =>
-            {
-                var commit1 = repository.Lookup<Commit>(sha1);
-                var commit2 = repository.Lookup<Commit>(sha2);
-
-                var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree);
-                var normalizedPath = path.Replace("/", "\\");
-                var renamed = treeChanges.FirstOrDefault(x => x.Path == normalizedPath);
-                var oldPath = renamed?.OldPath ?? path;
-
-                if (commit1 != null)
-                {
-                    var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
-                    var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
-                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
-                    return repository.Diff.Compare(blob1, blob2);
-                }
-
-                return null;
             });
         }
 
@@ -292,7 +203,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var result = repository.Config.Get<T>(key);
                 return result != null ? result.Value : default(T);
@@ -305,7 +216,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(key, nameof(key));
             Guard.ArgumentNotEmptyString(value, nameof(value));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 repository.Config.Set(key, value);
             });
@@ -316,7 +227,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 repository.Config.Set("remote." + remoteName + ".url", url.ToString());
                 repository.Config.Set("remote." + remoteName + ".fetch", "+refs/heads/*:refs/remotes/" + remoteName + "/*");
@@ -329,7 +240,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(branchName, nameof(branchName));
             Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var remoteBranchName = IsCanonical(remoteName) ? remoteName : "refs/remotes/" + remoteName + "/" + branchName;
                 var remoteBranch = repository.Branches[remoteBranchName];
@@ -347,7 +258,7 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotEmptyString(key, nameof(key));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 repository.Config.Unset(key);
             });
@@ -358,7 +269,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repo, nameof(repo));
             Guard.ArgumentNotEmptyString(remote, nameof(remote));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var uri = gitService.GetRemoteUri(repo, remote);
                 var remoteName = uri.IsHypertextTransferProtocol ? remote : remote + "-http";
@@ -373,9 +284,9 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if (commit == null)
@@ -392,9 +303,9 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentNotEmptyString(fileName, nameof(fileName));
+            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if (commit == null)
@@ -421,9 +332,9 @@ namespace GitHub.Services
         public Task<bool> IsModified(IRepository repository, string path, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(path, nameof(path));
+            Guard.ArgumentIsGitPath(path, nameof(path));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
                 {
@@ -491,7 +402,7 @@ namespace GitHub.Services
         {
             Guard.ArgumentNotNull(repo, nameof(repo));
 
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 return repo.Head.TrackingDetails.AheadBy == 0;
             });
@@ -503,7 +414,7 @@ namespace GitHub.Services
             string compareBranch,
             int maxCommits)
         {
-            return Task.Factory.StartNew(() =>
+            return Task.Run(() =>
             {
                 var baseCommit = repo.Lookup<Commit>(baseBranch);
                 var compareCommit = repo.Lookup<Commit>(compareBranch);
