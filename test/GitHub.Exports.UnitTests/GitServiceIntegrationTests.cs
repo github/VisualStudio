@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using GitHub.Services;
 using LibGit2Sharp;
@@ -7,6 +9,149 @@ using NUnit.Framework;
 
 public class GitServiceIntegrationTests
 {
+    public class TheCompareMethod
+    {
+        [TestCase("1.2.", "1.2.3.4.", "+3.+4.", Description = "Two lines added")]
+        public async Task Simple_Diff(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
+
+                Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("1.2.a..b.3.4", "1.2.a..b.a..b.3.4", "+b.+a.+.")] // This would be "+a.+.+b." without Indent-heuristic
+        public async Task Indent_Heuristic_Is_Enabled(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
+
+                Assert.That(patch.Content.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("foo", "bar")]
+        public async Task One_File_Is_Modified(string content1, string content2)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var treeChanges = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, false);
+
+                Assert.That(treeChanges.Modified.FirstOrDefault()?.Path, Is.EqualTo(path));
+            }
+        }
+
+
+        [Test]
+        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = @"dir\foo.txt";
+                var oldContent = "oldContent";
+                var newContent = "newContent";
+                var commit1 = AddCommit(temp.Repository, path, oldContent);
+                var commit2 = AddCommit(temp.Repository, path, newContent);
+                var target = new GitService(new RepositoryFacade());
+
+                Assert.ThrowsAsync<ArgumentException>(() =>
+                    target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path));
+            }
+        }
+    }
+
+    public class TheCompareWithMethod
+    {
+        [TestCase("1.2.", "1.2.3.4.", "+3.+4.", Description = "Two lines added")]
+        public async Task Simple_Diff(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes);
+
+                Assert.That(changes.Patch.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("1.2.a..b.3.4", "1.2.a..b.a..b.3.4", "+b.+a.+.")] // This would be "+a.+.+b." without Indent-heuristic
+        public async Task Indent_Heuristic_Is_Enabled(string content1, string content2, string expectPatch)
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = "foo.txt";
+                var commit1 = AddCommit(temp.Repository, path, content1.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, path, content2.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(content2.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes);
+
+                Assert.That(changes.Patch.Replace('\n', '.'), Contains.Substring(expectPatch));
+            }
+        }
+
+        [TestCase("foo.txt", "a.b.", "bar.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir/foo.txt", "a.b.", @"dir/bar.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir/foo.txt", "a.b.", @"dir/foo.txt", "a.b.c.d.", 2)]
+        [TestCase(@"dir/unrelated.txt", "x.x.x.x.", @"dir/foo.txt", "a.b.c.d.", 4)]
+        public async Task Can_Handle_Renames(string oldPath, string oldContent, string newPath, string newContent, int expectLinesAdded)
+        {
+            using (var temp = new TempRepository())
+            {
+                var commit1 = AddCommit(temp.Repository, oldPath, oldContent.Replace('.', '\n'));
+                var commit2 = AddCommit(temp.Repository, newPath, newContent.Replace('.', '\n'));
+                var contentBytes = new UTF8Encoding(false).GetBytes(newContent.Replace('.', '\n'));
+                var target = new GitService(new RepositoryFacade());
+
+                var changes = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, newPath, contentBytes);
+
+                Assert.That(changes?.LinesAdded, Is.EqualTo(expectLinesAdded));
+            }
+        }
+
+        [Test]
+        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        {
+            using (var temp = new TempRepository())
+            {
+                var path = @"dir\foo.txt";
+                var oldContent = "oldContent";
+                var newContent = "newContent";
+                var commit1 = AddCommit(temp.Repository, path, oldContent);
+                var commit2 = AddCommit(temp.Repository, path, newContent);
+                var contentBytes = new UTF8Encoding(false).GetBytes(newContent);
+                var target = new GitService(new RepositoryFacade());
+
+                Assert.ThrowsAsync<ArgumentException>(() =>
+                    target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes));
+            }
+        }
+    }
+
     public class TheCreateLocalRepositoryModelMethod
     {
         [Test]
@@ -296,19 +441,6 @@ public class GitServiceIntegrationTests
             }
         }
 
-        static Commit AddCommit(Repository repo)
-        {
-            var dir = repo.Info.WorkingDirectory;
-            var path = "file.txt";
-            var file = Path.Combine(dir, path);
-            var guidString = Guid.NewGuid().ToString();
-            File.WriteAllText(file, guidString);
-            Commands.Stage(repo, path);
-            var signature = new Signature("foobar", "foobar@github.com", DateTime.Now);
-            var commit = repo.Commit("message", signature, signature);
-            return commit;
-        }
-
         static void AddTrackedBranch(Repository repo, Branch branch, Commit commit,
             string trackedBranchName = null, string remoteName = "origin")
         {
@@ -322,6 +454,30 @@ public class GitServiceIntegrationTests
             repo.Refs.Add(canonicalName, commit.Id);
             repo.Branches.Update(branch, b => b.TrackedBranch = canonicalName);
         }
+    }
+
+    static Commit AddCommit(Repository repo, string path = "file.txt", string content = null)
+    {
+        content = content ?? Guid.NewGuid().ToString();
+
+        var dir = repo.Info.WorkingDirectory;
+        DeleteFilesNotInGit(dir);
+        var file = Path.Combine(dir, path);
+        Directory.CreateDirectory(Path.GetDirectoryName(file));
+        File.WriteAllText(file, content);
+        Commands.Stage(repo, "*");
+        var signature = new Signature("foobar", "foobar@github.com", DateTime.Now);
+        var commit = repo.Commit("message", signature, signature);
+        return commit;
+    }
+
+    static void DeleteFilesNotInGit(string dir)
+    {
+        var gitDir = Path.Combine(dir, @".git\");
+        Directory.GetFiles(dir, "*", SearchOption.AllDirectories)
+            .Where(f => !f.StartsWith(gitDir, StringComparison.OrdinalIgnoreCase))
+            .ToList()
+            .ForEach(File.Delete);
     }
 
     protected class TempRepository : TempDirectory
