@@ -41,6 +41,7 @@ namespace GitHub.SampleData.Dialog.Clone
         public ICollectionView ItemsView { get; }
         public IRepositoryItemViewModel SelectedItem { get; set; }
         public RepositoryModel Repository { get; }
+        public ReactiveCommand<Unit, Unit> Refresh { get; }
 
         public void Initialize(IConnection connection)
         {

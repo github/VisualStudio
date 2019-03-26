@@ -16,6 +16,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         IReadOnlyList<IRepositoryItemViewModel> Items { get; }
         ICollectionView ItemsView { get; }
         IRepositoryItemViewModel SelectedItem { get; set; }
+        ReactiveCommand<Unit, Unit> Refresh { get; }
 
         void Initialize(IConnection connection);
     }
