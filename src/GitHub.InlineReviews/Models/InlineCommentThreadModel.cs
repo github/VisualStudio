@@ -28,7 +28,8 @@ namespace GitHub.InlineReviews.Models
             string relativePath,
             string commitSha,
             IList<DiffLine> diffMatch,
-            IEnumerable<InlineCommentModel> comments)
+            IEnumerable<InlineCommentModel> comments,
+            bool isResolved)
         {
             Guard.ArgumentNotNull(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(commitSha, nameof(commitSha));
@@ -39,6 +40,7 @@ namespace GitHub.InlineReviews.Models
             DiffLineType = diffMatch[0].Type;
             CommitSha = commitSha;
             RelativePath = relativePath;
+            IsResolved = isResolved;
 
             foreach (var comment in comments)
             {
@@ -74,5 +76,8 @@ namespace GitHub.InlineReviews.Models
 
         /// <inheritdoc/>
         public string RelativePath { get; }
+
+        /// <inheritdoc/>
+        public bool IsResolved { get; }
     }
 }

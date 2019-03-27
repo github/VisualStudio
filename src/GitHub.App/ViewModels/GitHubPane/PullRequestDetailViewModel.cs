@@ -364,7 +364,8 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
-                await Files.InitializeAsync(Session);
+                // Only show unresolved comments
+                await Files.InitializeAsync(Session, c => !c.IsResolved);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
