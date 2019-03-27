@@ -319,5 +319,8 @@ public class VSGitExtTests
         public IRepository GetRepository(string path) => throw new NotImplementedException();
         public UriString GetUri(IRepository repository, string remote = "origin") => throw new NotImplementedException();
         public UriString GetUri(string path, string remote = "origin") => throw new NotImplementedException();
+        public Task<Patch> Compare(IRepository repository, string sha1, string sha2, string path) => throw new NotImplementedException();
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents) => throw new NotImplementedException();
+        public Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false) => throw new NotImplementedException();
     }
 }
