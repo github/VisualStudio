@@ -290,21 +290,21 @@ namespace GitHub.InlineReviews.Services
             return null;
         }
 
-        public virtual Task<PullRequestDetailModel> ReadPullRequestDetail(HostAddress address, string owner, string name, int number)
+        public virtual Task<PullRequestDetailModel> ReadPullRequestDetail(HostAddress address, string owner, string name, int number, bool refresh = false)
         {
             // The reviewThreads/isResolved field is only guaranteed to be available on github.com
             if (address.IsGitHubDotCom())
             {
-                return ReadPullRequestDetailWithResolved(address, owner, name, number);
+                return ReadPullRequestDetailWithResolved(address, owner, name, number, refresh);
             }
             else
             {
-                return ReadPullRequestDetailWithoutResolved(address, owner, name, number);
+                return ReadPullRequestDetailWithoutResolved(address, owner, name, number, refresh);
             }
         }
 
-        async Task<PullRequestDetailModel> ReadPullRequestDetailWithResolved(
-            HostAddress address, string owner, string name, int number)
+        async Task<PullRequestDetailModel> ReadPullRequestDetailWithResolved(HostAddress address, string owner,
+            string name, int number, bool refresh)
         {
 
             if (readPullRequestWithResolved == null)
@@ -424,7 +424,7 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(readPullRequestWithResolved, vars);
+            var result = await connection.Run(readPullRequestWithResolved, vars, refresh);
 
             var apiClient = await apiClientFactory.Create(address);
 
@@ -432,7 +432,7 @@ namespace GitHub.InlineReviews.Services
                 async () => await apiClient.GetPullRequestFiles(owner, name, number).ToList());
 
             var lastCommitModel = await log.TimeAsync(nameof(GetPullRequestLastCommitAdapter),
-                () => GetPullRequestLastCommitAdapter(address, owner, name, number));
+                () => GetPullRequestLastCommitAdapter(address, owner, name, number, refresh));
 
             result.Statuses = (IReadOnlyList<StatusModel>)lastCommitModel.Statuses ?? Array.Empty<StatusModel>();
 
@@ -488,8 +488,8 @@ namespace GitHub.InlineReviews.Services
             return result;
         }
 
-        async Task<PullRequestDetailModel> ReadPullRequestDetailWithoutResolved(
-            HostAddress address, string owner, string name, int number)
+        async Task<PullRequestDetailModel> ReadPullRequestDetailWithoutResolved(HostAddress address, string owner,
+            string name, int number, bool refresh)
         {
             if (readPullRequestWithoutResolved == null)
             {
@@ -602,7 +602,7 @@ namespace GitHub.InlineReviews.Services
             };
 
             var connection = await graphqlFactory.CreateConnection(address);
-            var result = await connection.Run(readPullRequest, vars);
+            var result = await connection.Run(readPullRequestWithoutResolved, vars, refresh);
 
             var apiClient = await apiClientFactory.Create(address);
 
