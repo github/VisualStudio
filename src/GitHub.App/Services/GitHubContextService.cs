@@ -406,6 +406,10 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path)
         {
+            Guard.ArgumentNotNull(path, nameof(repositoryDir));
+            Guard.ArgumentNotNull(path, nameof(commitish));
+            Guard.ArgumentIsGitPath(path, nameof(path));
+
             using (var repo = gitService.GetRepository(repositoryDir))
             {
                 var commit = repo.Lookup<Commit>(commitish);

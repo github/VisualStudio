@@ -70,6 +70,9 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public DiffSide Side { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsResolved { get; private set; }
+
         public bool IsNewThread
         {
             get => isNewThread;
@@ -97,6 +100,7 @@ namespace GitHub.ViewModels
             File = file;
             LineNumber = thread.LineNumber;
             Side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+            IsResolved = thread.IsResolved;
 
             foreach (var comment in thread.Comments)
             {
