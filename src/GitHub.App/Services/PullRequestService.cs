@@ -101,7 +101,7 @@ namespace GitHub.Services
                     readPullRequests = new Query()
                           .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequests(
-                              first: 100,
+                              first: 50,
                               after: Var(nameof(after)),
                               orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
                               states: Var(nameof(states)))
@@ -162,7 +162,7 @@ namespace GitHub.Services
                     readPullRequestsEnterprise = new Query()
                           .Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                           .PullRequests(
-                              first: 100,
+                              first: 50,
                               after: Var(nameof(after)),
                               orderBy: new IssueOrder { Direction = OrderDirection.Desc, Field = IssueOrderField.CreatedAt },
                               states: Var(nameof(states)))
