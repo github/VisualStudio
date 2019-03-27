@@ -166,7 +166,7 @@ namespace GitHub.ViewModels.GitHubPane
                     AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
                     .Subscribe(_ => FilterChanged());
 
-                await InitializeItemSource(false);
+                await InitializeItemSource(true);
             }
             catch (Exception ex)
             {
