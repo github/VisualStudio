@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub;
 using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -172,12 +177,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             public override IReadOnlyList<string> States { get; } = new[] { "Open", "Closed" };
 
-            protected IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource() => ItemSource;
-
             protected override Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh)
-            {
-                throw new NotImplementedException();
-            }
+                => Task.FromResult(ItemSource);
 
             protected override Task DoOpenItem(IIssueListItemViewModelBase item)
             {
