@@ -113,7 +113,7 @@ public class RepositorySelectViewModelTests
 
         var viewRepositoriesModel = CreateViewerRepositoriesModel(contributedToRepositories: contributedToRepositories);
         var repositoryCloneService = Substitute.For<IRepositoryCloneService>();
-        repositoryCloneService.ReadViewerRepositories(hostAddress).Returns(viewRepositoriesModel);
+        repositoryCloneService.ReadViewerRepositories(hostAddress, Arg.Any<bool>()).Returns(viewRepositoriesModel);
         return repositoryCloneService;
     }
 
