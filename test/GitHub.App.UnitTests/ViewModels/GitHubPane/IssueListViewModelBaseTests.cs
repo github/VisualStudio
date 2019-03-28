@@ -177,12 +177,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             public override IReadOnlyList<string> States { get; } = new[] { "Open", "Closed" };
 
-            protected IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource() => ItemSource;
-
             protected override Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh)
-            {
-                return Task.FromResult(Substitute.For<IVirtualizingListSource<IIssueListItemViewModelBase>>());
-            }
+                => Task.FromResult(ItemSource);
 
             protected override Task DoOpenItem(IIssueListItemViewModelBase item)
             {
