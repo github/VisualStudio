@@ -11,6 +11,11 @@ namespace GitHub.ViewModels.GitHubPane
     public interface IPullRequestCheckViewModel: IViewModel
     {
         /// <summary>
+        /// The flag to show this Status/Check is required.
+        /// </summary>
+        bool IsRequired { get; }
+        
+        /// <summary>
         /// The title of the Status/Check.
         /// </summary>
         string Title { get; }
@@ -29,6 +34,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// The url where more information about the Status/Check can be found.
         /// </summary>
         Uri DetailsUrl { get; }
+
+        /// <summary>
+        /// The amount of time this Status/Check took to run.
+        /// </summary>
+        string DurationStatus { get; }
 
         /// <summary>
         /// A command that opens the DetailsUrl in a browser.

@@ -24,5 +24,10 @@
         /// The descritption for the Status
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The flag to shows this Status is required.
+        /// </summary>
+        public bool IsRequired { get; set; }
     }
 }
