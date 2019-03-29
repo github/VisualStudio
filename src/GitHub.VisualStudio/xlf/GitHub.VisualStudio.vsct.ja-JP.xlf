@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ja-JP" original="../GitHub.VisualStudio.vsct">
+    <body>
+      <trans-unit id="addConnectionCommand|ButtonText">
+        <source>&amp;Connect to GitHub</source>
+        <target state="translated">GitHub に接続(&amp;C)</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="addConnectionCommand|LocCanonicalName">
+        <source>.GitHub.ConnectToGitHub</source>
+        <target state="translated">.GitHub.ConnectToGitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="backCommand|ButtonText">
+        <source>Back</source>
+        <target state="translated">戻る</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="backCommand|LocCanonicalName">
+        <source>.GitHub.Back</source>
+        <target state="translated">.GitHub.Back</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|ButtonText">
+        <source>Copy link to clipboard</source>
+        <target state="translated">リンクをクリップボードにコピー</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="copyLinkCommand|LocCanonicalName">
+        <source>.GitHub.CopyLink</source>
+        <target state="translated">.GitHub.CopyLink</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="forwardCommand|ButtonText">
+        <source>Forward</source>
+        <target state="translated">進む</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="forwardCommand|LocCanonicalName">
+        <source>.GitHub.Forward</source>
+        <target state="translated">.GitHub.Forward</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="githubCommand|ButtonText">
+        <source>View on GitHub</source>
+        <target state="translated">GitHub 上で表示</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="githubCommand|LocCanonicalName">
+        <source>.GitHub.ViewOnGitHub</source>
+        <target state="translated">.GitHub.ViewOnGitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|ButtonText">
+        <source>Go To Solution/PR File</source>
+        <target state="translated">ソリューション/PR ファイルへ移動</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="goToSolutionOrPullRequestFileCommand|LocCanonicalName">
+        <source>.GitHub.GoToSolutionOrPRFile</source>
+        <target state="translated">.GitHub.GoToSolutionOrPRFile</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="helpCommand|ButtonText">
+        <source>Help</source>
+        <target state="translated">ヘルプ</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="helpCommand|LocCanonicalName">
+        <source>.GitHub.Help</source>
+        <target state="translated">.GitHub.Help</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idBlameCommand|ButtonText">
+        <source>Blame</source>
+        <target state="translated">注釈</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idBlameCommand|LocCanonicalName">
+        <source>.GitHub.Blame</source>
+        <target state="translated">.GitHub.Blame</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|ButtonText">
+        <source>Create a GitHub Gist</source>
+        <target state="translated">GitHub Gist の作成</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistCommand|LocCanonicalName">
+        <source>.GitHub.CreateGist</source>
+        <target state="translated">.GitHub.CreateGist</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|ButtonText">
+        <source>Create an Enterprise Gist</source>
+        <target state="translated">Enterprise Gist の作成</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idCreateGistEnterpriseCommand|LocCanonicalName">
+        <source>.GitHub.CreateGistEnterprise</source>
+        <target state="translated">.GitHub.CreateGistEnterprise</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|ButtonText">
+        <source>GitHub</source>
+        <target state="translated">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubContextMenu|CommandName">
+        <source>GitHub</source>
+        <target state="translated">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|ButtonText">
+        <source>WindowToolBar</source>
+        <target state="translated">WindowToolBar</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="idGitHubToolbar|CommandName">
+        <source>Window Toolbar</source>
+        <target state="translated">ウィンドウ ツール バー</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|ButtonText">
+        <source>Open from clipboard</source>
+        <target state="translated">クリップボードから開く</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromClipboardCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromClipboard</source>
+        <target state="translated">.GitHub.OpenFromClipboard</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|ButtonText">
+        <source>Open from GitHub...</source>
+        <target state="translated">GitHub から開く...</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openFromUrlCommand|LocCanonicalName">
+        <source>.GitHub.OpenFromUrl</source>
+        <target state="translated">.GitHub.OpenFromUrl</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openLinkCommand|ButtonText">
+        <source>Open on GitHub</source>
+        <target state="translated">GitHub 上で開く</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="openLinkCommand|LocCanonicalName">
+        <source>.GitHub.OpenLink</source>
+        <target state="translated">.GitHub.OpenLink</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|ButtonText">
+        <source>Pull Requests</source>
+        <target state="translated">Pull Request</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="pullRequestCommand|LocCanonicalName">
+        <source>.GitHub.PullRequests</source>
+        <target state="translated">.GitHub.PullRequests</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="refreshCommand|ButtonText">
+        <source>Refresh</source>
+        <target state="translated">更新</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="refreshCommand|LocCanonicalName">
+        <source>.GitHub.Refresh</source>
+        <target state="translated">.GitHub.Refresh</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|ButtonText">
+        <source>Show Current Pull Request</source>
+        <target state="translated">現在の Pull Request を表示</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showCurrentPullRequestCommand|LocCanonicalName">
+        <source>.GitHub.ShowCurrentPullRequest</source>
+        <target state="translated">.GitHub.ShowCurrentPullRequest</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|ButtonText">
+        <source>GitHub</source>
+        <target state="translated">GitHub</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="showGitHubPaneCommand|LocCanonicalName">
+        <source>.GitHub.ShowGitHubPane</source>
+        <target state="translated">.GitHub.ShowGitHubPane</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|ButtonText">
+        <source>Sync Submodules</source>
+        <target state="translated">サブモジュールの同期</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="syncSubmodulesCommand|LocCanonicalName">
+        <source>.GitHub.SyncSubmodules</source>
+        <target state="translated">.GitHub.SyncSubmodules</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

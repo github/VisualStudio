@@ -181,7 +181,7 @@ Line 4";
 
                 using (var diffService = new FakeDiffService(winFilePath, baseContents))
                 {
-                    var diff = await diffService.Diff(winFilePath, headContents);
+                    var diff = await diffService.Diff(gitHubFilePath, headContents);
                     var pullRequest = CreatePullRequest(gitHubFilePath, comment);
                     var target = CreateTarget(diffService);
 
@@ -334,7 +334,7 @@ Line 4";
                 HeadRefName = "HEAD",
                 HeadRefSha = "HEAD_SHA",
                 HeadRepositoryOwner = "owner",
-                ChangedFiles = new []
+                ChangedFiles = new[]
                 {
                     new PullRequestFileModel { FileName = filePath },
                     new PullRequestFileModel { FileName = "other.cs" },

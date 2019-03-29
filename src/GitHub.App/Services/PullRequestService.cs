@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using GitHub.Api;
 using GitHub.App.Services;
 using GitHub.Extensions;
+using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -35,7 +36,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IPullRequestService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class PullRequestService : IPullRequestService, IStaticReviewFileMap
+    public class PullRequestService : IssueishService, IPullRequestService, IStaticReviewFileMap
     {
         const string SettingCreatedByGHfVS = "created-by-ghfvs";
         const string SettingGHfVSPullRequest = "ghfvs-pr-owner-number";
@@ -62,15 +63,17 @@ namespace GitHub.Services
         readonly IUsageTracker usageTracker;
 
         readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
-   
+
         [ImportingConstructor]
         public PullRequestService(
             IGitClient gitClient,
             IGitService gitService,
             IVSGitExt gitExt,
+            IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
             IOperatingSystem os,
             IUsageTracker usageTracker)
+            : base(apiClientFactory, graphqlFactory)
         {
             this.gitClient = gitClient;
             this.gitService = gitService;
@@ -86,7 +89,7 @@ namespace GitHub.Services
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states)
+            Models.PullRequestState[] states)
         {
 
             ICompiledQuery<Page<PullRequestListItemModel>> query;
@@ -212,7 +215,7 @@ namespace GitHub.Services
                 { nameof(owner), owner },
                 { nameof(name), name },
                 { nameof(after), after },
-                { nameof(states), states.Select(x => (PullRequestState)x).ToList() },
+                { nameof(states), states.Select(x => (Octokit.GraphQL.Model.PullRequestState)x).ToList() },
             };
 
             var result = await graphql.Run(query, vars);
@@ -576,6 +579,21 @@ namespace GitHub.Services
             });
         }
 
+        public async Task<bool> FetchCommit(LocalRepositoryModel localRepository, RepositoryModel remoteRepository, string sha)
+        {
+            using (var repo = gitService.GetRepository(localRepository.LocalPath))
+            {
+                if (!await gitClient.CommitExists(repo, sha).ConfigureAwait(false))
+                {
+                    var remote = await CreateRemote(repo, remoteRepository.CloneUrl).ConfigureAwait(false);
+                    await gitClient.Fetch(repo, remote).ConfigureAwait(false);
+                    return await gitClient.CommitExists(repo, sha).ConfigureAwait(false);
+                }
+
+                return true;
+            }
+        }
+
         public IObservable<string> GetDefaultLocalBranchName(LocalRepositoryModel repository, int pullRequestNumber, string pullRequestTitle)
         {
             return Observable.Defer(() =>
@@ -638,7 +656,7 @@ namespace GitHub.Services
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
                     await gitClient.Fetch(repo, remote.Name);
-                    var changes = await gitClient.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
+                    var changes = await gitService.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
                     return Observable.Return(changes);
                 }
             });
@@ -752,20 +770,20 @@ namespace GitHub.Services
             Encoding encoding)
         {
             var tempFilePath = CalculateTempFileName(relativePath, commitSha, encoding);
+            var gitPath = relativePath.TrimStart('/').Replace('\\', '/');
 
             if (!File.Exists(tempFilePath))
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath);
+                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, gitPath, encoding, tempFilePath);
                 }
             }
 
-            lock (this.tempFileMappings)
+            lock (tempFileMappings)
             {
-                string gitRelativePath = relativePath.TrimStart('/').Replace('\\', '/');
-                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitRelativePath);
+                tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitPath);
             }
 
             return tempFilePath;
@@ -895,22 +913,24 @@ namespace GitHub.Services
             IRepository repo,
             int pullRequestNumber,
             string commitSha,
-            string relativePath,
+            string path,
             Encoding encoding,
             string tempFilePath)
         {
+            Guard.ArgumentIsGitPath(path, nameof(path));
+
             string contents;
 
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
             }
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
                 await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));

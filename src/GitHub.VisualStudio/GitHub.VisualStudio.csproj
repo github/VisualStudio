@@ -9,7 +9,7 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
-    <XlfLanguages>zh-CN</XlfLanguages>
+    <XlfLanguages>cs-CZ;de-DE;es-ES;fr-FR;it-IT;ja-JP;ko-KR;pl-PL;pt-BR;ru-RU;tr-TR;zh-CN;zh-TW</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -24,9 +24,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio</AssemblyName>
-    <StartAction>Program</StartAction>
-    <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
     <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
@@ -113,6 +110,7 @@
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\OpenIssueishDocumentCommand.cs" />
     <Compile Include="Commands\SyncSubmodulesCommand.cs" />
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
@@ -148,7 +146,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\IssueishDocumentPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
@@ -304,6 +304,7 @@
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
       <Version>14.1.24720</Version>
     </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
