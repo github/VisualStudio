@@ -186,6 +186,8 @@
 
         </DockPanel>
 
-        <ContentPresenter Grid.Row="5" Margin="10,10,10,20" Content="{Binding ChangesUserControl}"/>
+        <Expander Grid.Row="5" Margin="10,10,10,20" IsExpanded="True" Header="Changes">
+          <ContentPresenter Content="{Binding ChangesUserControl}"/>
+        </Expander>
     </Grid>
 </local:GenericPullRequestCreationView>
