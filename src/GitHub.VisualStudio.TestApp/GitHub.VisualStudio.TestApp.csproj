@@ -101,8 +101,8 @@
     <Compile Include="ThemeControl.xaml.cs">
       <DependentUpon>ThemeControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\GitHubDialogWindow.xaml.cs">
-      <DependentUpon>GitHubDialogWindow.xaml</DependentUpon>
+    <Compile Include="Views\ExternalGitHubDialogWindow.xaml.cs">
+      <DependentUpon>ExternalGitHubDialogWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -268,7 +268,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\GitHubDialogWindow.xaml">
+    <Page Include="Views\ExternalGitHubDialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
