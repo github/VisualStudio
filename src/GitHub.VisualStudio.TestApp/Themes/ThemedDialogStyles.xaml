@@ -1,0 +1,322 @@
+﻿<ResourceDictionary x:Uid="ResourceDictionary_1"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+                    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+                    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+                    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary x:Uid="ResourceDictionary_2" Source="CommonControlsButtonStyle.xaml" />
+        <ResourceDictionary x:Uid="ResourceDictionary_3" Source="CommonControlsCheckBoxStyle.xaml" />
+        <ResourceDictionary x:Uid="ResourceDictionary_4" Source="CommonControlsComboBoxStyle.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ControlTemplate x:Uid="ControlTemplate_5" x:Key="ErrorTemplate">
+        <DockPanel x:Uid="DockPanel_1"
+                   LastChildFill="True">
+            <AdornedElementPlaceholder x:Uid="ControlWithError" Name="ControlWithError">
+                <Border x:Uid="Border_5" BorderBrush="Red" BorderThickness="1" />
+            </AdornedElementPlaceholder>
+            <imaging:CrispImage x:Uid="CrispImage_1"
+                                DockPanel.Dock="Right"
+                                VerticalAlignment="Center"
+                                Moniker="{x:Static catalog:KnownMonikers.StatusInvalid}"
+                                Height="16"
+                                Width="16"
+                                Margin="5,0,0,0"
+                                ToolTip="{Binding ElementName=ControlWithError,Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" />
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style x:Uid="Style_16" x:Key="FocusVisualStyleKey">
+        <Setter x:Uid="Setter_43" Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_6">
+                    <Rectangle
+                        x:Uid="Rectangle_2"
+                        SnapsToDevicePixels="true"
+                        Margin="0"
+                        Stroke="{DynamicResource {x:Static vs:CommonControlsColors.FocusVisualTextBrushKey}}"
+                        StrokeDashArray="1 2" StrokeThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Uid="Style_17" x:Key="RadioButtonWithContentFocusVisualStyleKey">
+        <Setter x:Uid="Setter_46" Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_7">
+                    <Rectangle
+                        x:Uid="Rectangle_3"
+                        SnapsToDevicePixels="true"
+                        Margin="14,0,0,0"
+                        Stroke="{DynamicResource {x:Static vs:CommonControlsColors.FocusVisualTextBrushKey}}"
+                        StrokeDashArray="1 2" StrokeThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Uid="Style_12" TargetType="Button" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.ButtonStyleKey}}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogButtonStyleKey}" />
+
+    <Style x:Uid="Style_13" TargetType="CheckBox" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.CheckBoxStyleKey}}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogCheckBoxStyleKey}" />
+
+    <Style x:Uid="Style_14" TargetType="ComboBox" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.ComboBoxStyleKey}}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogComboBoxStyleKey}">
+        <Setter x:Uid="Setter_39" Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}" />
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_10" Property="Validation.HasError" Value="True">
+                <Setter x:Uid="Setter_48" Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_15" TargetType="TextBox" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.TextBoxStyleKey}}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogTextBoxStyleKey}">
+        <Setter x:Uid="Setter_41" Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}" />
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_11" Property="Validation.HasError" Value="True">
+                <Setter x:Uid="Setter_49" Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_1" TargetType="Label" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogLabelStyleKey}">
+        <Setter x:Uid="Setter_1" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}" />
+    </Style>
+
+    <Style x:Uid="Style_2" TargetType="RadioButton" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogRadioButtonStyleKey}">
+        <Setter x:Uid="Setter_2" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}" />
+        <Setter x:Uid="Setter_45" Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyleKey}" />
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_9" Property="HasContent" Value="True">
+                <Setter x:Uid="Setter_47" Property="FocusVisualStyle" Value="{StaticResource RadioButtonWithContentFocusVisualStyleKey}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_3" TargetType="Hyperlink" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogHyperlinkStyleKey}">
+        <Setter x:Uid="Setter_3" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.HyperlinkBrushKey}}"/>
+        <Setter x:Uid="Setter_4" Property="TextDecorations" Value="None"/>
+        <Setter x:Uid="Setter_50" Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyleKey}" />
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_1" Property="IsMouseOver" Value="True">
+                <Setter x:Uid="Setter_5" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.HyperlinkHoverBrushKey}}" />
+                <Setter x:Uid="Setter_6" Property="TextDecorations" Value="underline" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_2" Property="IsEnabled" Value="False">
+                <Setter x:Uid="Setter_7" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.HyperlinkDisabledBrushKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_4" TargetType="TreeView" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogTreeViewStyleKey}">
+        <Setter x:Uid="Setter_8" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}" />
+    </Style>
+
+    <Style x:Uid="Style_5" TargetType="TreeViewItem" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogTreeViewItemStyleKey}">
+        <Setter x:Uid="Setter_9" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}" />
+    </Style>
+
+    <Style x:Uid="Style_6" TargetType="Thumb" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogGridViewColumnHeaderGripperStyleKey}">
+        <Setter x:Uid="Setter_10" Property="Canvas.Right" Value="-8.5"/>
+        <Setter x:Uid="Setter_11" Property="Width" Value="18"/>
+        <Setter x:Uid="Setter_12" Property="Height" Value="{Binding Path=ActualHeight, RelativeSource={RelativeSource TemplatedParent}}"/>
+        <Setter x:Uid="Setter_13" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_1" TargetType="Thumb">
+                    <Border x:Uid="Border_1" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <!--Set the Fill to Transparent so the gripper isn't visible-->
+                        <Rectangle x:Uid="Rectangle_1" HorizontalAlignment="Center" Width="1" Fill="Transparent"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Uid="Style_7" TargetType="GridViewColumnHeader" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogGridViewColumnHeaderStyleKey}">
+        <Setter x:Uid="Setter_14" Property="HorizontalContentAlignment" Value="Left" />
+        <Setter x:Uid="Setter_15" Property="Height" Value="24" />
+        <Setter x:Uid="Setter_16" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridHeadingBackgroundBrushKey}}" />
+        <Setter x:Uid="Setter_17" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridHeadingTextBrushKey}}" />
+        <Setter x:Uid="Setter_18" Property="BorderThickness" Value="0,1,0,1" />
+        <Setter x:Uid="Setter_19" Property="BorderBrush" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridLineBrushKey}}" />
+        <Setter x:Uid="Setter_20" Property="Padding" Value="5,2,2,2" />
+        <Setter x:Uid="Setter_21" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_2" TargetType="GridViewColumnHeader">
+                    <Grid x:Uid="Grid_1">
+                        <Border x:Uid="Border_2"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Uid="ContentPresenter_1"
+                                              SnapsToDevicePixels="True"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        </Border>
+                        <Canvas x:Uid="Canvas_1">
+                            <Thumb x:Uid="PART_HeaderGripper" x:Name="PART_HeaderGripper" Style="{StaticResource {x:Static vsfx:VsResourceKeys.ThemedDialogGridViewColumnHeaderGripperStyleKey}}"/>
+                        </Canvas>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_22" Property="IsMouseOver" Value="True">
+                <Setter x:Uid="Setter_72" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridHeadingHoverBackgroundBrushKey}}" />
+                <Setter x:Uid="Setter_73" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridHeadingHoverTextBrushKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_8" TargetType="ListBox" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogListBoxStyleKey}">
+        <Setter x:Uid="Setter_22" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}" />
+        <Setter x:Uid="Setter_23" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}" />
+        <Setter x:Uid="Setter_24" Property="SelectionMode" Value="Single" />
+    </Style>
+
+    <Style x:Uid="Style_9" TargetType="ListView" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogListViewStyleKey}" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.ThemedDialogListBoxStyleKey}}">
+        <Setter x:Uid="Setter_25" Property="BorderThickness" Value="0,0,0,1" />
+        <Setter x:Uid="Setter_26" Property="BorderBrush" Value="{DynamicResource {x:Static vs:ThemedDialogColors.GridLineBrushKey}}" />
+    </Style>
+
+    <ControlTemplate x:Uid="ControlTemplate_4" x:Key="ListViewItemControlTemplate" TargetType="{x:Type ListViewItem}">
+        <Border x:Uid="Border_4"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Background="{TemplateBinding Background}"
+                SnapsToDevicePixels="True"
+                Padding="{TemplateBinding Padding}">
+            <ContentPresenter x:Uid="ContentPresenter_2"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+        </Border>
+    </ControlTemplate>
+
+    <Style x:Uid="Style_10" TargetType="ListViewItem" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogListViewItemStyleKey}">
+        <Setter x:Uid="Setter_27" Property="BorderThickness" Value="0" />
+        <Setter x:Uid="Setter_28" Property="Padding" Value="5,3,3,3" />
+        <Setter x:Uid="Setter_29" Property="Template" Value="{StaticResource ListViewItemControlTemplate}" />
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_20" Property="IsMouseOver" Value="True">
+                <Setter x:Uid="Setter_68" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemMouseOverBrushKey}}" />
+                <Setter x:Uid="Setter_69" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemMouseOverTextBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_3" Property="IsSelected" Value="true">
+                <Setter x:Uid="Setter_30" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemInactiveBrushKey}}" />
+                <Setter x:Uid="Setter_31" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemInactiveTextBrushKey}}" />
+            </Trigger>
+            <MultiTrigger x:Uid="MultiTrigger_1" >
+                <MultiTrigger.Conditions>
+                    <Condition x:Uid="Condition_1" Property="IsSelected" Value="True" />
+                    <Condition x:Uid="Condition_2" Property="Selector.IsSelectionActive" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter x:Uid="Setter_32" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveBrushKey}}" />
+                <Setter x:Uid="Setter_33" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveTextBrushKey}}" />
+            </MultiTrigger>
+            <Trigger x:Uid="Trigger_4" Property="IsEnabled" Value="False">
+                <Setter x:Uid="Setter_34" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemDisabledTextBrushKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_11" TargetType="ListViewItem" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogListViewItemGridStyleKey}">
+        <Setter x:Uid="Setter_35" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_3" TargetType="ListViewItem">
+                    <Border x:Uid="Border_3" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid x:Uid="Grid_2" >
+                            <GridViewRowPresenter x:Uid="GridViewRowPresenter_1" Content="{TemplateBinding Content}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_21" Property="IsMouseOver" Value="True">
+                <Setter x:Uid="Setter_70" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemMouseOverBrushKey}}" />
+                <Setter x:Uid="Setter_71" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemMouseOverTextBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_5" Property="IsSelected" Value="True">
+                <Setter x:Uid="Setter_36" Property="Background" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveBrushKey}}" />
+                <Setter x:Uid="Setter_37" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveTextBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_6" Property="IsEnabled" Value="False">
+                <Setter x:Uid="Setter_38" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.ListItemDisabledTextBrushKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Uid="Style_18" x:Key="TabItemFocusVisualStyle">
+        <Setter x:Uid="Setter_74" Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_8">
+                    <Rectangle
+                        x:Uid="Rectangle_4" Margin="2"
+                        StrokeThickness="1"
+                        StrokeDashArray="1 2"
+                        Stroke="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveTextBrushKey}}"
+                        SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--<Style x:Uid="Style_19" TargetType="{x:Type TabControl}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogTabControlNavigationStyleKey}">
+        <Setter x:Uid="Setter_75" Property="TabStripPlacement" Value="Left" />
+        <Setter x:Uid="Setter_76" Property="BorderThickness" Value="0" />
+        <Setter x:Uid="Setter_77" Property="Background" Value="Transparent" />
+        <Setter x:Uid="Setter_78" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"/>
+        <Setter x:Uid="Setter_79" Property="Margin" Value="24,0,24,12"/>
+    </Style>
+
+    <Style x:Uid="Style_20" TargetType="{x:Type TabItem}" x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogTabItemNavigationStyleKey}">
+        <Setter x:Uid="Setter_80" Property="BorderBrush" Value="Transparent" />
+        <Setter x:Uid="Setter_81" Property="Background" Value="Transparent" />
+        <Setter x:Uid="Setter_82" Property="BorderThickness" Value="0" />
+        <Setter x:Uid="Setter_83" Property="VerticalAlignment" Value="Center" />
+        <Setter x:Uid="Setter_84" Property="HorizontalAlignment" Value="Stretch" />
+        <Setter x:Uid="Setter_85" Property="Foreground" Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemInactiveTextBrushKey}}"/>
+        <Setter x:Uid="Setter_86" Property="FocusVisualStyle" Value="{DynamicResource TabItemFocusVisualStyle}" />
+        <Setter x:Uid="Setter_87" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_9" TargetType="TabItem">
+                    <Label
+                        x:Uid="Panel"
+                        Name="Panel"
+                        HorizontalAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        MinWidth="200"
+                        MinHeight="36">
+                        <ContentPresenter
+                            x:Uid="ContentSite"
+                            x:Name="ContentSite"
+                            ContentSource="Header"
+                            Margin="12,0,0,0"/>
+                    </Label>
+                    <ControlTemplate.Triggers>
+                        <Trigger x:Uid="Trigger_23" Property="IsSelected" Value="True">
+                            <Setter
+                                x:Uid="Setter_88" TargetName="Panel"
+                                Property="Background"
+                                Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveBrushKey}}" />
+                            <Setter
+                                x:Uid="Setter_89" TargetName="Panel"
+                                Property="Foreground"
+                                Value="{DynamicResource {x:Static vs:ThemedDialogColors.SelectedItemActiveTextBrushKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>-->
+
+</ResourceDictionary>
