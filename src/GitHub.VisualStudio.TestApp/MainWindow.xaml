@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Button Content="Login" HorizontalAlignment="Left" Margin="57,30,0,0" VerticalAlignment="Top" Width="133" Click="Login_Click" />
         <Button Content="Open from GitHub" HorizontalAlignment="Left" Margin="57,55,0,0" VerticalAlignment="Top" Width="133" Click="CloneOrOpenRepository_Click" />
         <Button Content="Create Repository" HorizontalAlignment="Left" Margin="57,80,0,0" VerticalAlignment="Top" Width="133" Click="CreateRepository_Click" />
     </Grid>

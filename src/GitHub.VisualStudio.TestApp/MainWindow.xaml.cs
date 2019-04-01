@@ -20,6 +20,11 @@ namespace GitHub.VisualStudio.TestApp
             InitializeComponent();
         }
 
+        private void Login_Click(object sender, RoutedEventArgs e)
+        {
+            LoginAsync();
+        }
+
         private void CloneOrOpenRepository_Click(object sender, RoutedEventArgs e)
         {
             CloneOrOpenRepositoryAsync();
@@ -30,13 +35,21 @@ namespace GitHub.VisualStudio.TestApp
             CreateRepositoryAsync();
         }
 
+        async Task LoginAsync()
+        {
+            var compositionContainer = CreateCompositionContainer();
+
+            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            await dialogService.ShowLoginDialog();
+        }
+
         async Task CreateRepositoryAsync()
         {
             var compositionContainer = CreateCompositionContainer();
 
             var dialogService = compositionContainer.GetExportedValue<IDialogService>();
             var connection = await dialogService.ShowLoginDialog();
-            if(connection != null)
+            if (connection != null)
             {
                 await dialogService.ShowCreateRepositoryDialog(connection);
             }
