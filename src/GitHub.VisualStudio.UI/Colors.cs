@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.PlatformUI;
 using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace GitHub.VisualStudio.Helpers
@@ -34,25 +35,22 @@ namespace GitHub.VisualStudio.Helpers
 
         public static string DetectTheme()
         {
-            try
+            if (Application.Current?.TryFindResource(EnvironmentColors.AccentMediumColorKey) is Color cc)
             {
-                var color = VSColorTheme.GetThemedColor(EnvironmentColors.AccentMediumColorKey);
-                var cc = color.ToColor();
                 if (cc == AccentMediumBlueTheme)
                     return "Blue";
                 if (cc == AccentMediumLightTheme)
                     return "Light";
                 if (cc == AccentMediumDarkTheme)
                     return "Dark";
+                var color = System.Drawing.Color.FromArgb(cc.A, cc.R, cc.R, cc.B);
                 var brightness = color.GetBrightness();
                 var dark = brightness < 0.5f;
                 return dark ? "Dark" : "Light";
             }
-            // this throws in design time and when running outside of VS
-            catch (ArgumentNullException)
-            {
-                return "Dark";
-            }
+
+            // When Visual Studio resources aren't active
+            return "Dark";
         }
     }
 }
