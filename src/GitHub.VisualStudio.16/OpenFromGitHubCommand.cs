@@ -100,20 +100,6 @@ namespace GitHubCore
         }
 
         [STAThread]
-        static async Task Go()
-        {
-            var window = new Window();
-            var app = new Application();
-            app.Startup += App_Startup;
-            app.Run(window);
-        }
-
-        private static void App_Startup(object sender, StartupEventArgs e)
-        {
-            ShowCloneDialogAsync(null);
-        }
-
-        [STAThread]
         static async Task ShowCloneDialogAsync(IServiceProvider serviceProvider)
         {
             var componentModel = (IComponentModel)serviceProvider.GetService(typeof(SComponentModel));
@@ -121,17 +107,13 @@ namespace GitHubCore
             var compositionServices = new CompositionServices();
             var compositionContainer = compositionServices.CreateCompositionContainer(componentModel.DefaultExportProvider);
 
-            var viewViewModelFactory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
-            using (new ViewLocatorInitializer(viewViewModelFactory))
+            var url = null as string;
+            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
+            if (cloneDialogResult != null)
             {
-                var url = null as string;
-                var dialogService = compositionContainer.GetExportedValue<IDialogService>();
-                var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
-                if (cloneDialogResult != null)
-                {
-                    var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
-                    await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult);
-                }
+                var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
+                await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult);
             }
         }
     }

@@ -46,7 +46,17 @@ namespace GitHubCore
             var loginManager = CreateLoginManager(compositionContainer);
             compositionContainer.ComposeExportedValue<ILoginManager>(loginManager);
 
+            // HACK: Stop ViewLocator from attempting to fetch a global service
+            var viewViewModelFactory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
+            InitializeViewLocator(viewViewModelFactory);
+
             return compositionContainer;
+        }
+
+        static void InitializeViewLocator(IViewViewModelFactory viewViewModelFactory)
+        {
+            var factoryProviderFiled = typeof(ViewLocator).GetField("factoryProvider", BindingFlags.Static | BindingFlags.NonPublic);
+            factoryProviderFiled.SetValue(null, viewViewModelFactory);
         }
 
         private static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
@@ -87,27 +97,6 @@ namespace GitHubCore
 
             var catalog = new TypeCatalog(types);
             return catalog;
-        }
-    }
-
-    public class ViewLocatorInitializer : IDisposable
-    {
-        object value;
-
-        public ViewLocatorInitializer(IViewViewModelFactory viewViewModelFactory)
-        {
-            value = FactoryProviderFiled().GetValue(null);
-            FactoryProviderFiled().SetValue(null, viewViewModelFactory);
-        }
-
-        public void Dispose()
-        {
-            FactoryProviderFiled().SetValue(null, value);
-        }
-
-        private static FieldInfo FactoryProviderFiled()
-        {
-            return typeof(ViewLocator).GetField("factoryProvider", BindingFlags.Static | BindingFlags.NonPublic);
         }
     }
 

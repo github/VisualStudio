@@ -2,7 +2,6 @@
 using System.Windows;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using GitHub.Factories;
 using GitHub.Services;
 using GitHub.VisualStudio.UI.Services;
 using GitHubCore;
@@ -21,12 +20,43 @@ namespace GitHub.VisualStudio.TestApp
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void CloneOrOpenRepository_Click(object sender, RoutedEventArgs e)
         {
             CloneOrOpenRepositoryAsync();
         }
 
+        private void CreateRepository_Click(object sender, RoutedEventArgs e)
+        {
+            CreateRepositoryAsync();
+        }
+
+        async Task CreateRepositoryAsync()
+        {
+            var compositionContainer = CreateCompositionContainer();
+
+            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            var connection = await dialogService.ShowLoginDialog();
+            if(connection != null)
+            {
+                await dialogService.ShowCreateRepositoryDialog(connection);
+            }
+        }
+
         async Task CloneOrOpenRepositoryAsync()
+        {
+            var compositionContainer = CreateCompositionContainer();
+
+            var url = null as string;
+            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
+            if (cloneDialogResult != null)
+            {
+                var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
+                await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult);
+            }
+        }
+
+        CompositionContainer CreateCompositionContainer()
         {
             var compositionServices = new CompositionServices();
             var exports = CreateOutOfProcExports();
@@ -35,19 +65,7 @@ namespace GitHub.VisualStudio.TestApp
             var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
             var externalShowDialogService = new ExternalShowDialogService(gitHubServiceProvider, this);
             compositionContainer.ComposeExportedValue<IShowDialogService>(externalShowDialogService);
-
-            var viewViewModelFactory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
-            using (new ViewLocatorInitializer(viewViewModelFactory))
-            {
-                var url = null as string;
-                var dialogService = compositionContainer.GetExportedValue<IDialogService>();
-                var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
-                if (cloneDialogResult != null)
-                {
-                    var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
-                    await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult);
-                }
-            }
+            return compositionContainer;
         }
 
         static CompositionContainer CreateOutOfProcExports()
@@ -66,6 +84,5 @@ namespace GitHub.VisualStudio.TestApp
                 return null;
             }
         }
-
     }
 }

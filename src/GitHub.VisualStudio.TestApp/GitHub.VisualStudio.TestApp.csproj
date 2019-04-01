@@ -35,6 +35,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Akavache, Version=6.0.0.0, Culture=neutral, PublicKeyToken=decff03a04a41f69, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\Akavache.dll</HintPath>
+    </Reference>
+    <Reference Include="Akavache.Sqlite3, Version=6.0.0.0, Culture=neutral, PublicKeyToken=decff03a04a41f69, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\Akavache.Sqlite3.dll</HintPath>
+    </Reference>
     <Reference Include="GitHub.Exports">
       <HintPath>..\..\build\Content\GitHub.Exports.dll</HintPath>
     </Reference>
@@ -46,6 +54,13 @@
     </Reference>
     <Reference Include="ReactiveUI">
       <HintPath>..\..\build\Content\ReactiveUI.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Events.WPF, Version=8.7.0.0, Culture=neutral, PublicKeyToken=31f8874b2ce7ed44, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\ReactiveUI.Events.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Wpf">
+      <HintPath>..\..\build\Content\ReactiveUI.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Splat">
       <HintPath>..\..\build\Content\Splat.dll</HintPath>
