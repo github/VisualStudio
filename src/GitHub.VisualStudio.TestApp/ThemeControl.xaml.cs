@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft;
 
 namespace ThemedDialog.UI
 {
@@ -23,8 +25,21 @@ namespace ThemedDialog.UI
                     if (TryFindResource($"Themes/{theme}") is ResourceDictionary themeResources)
                     {
                         Application.Current.Resources.MergedDictionaries.Add(themeResources);
+                        FireThemeChangedEvent();
                     }
                 }
+            }
+        }
+
+        static void FireThemeChangedEvent()
+        {
+            var type = Type.GetType("Microsoft.VisualStudio.PlatformUI.VSColorTheme, Microsoft.VisualStudio.Shell.14.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
+            Assumes.NotNull(type);
+            var themeChangedStorage = type.GetField("ThemeChangedStorage", BindingFlags.Static | BindingFlags.NonPublic);
+            Assumes.NotNull(themeChangedStorage);
+            if (themeChangedStorage.GetValue(null) is Delegate method)
+            {
+                method.DynamicInvoke(new object[] { null });
             }
         }
     }
