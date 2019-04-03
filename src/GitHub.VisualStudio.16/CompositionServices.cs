@@ -11,14 +11,13 @@ using GitHub.Api;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
-using GitHub.VisualStudio;
 using GitHub.VisualStudio.Views;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft.VisualStudio.Shell;
 using Rothko;
 using Task = System.Threading.Tasks.Task;
 
-namespace GitHubCore
+namespace GitHub.VisualStudio
 {
     public class CompositionServices
     {

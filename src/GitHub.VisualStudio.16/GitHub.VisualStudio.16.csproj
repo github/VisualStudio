@@ -14,7 +14,7 @@
     <ProjectGuid>{4D63EA3B-6896-42B5-B182-AA54D9F5CFD6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitHubCore</RootNamespace>
+    <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio.16</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
@@ -47,7 +47,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CompositionServices.cs" />
+    <Compile Include="ExtensionServicesFactory.cs" />
+    <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
+    <Compile Include="InBoxExtensionServices.cs" />
+    <Compile Include="InstalledExtensionServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

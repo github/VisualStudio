@@ -1,4 +1,4 @@
-﻿namespace GitHubCore
+﻿namespace GitHub.VisualStudio
 {
     internal class Images
     {

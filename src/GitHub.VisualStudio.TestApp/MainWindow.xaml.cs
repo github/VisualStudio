@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using GitHub.Services;
 using GitHub.VisualStudio.UI.Services;
-using GitHubCore;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
