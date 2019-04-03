@@ -1,0 +1,13 @@
+﻿<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
+  <Symbols>
+    <String Name="Resources" Value="/GitHub.VisualStudio.16;component/Resources/icons" />    
+    <Guid Name="guidImages" Value="{27841f47-070a-46d6-90be-a5cbbfc724ac}" />
+    <ID Name="logo" Value="1" />
+  </Symbols>
+
+  <Images>
+    <Image Guid="$(guidImages)" ID="$(logo)">
+      <Source Uri="$(Resources)/mark_github.xaml" />
+    </Image>
+  </Images>
+</ImageManifest>

@@ -17,7 +17,7 @@ namespace GitHub.StartPage
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.StartPagePackageId)]
-    [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Guids.ImagesId, 1, "#110", "#111", typeof(GitHubContainerProvider))]
+    [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Images.ImageMonikerGuid, Images.Logo, "#110", "#111", typeof(GitHubContainerProvider))]
     public sealed class StartPagePackage : ExtensionPointPackage
     {
     }
