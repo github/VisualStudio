@@ -48,9 +48,7 @@
   <ItemGroup>
     <Compile Include="CompositionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
-    <Compile Include="OpenFromGitHubCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GitHubCorePackage.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -207,11 +205,6 @@
       <Version>15.9.28307</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2264" />
-  </ItemGroup>
-  <ItemGroup>
-    <VSCTCompile Include="GitHubCorePackage.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\build\Content\lib\win32\x86\git2-572e4d8.dll">
