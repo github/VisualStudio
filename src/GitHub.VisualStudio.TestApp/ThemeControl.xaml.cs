@@ -11,6 +11,8 @@ namespace ThemedDialog.UI
     /// </summary>
     public partial class ThemeControl : UserControl
     {
+        ResourceDictionary previousThemeResources;
+
         public ThemeControl()
         {
             InitializeComponent();
@@ -24,7 +26,16 @@ namespace ThemedDialog.UI
                 {
                     if (TryFindResource($"Themes/{theme}") is ResourceDictionary themeResources)
                     {
-                        Application.Current.Resources.MergedDictionaries.Add(themeResources);
+                        var mergedDictionaries = Application.Current.Resources.MergedDictionaries;
+                        mergedDictionaries.Add(themeResources);
+
+                        if(previousThemeResources != null)
+                        {
+                            mergedDictionaries.Remove(previousThemeResources);
+                        }
+
+                        previousThemeResources = themeResources;
+
                         FireThemeChangedEvent();
                     }
                 }
