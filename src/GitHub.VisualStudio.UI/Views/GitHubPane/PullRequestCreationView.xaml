@@ -187,7 +187,7 @@
         </DockPanel>
 
         <Expander Grid.Row="5" Margin="10,10,10,20" IsExpanded="True" Header="Changes">
-          <ContentPresenter Content="{Binding ChangesUserControl}"/>
+          <ContentPresenter Content="{Binding ChangesUserControl}" MaxHeight="400"/>
         </Expander>
     </Grid>
 </local:GenericPullRequestCreationView>

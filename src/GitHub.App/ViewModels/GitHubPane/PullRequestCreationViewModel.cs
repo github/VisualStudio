@@ -79,7 +79,6 @@ namespace GitHub.ViewModels.GitHubPane
             this.gitService = gitService;
             this.vsDiffBase = vsDiffBase;
             this.timerScheduler = timerScheduler;
-            this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
                 .WhereNotNull()
@@ -372,7 +371,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 try
                 {
-                    vsDiffBase?.SetDiffBase(activeLocalRepo.LocalPath, targetBranch?.Name);
+                    vsDiffBase?.SetDiffBase(activeLocalRepo.LocalPath, GitHubRepository.Parent.CloneUrl, targetBranch?.Name);
                 }
                 catch (Exception e)
                 {
