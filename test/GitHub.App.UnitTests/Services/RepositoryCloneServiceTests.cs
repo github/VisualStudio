@@ -121,9 +121,11 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
-        [TestCase("https://github.com/failing/url", @"c:\dev\bar")]
-        public async Task CleansDirectoryOnCloneFailed(string cloneUrl, string clonePath)
+        [Test]
+        public async Task CleansDirectoryOnCloneFailed()
         {
+            var cloneUrl = "https://github.com/failing/url";
+            var clonePath = @"c:\dev\bar";
             var operatingSystem = Substitute.For<IOperatingSystem>();
             var vsGitServices = Substitute.For<IVSGitServices>();
             vsGitServices.Clone(cloneUrl, clonePath, true).Returns(x => { throw new Exception(); });
@@ -136,9 +138,11 @@ public class RepositoryCloneServiceTests
             await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
         }
 
-        [TestCase("https://github.com/foo/bar", @"c:\empty\directory")]
-        public async Task CloneIntoEmptyDirectory(string cloneUrl, string clonePath)
+        [Test]
+        public async Task CloneIntoEmptyDirectory()
         {
+            var cloneUrl = "https://github.com/foo/bar";
+            var clonePath = @"c:\empty\directory";
             var operatingSystem = Substitute.For<IOperatingSystem>();
             operatingSystem.Directory.DirectoryExists(clonePath).Returns(true);
             operatingSystem.Directory.IsEmpty(clonePath).Returns(true);
