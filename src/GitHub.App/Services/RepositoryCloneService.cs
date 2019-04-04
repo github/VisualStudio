@@ -129,7 +129,7 @@ namespace GitHub.Services
 
             var repositoryUrl = url.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-            if (DestinationDirectoryExists(repositoryPath))
+            if (DestinationDirectoryExists(repositoryPath) && !DestinationDirectoryEmpty(repositoryPath))
             {
                 if (!IsSolutionInRepository(repositoryPath))
                 {
