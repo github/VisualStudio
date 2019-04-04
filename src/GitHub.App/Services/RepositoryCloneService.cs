@@ -206,9 +206,12 @@ namespace GitHub.Services
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
-            await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(repositoryPath);
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            if (!DestinationDirectoryExists(repositoryPath))
+            {
+                await ThreadingHelper.SwitchToPoolThreadAsync();
+                operatingSystem.Directory.CreateDirectory(repositoryPath);
+                await ThreadingHelper.SwitchToMainThreadAsync();
+            }
 
             try
             {

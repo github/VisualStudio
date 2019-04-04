@@ -136,6 +136,20 @@ public class RepositoryCloneServiceTests
             await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
         }
 
+        [TestCase("https://github.com/foo/bar", @"c:\empty\directory")]
+        public async Task CloneIntoEmptyDirectory(string cloneUrl, string clonePath)
+        {
+            var operatingSystem = Substitute.For<IOperatingSystem>();
+            operatingSystem.Directory.DirectoryExists(clonePath).Returns(true);
+            operatingSystem.Directory.IsEmpty(clonePath).Returns(true);
+            var vsGitServices = Substitute.For<IVSGitServices>();
+            var cloneService = CreateRepositoryCloneService(operatingSystem: operatingSystem, vsGitServices: vsGitServices);
+            await cloneService.CloneRepository(cloneUrl, clonePath);
+
+            operatingSystem.Directory.DidNotReceive().CreateDirectory(clonePath);
+            await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
+        }
+
         static RepositoryCloneService CreateRepositoryCloneService(IOperatingSystem operatingSystem = null,
             IVSGitServices vsGitServices = null, IUsageTracker usageTracker = null,
             ITeamExplorerServices teamExplorerServices = null, IGitHubServiceProvider serviceProvider = null)
