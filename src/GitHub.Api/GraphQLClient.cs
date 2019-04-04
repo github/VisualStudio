@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Core;
 
@@ -28,12 +27,10 @@ namespace GitHub.Api
             this.cache = cache;
         }
 
-        public async Task ClearCache(string regionName)
+        public Task ClearCache(string regionName)
         {
             // Switch to background thread because FileCache does not provide an async API.
-            await TaskScheduler.Default;
-
-            cache.ClearRegion(GetFullRegionName(regionName));
+            return Task.Run(() => cache.ClearRegion(GetFullRegionName(regionName)));
         }
 
         public Task<T> Run<T>(
@@ -131,28 +128,29 @@ namespace GitHub.Api
 
             public Uri Uri => owner.connection.Uri;
 
-            public async Task<string> Run(string query, CancellationToken cancellationToken = default)
+            public Task<string> Run(string query, CancellationToken cancellationToken = default)
             {
                 // Switch to background thread because FileCache does not provide an async API.
-                await TaskScheduler.Default;
-
-                var hash = GetHash(query);
-
-                if (refresh)
+                return Task.Run(async () =>
                 {
-                    owner.cache.Remove(hash, regionName);
-                }
+                    var hash = GetHash(query);
 
-                var data = (string)owner.cache.Get(hash, regionName);
+                    if (refresh)
+                    {
+                        owner.cache.Remove(hash, regionName);
+                    }
 
-                if (data != null)
-                {
-                    return data;
-                }
+                    var data = (string) owner.cache.Get(hash, regionName);
 
-                var result = await owner.connection.Run(query, cancellationToken);
-                owner.cache.Add(hash, result, DateTimeOffset.Now + cacheDuration, regionName);
-                return result;
+                    if (data != null)
+                    {
+                        return data;
+                    }
+
+                    var result = await owner.connection.Run(query, cancellationToken);
+                    owner.cache.Add(hash, result, DateTimeOffset.Now + cacheDuration, regionName);
+                    return result;
+                }, cancellationToken);
             }
         }
     }
