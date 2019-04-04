@@ -612,7 +612,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<IPullRequestFilesViewModel>(),
                 Substitute.For<ISyncSubmodulesCommand>(),
                 Substitute.For<IViewViewModelFactory>(),
-                gitService);
+                gitService,
+                Substitute.For<IOpenIssueishDocumentCommand>());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);
@@ -631,7 +632,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Number = number,
                 Title = "PR 1",
                 Author = new ActorModel(),
-                State = PullRequestStateEnum.Open,
+                State = PullRequestState.Open,
                 Body = string.Empty,
                 BaseRefName = "master",
                 BaseRefSha = "BASE_REF",
