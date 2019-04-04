@@ -5,6 +5,7 @@
                     xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf">
     <Style TargetType="local:InfoPanel">
         <Setter Property="Background" Value="{DynamicResource VsBrush.InfoBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource VsBrush.InfoText}"/>
         <Setter Property="Padding" Value="8"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -45,13 +46,11 @@
                                              VerticalAlignment="Top"
                                              Background="Transparent"
                                              DockPanel.Dock="Right"
-                                             Foreground="Black"
                                              Icon="x"
                                              Visibility="{TemplateBinding ShowCloseButton, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
                             <markdig:MarkdownViewer Margin="8,0"
                                                 VerticalAlignment="Top"
                                                 DockPanel.Dock="Top"
-                                                Foreground="Black"
                                                 Markdown="{TemplateBinding Message}"
                                                 ScrollViewer.CanContentScroll="False"
                                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"

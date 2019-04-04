@@ -25,7 +25,6 @@ namespace GitHub.VisualStudio.Views.Dialog
             this.WhenActivated(d =>
             {
                 d(this.BindCommand(ViewModel, vm => vm.OkCommand, view => view.okButton));
-                d(this.OneWayBind(ViewModel, vm => vm.IsBusy, view => view.okButton.ShowSpinner));
                 d(this.BindCommand(ViewModel, vm => vm.ResendCodeCommand, view => view.resendCodeButton));
 
                 d(this.Bind(ViewModel, vm => vm.AuthenticationCode, view => view.authenticationCode.Text));
