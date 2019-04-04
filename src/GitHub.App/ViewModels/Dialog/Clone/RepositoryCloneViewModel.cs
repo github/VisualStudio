@@ -67,11 +67,13 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             var canClone = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && !service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) &&
+                (!service.DestinationDirectoryExists(path)) || service.DestinationDirectoryEmpty(path));
 
             var canOpen = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path)
+                && !service.DestinationDirectoryEmpty(path));
 
             Browse = ReactiveCommand.Create(() => BrowseForDirectory());
             Clone = ReactiveCommand.CreateFromObservable(
@@ -240,6 +242,11 @@ namespace GitHub.ViewModels.Dialog.Clone
                 {
                     using (var repository = gitService.GetRepository(path))
                     {
+                        if (service.DestinationDirectoryEmpty(path))
+                        {
+                            return null;
+                        }
+
                         if (repository == null)
                         {
                             return Resources.CantFindARepositoryAtLocalPath;
