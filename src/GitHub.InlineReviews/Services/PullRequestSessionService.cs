@@ -716,7 +716,7 @@ namespace GitHub.InlineReviews.Services
             string repositoryOwner,
             int number)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var query = new Query()
@@ -775,7 +775,7 @@ namespace GitHub.InlineReviews.Services
             LocalRepositoryModel localRepository,
             string pullRequestId)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
             var (_, owner, number) = await CreatePendingReviewCore(localRepository, pullRequestId);
             var detail = await ReadPullRequestDetail(address, owner, localRepository.Name, number, true);
@@ -790,7 +790,7 @@ namespace GitHub.InlineReviews.Services
             LocalRepositoryModel localRepository,
             string reviewId)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var delete = new DeletePullRequestReviewInput
@@ -818,7 +818,7 @@ namespace GitHub.InlineReviews.Services
             string body,
             PullRequestReviewEvent e)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var addReview = new AddPullRequestReviewInput
@@ -848,7 +848,7 @@ namespace GitHub.InlineReviews.Services
             string body,
             PullRequestReviewEvent e)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var submit = new SubmitPullRequestReviewInput
@@ -880,7 +880,7 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var comment = new AddPullRequestReviewCommentInput
@@ -912,7 +912,7 @@ namespace GitHub.InlineReviews.Services
             string body,
             string inReplyTo)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var comment = new AddPullRequestReviewCommentInput
@@ -944,7 +944,7 @@ namespace GitHub.InlineReviews.Services
             string path,
             int position)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var addReview = new AddPullRequestReviewInput
@@ -995,7 +995,7 @@ namespace GitHub.InlineReviews.Services
             int pullRequestId,
             int commentDatabaseId)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var apiClient = await apiClientFactory.Create(address);
 
             await apiClient.DeletePullRequestReviewComment(
@@ -1013,7 +1013,7 @@ namespace GitHub.InlineReviews.Services
             string commentNodeId,
             string body)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var updatePullRequestReviewCommentInput = new UpdatePullRequestReviewCommentInput
@@ -1036,7 +1036,7 @@ namespace GitHub.InlineReviews.Services
 
         async Task<(string id, string owner, int number)> CreatePendingReviewCore(LocalRepositoryModel localRepository, string pullRequestId)
         {
-            var address = HostAddress.Create(localRepository.CloneUrl.Host);
+            var address = HostAddress.Create(localRepository.CloneUrl);
             var graphql = await graphqlFactory.CreateConnection(address);
 
             var input = new AddPullRequestReviewInput
