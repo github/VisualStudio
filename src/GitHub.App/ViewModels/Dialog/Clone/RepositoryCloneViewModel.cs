@@ -238,15 +238,10 @@ namespace GitHub.ViewModels.Dialog.Clone
                     return Resources.DestinationAlreadyExists;
                 }
 
-                if (service.DestinationDirectoryExists(path))
+                if (service.DestinationDirectoryExists(path) && !service.DestinationDirectoryEmpty(path))
                 {
                     using (var repository = gitService.GetRepository(path))
                     {
-                        if (service.DestinationDirectoryEmpty(path))
-                        {
-                            return null;
-                        }
-
                         if (repository == null)
                         {
                             return Resources.CantFindARepositoryAtLocalPath;
