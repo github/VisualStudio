@@ -20,6 +20,13 @@ namespace GitHub.StartPage
     [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Images.ImageMonikerGuid, Images.Logo, "#110", "#111", typeof(GitHubContainerProvider))]
     public sealed class StartPagePackage : ExtensionPointPackage
     {
+        protected override void Initialize()
+        {
+            base.Initialize();
+            ServiceProvider = this;
+        }
+
+        internal static IServiceProvider ServiceProvider { get; private set; }
     }
 
     [Guid(Guids.CodeContainerProviderId)]
@@ -27,7 +34,7 @@ namespace GitHub.StartPage
     {
         readonly ICodeContainerProvider provider;
 
-        public GitHubContainerProvider() : this(null)
+        public GitHubContainerProvider() : this(StartPagePackage.ServiceProvider)
         {
         }
 
@@ -35,7 +42,6 @@ namespace GitHub.StartPage
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            serviceProvider = serviceProvider ?? ServiceProvider.GlobalProvider;
             var factory = new ExtensionServicesFactory(serviceProvider);
             var services = factory.Create();
             provider = services.GetGitHubContainerProvider();

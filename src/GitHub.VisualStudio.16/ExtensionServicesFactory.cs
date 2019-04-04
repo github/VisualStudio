@@ -16,6 +16,8 @@ namespace GitHub.VisualStudio
 
         public IExtensionServices Create()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var package = FindGitHubPackage();
             if(package != null)
             {
