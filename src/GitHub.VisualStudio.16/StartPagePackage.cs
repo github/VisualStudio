@@ -10,6 +10,11 @@ using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagem
 
 namespace GitHub.StartPage
 {
+    // Allow assemblies in the UI directory to be resolved by their full or partial name.
+    // This is required for .imagemanifest files, XAML and when using unsigned assemblies.
+    // See: https://github.com/github/VisualStudio/pull/1236/
+    [ProvideBindingPath(SubPath = "UI")]
+
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.StartPagePackageId)]
     [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Images.ImageMonikerGuid, Images.Logo, "#110", "#111", typeof(GitHubContainerProvider))]

@@ -1,6 +1,6 @@
 ﻿<ImageManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/VisualStudio/ImageManifestSchema/2014">
   <Symbols>
-    <String Name="Resources" Value="/GitHub.VisualStudio.16;component/Resources/icons" />    
+    <String Name="Resources" Value="/GitHub.VisualStudio.UI.16;component/Resources/icons" />    
     <Guid Name="guidImages" Value="{de556d01-f3bc-4521-abc3-3e04b537f9c9}" />
     <ID Name="logo" Value="1" />
   </Symbols>
