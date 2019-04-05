@@ -20,8 +20,8 @@
                 <RectangleGeometry Rect="0,0,24,24" RadiusX="2" RadiusY="2" />
             </Image.Clip>
         </Image>
-        <TextBlock x:Name="suggestionText" Style="{DynamicResource GitHubTextBlock}" VerticalAlignment="Center">
-            <Run x:Name="name" Foreground="{DynamicResource GHTextBrush}" Text="Name" /> <Run x:Name="description" Foreground="{DynamicResource GHTextSecondaryBrush}" Text="Description" />
+        <TextBlock x:Name="suggestionText" VerticalAlignment="Center">
+            <Run x:Name="name" Text="Name" /> <Run x:Name="description" Text="Description" />
         </TextBlock>
     </StackPanel>
 </UserControl>
