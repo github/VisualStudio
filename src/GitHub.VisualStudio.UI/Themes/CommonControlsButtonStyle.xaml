@@ -1,0 +1,59 @@
+﻿<ResourceDictionary
+    x:Uid="ResourceDictionary_1" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+    >
+
+    <Style x:Uid="Style_1" TargetType="{x:Type Button}" x:Key="{x:Static vsfx:VsResourceKeys.ButtonStyleKey}">
+        <Setter x:Uid="Setter_1" Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter x:Uid="Setter_2" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBrushKey}}"/>
+        <Setter x:Uid="Setter_3" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonTextBrushKey}}"/>
+        <Setter x:Uid="Setter_4" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderBrushKey}}"/>
+        <Setter x:Uid="Setter_5" Property="BorderThickness" Value="1"/>
+        <Setter x:Uid="Setter_6" Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter x:Uid="Setter_7" Property="VerticalContentAlignment" Value="Center"/>
+        <Setter x:Uid="Setter_8" Property="Padding" Value="10,1,10,1"/>
+        <Setter x:Uid="Setter_9" Property="MinWidth" Value="75"/>
+        <Setter x:Uid="Setter_10" Property="MinHeight" Value="23"/>
+        <Setter x:Uid="Setter_11" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_1" TargetType="{x:Type Button}">
+                    <Border x:Uid="ContentContainer" x:Name="ContentContainer"
+                        SnapsToDevicePixels="true" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter
+                        x:Uid="ContentPresenter_1" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" RecognizesAccessKey="True"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_3" Property="IsDefaulted" Value="true">
+                <Setter x:Uid="Setter_18" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonDefaultBrushKey}}"/>
+                <Setter x:Uid="Setter_19" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonDefaultTextBrushKey}}"/>
+                <Setter x:Uid="Setter_20" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderDefaultBrushKey}}"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_1" Property="IsKeyboardFocused" Value="true">
+                <Setter x:Uid="Setter_12" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonFocusedBrushKey}}"/>
+                <Setter x:Uid="Setter_13" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonFocusedTextBrushKey}}"/>
+                <Setter x:Uid="Setter_14" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderFocusedBrushKey}}"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_2" Property="IsMouseOver" Value="true">
+                <Setter x:Uid="Setter_15" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonHoverBrushKey}}"/>
+                <Setter x:Uid="Setter_16" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonHoverTextBrushKey}}"/>
+                <Setter x:Uid="Setter_17" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderHoverBrushKey}}"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_4" Property="IsPressed" Value="true">
+                <Setter x:Uid="Setter_21" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonPressedBrushKey}}"/>
+                <Setter x:Uid="Setter_22" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonPressedTextBrushKey}}"/>
+                <Setter x:Uid="Setter_23" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderPressedBrushKey}}"/>
+            </Trigger>
+            <Trigger x:Uid="Trigger_5" Property="IsEnabled" Value="false">
+                <Setter x:Uid="Setter_24" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonDisabledBrushKey}}"/>
+                <Setter x:Uid="Setter_25" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonDisabledTextBrushKey}}"/>
+                <Setter x:Uid="Setter_26" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderDisabledBrushKey}}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

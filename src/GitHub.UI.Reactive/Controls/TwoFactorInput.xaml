@@ -11,14 +11,21 @@
     d:DesignWidth="262"
     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticatonInputCustom}">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Width" Value="36"/>
-            <Setter Property="Height" Value="46"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="FontSize" Value="20px" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Setter Property="Width" Value="36"/>
+                        <Setter Property="Height" Value="46"/>
+                        <Setter Property="Margin" Value="0,0,8,0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="20px" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" UseLayoutRounding="True" SnapsToDevicePixels="True" AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationInputStackPanel}">
         <TextBox x:Name="one" />        

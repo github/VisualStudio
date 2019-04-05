@@ -1,0 +1,105 @@
+﻿<ResourceDictionary
+    x:Uid="ResourceDictionary_1" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+    >
+
+    <Style x:Uid="Style_1" x:Key="FocusVisualStyleKey">
+        <Setter x:Uid="Setter_1" Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_1">
+                    <Rectangle
+                        x:Uid="Rectangle_1" SnapsToDevicePixels="true"
+                        Margin="0"
+                        Stroke="{DynamicResource {x:Static vs:CommonControlsColors.FocusVisualTextBrushKey}}"
+                        StrokeDashArray="1 2" StrokeThickness="1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Uid="Style_2" TargetType="{x:Type CheckBox}" x:Key="{x:Static vsfx:VsResourceKeys.CheckBoxStyleKey}">
+        <Setter x:Uid="Setter_24" Property ="Foreground" Value = "{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxTextBrushKey}}" />
+        <Setter x:Uid="Setter_2" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_2" TargetType="{x:Type CheckBox}">
+                    <Grid x:Uid="TemplateRoot" x:Name="TemplateRoot">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Uid="ColumnDefinition_1" Width="Auto"/>
+                            <ColumnDefinition x:Uid="ColumnDefinition_3" Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid x:Uid="Grid_1" SnapsToDevicePixels="true" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <Border x:Uid="CheckMarkBorder" x:Name="CheckMarkBorder"
+                                  Background="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBackgroundBrushKey}}"
+                                  BorderBrush="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBorderBrushKey}}"
+                                  BorderThickness="1"/>
+                            <Grid x:Uid="Grid_2" x:Name="MarkGrid">
+                                <Path x:Uid="CheckMark"
+                                  x:Name="CheckMark"
+                                  Data="M 6.22,11.02 C6.22,11.02 2.50,7.24 2.50,7.24 2.50,7.24 4.05,5.71 4.05,5.71 4.05,5.71 5.97,7.65 5.97,7.65 5.97,7.65 10.52,1.38 10.52,1.38 10.52,1.38 13.19,1.38 13.19,1.38 13.19,1.38 6.22,11.02 6.22,11.02 6.22,11.02 6.22,11.02 6.22,11.02 z"
+                                  Stretch="Uniform"
+                                  Margin="3,1,2,2"
+                                  Visibility="Collapsed"
+                                  Width="9"
+                                  Height="8"
+                                  Fill="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphBrushKey}}"/>
+                                <Rectangle  x:Uid="Rectangle_2"
+                                        x:Name="IndeterminateMark"
+                                        Fill="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphBrushKey}}"
+                                        Margin="3"
+                                        Visibility="Hidden"/>
+                            </Grid>
+                        </Grid>
+                        <ContentPresenter x:Uid="CheckBoxContent" 
+                                          x:Name="CheckBoxContent" 
+                                          Grid.Column="1" 
+                                          Focusable="False"
+                                          Margin="{TemplateBinding Padding}"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger x:Uid="Trigger_1" Property="HasContent" Value="true">
+                            <Setter x:Uid="Setter_3" Property="Padding" Value="6,1,0,0"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_2" Property="IsChecked" Value="true">
+                            <Setter x:Uid="Setter_4" Property="Visibility" TargetName="CheckMark" Value="Visible"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_3" Property="IsChecked" Value="{x:Null}">
+                            <Setter x:Uid="Setter_5" Property="Visibility" TargetName="IndeterminateMark" Value="Visible"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_4" Property="IsEnabled" Value="false">
+                            <Setter x:Uid="Setter_6" Property="Background" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBackgroundDisabledBrushKey}}"/>
+                            <Setter x:Uid="Setter_7" Property="BorderBrush" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBorderDisabledBrushKey}}"/>
+                            <Setter x:Uid="Setter_8" Property="Fill" TargetName="CheckMark" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphDisabledBrushKey}}"/>
+                            <Setter x:Uid="Setter_9" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxTextDisabledBrushKey}}"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_5" Property="IsFocused" Value="true">
+                            <Setter x:Uid="Setter_10" Property="Background" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBackgroundFocusedBrushKey}}"/>
+                            <Setter x:Uid="Setter_11" Property="BorderBrush" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBorderFocusedBrushKey}}"/>
+                            <Setter x:Uid="Setter_12" Property="Fill" TargetName="CheckMark" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphFocusedBrushKey}}"/>
+                            <Setter x:Uid="Setter_13" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxTextFocusedBrushKey}}"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_6" Property="IsMouseOver" Value="true">
+                            <Setter x:Uid="Setter_14" Property="Background" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBackgroundHoverBrushKey}}"/>
+                            <Setter x:Uid="Setter_15" Property="BorderBrush" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBorderHoverBrushKey}}"/>
+                            <Setter x:Uid="Setter_16" Property="Fill" TargetName="CheckMark" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphHoverBrushKey}}"/>
+                            <Setter x:Uid="Setter_17" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxTextHoverBrushKey}}"/>
+                        </Trigger>
+                        <Trigger x:Uid="Trigger_7" Property="IsPressed" Value="true">
+                            <Setter x:Uid="Setter_18" Property="Background" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBackgroundPressedBrushKey}}"/>
+                            <Setter x:Uid="Setter_19" Property="BorderBrush" TargetName="CheckMarkBorder" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxBorderPressedBrushKey}}"/>
+                            <Setter x:Uid="Setter_20" Property="Fill" TargetName="CheckMark" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxGlyphPressedBrushKey}}"/>
+                            <Setter x:Uid="Setter_21" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.CheckBoxTextPressedBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter x:Uid="Setter_22" Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyleKey}"/>
+    </Style>
+
+</ResourceDictionary>

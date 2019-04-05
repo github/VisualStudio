@@ -12,6 +12,8 @@
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" d:DesignWidth="300"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsWindowText}"
              Name="root">
 
     <d:DesignData.DataContext>
