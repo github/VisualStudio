@@ -10,6 +10,18 @@ public class TwoFactorInputTests
 {
     public class TheTextProperty : TestBaseClass
     {
+        [SetUp]
+        public void SetUp()
+        {
+            var app = Application.Current ?? new Application();
+            app.Resources.Add("ThemedDialogDefaultStylesKey", new ResourceDictionary());
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Application.Current.Resources.Remove("ThemedDialogDefaultStylesKey");
+        }
 
         [Test, Apartment(ApartmentState.STA)]
         public void SetsTextBoxesToIndividualCharacters()

@@ -12,7 +12,9 @@
                    Height="460"
                    MinWidth="414"
                    MinHeight="460"
-                   Background="White"
+                   xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+                   Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                   Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
                    FontFamily="Segoe UI"
                    FontSize="12"
                    FontStretch="Normal"
@@ -24,10 +26,12 @@
                    UseLayoutRounding="True"
                    WindowStartupLocation="CenterOwner"
                    Content="{Binding Content}">
-  <Window.Resources>
-    <local:ViewLocator x:Key="viewLocator"/>
-    <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
-      <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
-    </DataTemplate>
-  </Window.Resources>
+    <Window.Resources>
+        <ResourceDictionary>
+            <local:ViewLocator x:Key="viewLocator"/>
+            <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
+                <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
 </pfui:DialogWindow>

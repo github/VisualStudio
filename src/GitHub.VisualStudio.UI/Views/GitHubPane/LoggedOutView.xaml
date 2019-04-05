@@ -9,6 +9,8 @@
                             d:DesignHeight="300"
                             d:DesignWidth="300"
                             mc:Ignorable="d"
+                            Background="{DynamicResource GitHubVsToolWindowBackground}"
+                            Foreground="{DynamicResource GitHubVsWindowText}"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.LoggedOutViewCustom}">
     
   <Control.Resources>

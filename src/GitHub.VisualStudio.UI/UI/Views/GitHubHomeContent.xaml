@@ -24,6 +24,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
       </ResourceDictionary.MergedDictionaries>
       <ghfvs:BooleanToInverseVisibilityConverter x:Key="BooleanToInverseVisibilityConverter" />
     </ResourceDictionary>
