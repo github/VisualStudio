@@ -7,6 +7,8 @@
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsWindowText}"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="300">
 
     <d:DesignData.DataContext>
