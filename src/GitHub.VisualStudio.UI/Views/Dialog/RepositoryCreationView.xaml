@@ -166,8 +166,9 @@
         <ghfvs:ValidationMessage x:Name="pathValidationMessage"
                                 Grid.Row="4"
                                 Grid.Column="1"
-                    ValidatesControl="{Binding ElementName=localPathText}"
-                    ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}" />
+                                Style="{DynamicResource InlineValidationMessage}"
+                                ValidatesControl="{Binding ElementName=localPathText}"
+                                ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}" />
 
         <Label Grid.Row="5"
                Grid.Column="0"
