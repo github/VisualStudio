@@ -147,13 +147,13 @@ namespace GitHub.ViewModels.Dialog.Clone
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
-                    .Select(x => new RepositoryItemViewModel(x, "Your repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectYourRepositories));
                 var collaboratorRepositories = results.Repositories
                     .Where(r => r.Owner != results.Owner)
                     .OrderBy(r => r.Owner)
-                    .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectCollaboratorRepositories));
                 var repositoriesContributedTo = results.ContributedToRepositories
-                    .Select(x => new RepositoryItemViewModel(x, "Contributed to repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectContributedRepositories));
                 var orgRepositories = results.Organizations
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, GroupName(x, 100))));
