@@ -19,7 +19,7 @@ namespace GitHub {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -1806,6 +1806,33 @@ namespace GitHub {
         public static string RepositoryPublishedMessage {
             get {
                 return ResourceManager.GetString("RepositoryPublishedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Collaborator repositories.
+        /// </summary>
+        public static string RepositorySelectCollaboratorRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectCollaboratorRepositories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contributed to repositories.
+        /// </summary>
+        public static string RepositorySelectContributedRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectContributedRepositories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your repositories.
+        /// </summary>
+        public static string RepositorySelectYourRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectYourRepositories", resourceCulture);
             }
         }
         
