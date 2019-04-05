@@ -76,6 +76,6 @@ namespace GitHub.Services
         /// </returns>
         bool DestinationFileExists(string path);
 
-        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address);
+        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address, bool refresh = false);
     }
 }

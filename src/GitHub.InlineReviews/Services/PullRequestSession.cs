@@ -268,7 +268,8 @@ namespace GitHub.InlineReviews.Services
                 address,
                 RepositoryOwner,
                 LocalRepository.Name,
-                PullRequest.Number);
+                PullRequest.Number,
+                true);
             await Update(model);
         }
 

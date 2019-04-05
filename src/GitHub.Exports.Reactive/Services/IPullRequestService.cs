@@ -19,6 +19,7 @@ namespace GitHub.Services
         /// <param name="name">The repository name.</param>
         /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
         /// <param name="states">The pull request states to filter by</param>
+        /// <param name="refresh">Whether the data should be refreshed instead of read from the cache.</param>
         /// <returns>A page of pull request item models.</returns>
         Task<Page<PullRequestListItemModel>> ReadPullRequests(
             HostAddress address,
@@ -26,6 +27,14 @@ namespace GitHub.Services
             string name,
             string after,
             PullRequestState[] states);
+
+        /// <summary>
+        /// Clears the cache for <see cref="ReadPullRequests"/>.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        Task ClearPullRequestsCache(HostAddress address, string owner, string name);
 
         /// <summary>
         /// Reads a page of users that can be assigned to pull requests.
