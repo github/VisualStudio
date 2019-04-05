@@ -9,6 +9,11 @@ namespace GitHub.VisualStudio.Views.Dialog
     /// </summary>
     public partial class ExternalGitHubDialogWindow : Window
     {
+        public ExternalGitHubDialogWindow()
+        {
+            InitializeComponent();
+        }
+
         public ExternalGitHubDialogWindow(IGitHubDialogWindowViewModel viewModel)
         {
             DataContext = viewModel;

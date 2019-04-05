@@ -21,6 +21,7 @@
         <Button Content="Login" HorizontalAlignment="Left" Margin="200,77,0,0" VerticalAlignment="Top" Width="132" Click="Login_Click" />
         <Button Content="Open from GitHub" HorizontalAlignment="Left" Margin="200,105,0,0" VerticalAlignment="Top" Width="132" Click="CloneOrOpenRepository_Click" />
         <Button Content="Create Repository" HorizontalAlignment="Left" Margin="200,133,0,0" VerticalAlignment="Top" Width="132" Click="CreateRepository_Click" />
+        <Button Content="Publish" HorizontalAlignment="Left" Margin="200,162,0,0" VerticalAlignment="Top" Width="132" Click="Publish_Click" />
         <UI:ThemeControl HorizontalAlignment="Left" Height="146" Margin="21,32,0,0" VerticalAlignment="Top" Width="153"/>
     </Grid>
 </Window>
