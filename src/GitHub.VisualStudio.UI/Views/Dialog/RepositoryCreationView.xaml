@@ -13,77 +13,76 @@
                                      xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
                                      Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
                                      Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
-                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}">
-    <d:DesignProperties.DataContext>
-        <Binding>
-            <Binding.Source>
-                <ghfvs:RepositoryCreationViewModelDesigner />
-            </Binding.Source>
-        </Binding>
-    </d:DesignProperties.DataContext>
+                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryCreationControlCustom}" >
+  <d:DesignProperties.DataContext>
+    <Binding>
+      <Binding.Source>
+        <ghfvs:RepositoryCreationViewModelDesigner />
+      </Binding.Source>
+    </Binding>
+  </d:DesignProperties.DataContext>
 
-    <Control.Resources>
-        <ResourceDictionary Source="DialogStyles.xaml" />
-    </Control.Resources>
+  <Control.Resources>
+    <ResourceDictionary Source="DialogStyles.xaml" />
+  </Control.Resources>
 
-    <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
-        <ghfvs:OcticonImage Margin="0,-20,0,-10"
-                            Panel.ZIndex="100"
-                            DockPanel.Dock="Top"
-                            Icon="logo_github"
-                            Style="{DynamicResource GitHubLogo}" />
+  <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
+    <ghfvs:OcticonImage Margin="0,-20,0,-10"
+                     Panel.ZIndex="100"
+                     DockPanel.Dock="Top"
+                     Icon="logo_github"
+                     Style="{DynamicResource GitHubLogo}" />
 
-        <Button x:Name="createRepositoryButton"
-                Margin="0"
-                HorizontalAlignment="Center"
-                DockPanel.Dock="Bottom"
-                IsDefault="True"
-                Content="{x:Static ghfvs:Resources.CreateLink}"
-                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryButton}" />
+    <Button x:Name="createRepositoryButton"
+                            Margin="0"
+                            HorizontalAlignment="Center"
+                            DockPanel.Dock="Bottom"
+                            IsDefault="True"
+                            Content="{x:Static ghfvs:Resources.CreateLink}"
+                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryButton}" >
+    </Button>
 
-        <StackPanel>
-            <StackPanel.Resources>
-                <Style BasedOn="{StaticResource {x:Type ghfvs:UserErrorMessages}}"
-                       TargetType="{x:Type ghfvs:UserErrorMessages}">
-                    <Setter Property="IconMargin" Value="-1,2,7,0" />
-                    <Setter Property="ErrorMessageFontWeight" Value="Normal" />
-                    <Setter Property="Icon" Value="stop" />
-                    <Setter Property="Margin" Value="0,5,0,0" />
-                </Style>
-            </StackPanel.Resources>
-            <controls:HorizontalShadowDivider />
-            <Grid x:Name="loginStackPanel"
-                  Margin="30,-10,30,10"
-                  FocusManager.IsFocusScope="True"
-                  FocusVisualStyle="{x:Null}">
+    <StackPanel>
+      <StackPanel.Resources>
+        <Style BasedOn="{StaticResource {x:Type ghfvs:UserErrorMessages}}" TargetType="{x:Type ghfvs:UserErrorMessages}">
+          <Setter Property="IconMargin" Value="-1,2,7,0" />
+          <Setter Property="ErrorMessageFontWeight" Value="Normal" />
+          <Setter Property="Icon" Value="stop" />
+          <Setter Property="Margin" Value="0,5,0,0" />
+        </Style>
+      </StackPanel.Resources>
+      <controls:HorizontalShadowDivider />
+      <Grid x:Name="loginStackPanel"
+            Margin="30,-10,30,10"
+            FocusManager.IsFocusScope="True"
+            FocusVisualStyle="{x:Null}">
 
-                <Grid.Resources>
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Setter Property="Margin" Value="0,3,0,3" />
-                    </Style>
+        <Grid.Resources>
+          <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="0,3,0,3" />
+          </Style>
 
-                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="HorizontalAlignment" Value="Right" />
-                        <Setter Property="Margin" Value="0,0,10,0" />
-                        <Setter Property="Padding" Value="0" />
-                    </Style>
+          <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Padding" Value="0" />
+          </Style>
 
-                    <Style TargetType="{x:Type ghfvs:PromptTextBox}"
-                           BasedOn="{StaticResource {x:Type ghfvs:PromptTextBox}}">
-                        <Setter Property="Margin" Value="0,5" />
-                    </Style>
+          <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource {x:Type ghfvs:PromptTextBox}}">
+            <Setter Property="Margin" Value="0,5" />
+          </Style>
 
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                    </Style>
-                </Grid.Resources>
+          <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+          </Style>
+        </Grid.Resources>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35" />
@@ -99,14 +98,16 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0"
-                       Content="{x:Static ghfvs:Resources.nameText}"
-                       Target="{Binding ElementName=nameText}" />
-                <ghfvs:PromptTextBox Grid.Row="0" Grid.Column="1"
-                                     x:Name="nameText"
-                                     MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
-                                     Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}"
-                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryNameTextBox}" />
+        <Label Grid.Row="0"
+               Grid.Column="0"
+               Content="{x:Static ghfvs:Resources.nameText}"
+               Target="{Binding ElementName=nameText}" />
+                <ghfvs:PromptTextBox x:Name="nameText"
+                          Grid.Row="0"
+                          Grid.Column="1"
+                          MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
+                          Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" 
+                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryNameTextBox}" />
 
                 <StackPanel Grid.Row="1" Grid.Column="1">
                     <ghfvs:ValidationMessage x:Name="nameValidationMessage"
@@ -114,140 +115,141 @@
                                              ValidatesControl="{Binding ElementName=nameText}" 
                                              ReactiveValidator="{Binding RepositoryNameValidator, Mode=OneWay}"/>
 
-                    <ghfvs:ValidationMessage x:Name="safeRepositoryNameWarning"
-                                             ErrorAdornerTemplate="None"
-                                             Fill="#f39c12"
-                                             Icon="alert"
-                                             Style="{DynamicResource InlineValidationMessage}"
-                                             ValidatesControl="{Binding ElementName=nameText}" 
-                                             ReactiveValidator="{Binding SafeRepositoryNameWarningValidator, Mode=OneWay}" />
-                </StackPanel>
+          <ghfvs:ValidationMessage x:Name="safeRepositoryNameWarning"
+                                  ErrorAdornerTemplate="None"
+                                  Fill="#f39c12"
+                                  Icon="alert"
+                                  Style="{DynamicResource InlineValidationMessage}"
+                                  ValidatesControl="{Binding ElementName=nameText}" 
+                                  ReactiveValidator="{Binding SafeRepositoryNameWarningValidator, Mode=OneWay}" />
+        </StackPanel>
 
-                <Label Grid.Row="2" Grid.Column="0"
-                       Content="{x:Static ghfvs:Resources.Description}"
-                       Target="{Binding ElementName=description}"
-                       AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBlock}" />
-                <ghfvs:PromptTextBox Grid.Row="2" Grid.Column="1"
-                                     x:Name="description"
-                                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                                     SpellCheck.IsEnabled="True"
-                                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBox}" />
+        <Label Grid.Row="2"
+               Grid.Column="0"
+               Content="{x:Static ghfvs:Resources.Description}"
+               Target="{Binding ElementName=description}"
+               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBlock}" />
+        <ghfvs:PromptTextBox x:Name="description"
+                          Grid.Row="2"
+                          Grid.Column="1"
+                          Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                          SpellCheck.IsEnabled="True"
+                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryDescriptionTextBox}" />
 
-                <Label Grid.Row="3" Grid.Column="0"
-                       Content="{x:Static ghfvs:Resources.localPathText}"
-                       Target="{Binding ElementName=localPathText}" />
-                <Grid Grid.Row="3" Grid.Column="1">
+        <Label Grid.Row="3"
+               Grid.Column="0"
+               Content="{x:Static ghfvs:Resources.localPathText}"
+               Target="{Binding ElementName=localPathText}" />
+        <Grid Grid.Row="3" Grid.Column="1">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
 
-                    <ghfvs:PromptTextBox x:Name="localPathText"
-                                         Grid.Row="0"
-                                         Grid.Column="0"
-                                         Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}"
-                                         AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathTextBox}" />
-                    <Button x:Name="browsePathButton"
+          <ghfvs:PromptTextBox x:Name="localPathText"
                             Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="3,0,0,0"
-                            VerticalContentAlignment="Center"
-                            Content="{x:Static ghfvs:Resources.browsePathButtonContent}"
-                            Padding="0"
-                            Style="{DynamicResource GitHubLinkButton}"
-                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathBrowseButton}" />
-                </Grid>
+                            Grid.Column="0"
+                            Text="{Binding BaseRepositoryPath, UpdateSourceTrigger=PropertyChanged}" 
+                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathTextBox}" />
+          <Button x:Name="browsePathButton"
+                  Grid.Row="0"
+                  Grid.Column="1"
+                  Margin="3,0,0,0"
+                  VerticalContentAlignment="Center"
+                  Content="{x:Static ghfvs:Resources.browsePathButtonContent}"
+                  Padding="0"
+                  Style="{DynamicResource GitHubLinkButton}" 
+                  AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateRepositoryLocalPathBrowseButton}" />
+        </Grid>
 
-                <ghfvs:ValidationMessage Grid.Row="4" Grid.Column="1"
-                    x:Name="pathValidationMessage"
-                    Style="{DynamicResource InlineValidationMessage}"
+        <ghfvs:ValidationMessage x:Name="pathValidationMessage"
+                                Grid.Row="4"
+                                Grid.Column="1"
                     ValidatesControl="{Binding ElementName=localPathText}"
                     ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}" />
 
-                <Label Grid.Row="5" Grid.Column="0" Content="{x:Static ghfvs:Resources.ignoreTemplateListText}"
-                       Target="{Binding ElementName=ignoreTemplateList}" />
-                <ComboBox Grid.Row="5" Grid.Column="1"
-                          x:Name="ignoreTemplateList"
-                          ItemsSource="{Binding GitIgnoreTemplates}"
-                          SelectedItem="{Binding SelectedGitIgnoreTemplate}"
-                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitignoreComboBox}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock x:Name="itemName"
-                                       FontWeight="{Binding Recommended, Converter={ghfvs:BooleanToFontWeightConverter}}"
-                                       Text="{Binding Name}" />
-                            <DataTemplate.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ComboBoxItem}}"
-                                    Value="{x:Null}">
-                                    <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+        <Label Grid.Row="5"
+               Grid.Column="0"
+               Content="{x:Static ghfvs:Resources.ignoreTemplateListText}"
+               Target="{Binding ElementName=ignoreTemplateList}" />
+        <ComboBox x:Name="ignoreTemplateList"
+                               Grid.Row="5"
+                               Grid.Column="1"
+                               ItemsSource="{Binding GitIgnoreTemplates}"
+                               SelectedItem="{Binding SelectedGitIgnoreTemplate}"
+                               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GitignoreComboBox}" >
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock x:Name="itemName" FontWeight="{Binding Recommended, Converter={ghfvs:BooleanToFontWeightConverter}}" Text="{Binding Name}" />
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                  <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
 
-                <Label Grid.Row="6" Grid.Column="0"
-                       Content="{x:Static ghfvs:Resources.licenseListText}"
-                       Target="{Binding ElementName=licenseList}" />
-                <ComboBox Grid.Row="6" Grid.Column="1"
-                          x:Name="licenseList"
-                          ItemsSource="{Binding Licenses}"
-                          SelectedItem="{Binding SelectedLicense}"
-                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.LicenseComboBox}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock x:Name="itemName"
-                                       FontWeight="{Binding Recommended, Converter={ghfvs:BooleanToFontWeightConverter}}"
-                                       Text="{Binding Name}" />
-                            <DataTemplate.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ComboBoxItem}}"
-                                    Value="{x:Null}">
-                                    <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+        <Label Grid.Row="6"
+               Grid.Column="0"
+               Content="{x:Static ghfvs:Resources.licenseListText}"
+               Target="{Binding ElementName=licenseList}" />
+        <ComboBox x:Name="licenseList"
+                               Grid.Row="6"
+                               Grid.Column="1"
+                               ItemsSource="{Binding Licenses}"
+                               SelectedItem="{Binding SelectedLicense}"
+                               AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.LicenseComboBox}" >
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock x:Name="itemName" FontWeight="{Binding Recommended, Converter={ghfvs:BooleanToFontWeightConverter}}" Text="{Binding Name}" />
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ComboBoxItem}}" Value="{x:Null}">
+                  <Setter TargetName="itemName" Property="FontWeight" Value="Normal" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
 
-                <controls:HorizontalShadowDivider Grid.Row="7" Grid.ColumnSpan="2"
-                                                  Margin="0,12" />
+        <controls:HorizontalShadowDivider Grid.Row="7" Grid.ColumnSpan="2" Margin="0,12" />
 
-                <ComboBox Grid.Row="8" Grid.Column="1" 
-                          x:Name="accountsComboBox"
-                          Margin="0,0,0,8"
-                          ItemsSource="{Binding Accounts}"
-                          SelectedItem="{Binding SelectedAccount}"
-                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.AccountComboBox}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Width="16"
-                                       Height="16"
-                                       Margin="0,0,8,0"
-                                       RenderOptions.BitmapScalingMode="HighQuality"
-                                       Source="{Binding Avatar}" />
-                                <TextBlock Text="{Binding Login}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+        <ComboBox x:Name="accountsComboBox"
+                           Grid.Row="8"
+                           Grid.Column="1"
+                           Margin="0,0,0,8"
+                           ItemsSource="{Binding Accounts}"
+                           SelectedItem="{Binding SelectedAccount}"
+                           AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.AccountComboBox}" >
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal">
+                <Image Width="16"
+                       Height="16"
+                       Margin="0,0,8,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       Source="{Binding Avatar}" />
+                <TextBlock Text="{Binding Login}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
 
-                <CheckBox Grid.Row="9" Grid.Column="1"
-                          x:Name="makePrivate"
-                          Content="{x:Static ghfvs:Resources.makePrivateContent}"
-                          Padding="8,0,0,0"
-                          IsChecked="{Binding KeepPrivate}"
-                          AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateRepositoryCheckBox}" />
+                <CheckBox x:Name="makePrivate"
+                  Grid.Row="9"
+                  Grid.Column="1"
+                  Content="{x:Static ghfvs:Resources.makePrivateContent}"
+                  Padding="8,0,0,0"
+                  IsChecked="{Binding KeepPrivate}"
+                  AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateRepositoryCheckBox}" />
             </Grid>
 
-            <ghfvs:UserErrorMessages x:Name="userErrorMessages"
-                                     Margin="0"
-                                     HorizontalAlignment="Center"
-                                     HorizontalContentAlignment="Stretch" />
-        </StackPanel>
+      <ghfvs:UserErrorMessages x:Name="userErrorMessages"
+                              Margin="0"
+                              HorizontalAlignment="Center"
+                              HorizontalContentAlignment="Stretch" />
+    </StackPanel>
 
-    </DockPanel>
+  </DockPanel>
 </local:GenericRepositoryCreationView>
