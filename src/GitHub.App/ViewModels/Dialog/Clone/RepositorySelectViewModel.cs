@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -30,7 +31,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         string filter;
         bool isEnabled;
         bool isLoading;
-        bool loadingStarted;
         IReadOnlyList<IRepositoryItemViewModel> items;
         ICollectionView itemsView;
         ObservableAsPropertyHelper<RepositoryModel> repository;
@@ -113,16 +113,37 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public async Task Activate()
         {
-            if (connection == null || loadingStarted) return;
+            await this.LoadItems(true);
+        }
+
+        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
+        {
+            var name = group.Key;
+            if (group.Value.Count == max)
+            {
+                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
+            }
+
+            return name;
+        }
+
+        async Task LoadItems(bool refresh)
+        {
+            if (connection == null && !IsLoading) return;
 
             Error = null;
             IsLoading = true;
-            loadingStarted = true;
 
             try
             {
+                if (refresh)
+                {
+                    Items = new List<IRepositoryItemViewModel>();
+                    ItemsView = CollectionViewSource.GetDefaultView(Items);
+                }
+
                 var results = await log.TimeAsync(nameof(service.ReadViewerRepositories),
-                    () => service.ReadViewerRepositories(connection.HostAddress));
+                    () => service.ReadViewerRepositories(connection.HostAddress, refresh));
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
@@ -161,17 +182,6 @@ namespace GitHub.ViewModels.Dialog.Clone
             {
                 IsLoading = false;
             }
-        }
-
-        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
-        {
-            var name = group.Key;
-            if (group.Value.Count == max)
-            {
-                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
-            }
-
-            return name;
         }
 
         bool FilterItem(object obj)
