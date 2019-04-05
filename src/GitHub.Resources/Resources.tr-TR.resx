@@ -867,6 +867,6 @@ https://git-scm.com/download/win</value>
     <value>ve diğer kişiler</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Bu konuşma çözümlendi olarak işaretlendi</value>
   </data>
 </root>

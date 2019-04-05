@@ -867,6 +867,6 @@ https://git-scm.com/download/win</value>
     <value>및 기타</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>이 대화는 확인된 것으로 표시되었습니다.</value>
   </data>
 </root>

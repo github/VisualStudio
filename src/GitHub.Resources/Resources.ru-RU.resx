@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Этот репозиторий находится не в GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>Репозиторий отсутствует</value>
+    <value>Репозиторий отсутствует.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>Не удалось найти здесь репозиторий Git. Откройте проект Git или выберите "Файл" -&gt; "Добавить в систему управления версиями" в проекте, чтобы приступить к работе.</value>
@@ -867,6 +867,6 @@ https://git-scm.com/download/win</value>
     <value>и др.</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Эта беседа была помечена как разрешенная.</value>
   </data>
 </root>

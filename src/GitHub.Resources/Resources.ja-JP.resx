@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>このリポジトリは GitHub 上にありません</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>リポジトリではありません</value>
+    <value>リポジトリが見つかりません</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>この場所に Git リポジトリが見つかりませんでした。Git プロジェクトを開くか、プロジェクトで [ファイル] -&gt; [ソース管理に追加] をクリックして作業を開始してください。</value>
@@ -867,6 +867,6 @@ https://git-scm.com/download/win</value>
     <value>その他</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>この会話は解決済みとしてマークされました</value>
   </data>
 </root>
