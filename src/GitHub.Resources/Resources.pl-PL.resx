@@ -867,7 +867,7 @@ https://git-scm.com/download/win</value>
     <value>i inni</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Ta konwersacja została oznaczona jako rozwiązana</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
     <value>Your repositories</value>
