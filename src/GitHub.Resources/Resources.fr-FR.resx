@@ -809,7 +809,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>L'URL cible est introuvable dans le dépôt actuel. Réessayez après une récupération (fetch).</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>Un répertoire est déjà présent à cet emplacement, mais il ne contient pas de dépôt.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">

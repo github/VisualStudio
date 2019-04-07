@@ -809,7 +809,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>В этом расположении уже существует каталог, но он не содержит репозиторий.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">

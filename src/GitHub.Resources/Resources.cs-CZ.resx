@@ -809,7 +809,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>V aktuálním úložišti se nepodařilo najít cílovou adresu URL. Zkuste to znovu po načtení změn.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>V tomto umístění je už adresář, ale neobsahuje úložiště.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">

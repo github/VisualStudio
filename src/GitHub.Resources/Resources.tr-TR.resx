@@ -809,7 +809,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Hedef URL geçerli depoda bulunamadı. Getirme işlemi gerçekleştirdikten sonra yeniden deneyin.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>Bu konumda zaten bir dizin var ancak bir depo içermiyor.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">

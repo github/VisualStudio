@@ -268,15 +268,6 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is already a directory at this location, but it doesn&apos;t contain a repository..
-        /// </summary>
-        public static string CantFindARepositoryAtLocalPath {
-            get {
-                return ResourceManager.GetString("CantFindARepositoryAtLocalPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t find GitHub URL for repository.
         /// </summary>
         public static string CantFindGitHubUrlForRepository {
@@ -600,6 +591,15 @@ namespace GitHub {
         public static string DifferentRepositoryMessage {
             get {
                 return ResourceManager.GetString("DifferentRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory at the destination path is not empty..
+        /// </summary>
+        public static string DirectoryAtDestinationNotEmpty {
+            get {
+                return ResourceManager.GetString("DirectoryAtDestinationNotEmpty", resourceCulture);
             }
         }
         

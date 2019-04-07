@@ -809,7 +809,7 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>この場所に既にディレクトリがありますが、リポジトリが含まれていません。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">

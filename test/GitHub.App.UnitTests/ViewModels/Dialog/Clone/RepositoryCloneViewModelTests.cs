@@ -225,7 +225,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
             target.Path = directoryExists;
 
-            Assert.That(target.PathWarning, Is.EqualTo(Resources.CantFindARepositoryAtLocalPath));
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.DirectoryAtDestinationNotEmpty));
         }
 
         [Test]
