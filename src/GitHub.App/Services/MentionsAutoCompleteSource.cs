@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using GitHub.Api;
-using GitHub.Caches;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -30,7 +28,8 @@ namespace GitHub.Services
         ICompiledQuery<List<SuggestionItem>> query;
 
         [ImportingConstructor]
-        public MentionsAutoCompleteSource(ITeamExplorerContext teamExplorerContext, 
+        public MentionsAutoCompleteSource(
+            ITeamExplorerContext teamExplorerContext, 
             IGraphQLClientFactory graphqlFactory,
             IAvatarProvider avatarProvider)
         {

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using GitHub.Models;
-using GitHub.UI;
 
 namespace GitHub.Services
 {

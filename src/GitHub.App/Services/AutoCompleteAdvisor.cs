@@ -10,7 +10,6 @@ using System.Reactive.Linq;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
-using GitHub.UI;
 using Serilog;
 
 namespace GitHub.Services
