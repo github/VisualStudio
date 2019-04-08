@@ -67,11 +67,13 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             var canClone = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && !service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) &&
+                (!service.DestinationDirectoryExists(path)) || service.DestinationDirectoryEmpty(path));
 
             var canOpen = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path)
+                && !service.DestinationDirectoryEmpty(path));
 
             Browse = ReactiveCommand.Create(() => BrowseForDirectory());
             Clone = ReactiveCommand.CreateFromObservable(
@@ -236,13 +238,13 @@ namespace GitHub.ViewModels.Dialog.Clone
                     return Resources.DestinationAlreadyExists;
                 }
 
-                if (service.DestinationDirectoryExists(path))
+                if (service.DestinationDirectoryExists(path) && !service.DestinationDirectoryEmpty(path))
                 {
                     using (var repository = gitService.GetRepository(path))
                     {
                         if (repository == null)
                         {
-                            return Resources.CantFindARepositoryAtLocalPath;
+                            return Resources.DirectoryAtDestinationNotEmpty;
                         }
 
                         var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
@@ -254,7 +256,8 @@ namespace GitHub.ViewModels.Dialog.Clone
                         var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
                         if (localUrl != targetUrl)
                         {
-                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
+                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf,
+                                localUrl);
                         }
 
                         return Resources.YouHaveAlreadyClonedToThisLocation;

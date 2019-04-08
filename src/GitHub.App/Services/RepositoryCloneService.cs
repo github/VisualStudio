@@ -129,7 +129,7 @@ namespace GitHub.Services
 
             var repositoryUrl = url.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-            if (DestinationDirectoryExists(repositoryPath))
+            if (DestinationDirectoryExists(repositoryPath) && !DestinationDirectoryEmpty(repositoryPath))
             {
                 if (!IsSolutionInRepository(repositoryPath))
                 {
@@ -206,9 +206,12 @@ namespace GitHub.Services
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
-            await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(repositoryPath);
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            if (!DestinationDirectoryExists(repositoryPath))
+            {
+                await ThreadingHelper.SwitchToPoolThreadAsync();
+                operatingSystem.Directory.CreateDirectory(repositoryPath);
+                await ThreadingHelper.SwitchToMainThreadAsync();
+            }
 
             try
             {
@@ -231,6 +234,9 @@ namespace GitHub.Services
 
         /// <inheritdoc/>
         public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationDirectoryEmpty(string path) => operatingSystem.Directory.GetDirectory(path).IsEmpty;
 
         /// <inheritdoc/>
         public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
