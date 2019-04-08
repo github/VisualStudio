@@ -242,23 +242,22 @@ namespace GitHub.ViewModels.Dialog.Clone
                 {
                     using (var repository = gitService.GetRepository(path))
                     {
-                        if (repository != null)
-                        {
-                            var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
-                            if (localUrl == null)
-                            {
-                                return Resources.LocalRepositoryDoesntHaveARemoteOrigin;
-                            }
-
-                            var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
-                            if (localUrl != targetUrl)
-                            {
-                                return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
-                            }
-                        }
-                        else
+                        if (repository == null)
                         {
                             return Resources.DirectoryAtDestinationNotEmpty;
+                        }
+
+                        var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
+                        if (localUrl == null)
+                        {
+                            return Resources.LocalRepositoryDoesntHaveARemoteOrigin;
+                        }
+
+                        var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
+                        if (localUrl != targetUrl)
+                        {
+                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf,
+                                localUrl);
                         }
 
                         return Resources.YouHaveAlreadyClonedToThisLocation;
