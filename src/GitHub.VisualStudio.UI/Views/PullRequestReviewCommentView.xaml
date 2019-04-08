@@ -161,39 +161,51 @@
             <Separator Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0 0 0 4" 
                        Background="{DynamicResource GitHubButtonBorderBrush}"/>
 
-            <ui:PromptTextBox Name="body"
-                              Grid.Column="1"
-                              Grid.Row="1"
-                              AcceptsReturn="True"
-                              AcceptsTab="True"
-                              IsReadOnly="{Binding IsReadOnly}"
-                              Margin="4 0 4 4"
-                              Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
-                              TextWrapping="Wrap"
-                              VerticalAlignment="Center"
-                              GotFocus="ReplyPlaceholder_GotFocus"
-                              Loaded="body_Loaded"
-                              SpellCheck.IsEnabled="True">
-                <ui:PromptTextBox.Style>
-                    <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource GitHubVsPromptTextBox}">
-                        <Setter Property="Height" Value="28"/>
-                        <Setter Property="PromptText" Value="Reply..."/>
+            <ui:AutoCompleteBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="4 0 4 4"
+                Advisor="{Binding AutoCompleteAdvisor}">
+                <ui:AutoCompleteBox.ItemTemplate>
+                    <DataTemplate>
+                        <ui:AutoCompleteSuggestionView ViewModel="{Binding}" />
+                    </DataTemplate>
+                </ui:AutoCompleteBox.ItemTemplate>
+                <ui:AutoCompleteBox.InputElement>
+                    <ui:TextBoxAutoCompleteTextInput>
+                        <ui:PromptTextBox Name="body"
+                                          AcceptsReturn="True"
+                                          AcceptsTab="True"
+                                          IsReadOnly="{Binding IsReadOnly}"
+                                          Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}"
+                                          TextWrapping="Wrap"
+                                          VerticalAlignment="Center"
+                                          GotFocus="ReplyPlaceholder_GotFocus"
+                                          Loaded="body_Loaded"
+                                          SpellCheck.IsEnabled="True">
+                            <ui:PromptTextBox.Style>
+                                <Style TargetType="ui:PromptTextBox" BasedOn="{StaticResource GitHubVsPromptTextBox}">
+                                    <Setter Property="Height" Value="28"/>
+                                    <Setter Property="PromptText" Value="Reply..."/>
 
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding EditState}" Value="Editing">
-                                <Setter Property="MinHeight" Value="100"/>
-                                <Setter Property="PromptText" Value="Leave a comment"/>
-                            </DataTrigger>
-                        </Style.Triggers>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EditState}" Value="Editing">
+                                            <Setter Property="MinHeight" Value="100"/>
+                                            <Setter Property="PromptText" Value="Leave a comment"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
 
-                        <Style.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </ui:PromptTextBox.Style>
-            </ui:PromptTextBox>
+                                    <Style.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+                                        </Style>
+                                    </Style.Resources>
+                                </Style>
+                            </ui:PromptTextBox.Style>
+                        </ui:PromptTextBox>
+                    </ui:TextBoxAutoCompleteTextInput>
+                </ui:AutoCompleteBox.InputElement>
+            </ui:AutoCompleteBox>
 
             <DockPanel Grid.Column="1" Grid.Row="2"
                        Margin="0 4"

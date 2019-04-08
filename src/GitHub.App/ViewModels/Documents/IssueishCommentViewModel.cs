@@ -23,9 +23,10 @@ namespace GitHub.ViewModels.Documents
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service.</param>
+        /// <param name="autoCompleteAdvisor"></param>
         [ImportingConstructor]
-        public IssueishCommentViewModel(ICommentService commentService)
-            : base(commentService)
+        public IssueishCommentViewModel(ICommentService commentService, IAutoCompleteAdvisor autoCompleteAdvisor)
+            : base(commentService, autoCompleteAdvisor)
         {
             CloseOrReopen = ReactiveCommand.CreateFromTask(
                 DoCloseOrReopen,

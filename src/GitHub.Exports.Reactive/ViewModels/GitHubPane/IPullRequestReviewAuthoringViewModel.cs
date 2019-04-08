@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -86,6 +87,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// Gets a command which cancels the review.
         /// </summary>
         ReactiveCommand<Unit, Unit> Cancel { get; }
+
+        /// <summary>
+        /// Provides an AutoCompleteAdvisor.
+        /// </summary>
+        IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         /// <summary>
         /// Initializes the view model for creating a new review.
