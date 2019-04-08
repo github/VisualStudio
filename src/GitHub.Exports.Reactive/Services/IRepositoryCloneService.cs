@@ -59,6 +59,15 @@ namespace GitHub.Services
         bool DestinationDirectoryExists(string path);
 
         /// <summary>
+        /// Checks whether the specified destination directory is empty.
+        /// </summary>
+        /// <param name="path">The destination path.</param>
+        /// <returns>
+        /// true if a directory is empty <paramref name="path"/>; otherwise false.
+        /// </returns>
+        bool DestinationDirectoryEmpty(string path);
+
+        /// <summary>
         /// Checks whether the specified destination file already exists.
         /// </summary>
         /// <param name="path">The destination file.</param>
