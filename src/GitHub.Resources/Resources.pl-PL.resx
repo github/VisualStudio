@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Nie można odnaleźć docelowego adresu URL w bieżącym repozytorium. Spróbuj ponownie po zakończeniu pobierania.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>W tej lokalizacji istnieje już katalog, ale nie zawiera on repozytorium.</value>
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma zdalnego repozytorium o nazwie „origin”.</value>

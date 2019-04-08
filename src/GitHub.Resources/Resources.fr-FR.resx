@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>L'URL cible est introuvable dans le dépôt actuel. Réessayez après une récupération (fetch).</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>Un répertoire est déjà présent à cet emplacement, mais il ne contient pas de dépôt.</value>
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Un dépôt existe déjà à cet emplacement, mais il n'a pas de dépôt distant nommé « origin ».</value>

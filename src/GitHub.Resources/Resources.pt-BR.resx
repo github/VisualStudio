@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Não foi possível encontrar a URL de destino no repositório atual. Tente novamente depois de efetuar um fetch.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>Já existe um diretório neste local, mas ele não contém um repositório.</value>
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Já existe um repositório neste local, mas ele não tem um repositório remoto com o nome "origem".</value>

@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>В этом расположении уже существует каталог, но он не содержит репозиторий.</value>
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>В этом расположении уже существует репозиторий, но у него отсутствует удаленный репозиторий с именем "origin".</value>

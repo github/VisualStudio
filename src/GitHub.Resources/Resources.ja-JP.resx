@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>この場所に既にディレクトリがありますが、リポジトリが含まれていません。</value>
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>この場所にリポジトリが既に存在しますが、そのリポジトリには "origin" という名前のリモートがありません。</value>
