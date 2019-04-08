@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>ve diğer kişiler</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Bu konuşma çözümlendi olarak işaretlendi</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

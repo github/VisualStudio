@@ -121,7 +121,7 @@
     <value>為新的存放庫選取包含資料夾。</value>
   </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
-    <value>從 GitHub 開啟</value>
+    <value>從 GitHub 打開</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
     <value>無法連線到 github.com</value>
@@ -130,7 +130,7 @@
     <value>建立 GitHub Gist</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>建立 {0} 存放庫</value>
+    <value>創建 {0} 存儲庫</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
@@ -175,7 +175,7 @@
     <value>遠端不存在來源分支，您有推送它嗎?</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>請輸入存放庫路徑</value>
+    <value>請輸入存儲庫路徑</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
     <value>請輸入有效的路徑</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>及其他</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>此交談已標示為已解決</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

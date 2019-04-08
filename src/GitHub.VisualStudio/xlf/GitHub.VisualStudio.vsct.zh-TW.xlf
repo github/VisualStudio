@@ -134,7 +134,7 @@
       </trans-unit>
       <trans-unit id="openFromUrlCommand|ButtonText">
         <source>Open from GitHub...</source>
-        <target state="translated">從 GitHub 開啟...</target>
+        <target state="translated">從 GitHub 打開...</target>
         <note />
       </trans-unit>
       <trans-unit id="openFromUrlCommand|LocCanonicalName">
