@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>当前存储库中找不到目标 URL。请执行提取后重试。</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>在此位置已存在一个目录，但它不包含存储库。</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程库。</value>

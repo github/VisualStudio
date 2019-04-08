@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Die Ziel-URL wurde im aktuellen Repository nicht gefunden. Versuchen Sie es nach einem Abrufvorgang (fetch) noch einmal.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>An diesem Speicherort liegt bereits ein Verzeichnis vor, aber es enthält kein Repository.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber kein Remoterepository namens "origin" aufweist.</value>
