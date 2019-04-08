@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>et autres</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Cette conversation a été marquée comme résolue</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

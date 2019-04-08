@@ -84,19 +84,19 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-          <RowDefinition Height="35" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="35" />
-          <RowDefinition Height="35" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="35" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
         <Label Grid.Row="0"
                Grid.Column="0"
@@ -107,17 +107,21 @@
                           Grid.Column="1"
                           MaxLength="{x:Static ghfvs:Constants.MaxRepositoryNameLength}"
                           Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" 
-                          SpellCheck.IsEnabled="True"
                           AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.RepositoryNameTextBox}" />
 
                 <StackPanel Grid.Row="1" Grid.Column="1">
-          <ghfvs:ValidationMessage x:Name="nameValidationMessage" ValidatesControl="{Binding ElementName=nameText}" />
+                    <ghfvs:ValidationMessage x:Name="nameValidationMessage"
+                                             Style="{DynamicResource InlineValidationMessage}"
+                                             ValidatesControl="{Binding ElementName=nameText}" 
+                                             ReactiveValidator="{Binding RepositoryNameValidator, Mode=OneWay}"/>
+
           <ghfvs:ValidationMessage x:Name="safeRepositoryNameWarning"
                                   ErrorAdornerTemplate="None"
                                   Fill="#f39c12"
                                   Icon="alert"
                                   Style="{DynamicResource InlineValidationMessage}"
-                                  ValidatesControl="{Binding ElementName=nameText}" />
+                                  ValidatesControl="{Binding ElementName=nameText}" 
+                                  ReactiveValidator="{Binding SafeRepositoryNameWarningValidator, Mode=OneWay}" />
         </StackPanel>
 
         <Label Grid.Row="2"
@@ -162,7 +166,9 @@
         <ghfvs:ValidationMessage x:Name="pathValidationMessage"
                                 Grid.Row="4"
                                 Grid.Column="1"
-                                ValidatesControl="{Binding ElementName=localPathText}" />
+                                Style="{DynamicResource InlineValidationMessage}"
+                                ValidatesControl="{Binding ElementName=localPathText}"
+                                ReactiveValidator="{Binding BaseRepositoryPathValidator, Mode=OneWay}" />
 
         <Label Grid.Row="5"
                Grid.Column="0"
