@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
-using GitHub.Services;
 using GitHub.Validation;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -54,7 +53,6 @@ namespace GitHub.SampleData
         public string PRTitle { get; set; }
 
         public ReactivePropertyValidator TitleValidator { get; }
-        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         public ReactivePropertyValidator BranchValidator { get; }
 
