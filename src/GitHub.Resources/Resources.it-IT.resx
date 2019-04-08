@@ -259,10 +259,10 @@
     <value>Esegui checkout in {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>Esegui pull dal ramo {1} di {0}</value>
+    <value>Eseguire pull dal ramo {1} di {0}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>Esegui push dal ramo {1} di {0}</value>
+    <value>Eseguire push dal ramo {1} di {0}</value>
   </data>
   <data name="Remote" xml:space="preserve">
     <value>repository remoto</value>
@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Questo repository non è presente in GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>Non è presente alcun repository</value>
+    <value>Non è stato trovato alcun repository</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>Non è stato possibile trovare alcun repository GIT qui. Per iniziare, aprire un progetto git o fare clic su "File -&gt; Aggiungi al controllo del codice sorgente" in un progetto.</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>e altri</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Questa conversazione è stata contrassegnata come risolta</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>
