@@ -632,7 +632,7 @@ namespace GitHub.UI
             if (textInput != null)
             {
                 UnsubscribeToEvent("SelectionChanged");
-//                UnsubscribeToEvent("OnTextBoxTextChanged");
+                UnsubscribeToEvent("OnTextBoxTextChanged");
             }
 
             textInput = value;
