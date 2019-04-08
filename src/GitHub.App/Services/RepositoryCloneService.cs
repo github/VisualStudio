@@ -236,7 +236,7 @@ namespace GitHub.Services
         public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
 
         /// <inheritdoc/>
-        public bool DestinationDirectoryEmpty(string path) => !DestinationDirectoryExists(path) || operatingSystem.Directory.GetDirectory(path).IsEmpty;
+        public bool DestinationDirectoryEmpty(string path) => operatingSystem.Directory.GetDirectory(path).IsEmpty;
 
         /// <inheritdoc/>
         public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
