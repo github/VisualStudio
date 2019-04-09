@@ -487,12 +487,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager = null,
             IMessageDraftStore draftStore = null,
             IPullRequestFilesViewModel files = null,
-            IScheduler timerScheduler = null)
+            IScheduler timerScheduler = null,
+            IAutoCompleteAdvisor autoCompleteAdvisor = null
+            )
         {
             editorService = editorService ?? Substitute.For<IPullRequestEditorService>();
             sessionManager = sessionManager ?? CreateSessionManager();
             draftStore = draftStore ?? Substitute.For<IMessageDraftStore>();
             files = files ?? Substitute.For<IPullRequestFilesViewModel>();
+            autoCompleteAdvisor = autoCompleteAdvisor ?? Substitute.For<IAutoCompleteAdvisor>();
             timerScheduler = timerScheduler ?? DefaultScheduler.Instance;
 
             return new PullRequestReviewAuthoringViewModel(
@@ -501,6 +504,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 sessionManager,
                 draftStore,
                 files,
+                autoCompleteAdvisor,
                 timerScheduler);
         }
 
