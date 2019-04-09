@@ -8,6 +8,7 @@ using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
 using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
@@ -18,7 +19,7 @@ namespace GitHub.Services
     {
         readonly ITeamExplorerContext teamExplorerContext;
         readonly IGraphQLClientFactory graphqlFactory;
-        ICompiledQuery<List<SuggestionItem>> query;
+        ICompiledQuery<Page<SuggestionItem>> query;
 
         [ImportingConstructor]
         public IssuesAutoCompleteSource(ITeamExplorerContext teamExplorerContext, IGraphQLClientFactory graphqlFactory)
@@ -38,32 +39,58 @@ namespace GitHub.Services
             var owner = localRepositoryModel.Owner;
             var name = localRepositoryModel.Name;
 
+            string filter;
+            string after;
+
             if (query == null)
             {
-                query = new Query().Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
-                    .Select(repository =>
-                        repository.Issues(null, null, null, null, null, null, null)
-                            .AllPages()
-                            .Select(issue => new SuggestionItem("#" + issue.Number, issue.Title)
-                            {
-                                LastModifiedDate = issue.LastEditedAt
-                            })
-                            .ToList())
-                    .Compile();
+               query = new Query().Search(query: Var(nameof(filter)), SearchType.Issue, 100, after: Var(nameof(after)))
+                       .Select(item => new Page<SuggestionItem>
+                       {
+                           Items = item.Nodes.Select(searchResultItem => 
+                               searchResultItem.Switch<SuggestionItem>(selector => selector
+                                       .Issue(i => new SuggestionItem("#" + i.Number, i.Title) { LastModifiedDate = i.LastEditedAt })
+                                       .PullRequest(p => new SuggestionItem("#" + p.Number, p.Title) { LastModifiedDate = p.LastEditedAt }))
+                               ).ToList(),
+                           EndCursor = item.PageInfo.EndCursor,
+                           HasNextPage = item.PageInfo.HasNextPage,
+                           TotalCount = item.IssueCount
+                       })
+                       .Compile();
             }
 
-            var variables = new Dictionary<string, object>
-            {
-                {nameof(owner), owner },
-                {nameof(name), name },
-            };
+            filter = $"repo:{owner}/{name} is:open";
 
             return Observable.FromAsync(async () =>
+            {
+                var results = new List<SuggestionItem>();
+
+                var variables = new Dictionary<string, object>
                 {
-                    var connection = await graphqlFactory.CreateConnection(hostAddress);
-                    var suggestions = await connection.Run(query, variables);
-                    return suggestions.Select(suggestion => new IssueAutoCompleteSuggestion(suggestion, Prefix));
-                }).SelectMany(enumerable => enumerable);
+                    {nameof(filter), filter },
+                };
+
+                var connection = await graphqlFactory.CreateConnection(hostAddress);
+                var searchResults = await connection.Run(query, variables);
+
+                results.AddRange(searchResults.Items);
+
+                while (searchResults.HasNextPage)
+                {
+                    variables[nameof(after)] = searchResults.EndCursor;
+                    searchResults = await connection.Run(query, variables);
+
+                    results.AddRange(searchResults.Items);
+                }
+
+                return results.Select(item => new IssueAutoCompleteSuggestion(item, Prefix));
+
+            }).SelectMany(observable => observable);
+        }
+
+        class SearchResult
+        {
+            public SuggestionItem SuggestionItem { get; set; }
         }
 
         public string Prefix
