@@ -63,7 +63,7 @@ namespace GitHub.Services
         readonly IUsageTracker usageTracker;
 
         readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
-   
+
         [ImportingConstructor]
         public PullRequestService(
             IGitClient gitClient,
@@ -218,7 +218,8 @@ namespace GitHub.Services
                 { nameof(states), states.Select(x => (Octokit.GraphQL.Model.PullRequestState)x).ToList() },
             };
 
-            var result = await graphql.Run(query, vars);
+            var region = owner + '/' + name + "/pr-list";
+            var result = await graphql.Run(query, vars, regionName: region);
 
             foreach (var item in result.Items.Cast<ListItemAdapter>())
             {
@@ -293,6 +294,14 @@ namespace GitHub.Services
             return result;
         }
 
+        public async Task ClearPullRequestsCache(HostAddress address, string owner, string name)
+        {
+            var region = owner + '/' + name + "/pr-list";
+            var graphql = await graphqlFactory.CreateConnection(address);
+
+            await graphql.ClearCache(region);
+        }
+
         public async Task<Page<ActorModel>> ReadAssignableUsers(
             HostAddress address,
             string owner,
@@ -325,7 +334,7 @@ namespace GitHub.Services
                 { nameof(after), after },
             };
 
-            return await graphql.Run(readAssignableUsers, vars);
+            return await graphql.Run(readAssignableUsers, vars, cacheDuration: TimeSpan.FromHours(1));
         }
 
         public IObservable<IPullRequestModel> CreatePullRequest(IModelService modelService,
@@ -656,7 +665,7 @@ namespace GitHub.Services
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
                     await gitClient.Fetch(repo, remote.Name);
-                    var changes = await gitClient.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
+                    var changes = await gitService.Compare(repo, pullRequest.BaseRefSha, pullRequest.HeadRefSha, detectRenames: true);
                     return Observable.Return(changes);
                 }
             });
@@ -770,20 +779,20 @@ namespace GitHub.Services
             Encoding encoding)
         {
             var tempFilePath = CalculateTempFileName(relativePath, commitSha, encoding);
+            var gitPath = relativePath.TrimStart('/').Replace('\\', '/');
 
             if (!File.Exists(tempFilePath))
             {
                 using (var repo = gitService.GetRepository(repository.LocalPath))
                 {
                     var remote = await gitClient.GetHttpRemote(repo, "origin");
-                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, relativePath, encoding, tempFilePath);
+                    await ExtractToTempFile(repo, pullRequest.Number, commitSha, gitPath, encoding, tempFilePath);
                 }
             }
 
-            lock (this.tempFileMappings)
+            lock (tempFileMappings)
             {
-                string gitRelativePath = relativePath.TrimStart('/').Replace('\\', '/');
-                this.tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitRelativePath);
+                tempFileMappings[CanonicalizeLocalFilePath(tempFilePath)] = (commitSha, gitPath);
             }
 
             return tempFilePath;
@@ -913,22 +922,24 @@ namespace GitHub.Services
             IRepository repo,
             int pullRequestNumber,
             string commitSha,
-            string relativePath,
+            string path,
             Encoding encoding,
             string tempFilePath)
         {
+            Guard.ArgumentIsGitPath(path, nameof(path));
+
             string contents;
 
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
             }
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
                 await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
-                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));

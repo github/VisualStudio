@@ -268,15 +268,6 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is already a directory at this location, but it doesn&apos;t contain a repository..
-        /// </summary>
-        public static string CantFindARepositoryAtLocalPath {
-            get {
-                return ResourceManager.GetString("CantFindARepositoryAtLocalPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t find GitHub URL for repository.
         /// </summary>
         public static string CantFindGitHubUrlForRepository {
@@ -600,6 +591,15 @@ namespace GitHub {
         public static string DifferentRepositoryMessage {
             get {
                 return ResourceManager.GetString("DifferentRepositoryMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory at the destination path is not empty..
+        /// </summary>
+        public static string DirectoryAtDestinationNotEmpty {
+            get {
+                return ResourceManager.GetString("DirectoryAtDestinationNotEmpty", resourceCulture);
             }
         }
         
@@ -1810,6 +1810,33 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Collaborator repositories.
+        /// </summary>
+        public static string RepositorySelectCollaboratorRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectCollaboratorRepositories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contributed to repositories.
+        /// </summary>
+        public static string RepositorySelectContributedRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectContributedRepositories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your repositories.
+        /// </summary>
+        public static string RepositorySelectYourRepositories {
+            get {
+                return ResourceManager.GetString("RepositorySelectYourRepositories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request changes.
         /// </summary>
         public static string RequestChanges {
@@ -2033,6 +2060,15 @@ namespace GitHub {
         public static string ThereArenTAnyOpenPullRequests {
             get {
                 return ResourceManager.GetString("ThereArenTAnyOpenPullRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This conversation was marked as resolved.
+        /// </summary>
+        public static string ThisConversationWasMarkedAsResolved {
+            get {
+                return ResourceManager.GetString("ThisConversationWasMarkedAsResolved", resourceCulture);
             }
         }
         

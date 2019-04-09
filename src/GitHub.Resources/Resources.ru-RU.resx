@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Этот репозиторий находится не в GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>Репозиторий отсутствует</value>
+    <value>Репозиторий отсутствует.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>Не удалось найти здесь репозиторий Git. Откройте проект Git или выберите "Файл" -&gt; "Добавить в систему управления версиями" в проекте, чтобы приступить к работе.</value>
@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>В этом расположении уже существует каталог, но он не содержит репозиторий.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>В этом расположении уже существует репозиторий, но у него отсутствует удаленный репозиторий с именем "origin".</value>
@@ -865,5 +865,17 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
     <value>и др.</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Эта беседа была помечена как разрешенная.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

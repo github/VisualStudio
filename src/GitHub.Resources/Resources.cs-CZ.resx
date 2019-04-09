@@ -193,7 +193,7 @@
     <value>Změňte název úložiště nebo vyberte jiný účet a zkuste to znovu.</value>
   </data>
   <data name="RepositoryCreationFailedQuota" xml:space="preserve">
-    <value>Došlo k překročení kvóty pro privátní úložiště.</value>
+    <value>Překročila se kvóta pro privátní úložiště.</value>
   </data>
   <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
     <value>Úložiště se stejným názvem už v tomto umístění existuje.</value>
@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>V aktuálním úložišti se nepodařilo najít cílovou adresu URL. Zkuste to znovu po načtení změn.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>V tomto umístění je už adresář, ale neobsahuje úložiště.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Úložiště už v tomto umístění existuje, ale nemá vzdálené úložiště s názvem origin.</value>
@@ -858,12 +858,24 @@ https://git-scm.com/download/win</value>
     <value>Znovu otevřít žádost o přijetí změn</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} – potvrzení</value>
+    <value>Počet zápisů: {0}</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>přidala se nějaká potvrzení</value>
+    <value>přidal(a) nějaké zápisy</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
     <value>a další</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Tato konverzace byla označena jako vyřešená.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>
