@@ -5,7 +5,7 @@ namespace GitHub.Services
 {
     public interface IVsDiffBase
     {
-        void SetDiffBase(string repoPath, UriString cloneRepo, string branchName);
+        void SetDiffBase(string repoPath, UriString cloneRepo, string branchName, string mergeBase);
         object GetChangesList();
     }
 }

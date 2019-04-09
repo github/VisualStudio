@@ -371,7 +371,15 @@ namespace GitHub.ViewModels.GitHubPane
 
                 try
                 {
-                    vsDiffBase?.SetDiffBase(activeLocalRepo.LocalPath, GitHubRepository.Parent.CloneUrl, targetBranch?.Name);
+                    if (vsDiffBase != null)
+                    {
+                        var result = modelService.ApiClient.Compare(activeLocalRepo.Owner, activeLocalRepo.Name, sourceBranch.Name, $"{targetBranch.Repository.Owner}:{targetBranch.Name}")
+                            .Select(x => x)
+                            .Subscribe(x =>
+                            {
+                                vsDiffBase.SetDiffBase(activeLocalRepo.LocalPath, GitHubRepository.Parent.CloneUrl, targetBranch?.Name, x?.MergeBaseCommit?.Sha);
+                            });
+                    }
                 }
                 catch (Exception e)
                 {

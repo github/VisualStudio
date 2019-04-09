@@ -328,5 +328,15 @@ namespace GitHub.Api
 
             return gitHubClient.Repository.Content.GetAllContentsByRef(owner, name, reference, path);
         }
+
+        public IObservable<CompareResult> Compare(string owner, string name, string baseRef, string headRef)
+        {
+            Guard.ArgumentNotEmptyString(owner, nameof(owner));
+            Guard.ArgumentNotEmptyString(name, nameof(name));
+            Guard.ArgumentNotEmptyString(baseRef, nameof(baseRef));
+            Guard.ArgumentNotEmptyString(headRef, nameof(headRef));
+
+            return gitHubClient.Repository.Commit.Compare(owner, name, baseRef, headRef);
+        }
     }
 }

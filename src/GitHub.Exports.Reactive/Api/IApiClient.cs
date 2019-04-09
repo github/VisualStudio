@@ -118,5 +118,6 @@ namespace GitHub.Api
         IObservable<Repository> GetRepositories();
         IObservable<Repository> GetRepository(string owner, string repo);
         IObservable<RepositoryContent> GetFileContents(string owner, string name, string reference, string path);
+        IObservable<CompareResult> Compare(string owner, string name, string baseRef, string headRef);
     }
 }
