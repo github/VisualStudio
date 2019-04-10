@@ -41,11 +41,14 @@ namespace GitHub.ViewModels
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service.</param>
+        /// <param name="autoCompleteAdvisor">The auto complete advisor.</param>
         [ImportingConstructor]
-        public CommentViewModel(ICommentService commentService)
+        public CommentViewModel(ICommentService commentService, IAutoCompleteAdvisor autoCompleteAdvisor)
         {
             Guard.ArgumentNotNull(commentService, nameof(commentService));
+            Guard.ArgumentNotNull(autoCompleteAdvisor, nameof(autoCompleteAdvisor));
 
+            AutoCompleteAdvisor = autoCompleteAdvisor;
             this.commentService = commentService;
 
             var canDeleteObservable = this.WhenAnyValue(
@@ -189,6 +192,9 @@ namespace GitHub.ViewModels
 
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Delete { get; }
+
+        /// <inheritdoc/>
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         /// <inheritdoc/>
         public Task InitializeAsync(

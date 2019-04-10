@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
-using GitHub.Cache;
+using GitHub.Api;
+using GitHub.Extensions;
 using GitHub.Models;
-using GitHub.UI;
-using GitHub.ViewModels;
+using GitHub.Primitives;
+using Octokit.GraphQL;
+using Octokit.GraphQL.Model;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -14,43 +17,86 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class IssuesAutoCompleteSource : IAutoCompleteSource
     {
-        readonly Lazy<IIssuesCache> issuesCache;
-        readonly Lazy<ISourceListViewModel> currentRepositoryState;
+        readonly ITeamExplorerContext teamExplorerContext;
+        readonly IGraphQLClientFactory graphqlFactory;
+        ICompiledQuery<Page<SuggestionItem>> query;
 
         [ImportingConstructor]
-        public IssuesAutoCompleteSource(
-            Lazy<IIssuesCache> issuesCache,
-            Lazy<ISourceListViewModel> currentRepositoryState)
+        public IssuesAutoCompleteSource(ITeamExplorerContext teamExplorerContext, IGraphQLClientFactory graphqlFactory)
         {
-            Ensure.ArgumentNotNull(issuesCache, "issuesCache");
-            Ensure.ArgumentNotNull(currentRepositoryState, "currentRepositoryState");
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
+            Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
 
-            this.issuesCache = issuesCache;
-            this.currentRepositoryState = currentRepositoryState;
+            this.teamExplorerContext = teamExplorerContext;
+            this.graphqlFactory = graphqlFactory;
         }
 
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
-            if (CurrentRepository.RepositoryHost == null)
+            var localRepositoryModel = teamExplorerContext.ActiveRepository;
+
+            var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl.Host);
+            var owner = localRepositoryModel.Owner;
+            var name = localRepositoryModel.Name;
+
+            string filter;
+            string after;
+
+            if (query == null)
             {
-                return Observable.Empty<AutoCompleteSuggestion>();
+               query = new Query().Search(query: Var(nameof(filter)), SearchType.Issue, 100, after: Var(nameof(after)))
+                       .Select(item => new Page<SuggestionItem>
+                       {
+                           Items = item.Nodes.Select(searchResultItem => 
+                               searchResultItem.Switch<SuggestionItem>(selector => selector
+                                       .Issue(i => new SuggestionItem("#" + i.Number, i.Title) { LastModifiedDate = i.LastEditedAt })
+                                       .PullRequest(p => new SuggestionItem("#" + p.Number, p.Title) { LastModifiedDate = p.LastEditedAt }))
+                               ).ToList(),
+                           EndCursor = item.PageInfo.EndCursor,
+                           HasNextPage = item.PageInfo.HasNextPage,
+                           TotalCount = item.IssueCount
+                       })
+                       .Compile();
             }
 
-            return IssuesCache.RetrieveSuggestions(CurrentRepository)
-                .Catch<IReadOnlyList<SuggestionItem>, Exception>(_ => Observable.Empty<IReadOnlyList<SuggestionItem>>())
-                .SelectMany(x => x.ToObservable())
-                .Where(suggestion => !String.IsNullOrEmpty(suggestion.Name)) // Just being extra cautious
-                .Select(suggestion => new IssueAutoCompleteSuggestion(suggestion, Prefix));
+            filter = $"repo:{owner}/{name}";
+
+            return Observable.FromAsync(async () =>
+            {
+                var results = new List<SuggestionItem>();
+
+                var variables = new Dictionary<string, object>
+                {
+                    {nameof(filter), filter },
+                };
+
+                var connection = await graphqlFactory.CreateConnection(hostAddress);
+                var searchResults = await connection.Run(query, variables);
+
+                results.AddRange(searchResults.Items);
+
+                while (searchResults.HasNextPage)
+                {
+                    variables[nameof(after)] = searchResults.EndCursor;
+                    searchResults = await connection.Run(query, variables);
+
+                    results.AddRange(searchResults.Items);
+                }
+
+                return results.Select(item => new IssueAutoCompleteSuggestion(item, Prefix));
+
+            }).SelectMany(observable => observable);
+        }
+
+        class SearchResult
+        {
+            public SuggestionItem SuggestionItem { get; set; }
         }
 
         public string Prefix
         {
             get { return "#"; }
         }
-
-        IIssuesCache IssuesCache { get { return issuesCache.Value; } }
-
-        IRepositoryModel CurrentRepository { get { return currentRepositoryState.Value.SelectedRepository; } }
 
         class IssueAutoCompleteSuggestion : AutoCompleteSuggestion
         {

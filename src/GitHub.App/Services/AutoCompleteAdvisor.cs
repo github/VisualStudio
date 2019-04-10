@@ -7,8 +7,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using GitHub.UI;
-using NLog;
+using GitHub.Extensions;
+using GitHub.Logging;
+using GitHub.Models;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -18,11 +20,11 @@ namespace GitHub.Services
     {
         const int SuggestionCount = 5; // The number of suggestions we'll provide. github.com does 5.
 
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<AutoCompleteAdvisor>();
         readonly Lazy<Dictionary<string, IAutoCompleteSource>> prefixSourceMap;
 
         [ImportingConstructor]
-        public AutoCompleteAdvisor([ImportMany]IEnumerable<IAutoCompleteSource> autocompleteSources)
+        public AutoCompleteAdvisor([ImportMany(typeof(IAutoCompleteSource))]IEnumerable<IAutoCompleteSource> autocompleteSources)
         {
             prefixSourceMap = new Lazy<Dictionary<string, IAutoCompleteSource>>(
                 () => autocompleteSources.ToDictionary(s => s.Prefix, s => s));
@@ -30,7 +32,7 @@ namespace GitHub.Services
 
         public IObservable<AutoCompleteResult> GetAutoCompletionSuggestions(string text, int caretPosition)
         {
-            Ensure.ArgumentNotNull("text", text);
+            Guard.ArgumentNotNull("text", text);
 
             if (caretPosition < 0 || caretPosition > text.Length)
             {
@@ -73,7 +75,7 @@ namespace GitHub.Services
                     new ReadOnlyCollection<AutoCompleteSuggestion>(suggestions)))
                 .Catch<AutoCompleteResult, Exception>(e =>
                 {
-                    log.Info(e);
+                    log.Error(e, "Error Getting AutoCompleteResult");
                     return Observable.Return(AutoCompleteResult.Empty);
                 });
         }
@@ -82,8 +84,8 @@ namespace GitHub.Services
             , Justification = "We ensure the argument is greater than -1 so it can't overflow")]
         public static AutoCompletionToken ParseAutoCompletionToken(string text, int caretPosition, string triggerPrefix)
         {
-            Ensure.ArgumentNotNull("text", text);
-            Ensure.ArgumentInRange(caretPosition, 0, text.Length, "caretPosition");
+            Guard.ArgumentNotNull("text", text);
+            Guard.ArgumentInRange(caretPosition, 0, text.Length, "caretPosition");
             if (caretPosition == 0 || text.Length == 0) return null;
 
             // :th     : 1
@@ -103,8 +105,8 @@ namespace GitHub.Services
     {
         public AutoCompletionToken(string searchPrefix, int offset)
         {
-            Ensure.ArgumentNotNull(searchPrefix, "searchPrefix");
-            Ensure.ArgumentNonNegative(offset, "offset");
+            Guard.ArgumentNotNull(searchPrefix, "searchPrefix");
+            Guard.ArgumentNonNegative(offset, "offset");
 
             SearchSearchPrefix = searchPrefix;
             Offset = offset;

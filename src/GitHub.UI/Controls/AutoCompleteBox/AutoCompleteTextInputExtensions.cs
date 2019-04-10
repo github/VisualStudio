@@ -24,8 +24,10 @@ namespace GitHub.UI.Controls.AutoCompleteBox
             int offset = completionOffset;
 
             var currentText = textInput.Text ?? ""; // Playing it safe
-            Debug.Assert(offset <= currentText.Length, "The offset can't be larger than the current text length");
-            Debug.Assert(afterIndex <= currentText.Length, "The afterIndex can't be larger than the current text length");
+
+            if (offset > currentText.Length) throw new InvalidOperationException("The offset can't be larger than the current text length");
+            if (afterIndex > currentText.Length) throw new InvalidOperationException("The afterIndex can't be larger than the current text length");
+
             var before = currentText.Substring(0, offset);
             var after = currentText.Substring(afterIndex);
             string prefix = before + value + " ";

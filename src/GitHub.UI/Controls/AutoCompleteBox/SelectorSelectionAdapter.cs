@@ -61,13 +61,13 @@ namespace GitHub.UI
         }
 
         /// <summary>
-        /// Occurs when the <see cref="P:Chat.SelectorSelectionAdapter.SelectedItem" /> property value changes.
+        /// Occurs when the <see cref="SelectorSelectionAdapter.SelectedItem" /> property value changes.
         /// </summary>
         public event SelectionChangedEventHandler SelectionChanged;
 
         /// <summary>
         /// Occurs when an item is selected and is committed to the underlying
-        /// <see cref="T:System.Windows.Controls.Primitives.Selector" /> control.
+        /// <see cref="System.Windows.Controls.Primitives.Selector" /> control.
         /// </summary>
         public event RoutedEventHandler Commit;
 
@@ -194,9 +194,9 @@ namespace GitHub.UI
 
         /// <summary>
         /// Increments the
-        /// <see cref="P:System.Windows.Controls.Primitives.Selector.SelectedIndex" />
+        /// <see cref="Selector.SelectedIndex" />
         /// property of the underlying
-        /// <see cref="T:System.Windows.Controls.Primitives.Selector" />
+        /// <see cref="Selector" />
         /// control.
         /// </summary>
         protected void SelectedIndexIncrement()
@@ -212,9 +212,9 @@ namespace GitHub.UI
 
         /// <summary>
         /// Decrements the
-        /// <see cref="P:System.Windows.Controls.Primitives.Selector.SelectedIndex" />
+        /// <see cref="Selector.SelectedIndex" />
         /// property of the underlying
-        /// <see cref="T:System.Windows.Controls.Primitives.Selector" />
+        /// <see cref="Selector" />
         /// control.
         /// </summary>
         protected void SelectedIndexDecrement()

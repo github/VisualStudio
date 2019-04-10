@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Media.Imaging;
-using GitHub.Caches;
+using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Models;
-using GitHub.Services;
-using GitHub.UI;
-using GitHub.ViewModels;
+using GitHub.Primitives;
+using Octokit.GraphQL;
+using static Octokit.GraphQL.Variable;
 
 namespace GitHub.Services
 {
@@ -20,58 +20,77 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class MentionsAutoCompleteSource : IAutoCompleteSource
     {
-        readonly Lazy<IMentionsCache> mentionsCache;
-        readonly Lazy<ISourceListViewModel> currentRepositoryState;
-        readonly Lazy<IImageCache> imageCache;
-        readonly IAvatarProvider hostAvatarProvider;
+        const string DefaultAvatar = "pack://application:,,,/GitHub.App;component/Images/default_user_avatar.png";
+
+        readonly ITeamExplorerContext teamExplorerContext;
+        readonly IGraphQLClientFactory graphqlFactory;
+        readonly IAvatarProvider avatarProvider;
+        ICompiledQuery<List<SuggestionItem>> query;
 
         [ImportingConstructor]
         public MentionsAutoCompleteSource(
-            Lazy<IMentionsCache> mentionsCache,
-            Lazy<IImageCache> imageCache,
-            IAvatarProvider hostAvatarProvider)
+            ITeamExplorerContext teamExplorerContext, 
+            IGraphQLClientFactory graphqlFactory,
+            IAvatarProvider avatarProvider)
         {
-            Guard.ArgumentNotNull(mentionsCache, "mentionsCache");
-            Guard.ArgumentNotNull(currentRepositoryState, "currentRepositoryState");
-            Guard.ArgumentNotNull(imageCache, "imageCache");
-            Guard.ArgumentNotNull(hostAvatarProvider, "hostAvatarProvider");
+            Guard.ArgumentNotNull(teamExplorerContext, nameof(teamExplorerContext));
+            Guard.ArgumentNotNull(graphqlFactory, nameof(graphqlFactory));
+            Guard.ArgumentNotNull(avatarProvider, nameof(avatarProvider));
 
-            this.mentionsCache = mentionsCache;
-            this.currentRepositoryState = currentRepositoryState;
-            this.imageCache = imageCache;
-            this.hostAvatarProvider = hostAvatarProvider;
+            this.teamExplorerContext = teamExplorerContext;
+            this.graphqlFactory = graphqlFactory;
+            this.avatarProvider = avatarProvider;
         }
 
         public IObservable<AutoCompleteSuggestion> GetSuggestions()
         {
-            if (CurrentRepository.RepositoryHost == null)
+            var localRepositoryModel = teamExplorerContext.ActiveRepository;
+
+            var hostAddress = HostAddress.Create(localRepositoryModel.CloneUrl.Host);
+            var owner = localRepositoryModel.Owner;
+            var name = localRepositoryModel.Name;
+
+            if (query == null)
             {
-                return Observable.Empty<AutoCompleteSuggestion>();
+                query = new Query().Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
+                .Select(repository =>
+                    repository.MentionableUsers(null, null, null, null)
+                        .AllPages()
+                        .Select(sourceItem => 
+                            new SuggestionItem(sourceItem.Login, 
+                                sourceItem.Name ?? "(unknown)", 
+                                sourceItem.AvatarUrl(null)))
+                        .ToList())
+                .Compile();
             }
 
-            var avatarProviderKey = CurrentRepository.RepositoryHost.Address.WebUri.ToString();
-            var avatarProvider = hostAvatarProvider.Get(avatarProviderKey);
+            var variables = new Dictionary<string, object>
+            {
+                {nameof(owner), owner },
+                {nameof(name), name },
+            };
 
-            Func<Uri, IObservable<BitmapSource>> resolveImage = uri =>
-                Observable.Defer(() => ImageCache
-                    .GetImage(uri)
-                    .Catch<BitmapSource, Exception>(_ => Observable.Return(avatarProvider.DefaultUserBitmapImage))
-                    .StartWith(avatarProvider.DefaultUserBitmapImage));
-
-            return MentionsCache.RetrieveSuggestions(CurrentRepository)
-                .Catch<IReadOnlyList<SuggestionItem>, Exception>(_ => Observable.Empty<IReadOnlyList<SuggestionItem>>())
-                .SelectMany(x => x.ToObservable())
-                .Where(suggestion => !String.IsNullOrEmpty(suggestion.Name)) // Just being extra cautious
-                .Select(suggestion =>
-                    new AutoCompleteSuggestion(suggestion.Name, suggestion.Description, resolveImage(suggestion.IconKey), Prefix));
+            return Observable.FromAsync(async () =>
+            {
+                var connection = await graphqlFactory.CreateConnection(hostAddress);
+                var suggestions = await connection.Run(query, variables);
+                return suggestions.Select(suggestion => new AutoCompleteSuggestion(suggestion.Name,
+                    suggestion.Description,
+                    ResolveImage(suggestion),
+                    Prefix));
+            }).SelectMany(enumerable => enumerable);
         }
 
-        public string Prefix { get { return "@"; } }
+        IObservable<BitmapSource> ResolveImage(SuggestionItem uri)
+        {
+            if (uri.ImageUrl != null)
+            {
+                return avatarProvider.GetAvatar(uri.ImageUrl);
+            }
 
-        IImageCache ImageCache { get { return imageCache.Value; } }
+            return Observable.Return(AvatarProvider.CreateBitmapImage(DefaultAvatar));
+        }
 
-        IMentionsCache MentionsCache { get { return mentionsCache.Value; } }
-
-        RepositoryModel CurrentRepository { get { return currentRepositoryState.Value.SelectedRepository; } }
+        public string Prefix => "@";
     }
 }

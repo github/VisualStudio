@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
@@ -112,15 +113,15 @@ namespace GitHub.UI
             }
         }
 
-        public IObservable<KeyEventArgs> PreviewKeyDown
+        public IObservable<EventPattern<KeyEventArgs>> PreviewKeyDown
         {
             get;
             private set;
         }
 
-        public IObservable<RoutedEventArgs> SelectionChanged { get; private set; }
+        public IObservable<EventPattern<RoutedEventArgs>> SelectionChanged { get; private set; }
 
-        public IObservable<TextChangedEventArgs> TextChanged { get; private set; }
+        public IObservable<EventPattern<TextChangedEventArgs>> TextChanged { get; private set; }
 
         public UIElement Control { get { return textBox; } }
 
@@ -158,15 +159,15 @@ namespace GitHub.UI
                 {
                     textBox = value;
 
-                    PreviewKeyDown = Observable.FromEvent<KeyEventHandler, KeyEventArgs>(
+                    PreviewKeyDown = Observable.FromEventPattern<KeyEventHandler, KeyEventArgs>(
                         h => textBox.PreviewKeyDown += h,
                         h => textBox.PreviewKeyDown -= h);
 
-                    SelectionChanged = Observable.FromEvent<RoutedEventHandler, RoutedEventArgs>(
+                    SelectionChanged = Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
                         h => textBox.SelectionChanged += h,
                         h => textBox.SelectionChanged -= h);
 
-                    TextChanged = Observable.FromEvent<TextChangedEventHandler, TextChangedEventArgs>(
+                    TextChanged = Observable.FromEventPattern<TextChangedEventHandler, TextChangedEventArgs>(
                         h => textBox.TextChanged += h,
                         h => textBox.TextChanged -= h);
 

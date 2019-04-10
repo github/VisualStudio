@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.Models;
-using GitHub.UI;
 
 namespace GitHub.Services
 {

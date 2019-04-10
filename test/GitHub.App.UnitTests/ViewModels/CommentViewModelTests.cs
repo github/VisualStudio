@@ -65,11 +65,14 @@ namespace GitHub.App.UnitTests.ViewModels
         }
 
         CommentViewModel CreateTarget(
-            ICommentService commentService = null)
+            ICommentService commentService = null,
+            IAutoCompleteAdvisor autoCompleteAdvisor = null
+            )
         {
             commentService = commentService ?? Substitute.For<ICommentService>();
+            autoCompleteAdvisor = autoCompleteAdvisor ?? Substitute.For<IAutoCompleteAdvisor>();
 
-            return new CommentViewModel(commentService);
+            return new CommentViewModel(commentService, autoCompleteAdvisor);
         }
     }
 }
