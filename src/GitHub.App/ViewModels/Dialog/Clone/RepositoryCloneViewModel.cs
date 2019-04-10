@@ -68,7 +68,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             var canClone = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
                 (repo, path) => repo != null && !service.DestinationFileExists(path) &&
-                (!service.DestinationDirectoryExists(path)) || service.DestinationDirectoryEmpty(path));
+                (!service.DestinationDirectoryExists(path) || service.DestinationDirectoryEmpty(path)));
 
             var canOpen = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
