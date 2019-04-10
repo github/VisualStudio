@@ -59,7 +59,7 @@ namespace GitHub.Services
                        .Compile();
             }
 
-            filter = $"repo:{owner}/{name} is:open";
+            filter = $"repo:{owner}/{name}";
 
             return Observable.FromAsync(async () =>
             {
