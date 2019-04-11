@@ -54,11 +54,13 @@ namespace GitHub.App.UnitTests.ViewModels.Documents
         }
 
         IssueishCommentViewModel CreateTarget(
-            ICommentService commentService = null)
+            ICommentService commentService = null,
+            IAutoCompleteAdvisor autoCompleteAdvisor = null)
         {
             commentService = commentService ?? Substitute.For<ICommentService>();
+            autoCompleteAdvisor = autoCompleteAdvisor ?? Substitute.For<IAutoCompleteAdvisor>();
 
-            return new IssueishCommentViewModel(commentService);
+            return new IssueishCommentViewModel(commentService, autoCompleteAdvisor);
         }
     }
 }

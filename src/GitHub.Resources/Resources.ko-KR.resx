@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>현재 리포지토리에서 대상 URL을 찾을 수 없습니다. 페치를 수행한 후 다시 시도하세요.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>이 위치에 이미 디렉터리가 있지만, 디렉터리에 리포지토리가 없습니다.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>리포지토리가 이 위치에 이미 있지만, "origin"이라는 원격 항목을 포함하지 않습니다.</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>및 기타</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>이 대화는 확인된 것으로 표시되었습니다.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

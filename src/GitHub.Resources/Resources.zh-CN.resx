@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>此存储库不在 GitHub 上</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>没有任何存储库</value>
+    <value>未找到任何存储库</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>此处找不到 git 存储库。请打开 git 项目或在项目中单击“文件”-&gt;“添加到源代码管理”以开始使用。</value>
@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>当前存储库中找不到目标 URL。请执行提取后重试。</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>在此位置已存在一个目录，但它不包含存储库。</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程库。</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>以及其他</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>此对话标记为已解决</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

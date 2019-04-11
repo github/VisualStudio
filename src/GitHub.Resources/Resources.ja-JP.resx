@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>このリポジトリは GitHub 上にありません</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>リポジトリではありません</value>
+    <value>リポジトリが見つかりません</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>この場所に Git リポジトリが見つかりませんでした。Git プロジェクトを開くか、プロジェクトで [ファイル] -&gt; [ソース管理に追加] をクリックして作業を開始してください。</value>
@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>この場所に既にディレクトリがありますが、リポジトリが含まれていません。</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>この場所にリポジトリが既に存在しますが、そのリポジトリには "origin" という名前のリモートがありません。</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>その他</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>この会話は解決済みとしてマークされました</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>

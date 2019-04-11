@@ -556,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Este repositorio no está en GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>No hay ningún repositorio</value>
+    <value>No se encontró ningún repositorio.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>No se encontró ningún repositorio GIT aquí. Abra un proyecto GIT o haga clic en "Archivo -&gt; Agregar al control de código fuente" en un proyecto para empezar.</value>
@@ -809,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>No se encontró la dirección URL de destino en el repositorio actual. Vuelva a intentarlo tras una recuperación de cambios.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>Ya hay un directorio en esta ubicación, pero no contiene un repositorio.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Ya existe un repositorio en esta ubicación, pero no tiene un repositorio remoto con el nombre "origen".</value>
@@ -867,6 +867,15 @@ https://git-scm.com/download/win</value>
     <value>y otros</value>
   </data>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
-    <value>This conversation was marked as resolved</value>
+    <value>Esta conversación se ha marcado como resuelta</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
   </data>
 </root>
