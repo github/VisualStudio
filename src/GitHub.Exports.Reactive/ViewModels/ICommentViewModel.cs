@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels
@@ -119,5 +120,10 @@ namespace GitHub.ViewModels
         /// Deletes a comment.
         /// </summary>
         ReactiveCommand<Unit, Unit> Delete { get; }
+
+        /// <summary>
+        /// Provides an AutoCompleteAdvisor.
+        /// </summary>
+        IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
     }
 }

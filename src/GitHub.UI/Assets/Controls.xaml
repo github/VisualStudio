@@ -6,6 +6,7 @@
                     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Controls/AutoCompleteBox.xaml" />
         <ResourceDictionary Source="Controls/ScrollViewerWithShadow.xaml" />
         <ResourceDictionary Source="../Controls/Octicons/OcticonImage.xaml" />
     </ResourceDictionary.MergedDictionaries>

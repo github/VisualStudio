@@ -25,10 +25,12 @@ namespace GitHub.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestReviewCommentViewModel"/> class.
         /// </summary>
-        /// <param name="commentService">The comment service</param>
+        /// <param name="commentService">The comment service.</param>
+        /// <param name="autoCompleteAdvisor">The auto complete advisor.</param>
         [ImportingConstructor]
-        public PullRequestReviewCommentViewModel(ICommentService commentService)
-            : base(commentService)
+        public PullRequestReviewCommentViewModel(ICommentService commentService,
+            IAutoCompleteAdvisor autoCompleteAdvisor)
+            : base(commentService, autoCompleteAdvisor)
         {
             canStartReview = this.WhenAnyValue(
                 x => x.IsPending,
