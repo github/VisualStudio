@@ -83,6 +83,6 @@ if ($Package) {
 Get-ChildItem -Recurse -Path 'C:\Program Files (x86)\MSBuild\' msbuild.exe
 
 Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller
-Build-Solution src/GitHub.VisualStudio.16.sln "Build" $config -Deploy:$Package
+Build-Solution src\GitHub.VisualStudio.16.sln "Build" $config -Deploy:$Package
 
 Pop-Location
