@@ -5,19 +5,41 @@ open Fake.IO
 open Fake.BuildServer
 open Fake.IO.Globbing.Operators
 open Fake.Core
+open Fake.DotNet
+open Fake.Core
+open Fake.Core
+open Fake.Core
 
 BuildServer.install [
     AppVeyor.Installer
 ]
 
 let isAppveyor = AppVeyor.detect()
+let forceBumpVersion = Environment.hasEnvironVar "BumpVersion"
+let forceBuildNumber = Environment.environVarOrDefault "BuildNumber"
+
+let runBumpVersion = false
 
 Target.create "Clean" (fun _ ->
-  ()
+  ["build"]
+  |> Seq.iter Directory.delete
+)
+
+Target.create "BumpVersion" (fun _ ->
+    Trace.logfn "Bumping Version"
+    Shell.Exec("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File Bump-Version -BumpBuild -BuildNumber:" + "") |> ignore
+    ()
 )
 
 Target.create "Build" (fun _ ->
-  ()
+    (*
+    let setParams (defaults:MSBuildParams) = 
+        { defaults with
+            Verbosity = Some(MSBuildVerbosity.Quiet)}
+
+    MSBuild.build setParams "./GitHubVS.sln"
+    *)
+    ()
 )
 
 Target.create "Test" (fun _ ->
@@ -34,9 +56,10 @@ Target.create "Default" (fun _ ->
 
 open Fake.Core.TargetOperators
 "Clean" ==> "Build"
+"BumpVersion" =?> ("Build", runBumpVersion)
 
 "Build" ==> "Test" ==> "Default"
 "Build" ==> "Coverage" ==> "Default"
 
 // start build
-Target.runOrDefault "Default"
+Target.runOrDefaultWithArguments "Default"

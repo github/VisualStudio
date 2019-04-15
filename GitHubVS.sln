@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28603.18
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.Vsix", "src\GitHub.VisualStudio.Vsix\GitHub.VisualStudio.Vsix.csproj", "{D26B4B40-0C94-48AD-8019-0B9BE46E0071}"
 EndProject
@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
+		Build.fsx = Build.fsx
 		scripts\build.ps1 = scripts\build.ps1
 		scripts\Bump-Version.ps1 = scripts\Bump-Version.ps1
 		scripts\common.ps1 = scripts\common.ps1
