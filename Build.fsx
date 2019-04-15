@@ -5,7 +5,6 @@ open Fake.IO
 open Fake.BuildServer
 open Fake.IO.Globbing.Operators
 open Fake.Core
-open Fake.Tools
 
 BuildServer.install [
     AppVeyor.Installer
