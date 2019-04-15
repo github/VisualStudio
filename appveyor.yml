@@ -3,6 +3,7 @@ version: '2.10.0.{build}'
 skip_tags: true
 
 install:
+- dotnet tool install fake-cli -g
 - choco install --no-progress BCC-MSBuildLog
 - choco install --no-progress BCC-Submission
 - ps: |
@@ -35,7 +36,8 @@ install:
     nuget restore GitHubVS.sln
 
 build_script:
-- ps: scripts\build.ps1 -AppVeyor -Package:$package -BuildNumber:$env:APPVEYOR_BUILD_NUMBER -ForVSInstaller:$forVSInstaller
+- ps: >-
+    fake run Build.fsx
 
 test:
   categories:

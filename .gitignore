@@ -238,6 +238,14 @@ coverage.xml
 #Msbuild binary log output
 output.binlog
 
+# Paket dependency manager
+.paket/
+paket-files/
+
+# FAKE - F# Make
+.fake/
+*.fsx.lock
+
 AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt
