@@ -84,6 +84,7 @@ Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$Fo
 
 Push-Location src
 Build-Solution GitHub.VisualStudio.16.sln "Build" $config -Deploy:$Package
+Get-ChildItem GitHub.VisualStudio.16/bin/*.* -Recurse
 Pop-Location
 
 Pop-Location
