@@ -12,8 +12,8 @@
 
   <Color x:Key="GitHubActionLinkItemColor">#FF0097FB</Color>
   <SolidColorBrush x:Key="GitHubActionLinkItemBrush" Color="{StaticResource GitHubActionLinkItemColor}" PresentationOptions:Freeze="true" />
-  
-  <Color x:Key="GitHubHeaderSeparatorColor">#FF2D2D30</Color>
+
+  <Color x:Key="GitHubHeaderSeparatorColor">#FF3f3f46</Color>
   <SolidColorBrush x:Key="GitHubHeaderSeparatorBrush" Color="{StaticResource GitHubHeaderSeparatorColor}" PresentationOptions:Freeze="true" />
 
   <Color x:Key="GitHubPaneTitleColor">#FFFFFFFF</Color>
@@ -66,4 +66,58 @@
   <SolidColorBrush x:Key="GitHubPendingReviewBackground" Color="#26384D" />
   <SolidColorBrush x:Key="GitHubMultilineListItemActiveBrush" Color="#FF3F3F46"/>
   <SolidColorBrush x:Key="GitHubFileExpanderHeaderBackgroundBrush" Color="#FF2D2D30" />
+
+  <SolidColorBrush x:Key="GitHubTimelineEventBackgroundBrush" Color="#FF4b4d50" />
+
+    <!-- Not selected, nor focused -->
+    <Color x:Key="GHBoxTextColor">#cccccc</Color>
+    <SolidColorBrush x:Key="GHBoxTextBrush" Color="{StaticResource GHBoxTextColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxIconColor">#b7b7b7</Color>
+    <SolidColorBrush x:Key="GHBoxIconBrush" Color="{StaticResource GHBoxIconColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxBackgroundColor">Transparent</Color>
+    <SolidColorBrush x:Key="GHBoxBackgroundBrush" Color="{StaticResource GHBoxBackgroundColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <!-- Selected, not active (focused) -->
+    <Color x:Key="GHBoxSelectedTextColor">#cccccc</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedTextBrush" Color="{StaticResource GHBoxSelectedTextColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxSelectedIconColor">#b7b7b7</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedIconBrush" Color="{StaticResource GHBoxSelectedIconColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxSelectedBackgroundColor">#3e3e3e</Color>
+    <SolidColorBrush x:Key="GHBoxSelectedBackgroundBrush" Color="{StaticResource GHBoxSelectedBackgroundColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <!-- Selected and active (focused) -->
+    <Color x:Key="GHBoxActiveSelectionTextColor">#ffffff</Color>
+    <SolidColorBrush x:Key="GHBoxActiveSelectionTextBrush" Color="{StaticResource GHBoxActiveSelectionTextColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxActiveSelectionIconColor">#ffffff</Color>
+    <SolidColorBrush x:Key="GHBoxActiveSelectionIconBrush" Color="{StaticResource GHBoxActiveSelectionIconColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxActiveSelectionBackgroundColor">#3998d6</Color>
+    <SolidColorBrush x:Key="GHBoxActiveSelectionBackgroundBrush" Color="{StaticResource GHBoxActiveSelectionBackgroundColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <!-- Hovered (should never be used for selected or active items) -->
+    <Color x:Key="GHBoxHoverTextColor">#ffffff</Color>
+    <SolidColorBrush x:Key="GHBoxHoverTextBrush" Color="{StaticResource GHBoxHoverTextColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxHoverIconColor">#ffffff</Color>
+    <SolidColorBrush x:Key="GHBoxHoverIconBrush" Color="{StaticResource GHBoxHoverIconColor}"
+                     PresentationOptions:Freeze="true" />
+
+    <Color x:Key="GHBoxHoverBackgroundColor">Transparent</Color>
+    <SolidColorBrush x:Key="GHBoxHoverBackgroundBrush" Color="{StaticResource GHBoxHoverBackgroundColor}"
+                     PresentationOptions:Freeze="true" />
 </ResourceDictionary>

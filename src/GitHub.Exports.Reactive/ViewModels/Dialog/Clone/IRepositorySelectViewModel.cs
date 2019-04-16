@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using ReactiveUI;
 
 namespace GitHub.ViewModels.Dialog.Clone
 {

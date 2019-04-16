@@ -63,6 +63,7 @@ namespace GitHub.SampleData
         public IReadOnlyList<string> States { get; }
         public Uri WebUrl => null;
         public ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
+        public ReactiveCommand<IPullRequestListItemViewModel, Unit> OpenConversation { get; }
         public ReactiveCommand<IIssueListItemViewModelBase, Unit> OpenItem { get; }
         public ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
 

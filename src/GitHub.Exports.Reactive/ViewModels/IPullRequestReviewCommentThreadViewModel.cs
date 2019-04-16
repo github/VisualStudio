@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Services;
+using ReactiveUI;
 
 namespace GitHub.ViewModels
 {
@@ -10,6 +11,11 @@ namespace GitHub.ViewModels
     /// </summary>
     public interface IPullRequestReviewCommentThreadViewModel : ICommentThreadViewModel
     {
+        /// <summary>
+        /// Gets the comments in the thread.
+        /// </summary>
+        IReadOnlyReactiveList<ICommentViewModel> Comments { get; }
+
         /// <summary>
         /// Gets the current pull request review session.
         /// </summary>
@@ -29,6 +35,11 @@ namespace GitHub.ViewModels
         /// Gets the side of the diff that the comment is on.
         /// </summary>
         DiffSide Side { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether comment thread has been marked as resolved by a user.
+        /// </summary>
+        bool IsResolved { get; }
 
         /// <summary>
         /// Gets a value indicating whether the thread is a new thread being authored, that is not

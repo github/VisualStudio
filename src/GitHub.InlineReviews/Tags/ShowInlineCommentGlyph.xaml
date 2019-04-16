@@ -16,14 +16,27 @@
                         <Setter Property="Stroke" Value="{DynamicResource GitHubDiffGlyphFill.None}" />
                     </Style>
                 </Canvas.Resources>
-
                 <Ellipse Width="9"
                          Height="9" 
                          Canvas.Top="3.5"
                          Canvas.Left="3.5"
-                         Fill="#959DA5"
-                         Stroke="White"
-                         StrokeThickness="1" />
+                         StrokeThickness="1">
+                    <Ellipse.Resources>
+                        <Style TargetType="Ellipse">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Thread.IsResolved}" Value="False">
+                                    <Setter Property="Fill" Value="#959DA5" />
+                                    <Setter Property="Stroke" Value="White" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Thread.IsResolved}" Value="True">
+                                    <Setter Property="Fill" Value="Transparent" />
+                                    <Setter Property="Stroke" Value="#959DA5" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Resources>
+                </Ellipse>
             </Canvas>
         </Viewbox>
     </Grid>

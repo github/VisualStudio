@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsWindowText}"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
 
     <d:DesignData.DataContext>

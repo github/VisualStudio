@@ -17,6 +17,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 {
     public class RepositoryCloneViewModelTests
     {
+        const string directoryEmpty = "d:\\empty\\directory";
         const string directoryExists = "d:\\exists\\directory";
         const string fileExists = "d:\\exists\\file";
         const string defaultPath = "d:\\default\\path";
@@ -224,7 +225,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
             target.Path = directoryExists;
 
-            Assert.That(target.PathWarning, Is.EqualTo(Resources.CantFindARepositoryAtLocalPath));
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.DirectoryAtDestinationNotEmpty));
         }
 
         [Test]
@@ -242,6 +243,16 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             target.Path = directoryExists;
 
             Assert.That(target.PathWarning, Is.EqualTo(expectMessage));
+        }
+
+        [Test]
+        public void PathWarning_Is_Not_Set_When_EmptyDirectoryExists_Selected()
+        {
+            var target = CreateTarget();
+
+            target.Path = directoryEmpty;
+
+            Assert.That(target.PathWarning, Is.Null);
         }
 
         [Test]
@@ -342,6 +353,21 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.Open.CanExecute(null), Is.True);
         }
 
+        [Test]
+        public async Task Clone_Is_Enabled_When_Path_EmptyDirectoryExists()
+        {
+            var target = CreateTarget();
+
+            await target.InitializeAsync(null);
+
+            SetRepository(target.GitHubTab, CreateRepositoryModel());
+            Assert.That(target.Clone.CanExecute(null), Is.True);
+
+            target.Path = directoryEmpty;
+
+            Assert.That(target.Clone.CanExecute(null), Is.True);
+        }
+
         static void SetRepository(IRepositoryCloneTabViewModel vm, RepositoryModel repository)
         {
             vm.Repository.Returns(repository);
@@ -385,6 +411,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             var result = Substitute.For<IRepositoryCloneService>();
             result.DefaultClonePath.Returns(defaultClonePath);
             result.DestinationDirectoryExists(directoryExists).Returns(true);
+            result.DestinationDirectoryExists(directoryEmpty).Returns(true);
+            result.DestinationDirectoryEmpty(directoryEmpty).Returns(true);
             result.DestinationFileExists(directoryExists).Returns(false);
             result.DestinationDirectoryExists(fileExists).Returns(false);
             result.DestinationFileExists(fileExists).Returns(true);

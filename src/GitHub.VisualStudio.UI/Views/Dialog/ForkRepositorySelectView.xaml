@@ -3,20 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" 
+             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
              d:DesignHeight="414" d:DesignWidth="440">
 
   <Control.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
+    <ResourceDictionary Source="DialogStyles.xaml" />
   </Control.Resources>
 
   <d:DesignProperties.DataContext>
@@ -29,7 +28,6 @@
     </TextBlock>
 
     <ui:GitHubProgressBar DockPanel.Dock="Top"
-                          Foreground="{DynamicResource GitHubAccentBrush}"
                           IsIndeterminate="True"
                           Style="{DynamicResource GitHubProgressBar}"
                           Visibility="{Binding IsLoading, Converter={ui:BooleanToHiddenVisibilityConverter}}"/>
@@ -50,7 +48,7 @@
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate>
-          <Border Margin="4" Background="#fff2f2f2" CornerRadius="3">
+          <Border Margin="4" CornerRadius="3">
             <DockPanel>
               <TextBlock DockPanel.Dock="Bottom"
                                 Margin="4,0,4,4"
