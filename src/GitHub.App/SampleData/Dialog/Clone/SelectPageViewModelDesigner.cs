@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog.Clone;
+using ReactiveUI;
 
 namespace GitHub.SampleData.Dialog.Clone
 {

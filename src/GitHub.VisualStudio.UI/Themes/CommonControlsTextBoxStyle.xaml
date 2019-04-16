@@ -1,0 +1,34 @@
+﻿<ResourceDictionary
+    x:Uid="ResourceDictionary_1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0">
+
+    <Style x:Uid="Style_1" TargetType="{x:Type TextBox}" x:Key="{x:Static vsfx:VsResourceKeys.TextBoxStyleKey}">
+        <Setter x:Uid="Setter_2" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBackgroundBrushKey}}" />
+        <Setter x:Uid="Setter_3" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxTextBrushKey}}" />
+        <Setter x:Uid="Setter_4" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBorderBrushKey}}" />
+        <Setter x:Uid="Setter_12" Property="Template">
+            <Setter.Value>
+                <ControlTemplate x:Uid="ControlTemplate_1" TargetType="{x:Type TextBoxBase}">
+                    <Border x:Uid="border" x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Uid="PART_ContentHost" x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger x:Uid="Trigger_1" Property="IsKeyboardFocused" Value="True">
+                <Setter x:Uid="Setter_5" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBackgroundFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_6" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxTextFocusedBrushKey}}" />
+                <Setter x:Uid="Setter_7" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBorderFocusedBrushKey}}" />
+            </Trigger>
+            <Trigger x:Uid="Trigger_2" Property="IsEnabled" Value="False">
+                <Setter x:Uid="Setter_8" Property="Background" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBackgroundDisabledBrushKey}}" />
+                <Setter x:Uid="Setter_9" Property="Foreground" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxTextDisabledBrushKey}}" />
+                <Setter x:Uid="Setter_10" Property="BorderBrush" Value="{DynamicResource {x:Static vs:CommonControlsColors.TextBoxBorderDisabledBrushKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

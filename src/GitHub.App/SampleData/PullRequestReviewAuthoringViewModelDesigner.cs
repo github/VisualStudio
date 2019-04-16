@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
 
@@ -53,6 +54,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public ReactiveCommand<Unit, Unit> Comment { get; }
         public ReactiveCommand<Unit, Unit> RequestChanges { get; }
         public ReactiveCommand<Unit, Unit> Cancel { get; }
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         public Task InitializeAsync(
             LocalRepositoryModel localRepository,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -13,13 +14,17 @@ using Serilog;
 namespace GitHub.ViewModels
 {
     /// <summary>
-    /// Base view model for an issue or pull request comment.
+    /// An issue or pull request comment.
     /// </summary>
-    public abstract class CommentViewModel : ReactiveObject, ICommentViewModel
+    [Export(typeof(ICommentViewModel))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class CommentViewModel : ViewModelBase, ICommentViewModel
     {
         static readonly ILogger log = LogManager.ForContext<CommentViewModel>();
         readonly ICommentService commentService;
+        readonly ObservableAsPropertyHelper<bool> canCancel;
         readonly ObservableAsPropertyHelper<bool> canDelete;
+        ObservableAsPropertyHelper<string> commitCaption;
         string id;
         IActorViewModel author;
         IActorViewModel currentUser;
@@ -36,10 +41,14 @@ namespace GitHub.ViewModels
         /// Initializes a new instance of the <see cref="CommentViewModel"/> class.
         /// </summary>
         /// <param name="commentService">The comment service.</param>
-        public CommentViewModel(ICommentService commentService)
+        /// <param name="autoCompleteAdvisor">The auto complete advisor.</param>
+        [ImportingConstructor]
+        public CommentViewModel(ICommentService commentService, IAutoCompleteAdvisor autoCompleteAdvisor)
         {
             Guard.ArgumentNotNull(commentService, nameof(commentService));
+            Guard.ArgumentNotNull(autoCompleteAdvisor, nameof(autoCompleteAdvisor));
 
+            AutoCompleteAdvisor = autoCompleteAdvisor;
             this.commentService = commentService;
 
             var canDeleteObservable = this.WhenAnyValue(
@@ -70,6 +79,9 @@ namespace GitHub.ViewModels
                     (ro, body) => !ro && !string.IsNullOrWhiteSpace(body)));
             AddErrorHandler(CommitEdit);
 
+            canCancel = this.WhenAnyValue(x => x.Id)
+                .Select(id => id != null)
+                .ToProperty(this, x => x.CanCancel);
             CancelEdit = ReactiveCommand.Create(DoCancelEdit, CommitEdit.IsExecuting.Select(x => !x));
             AddErrorHandler(CancelEdit);
 
@@ -141,6 +153,9 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
+        public bool CanCancel => canCancel.Value;
+
+        /// <inheritdoc/>
         public bool CanDelete => canDelete.Value;
 
         /// <inheritdoc/>
@@ -149,6 +164,9 @@ namespace GitHub.ViewModels
             get => createdAt;
             private set => this.RaiseAndSetIfChanged(ref createdAt, value);
         }
+
+        /// <inheritdoc/>
+        public string CommitCaption => commitCaption.Value;
 
         /// <inheritdoc/>
         public ICommentThreadViewModel Thread
@@ -175,14 +193,11 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> Delete { get; }
 
-        /// <summary>
-        /// Initializes the view model with data.
-        /// </summary>
-        /// <param name="thread">The thread that the comment is a part of.</param>
-        /// <param name="currentUser">The current user.</param>
-        /// <param name="comment">The comment model. May be null.</param>
-        /// <param name="state">The comment edit state.</param>
-        protected Task InitializeAsync(
+        /// <inheritdoc/>
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
+
+        /// <inheritdoc/>
+        public Task InitializeAsync(
             ICommentThreadViewModel thread,
             ActorModel currentUser,
             CommentModel comment,
@@ -195,12 +210,14 @@ namespace GitHub.ViewModels
             CurrentUser = new ActorViewModel(currentUser);
             Id = comment?.Id;
             DatabaseId = comment?.DatabaseId ?? 0;
-            PullRequestId = comment?.PullRequestId ?? 0;
+            PullRequestId = (comment as PullRequestReviewCommentModel)?.PullRequestId ?? 0;
             Body = comment?.Body;
             EditState = state;
             Author = comment != null ? new ActorViewModel(comment.Author) : CurrentUser;
             CreatedAt = comment?.CreatedAt ?? DateTimeOffset.MinValue;
             WebUrl = comment?.Url != null ? new Uri(comment.Url) : null;
+
+            commitCaption = GetCommitCaptionObservable().ToProperty(this, x => x.CommitCaption);
 
             return Task.CompletedTask;
         }
@@ -208,6 +225,12 @@ namespace GitHub.ViewModels
         protected void AddErrorHandler(ReactiveCommand command)
         {
             command.ThrownExceptions.Subscribe(x => ErrorMessage = x.Message);
+        }
+
+        protected virtual IObservable<string> GetCommitCaptionObservable()
+        {
+            return this.WhenAnyValue(x => x.Id)
+                .Select(x => x == null ? Resources.Comment : Resources.UpdateComment);
         }
 
         async Task DoDelete()

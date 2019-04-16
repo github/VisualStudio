@@ -172,8 +172,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         {
             var result = Substitute.For<IViewViewModelFactory>();
             var commentService = Substitute.For<ICommentService>();
+            var autoCompleteAdvisor = Substitute.For<IAutoCompleteAdvisor>();
             result.CreateViewModel<IPullRequestReviewCommentViewModel>().Returns(_ =>
-                new PullRequestReviewCommentViewModel(commentService));
+                new PullRequestReviewCommentViewModel(commentService, autoCompleteAdvisor));
             return result;
         }
 

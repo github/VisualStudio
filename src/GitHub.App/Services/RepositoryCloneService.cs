@@ -64,7 +64,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address)
+        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address, bool refresh = false)
         {
             if (readViewerRepositories == null)
             {
@@ -107,7 +107,7 @@ namespace GitHub.Services
             }
 
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
-            var result = await graphql.Run(readViewerRepositories).ConfigureAwait(false);
+            var result = await graphql.Run(readViewerRepositories, cacheDuration: TimeSpan.FromHours(1), refresh: refresh).ConfigureAwait(false);
             return result;
         }
 
@@ -129,7 +129,7 @@ namespace GitHub.Services
 
             var repositoryUrl = url.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-            if (DestinationDirectoryExists(repositoryPath))
+            if (DestinationDirectoryExists(repositoryPath) && !DestinationDirectoryEmpty(repositoryPath))
             {
                 if (!IsSolutionInRepository(repositoryPath))
                 {
@@ -206,9 +206,12 @@ namespace GitHub.Services
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
-            await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(repositoryPath);
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            if (!DestinationDirectoryExists(repositoryPath))
+            {
+                await ThreadingHelper.SwitchToPoolThreadAsync();
+                operatingSystem.Directory.CreateDirectory(repositoryPath);
+                await ThreadingHelper.SwitchToMainThreadAsync();
+            }
 
             try
             {
@@ -224,12 +227,16 @@ namespace GitHub.Services
             catch (Exception ex)
             {
                 log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, repositoryPath);
+                operatingSystem.Directory.DeleteDirectory(repositoryPath);
                 throw;
             }
         }
 
         /// <inheritdoc/>
         public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
+
+        /// <inheritdoc/>
+        public bool DestinationDirectoryEmpty(string path) => operatingSystem.Directory.GetDirectory(path).IsEmpty;
 
         /// <inheritdoc/>
         public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);

@@ -24,6 +24,7 @@ using ReactiveUI.Legacy;
 using Serilog;
 using static System.FormattableString;
 using ReactiveCommand = ReactiveUI.ReactiveCommand;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -42,6 +43,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ISyncSubmodulesCommand syncSubmodulesCommand;
         readonly IViewViewModelFactory viewViewModelFactory;
         readonly IGitService gitService;
+        readonly IOpenIssueishDocumentCommand openDocumentCommand;
 
         IModelService modelService;
         PullRequestDetailModel model;
@@ -82,7 +84,8 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestFilesViewModel files,
             ISyncSubmodulesCommand syncSubmodulesCommand,
             IViewViewModelFactory viewViewModelFactory,
-            IGitService gitService)
+            IGitService gitService,
+            IOpenIssueishDocumentCommand openDocumentCommand)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -92,6 +95,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(syncSubmodulesCommand, nameof(syncSubmodulesCommand));
             Guard.ArgumentNotNull(viewViewModelFactory, nameof(viewViewModelFactory));
             Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(openDocumentCommand, nameof(openDocumentCommand));
 
             this.pullRequestsService = pullRequestsService;
             this.sessionManager = sessionManager;
@@ -101,6 +105,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.syncSubmodulesCommand = syncSubmodulesCommand;
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
+            this.openDocumentCommand = openDocumentCommand;
 
             Files = files;
 
@@ -134,6 +139,8 @@ namespace GitHub.ViewModels.GitHubPane
             SyncSubmodules.Subscribe(_ => Refresh().ToObservable());
             SubscribeOperationError(SyncSubmodules);
 
+            OpenConversation = ReactiveCommand.Create(DoOpenConversation);
+
             OpenOnGitHub = ReactiveCommand.Create(DoOpenDetailsUrl);
 
             ShowReview = ReactiveCommand.Create<IPullRequestReviewSummaryViewModel>(DoShowReview);
@@ -143,11 +150,6 @@ namespace GitHub.ViewModels.GitHubPane
 
         [Import(AllowDefault = true)]
         private IStaticReviewFileMapManager StaticReviewFileMapManager { get; set; }
-
-        private void DoOpenDetailsUrl()
-        {
-            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
-        }
 
         /// <inheritdoc/>
         public PullRequestDetailModel Model
@@ -274,6 +276,9 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit, Unit> SyncSubmodules { get; }
 
         /// <inheritdoc/>
+        public ReactiveCommand<Unit, Unit> OpenConversation { get; }
+
+        /// <inheritdoc/>
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; }
 
         /// <inheritdoc/>
@@ -359,7 +364,8 @@ namespace GitHub.ViewModels.GitHubPane
 
                 Checks = (IReadOnlyList<IPullRequestCheckViewModel>)PullRequestCheckViewModel.Build(viewViewModelFactory, pullRequest)?.ToList() ?? Array.Empty<IPullRequestCheckViewModel>();
 
-                await Files.InitializeAsync(Session);
+                // Only show unresolved comments
+                await Files.InitializeAsync(Session, c => !c.IsResolved);
 
                 var localBranches = await pullRequestsService.GetLocalBranches(LocalRepository, pullRequest).ToList();
 
@@ -648,6 +654,21 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 IsBusy = false;
             }
+        }
+
+        void DoOpenConversation()
+        {
+            var p = new OpenIssueishParams(
+                HostAddress.Create(LocalRepository.CloneUrl),
+                RemoteRepositoryOwner,
+                LocalRepository.Name,
+                Number);
+            openDocumentCommand.Execute(p);
+        }
+
+        void DoOpenDetailsUrl()
+        {
+            usageTracker.IncrementCounter(measuresModel => measuresModel.NumberOfPRDetailsOpenInGitHub).Forget();
         }
 
         void DoShowReview(IPullRequestReviewSummaryViewModel review)

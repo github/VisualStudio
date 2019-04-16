@@ -15,12 +15,18 @@ GitHub for Visual Studio provides facilities for reviewing a pull request direct
 The Pull Request Details view shows the current state of the pull request, including:
 - information about who created the pull request
 - the source and target branch
-- a description of the pull request
+- a description of the pull request (collapsed by default)
 - reviewers and the status of their review
 - checks (if checks have been enabled for the repository)
 - the files changed
 
 ![The details of a single pull request in the GitHub pane](images/pr-detail-view.png)
+
+## Viewing conversation details
+
+Click the comment count link in the GitHub pane to open up the conversation view. The conversation view shows the Pull Request description, a history of commits, and comments made.
+
+![View the conversation for a pull request](images/view-conversation.png)
 
 ## Checking out a pull request
 

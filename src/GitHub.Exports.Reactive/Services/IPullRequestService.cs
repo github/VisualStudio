@@ -9,7 +9,7 @@ using LibGit2Sharp;
 
 namespace GitHub.Services
 {
-    public interface IPullRequestService
+    public interface IPullRequestService : IIssueishService
     {
         /// <summary>
         /// Reads a page of pull request items.
@@ -19,13 +19,22 @@ namespace GitHub.Services
         /// <param name="name">The repository name.</param>
         /// <param name="after">The end cursor of the previous page, or null for the first page.</param>
         /// <param name="states">The pull request states to filter by</param>
+        /// <param name="refresh">Whether the data should be refreshed instead of read from the cache.</param>
         /// <returns>A page of pull request item models.</returns>
         Task<Page<PullRequestListItemModel>> ReadPullRequests(
             HostAddress address,
             string owner,
             string name,
             string after,
-            PullRequestStateEnum[] states);
+            PullRequestState[] states);
+
+        /// <summary>
+        /// Clears the cache for <see cref="ReadPullRequests"/>.
+        /// </summary>
+        /// <param name="address">The host address.</param>
+        /// <param name="owner">The repository owner.</param>
+        /// <param name="name">The repository name.</param>
+        Task ClearPullRequestsCache(HostAddress address, string owner, string name);
 
         /// <summary>
         /// Reads a page of users that can be assigned to pull requests.
@@ -68,6 +77,15 @@ namespace GitHub.Services
         /// <param name="localBranchName">The name of the local branch.</param>
         /// <returns></returns>
         IObservable<Unit> Checkout(LocalRepositoryModel repository, PullRequestDetailModel pullRequest, string localBranchName);
+
+        /// <summary>
+        /// Checks if a commit is available and if not tries to fetch the commit.
+        /// </summary>
+        /// <param name="localRepository">The local repository.</param>
+        /// <param name="remoteRepository">The remote repository.</param>
+        /// <param name="sha">The SHA of the commit.</param>
+        /// <returns>True if the commit was found, otherwise false.</returns>
+        Task<bool> FetchCommit(LocalRepositoryModel localRepository, RepositoryModel remoteRepository, string sha);
 
         /// <summary>
         /// Carries out a pull on the current branch.

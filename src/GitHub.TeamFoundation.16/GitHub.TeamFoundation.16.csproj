@@ -12,7 +12,7 @@
     <RootNamespace>GitHub.TeamFoundation</RootNamespace>
     <AssemblyName>GitHub.TeamFoundation.16</AssemblyName>
     <LangVersion>7.3</LangVersion>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <NuGetPackageImportStamp>
@@ -218,12 +218,7 @@
     <PackageReference Include="EnvDTE">
       <Version>8.0.2</Version>
     </PackageReference>
-    <PackageReference Include="LibGit2Sharp">
-      <Version>0.23.1</Version>
-    </PackageReference>
-    <PackageReference Include="LibGit2Sharp.NativeBinaries">
-      <Version>1.0.164</Version>
-    </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
     <PackageReference Include="Serilog">
       <Version>2.5.0</Version>
     </PackageReference>

@@ -268,7 +268,8 @@ namespace GitHub.InlineReviews.Services
                 address,
                 RepositoryOwner,
                 LocalRepository.Name,
-                PullRequest.Number);
+                PullRequest.Number,
+                true);
             await Update(model);
         }
 
@@ -304,7 +305,6 @@ namespace GitHub.InlineReviews.Services
 
         async Task UpdateFile(PullRequestSessionFile file)
         {
-            await Task.Delay(0);
             var mergeBaseSha = await GetMergeBase();
             file.BaseSha = PullRequest.BaseRefSha;
             file.CommitSha = file.IsTrackingHead ? PullRequest.HeadRefSha : file.CommitSha;

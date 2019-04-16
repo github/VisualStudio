@@ -8,6 +8,8 @@
     DataContext="{Binding ViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300"
+    Background="{DynamicResource GitHubVsToolWindowBackground}"
+    Foreground="{DynamicResource GitHubVsWindowText}"
     mc:Ignorable="d">
 
   <Control.Resources>

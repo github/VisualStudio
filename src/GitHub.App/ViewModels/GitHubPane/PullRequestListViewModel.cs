@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Collections;
+using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -68,8 +68,16 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
 
         /// <inheritdoc/>
-        protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource()
+        protected override async Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh)
         {
+            if (refresh)
+            {
+                await service.ClearPullRequestsCache(
+                    HostAddress.Create(RemoteRepository.CloneUrl),
+                    RemoteRepository.Owner,
+                    RemoteRepository.Name);
+            }
+
             return new ItemSource(this);
         }
 
@@ -125,18 +133,18 @@ namespace GitHub.ViewModels.GitHubPane
 
             protected override async Task<Page<PullRequestListItemModel>> LoadPage(string after)
             {
-                PullRequestStateEnum[] states;
+                PullRequestState[] states;
 
                 switch (owner.SelectedState)
                 {
                     case "Open":
-                        states = new[] { PullRequestStateEnum.Open };
+                        states = new[] { PullRequestState.Open };
                         break;
                     case "Closed":
-                        states = new[] { PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        states = new[] { PullRequestState.Closed, PullRequestState.Merged };
                         break;
                     default:
-                        states = new[] { PullRequestStateEnum.Open, PullRequestStateEnum.Closed, PullRequestStateEnum.Merged };
+                        states = new[] { PullRequestState.Open, PullRequestState.Closed, PullRequestState.Merged };
                         break;
                 }
 
