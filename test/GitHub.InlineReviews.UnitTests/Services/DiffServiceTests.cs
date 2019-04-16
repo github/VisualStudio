@@ -14,9 +14,9 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public async Task DiffReturnsEmptyList()
             {
-                var gitClient = Substitute.For<IGitClient>();
-                gitClient.Compare(null, null, null, null).ReturnsNull();
-                var target = new DiffService(gitClient);
+                var gitService = Substitute.For<IGitService>();
+                gitService.Compare(null, null, null, null).ReturnsNull();
+                var target = new DiffService(gitService);
 
                 var result = await target.Diff(null, null, null, null);
 
@@ -29,9 +29,9 @@ namespace GitHub.InlineReviews.UnitTests.Services
             [Test]
             public async Task DiffReturnsEmptyList()
             {
-                var gitClient = Substitute.For<IGitClient>();
-                gitClient.CompareWith(null, null, null, null, null).ReturnsNull();
-                var target = new DiffService(gitClient);
+                var gitService = Substitute.For<IGitService>();
+                gitService.CompareWith(null, null, null, null, null).ReturnsNull();
+                var target = new DiffService(gitService);
 
                 var result = await target.Diff(null, null, null, null, null);
 
