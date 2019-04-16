@@ -82,7 +82,7 @@ public class GitClientTests
             var changes = Substitute.For<ContentChanges>();
             changes.LinesAdded.Returns(linesAdded);
             changes.LinesDeleted.Returns(linesDeleted);
-            repo.Diff.Compare(null, null).ReturnsForAnyArgs(changes);
+            repo.Diff.Compare(null as Blob, null as Blob).ReturnsForAnyArgs(changes);
             var gitClient = CreateGitClient();
 
             var modified = await gitClient.IsModified(repo, path, null);
@@ -277,10 +277,7 @@ public class GitClientTests
 
             await gitClient.Fetch(repo, fetchUri, refSpec);
 
-            var remote = repo.Network.Remotes[expectRemoteName];
-#pragma warning disable 0618 // TODO: Replace `Network.Fetch` with `Commands.Fetch`.
-            repo.Network.Received(1).Fetch(remote, Arg.Any<string[]>(), Arg.Any<FetchOptions>());
-#pragma warning restore 0618
+            repo.Network.Received(1).Fetch(expectRemoteName, Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
 
         static IRepository CreateRepository(string remoteName, string remoteUrl)
@@ -312,9 +309,7 @@ public class GitClientTests
 
             var mergeBaseSha = await gitClient.GetPullRequestMergeBase(repo, targetCloneUrl, baseSha, headSha, baseRef, pullNumber);
 
-#pragma warning disable 618 // Type or member is obsolete
-            repo.Network.DidNotReceiveWithAnyArgs().Fetch(null as Remote, null, null as FetchOptions);
-#pragma warning restore 618 // Type or member is obsolete
+            repo.Network.DidNotReceiveWithAnyArgs().Fetch(null as string, null, null as FetchOptions);
             Assert.That(expectMergeBaseSha, Is.EqualTo(mergeBaseSha));
         }
 
@@ -338,9 +333,7 @@ public class GitClientTests
             }
             catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
-#pragma warning disable 618 // Type or member is obsolete
-            repo.Network.Received(receivedFetch).Fetch(Arg.Any<Remote>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
-#pragma warning restore 618 // Type or member is obsolete
+            repo.Network.Received(receivedFetch).Fetch(Arg.Any<string>(), Arg.Any<string[]>(), Arg.Any<FetchOptions>());
         }
 
         [TestCase("baseSha", null, "mergeBaseSha", "baseRef", 777, "refs/pull/777/head")]
@@ -361,9 +354,7 @@ public class GitClientTests
             }
             catch (NotFoundException) { /* We're interested in calls to Fetch even if it throws */ }
 
-#pragma warning disable 618 // Type or member is obsolete
-            repo.Network.Received(1).Fetch(Arg.Any<Remote>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
-#pragma warning restore 618 // Type or member is obsolete
+            repo.Network.Received(1).Fetch(Arg.Any<string>(), Arg.Is<IEnumerable<string>>(x => x.Contains(expectRefSpec)), Arg.Any<FetchOptions>());
         }
 
         static IRepository MockRepo(string baseSha, string headSha, string mergeBaseSha)

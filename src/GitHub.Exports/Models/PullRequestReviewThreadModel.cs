@@ -34,6 +34,11 @@ namespace GitHub.Models
         public bool IsOutdated { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the thread is resolved.
+        /// </summary>
+        public bool IsResolved { get; set; }
+
+        /// <summary>
         /// Gets or sets the line position in the diff that the thread starts on.
         /// </summary>
         /// <remarks>

@@ -3,27 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog.Clone"
              xmlns:ghfvs="https://github.com/github/VisualStudio"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="400">
     <d:DesignData.DataContext>
         <ghfvs:SelectPageViewModelDesigner/>
     </d:DesignData.DataContext>
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
+    <Control.Resources>
+        <ResourceDictionary Source="../DialogStyles.xaml" />
+    </Control.Resources>
 
     <DockPanel>
         <ghfvs:PromptTextBox DockPanel.Dock="Top"
                              Margin="0,4"
-                             PromptText="Filter"
+                             PromptText="Search or enter a URL"
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
 
         <Grid>

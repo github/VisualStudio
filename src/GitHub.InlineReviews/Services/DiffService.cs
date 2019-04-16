@@ -16,12 +16,12 @@ namespace GitHub.InlineReviews.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DiffService : IDiffService
     {
-        readonly IGitClient gitClient;
+        readonly IGitService gitService;
 
         [ImportingConstructor]
-        public DiffService(IGitClient gitClient)
+        public DiffService(IGitService gitService)
         {
-            this.gitClient = gitClient;
+            this.gitService = gitService;
         }
 
         /// <inheritdoc/>
@@ -31,7 +31,7 @@ namespace GitHub.InlineReviews.Services
             string headSha,
             string path)
         {
-            var patch = await gitClient.Compare(repo, baseSha, headSha, path);
+            var patch = await gitService.Compare(repo, baseSha, headSha, path);
 
             if (patch != null)
             {
@@ -51,7 +51,7 @@ namespace GitHub.InlineReviews.Services
             string path,
             byte[] contents)
         {
-            var changes = await gitClient.CompareWith(repo, baseSha, headSha, path, contents);
+            var changes = await gitService.CompareWith(repo, baseSha, headSha, path, contents);
 
             if (changes?.Patch != null)
             {

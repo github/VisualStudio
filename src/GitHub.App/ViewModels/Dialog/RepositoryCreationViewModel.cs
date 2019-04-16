@@ -90,9 +90,6 @@ namespace GitHub.ViewModels.Dialog
                     return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
 
-            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
-                .Subscribe();
-
             CreateRepository = InitializeCreateRepositoryCommand();
 
             isCreating = CreateRepository.IsExecuting

@@ -23,6 +23,7 @@ namespace GitHub.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class PullRequestReviewCommentThreadViewModel : CommentThreadViewModel, IPullRequestReviewCommentThreadViewModel
     {
+        readonly ReactiveList<ICommentViewModel> comments = new ReactiveList<ICommentViewModel>();
         readonly IViewViewModelFactory factory;
         readonly ObservableAsPropertyHelper<bool> needsPush;
         IPullRequestSessionFile file;
@@ -51,6 +52,9 @@ namespace GitHub.ViewModels
         }
 
         /// <inheritdoc/>
+        public IReactiveList<ICommentViewModel> Comments => comments;
+
+        /// <inheritdoc/>
         public IPullRequestSession Session { get; private set; }
 
         /// <inheritdoc/>
@@ -66,6 +70,9 @@ namespace GitHub.ViewModels
         /// <inheritdoc/>
         public DiffSide Side { get; private set; }
 
+        /// <inheritdoc/>
+        public bool IsResolved { get; private set; }
+
         public bool IsNewThread
         {
             get => isNewThread;
@@ -76,7 +83,11 @@ namespace GitHub.ViewModels
         public bool NeedsPush => needsPush.Value;
 
         /// <inheritdoc/>
-        public async Task InitializeAsync(IPullRequestSession session,
+        IReadOnlyReactiveList<ICommentViewModel> IPullRequestReviewCommentThreadViewModel.Comments => comments;
+
+        /// <inheritdoc/>
+        public async Task InitializeAsync(
+            IPullRequestSession session,
             IPullRequestSessionFile file,
             IInlineCommentThreadModel thread,
             bool addPlaceholder)
@@ -89,6 +100,7 @@ namespace GitHub.ViewModels
             File = file;
             LineNumber = thread.LineNumber;
             Side = thread.DiffLineType == DiffChangeType.Delete ? DiffSide.Left : DiffSide.Right;
+            IsResolved = thread.IsResolved;
 
             foreach (var comment in thread.Comments)
             {
@@ -121,7 +133,8 @@ namespace GitHub.ViewModels
                     vm.Body = draft.Body;
                 }
 
-                AddPlaceholder(vm);
+                InitializePlaceholder(vm);
+                comments.Add(vm);
             }
         }
 
@@ -154,7 +167,8 @@ namespace GitHub.ViewModels
                 vm.Body = draft.Body;
             }
 
-            AddPlaceholder(vm);
+            InitializePlaceholder(vm);
+            comments.Add(vm);
         }
 
         public override async Task PostComment(ICommentViewModel comment)

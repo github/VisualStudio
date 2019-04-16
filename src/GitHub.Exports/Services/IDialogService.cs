@@ -26,20 +26,6 @@ namespace GitHub.Services
         Task<CloneDialogResult> ShowCloneDialog(IConnection connection, string url = null);
 
         /// <summary>
-        /// Shows the re-clone dialog.
-        /// </summary>
-        /// <param name="repository">The repository to clone.</param>
-        /// <returns>
-        /// A task that returns the base path for the clone on success, or null if the dialog was
-        /// cancelled.
-        /// </returns>
-        /// <remarks>
-        /// The re-clone dialog is shown from the VS2017+ start page when the user wants to check
-        /// out a repository that was previously checked out on another machine.
-        /// </remarks>
-        Task<string> ShowReCloneDialog(RepositoryModel repository);
-
-        /// <summary>
         /// Shows the Create Gist dialog.
         /// </summary>
         /// <param name="connection">
