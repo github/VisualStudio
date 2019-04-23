@@ -38,9 +38,8 @@
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
         </StackPanel>
 
-        <DockPanel DockPanel.Dock="Bottom"
-                   Margin="16">
-            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,9">
+            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}" />
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
                     Style="{DynamicResource GitHubLinkButton}"
