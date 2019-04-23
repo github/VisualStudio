@@ -46,7 +46,7 @@
                     VerticalContentAlignment="Center">
                 Browse
             </Button>
-            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
                      VerticalContentAlignment="Center" />
         </DockPanel>
 
