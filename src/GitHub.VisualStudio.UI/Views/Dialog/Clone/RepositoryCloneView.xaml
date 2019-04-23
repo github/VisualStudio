@@ -42,9 +42,8 @@
             <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}" />
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
-                    Style="{DynamicResource GitHubLinkButton}"
                     VerticalContentAlignment="Center">
-                Browse
+                Browse...
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
                      VerticalContentAlignment="Center" />
