@@ -20,9 +20,8 @@
     </Control.Resources>
 
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Button
-                Margin="12"
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Clone}"
@@ -30,7 +29,7 @@
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
 
             <Button
-                Margin="12"
+                Margin="6,0,0,0"
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Open}"
