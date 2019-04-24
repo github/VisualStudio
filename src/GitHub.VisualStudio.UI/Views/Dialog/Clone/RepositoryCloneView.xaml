@@ -26,7 +26,8 @@
                 IsDefault="True"
                 Command="{Binding Clone}"
                 Content="Clone"
-                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"
+                KeyboardNavigation.TabIndex="3" />
 
             <Button
                 Margin="6,0,0,0"
@@ -34,18 +35,21 @@
                 IsDefault="True"
                 Command="{Binding Open}"
                 Content="Open"
-                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"
+                KeyboardNavigation.TabIndex="4 "/>
         </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom" Margin="0,9,0,0">
             <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}" />
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
-                    VerticalContentAlignment="Center">
+                    VerticalContentAlignment="Center"
+                    KeyboardNavigation.TabIndex="6">
                 Browse...
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
-                     VerticalContentAlignment="Center" />
+                     VerticalContentAlignment="Center"
+                     KeyboardNavigation.TabIndex="5" />
         </DockPanel>
 
         <uic:InfoPanel Message="{Binding PathWarning}"
