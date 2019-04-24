@@ -108,7 +108,7 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [bool]$Deploy = $false) {
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [string]$VsixFileName, [bool]$Deploy = $false) {
         $msbuild = Find-MSBuild
 
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed -MSBuildPath (Split-Path -parent $msbuild) }
@@ -116,7 +116,7 @@ New-Module -ScriptBlock {
         $flag2 = ""
         if ($ForVSInstaller) {
             $flag1 = "/p:IsProductComponent=true"
-            $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
+            $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\$VsixFileName"
             new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
         } elseif (!$Deploy) {
             $configuration += "WithoutVsix"
