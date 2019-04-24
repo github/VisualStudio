@@ -27,7 +27,7 @@
                 Command="{Binding Clone}"
                 Content="Clone"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"
-                KeyboardNavigation.TabIndex="3" />
+                KeyboardNavigation.TabIndex="5" />
 
             <Button
                 Margin="6,0,0,0"
@@ -36,7 +36,7 @@
                 Command="{Binding Open}"
                 Content="Open"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"
-                KeyboardNavigation.TabIndex="4 "/>
+                KeyboardNavigation.TabIndex="6"/>
         </StackPanel>
 
         <DockPanel DockPanel.Dock="Bottom" Margin="0,9,0,0">
@@ -44,12 +44,12 @@
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
                     VerticalContentAlignment="Center"
-                    KeyboardNavigation.TabIndex="6">
+                    KeyboardNavigation.TabIndex="4">
                 Browse...
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
                      VerticalContentAlignment="Center"
-                     KeyboardNavigation.TabIndex="5" />
+                     KeyboardNavigation.TabIndex="3" />
         </DockPanel>
 
         <uic:InfoPanel Message="{Binding PathWarning}"
