@@ -16,7 +16,7 @@ namespace GitHub.VisualStudio.Views.Dialog.Clone
         {
             InitializeComponent();
 
-            // See Douglas Stockwell's suggestion here:
+            // See Douglas Stockwell's suggestion:
             // https://social.msdn.microsoft.com/Forums/vstudio/en-US/30ed27ce-f7b7-48ae-8adc-0400b9b9ec78
             IsVisibleChanged += (sender, e) =>
             {
