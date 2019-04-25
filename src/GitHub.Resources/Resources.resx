@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Private Repository</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Local path</value>
+    <value>Local path:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>License</value>
