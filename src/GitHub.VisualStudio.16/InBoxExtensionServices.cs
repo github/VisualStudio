@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio
                 IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, string url = null)
             {
                 var compositionServices = new CompositionServices();
-                var compositionContainer = compositionServices.CreateCompositionContainer(componentModel.DefaultExportProvider);
+                var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
 
                 var dialogService = compositionContainer.GetExportedValue<IDialogService>();
                 var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
