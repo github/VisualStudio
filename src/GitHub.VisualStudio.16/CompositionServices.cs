@@ -11,6 +11,7 @@ using GitHub.Api;
 using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.Views;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft.VisualStudio.Shell;
@@ -21,7 +22,38 @@ namespace GitHub.VisualStudio
 {
     public class CompositionServices
     {
-        public CompositionContainer CreateCompositionContainer(ExportProvider defaultExportProvider)
+        public CompositionContainer CreateVisualStudioCompositionContainer(ExportProvider defaultExportProvider)
+        {
+            var compositionContainer = CreateCompositionContainer(defaultExportProvider);
+
+            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
+            var packageSettings = new PackageSettings(gitHubServiceProvider);
+            var usageService = compositionContainer.GetExportedValue<IUsageService>();
+            var usageTracker = new UsageTracker(gitHubServiceProvider, usageService, packageSettings);
+            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
+
+            return compositionContainer;
+        }
+
+        public CompositionContainer CreateOutOfProcCompositionContainer()
+        {
+            var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
+
+            var usageTracker = new OutOfProcUsageTracker();
+            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
+
+            return compositionContainer;
+        }
+
+        static CompositionContainer CreateOutOfProcExports()
+        {
+            var container = new CompositionContainer();
+            var serviceProvider = new OutOfProcSVsServiceProvider();
+            container.ComposeExportedValue<SVsServiceProvider>(serviceProvider);
+            return container;
+        }
+
+        static CompositionContainer CreateCompositionContainer(ExportProvider defaultExportProvider)
         {
             var catalog = new LoggingCatalog(
                 GetCatalog(typeof(DialogService).Assembly), // GitHub.App
@@ -39,9 +71,6 @@ namespace GitHub.VisualStudio
             var gitHubServiceProvider = new MyGitHubServiceProvider(compositionContainer);
             compositionContainer.ComposeExportedValue<IGitHubServiceProvider>(gitHubServiceProvider);
 
-            var usageTracker = new MyUsageTracker();
-            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
-
             var loginManager = CreateLoginManager(compositionContainer);
             compositionContainer.ComposeExportedValue<ILoginManager>(loginManager);
 
@@ -58,7 +87,7 @@ namespace GitHub.VisualStudio
             factoryProviderFiled.SetValue(null, viewViewModelFactory);
         }
 
-        private static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
+        static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
         {
             var keychain = compositionContainer.GetExportedValue<IKeychain>();
             var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() => compositionContainer.GetExportedValue<ITwoFactorChallengeHandler>());
@@ -185,12 +214,21 @@ namespace GitHub.VisualStudio
         public ExportProvider ExportProvider { get; }
     }
 
-    public class MyUsageTracker : IUsageTracker
+    public class OutOfProcUsageTracker : IUsageTracker
     {
         public Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             Trace.WriteLine($"IncrementCounter {counter}");
             return Task.CompletedTask;
+        }
+    }
+
+    class OutOfProcSVsServiceProvider : SVsServiceProvider
+    {
+        public object GetService(Type serviceType)
+        {
+            Console.WriteLine($"GetService: {serviceType}");
+            return null;
         }
     }
 
