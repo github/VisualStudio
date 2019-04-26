@@ -33,7 +33,7 @@ namespace GitHub.Services
             IPackageSettings settings,
             JoinableTaskContext joinableTaskContext)
         {
-            makethis.gitHubServiceProvider = gitHubServiceProvider;
+            this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
             JoinableTaskFactory = joinableTaskContext.Factory;
