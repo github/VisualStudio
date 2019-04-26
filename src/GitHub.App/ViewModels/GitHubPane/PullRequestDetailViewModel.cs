@@ -13,7 +13,6 @@ using GitHub.App;
 using GitHub.Commands;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Services;
@@ -25,6 +24,9 @@ using Serilog;
 using static System.FormattableString;
 using ReactiveCommand = ReactiveUI.ReactiveCommand;
 using GitHub.Primitives;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -85,7 +87,8 @@ namespace GitHub.ViewModels.GitHubPane
             ISyncSubmodulesCommand syncSubmodulesCommand,
             IViewViewModelFactory viewViewModelFactory,
             IGitService gitService,
-            IOpenIssueishDocumentCommand openDocumentCommand)
+            IOpenIssueishDocumentCommand openDocumentCommand,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             Guard.ArgumentNotNull(pullRequestsService, nameof(pullRequestsService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
@@ -106,6 +109,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
             this.openDocumentCommand = openDocumentCommand;
+            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
 
             Files = files;
 
@@ -471,7 +475,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                await ThreadingHelper.SwitchToMainThreadAsync();
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 Error = null;
                 OperationError = null;
@@ -734,5 +738,7 @@ namespace GitHub.ViewModels.GitHubPane
             public string SyncSubmodulesToolTip { get; }
             public int SubmodulesToSync { get; }
         }
+
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

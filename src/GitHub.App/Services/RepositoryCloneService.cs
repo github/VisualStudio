@@ -8,11 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using Rothko;
@@ -50,7 +50,8 @@ namespace GitHub.Services
             IGraphQLClientFactory graphqlFactory,
             IGitHubContextService gitHubContextService,
             IUsageTracker usageTracker,
-            IGitHubServiceProvider sp)
+            IGitHubServiceProvider sp,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
@@ -59,6 +60,7 @@ namespace GitHub.Services
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
             dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
+            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -208,9 +210,9 @@ namespace GitHub.Services
             // vsGitServices.Clone() as this must be called on the main thread.
             if (!DestinationDirectoryExists(repositoryPath))
             {
-                await ThreadingHelper.SwitchToPoolThreadAsync();
+                await TaskScheduler.Default;
                 operatingSystem.Directory.CreateDirectory(repositoryPath);
-                await ThreadingHelper.SwitchToMainThreadAsync();
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
             }
 
             try
@@ -250,6 +252,8 @@ namespace GitHub.Services
         }
 
         public string DefaultClonePath { get { return defaultClonePath; } }
+
+        JoinableTaskFactory JoinableTaskFactory { get; }
 
         class OrganizationAdapter
         {

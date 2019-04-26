@@ -5,11 +5,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using Serilog;
 using Rothko;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.Shell;
 using Environment = System.Environment;
 using Task = System.Threading.Tasks.Task;
 
@@ -31,10 +32,12 @@ namespace GitHub.Services
         Guid? userGuid;
 
         [ImportingConstructor]
-        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment)
+        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.serviceProvider = serviceProvider;
             this.environment = environment;
+            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
         }
 
         public void Dispose()
@@ -135,7 +138,7 @@ namespace GitHub.Services
         {
             if (storePath == null)
             {
-                await ThreadingHelper.SwitchToMainThreadAsync();
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 var program = serviceProvider.GetService<IProgram>();
 
@@ -186,5 +189,7 @@ namespace GitHub.Services
         {
             public Guid UserGuid { get; set; }
         }
+
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -31,11 +30,13 @@ namespace GitHub.Services
         public UsageTracker(
             IGitHubServiceProvider gitHubServiceProvider,
             IUsageService service,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            JoinableTaskContext joinableTaskContext)
         {
-            this.gitHubServiceProvider = gitHubServiceProvider;
+            makethis.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
+            JoinableTaskFactory = joinableTaskContext.Factory;
             timer = StartTimer();
         }
 
@@ -69,7 +70,7 @@ namespace GitHub.Services
 
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
 
             client = gitHubServiceProvider.TryGetService<IMetricsService>();
             connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
@@ -141,5 +142,7 @@ namespace GitHub.Services
             current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
             return current;
         }
+
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }

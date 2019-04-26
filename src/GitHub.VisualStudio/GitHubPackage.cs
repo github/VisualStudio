@@ -381,7 +381,7 @@ namespace GitHub.VisualStudio
                 Assumes.Present(sp);
 
                 var environment = new Rothko.Environment();
-                return new UsageService(sp, environment);
+                return new UsageService(sp, environment, ThreadHelper.JoinableTaskContext);
             }
             else if (serviceType == typeof(IUsageTracker))
             {
@@ -393,7 +393,7 @@ namespace GitHub.VisualStudio
                 Assumes.Present(serviceProvider);
                 Assumes.Present(settings);
 
-                return new UsageTracker(serviceProvider, usageService, settings);
+                return new UsageTracker(serviceProvider, usageService, settings, ThreadHelper.JoinableTaskContext);
             }
             else if (serviceType == typeof(IVSGitExt))
             {
