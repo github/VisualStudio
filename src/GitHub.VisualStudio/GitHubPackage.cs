@@ -398,7 +398,7 @@ namespace GitHub.VisualStudio
             else if (serviceType == typeof(IVSGitExt))
             {
                 var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
-                return new VSGitExtFactory(vsVersion, this, GitService.GitServiceHelper).Create();
+                return new VSGitExtFactory(vsVersion, this, GitService.GitServiceHelper, ThreadHelper.JoinableTaskContext).Create();
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
