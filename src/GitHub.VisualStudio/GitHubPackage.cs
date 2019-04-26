@@ -357,9 +357,9 @@ namespace GitHub.VisualStudio
                 // needs to be refactored. See #1398.
 #pragma warning disable VSTHRD011 // Use AsyncLazy<T>
                 var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() =>
-                    ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    JoinableTaskFactory.Run(async () =>
                     {
-                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        await JoinableTaskFactory.SwitchToMainThreadAsync();
                         return serviceProvider.GetService<ITwoFactorChallengeHandler>();
                     }));
 #pragma warning restore VSTHRD011 // Use AsyncLazy<T>
@@ -406,7 +406,7 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IPackageSettings))
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
                 var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 return new PackageSettings(sp);
             }

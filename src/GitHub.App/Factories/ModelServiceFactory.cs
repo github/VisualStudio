@@ -8,6 +8,7 @@ using GitHub.Caches;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.Factories
 {
@@ -25,11 +26,13 @@ namespace GitHub.Factories
         public ModelServiceFactory(
             IApiClientFactory apiClientFactory,
             IHostCacheFactory hostCacheFactory,
-            IAvatarProvider avatarProvider)
+            IAvatarProvider avatarProvider,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.avatarProvider = avatarProvider;
+            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
         }
 
         public async Task<IModelService> CreateAsync(IConnection connection)
@@ -60,9 +63,11 @@ namespace GitHub.Factories
 
         public IModelService CreateBlocking(IConnection connection)
         {
-            return ThreadHelper.JoinableTaskFactory.Run(() => CreateAsync(connection));
+            return JoinableTaskFactory.Run(() => CreateAsync(connection));
         }
 
         public void Dispose() => cacheLock.Dispose();
+
+        JoinableTaskFactory JoinableTaskFactory { get; }
     }
 }
