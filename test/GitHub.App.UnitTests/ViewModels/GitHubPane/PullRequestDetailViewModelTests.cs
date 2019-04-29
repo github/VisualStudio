@@ -16,6 +16,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System.Windows.Input;
 using System.Reactive.Threading.Tasks;
+using Microsoft.VisualStudio.Threading;
 
 namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 {
@@ -613,7 +614,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 Substitute.For<ISyncSubmodulesCommand>(),
                 Substitute.For<IViewViewModelFactory>(),
                 gitService,
-                Substitute.For<IOpenIssueishDocumentCommand>());
+                Substitute.For<IOpenIssueishDocumentCommand>(),
+                new JoinableTaskContext());
             vm.InitializeAsync(repository, Substitute.For<IConnection>(), "owner", "repo", 1).Wait();
 
             return Tuple.Create(vm, pullRequestService);

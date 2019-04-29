@@ -33,8 +33,9 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitExt;
         IReadOnlyList<LocalRepositoryModel> activeRepositories;
 
-        public VSGitExt(IServiceProvider serviceProvider, IGitService gitService)
-            : this(serviceProvider, new VSUIContextFactory(), gitService, ThreadHelper.JoinableTaskContext)
+        /// NOTE: Used by VSGitExtFactory.
+        public VSGitExt(IServiceProvider serviceProvider, IGitService gitService, JoinableTaskContext joinableTaskContext)
+            : this(serviceProvider, new VSUIContextFactory(), gitService, joinableTaskContext)
         {
         }
 
