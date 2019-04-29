@@ -23,12 +23,7 @@ namespace GitHub.VisualStudio.Base
         public TeamExplorerServiceHolder(ITeamExplorerContext teamExplorerContext,
             [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
-            joinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
-
-            JoinableTaskCollection = joinableTaskContext.CreateCollection();
-            JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
-            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
-
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
             TeamExplorerContext = teamExplorerContext;
         }
 
@@ -82,8 +77,7 @@ namespace GitHub.VisualStudio.Base
             get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
 
-        public JoinableTaskCollection JoinableTaskCollection { get; }
-        public JoinableTaskFactory JoinableTaskFactory { get; }
+        public JoinableTaskContext JoinableTaskContext { get; }
         public ITeamExplorerContext TeamExplorerContext { get; }
     }
 }
