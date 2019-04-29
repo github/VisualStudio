@@ -36,7 +36,7 @@ namespace GitHub.Services
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
-            JoinableTaskFactory = joinableTaskContext.Factory;
+            JoinableTaskContext = joinableTaskContext;
             timer = StartTimer();
         }
 
@@ -70,7 +70,7 @@ namespace GitHub.Services
 
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             client = gitHubServiceProvider.TryGetService<IMetricsService>();
             connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
@@ -143,6 +143,6 @@ namespace GitHub.Services
             return current;
         }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

@@ -60,7 +60,7 @@ namespace GitHub.Services
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
             dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
@@ -212,7 +212,7 @@ namespace GitHub.Services
             {
                 await TaskScheduler.Default;
                 operatingSystem.Directory.CreateDirectory(repositoryPath);
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
             }
 
             try
@@ -253,7 +253,7 @@ namespace GitHub.Services
 
         public string DefaultClonePath { get { return defaultClonePath; } }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
 
         class OrganizationAdapter
         {

@@ -109,7 +109,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.viewViewModelFactory = viewViewModelFactory;
             this.gitService = gitService;
             this.openDocumentCommand = openDocumentCommand;
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
 
             Files = files;
 
@@ -475,7 +475,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             try
             {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
                 Error = null;
                 OperationError = null;
@@ -739,6 +739,6 @@ namespace GitHub.ViewModels.GitHubPane
             public int SubmodulesToSync { get; }
         }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

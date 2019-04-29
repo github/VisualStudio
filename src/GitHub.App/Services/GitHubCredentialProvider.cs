@@ -24,7 +24,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(keychain, nameof(keychain));
 
             this.keychain = keychain;
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace GitHub.Services
 
             try
             {
-                var credentials = JoinableTaskFactory.Run(async () => await keychain.Load(host));
+                var credentials = JoinableTaskContext.Factory.Run(async () => await keychain.Load(host));
                 return new UsernamePasswordCredentials
                 {
                     Username = credentials.Item1,
@@ -54,6 +54,6 @@ namespace GitHub.Services
             }
         }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

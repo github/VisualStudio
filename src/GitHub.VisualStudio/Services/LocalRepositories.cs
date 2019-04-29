@@ -26,7 +26,7 @@ namespace GitHub.Services
         public LocalRepositories(IVSGitServices vsGitServices, [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.vsGitServices = vsGitServices;
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         /// <inheritdoc/>
@@ -34,7 +34,7 @@ namespace GitHub.Services
         {
             await TaskScheduler.Default;
             var list = vsGitServices.GetKnownRepositories();
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             repositories.Except(list).ToList().ForEach(x => repositories.Remove(x));
             list.Except(repositories).ToList().ForEach(x => repositories.Add(x));
@@ -46,6 +46,6 @@ namespace GitHub.Services
         /// <inheritdoc/>
         public IReadOnlyObservableCollection<LocalRepositoryModel> Repositories => repositories;
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

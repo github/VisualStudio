@@ -22,7 +22,7 @@ namespace GitHub.Authentication
         [ImportingConstructor]
         public TwoFactorChallengeHandler([Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {            
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         ILogin2FaViewModel twoFactorDialog;
@@ -41,7 +41,7 @@ namespace GitHub.Authentication
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
 
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             var userError = new TwoFactorRequiredUserError(exception);
             var result = await twoFactorDialog.Show(userError);
@@ -58,10 +58,10 @@ namespace GitHub.Authentication
 
         public async Task ChallengeFailed(Exception exception)
         {
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
             twoFactorDialog.Cancel();
         }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

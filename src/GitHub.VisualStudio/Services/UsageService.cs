@@ -37,7 +37,7 @@ namespace GitHub.Services
         {
             this.serviceProvider = serviceProvider;
             this.environment = environment;
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         public void Dispose()
@@ -138,7 +138,7 @@ namespace GitHub.Services
         {
             if (storePath == null)
             {
-                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
                 var program = serviceProvider.GetService<IProgram>();
 
@@ -190,6 +190,6 @@ namespace GitHub.Services
             public Guid UserGuid { get; set; }
         }
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

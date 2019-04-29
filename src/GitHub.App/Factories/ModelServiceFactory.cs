@@ -32,7 +32,7 @@ namespace GitHub.Factories
             this.apiClientFactory = apiClientFactory;
             this.hostCacheFactory = hostCacheFactory;
             this.avatarProvider = avatarProvider;
-            JoinableTaskFactory = joinableTaskContext?.Factory ?? ThreadHelper.JoinableTaskFactory;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         public async Task<IModelService> CreateAsync(IConnection connection)
@@ -63,11 +63,11 @@ namespace GitHub.Factories
 
         public IModelService CreateBlocking(IConnection connection)
         {
-            return JoinableTaskFactory.Run(() => CreateAsync(connection));
+            return JoinableTaskContext.Factory.Run(() => CreateAsync(connection));
         }
 
         public void Dispose() => cacheLock.Dispose();
 
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }
