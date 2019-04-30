@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Repozytorium prywatne</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Ścieżka lokalna</value>
+    <value>Ścieżka lokalna:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licencja</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Nie można odnaleźć docelowego adresu URL w bieżącym repozytorium. Spróbuj ponownie po zakończeniu pobierania.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Katalog w ścieżce docelowej nie jest pusty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma zdalnego repozytorium o nazwie „origin”.</value>
@@ -870,12 +870,12 @@ https://git-scm.com/download/win</value>
     <value>Ta konwersacja została oznaczona jako rozwiązana</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Twoje repozytoria</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Repozytoria współpracowników</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Współtworzone repozytoria</value>
   </data>
 </root>

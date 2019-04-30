@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>비공개 리포지토리</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>로컬 경로</value>
+    <value>로컬 경로:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>라이선스</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>현재 리포지토리에서 대상 URL을 찾을 수 없습니다. 페치를 수행한 후 다시 시도하세요.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>대상 경로의 디렉터리가 비어 있지 않습니다.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>리포지토리가 이 위치에 이미 있지만, "origin"이라는 원격 항목을 포함하지 않습니다.</value>
@@ -870,12 +870,12 @@ https://git-scm.com/download/win</value>
     <value>이 대화는 확인된 것으로 표시되었습니다.</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>사용자 리포지토리</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>협력자 리포지토리</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>리포지토리에 협력함</value>
   </data>
 </root>
