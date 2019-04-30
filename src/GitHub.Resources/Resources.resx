@@ -878,4 +878,8 @@ https://git-scm.com/download/win</value>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
     <value>Contributed to repositories</value>
   </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+    
+  </data>
 </root>
