@@ -1306,6 +1306,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clone.
+        /// </summary>
+        public static string OpenFromGitHubClone {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubClone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search or enter a URL.
         /// </summary>
         public static string OpenFromGitHubSearchOrEnterAUrl {

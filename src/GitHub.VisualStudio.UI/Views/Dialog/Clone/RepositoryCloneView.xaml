@@ -25,7 +25,7 @@
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Clone}"
-                Content="Clone"
+                Content="{x:Static ghfvs:Resources.OpenFromGitHubClone}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"
                 KeyboardNavigation.TabIndex="5" />
 
