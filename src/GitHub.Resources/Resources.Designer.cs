@@ -1297,6 +1297,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        public static string OpenFromGitHubBrowse {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubBrowse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search or enter a URL.
         /// </summary>
         public static string OpenFromGitHubSearchOrEnterAUrl {

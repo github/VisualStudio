@@ -881,4 +881,7 @@ https://git-scm.com/download/win</value>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Search or enter a URL</value>
   </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
 </root>

@@ -45,7 +45,7 @@
                     Command="{Binding Browse}"
                     VerticalContentAlignment="Center"
                     KeyboardNavigation.TabIndex="4">
-                Browse...
+                <x:Static Member="ghfvs:Resources.OpenFromGitHubBrowse" />
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
                      VerticalContentAlignment="Center"
