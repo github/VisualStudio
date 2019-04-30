@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Repositório Privado</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Caminho local</value>
+    <value>Caminho local:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licença</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Não foi possível encontrar a URL de destino no repositório atual. Tente novamente depois de efetuar um fetch.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>O diretório no caminho de destino não está vazio.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Já existe um repositório neste local, mas ele não tem um repositório remoto com o nome "origem".</value>
@@ -870,12 +870,12 @@ https://git-scm.com/download/win</value>
     <value>Esta conversa foi marcada como resolvida</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Seus repositórios</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Repositórios de colaborador</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Contribui para os repositórios</value>
   </data>
 </root>
