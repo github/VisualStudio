@@ -17,7 +17,7 @@
         <ghfvs:PromptTextBox Name="SearchTextBox"
                              DockPanel.Dock="Top"
                              Margin="0,9"
-                             PromptText="Search or enter a URL"                             
+                             PromptText="{x:Static ghfvs:Resources.OpenFromGitHubSearchOrEnterAUrl}"
                              Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              KeyboardNavigation.TabIndex="1" />
 

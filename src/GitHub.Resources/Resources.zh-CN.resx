@@ -878,4 +878,13 @@ https://git-scm.com/download/win</value>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
     <value>已参与存储库</value>
   </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
+  </data>
 </root>
