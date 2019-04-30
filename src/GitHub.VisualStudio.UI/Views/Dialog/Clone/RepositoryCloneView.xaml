@@ -34,7 +34,7 @@
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Open}"
-                Content="Open"
+                Content="{x:Static ghfvs:Resources.Open}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"
                 KeyboardNavigation.TabIndex="6"/>
         </StackPanel>
