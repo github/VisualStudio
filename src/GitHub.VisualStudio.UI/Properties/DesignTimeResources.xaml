@@ -8,6 +8,8 @@
         <ResourceDictionary Source="/Themes/Dark/ThemedDialogColors.xaml" />
         <ResourceDictionary Source="/Themes/Dark/EnvironmentColors.xaml" />
         <ResourceDictionary Source="/Themes/Dark/TreeViewColors.xaml" />
+        <ResourceDictionary Source="/Themes/FontScalingLabelStyle.xaml" />
+        <ResourceDictionary Source="/Themes/FontScalingTextBlockStyle.xaml" />
         <ResourceDictionary Source="/Themes/CommonControlsButtonStyle.xaml" />
         <ResourceDictionary Source="/Themes/CommonControlsCheckboxStyle.xaml" />
         <ResourceDictionary Source="/Themes/CommonControlsComboboxStyle.xaml" />
