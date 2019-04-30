@@ -7,6 +7,7 @@ using GitHub.Factories;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -72,7 +73,8 @@ namespace UnitTests.GitHub.App.Factories
             return new ModelServiceFactory(
                 apiClientFactory,
                 hostCacheFactory,
-                avatarProvider);
+                avatarProvider,
+                new JoinableTaskContext());
         }
 
         static IConnection CreateConnection(string address, string login = "user")

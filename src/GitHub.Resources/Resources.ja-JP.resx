@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>プライベート リポジトリ</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>ローカル パス</value>
+    <value>ローカル パス:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>ライセンス</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>ターゲット パスのディレクトリが空ではありません。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>この場所にリポジトリが既に存在しますが、そのリポジトリには "origin" という名前のリモートがありません。</value>
@@ -870,13 +870,13 @@ https://git-scm.com/download/win</value>
     <value>この会話は解決済みとしてマークされました</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>ご使用のリポジトリ</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>コラボレーターのリポジトリ</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>参加先のリポジトリ</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Search or enter a URL</value>

@@ -175,7 +175,7 @@
     <value>遠端不存在來源分支，您有推送它嗎?</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>請輸入存儲庫路徑</value>
+    <value>請輸入存放庫路徑</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
     <value>請輸入有效的路徑</value>
@@ -433,7 +433,7 @@ https://git-scm.com/download/win</value>
     <value>Wiki</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>脈衝</value>
+    <value>動態</value>
   </data>
   <data name="pathText" xml:space="preserve">
     <value>路徑</value>
@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>私人存放庫</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>本機路徑</value>
+    <value>本機路徑:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>授權</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>在目前存放庫中找不到目標 URL。請在執行擷取後再試一次。</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>在目的地路徑中的目錄並非空白。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>存放庫已存在於此位置，但其不具有名為 "origin" 的遠端存放庫。</value>
@@ -870,13 +870,13 @@ https://git-scm.com/download/win</value>
     <value>此交談已標示為已解決</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>您的存放庫</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>共同作業者存放庫</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>已提供給存放庫</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Search or enter a URL</value>

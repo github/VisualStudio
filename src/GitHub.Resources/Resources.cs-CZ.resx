@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Privátní úložiště</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Místní cesta</value>
+    <value>Místní cesta:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licence</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>V aktuálním úložišti se nepodařilo najít cílovou adresu URL. Zkuste to znovu po načtení změn.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Adresář v cílové cestě není prázdný.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Úložiště už v tomto umístění existuje, ale nemá vzdálené úložiště s názvem origin.</value>
@@ -870,13 +870,13 @@ https://git-scm.com/download/win</value>
     <value>Tato konverzace byla označena jako vyřešená.</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Vaše úložiště</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Úložiště spolupracovníka</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Přidáno do úložišť</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Search or enter a URL</value>

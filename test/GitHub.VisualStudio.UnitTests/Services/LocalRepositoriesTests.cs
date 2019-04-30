@@ -6,6 +6,7 @@ using GitHub.App.Services;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -17,7 +18,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public void RepositoriesShouldInitiallyBeEmpty()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         Assert.That(target.Repositories, Is.Empty);
     }
@@ -26,7 +27,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task RefreshShouldLoadRepositories()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -39,7 +40,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task RefreshShouldAddNewRepository()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -60,7 +61,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task RefreshShouldRemoveRepository()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -83,7 +84,7 @@ public class LocalRepositoriesTests : TestBaseClass
             Tuple.Create("repo1", GitHubAddress),
             Tuple.Create("repo2", GitHubAddress),
             Tuple.Create("repo2", "https://another.com"));
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -98,7 +99,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task GetRepositoriesForAddressShouldSortRepositories()
     {
         var service = CreateVSGitServices("c", "a", "b");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
         var result = target.GetRepositoriesForAddress(HostAddress.Create(GitHubAddress));
