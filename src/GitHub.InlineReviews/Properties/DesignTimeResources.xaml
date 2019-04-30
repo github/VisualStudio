@@ -8,6 +8,8 @@
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/Dark/ThemedDialogColors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/Dark/EnvironmentColors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/Dark/TreeViewColors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/FontScalingLabelStyle.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/FontScalingTextBlockStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/CommonControlsButtonStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/CommonControlsCheckboxStyle.xaml" />
         <ResourceDictionary Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Themes/CommonControlsComboboxStyle.xaml" />
