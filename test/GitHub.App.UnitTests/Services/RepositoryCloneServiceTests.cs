@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using Rothko;
@@ -168,7 +169,7 @@ public class RepositoryCloneServiceTests
 
             return new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                usageTracker, serviceProvider);
+                usageTracker, serviceProvider, new JoinableTaskContext());
         }
     }
 }
