@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Repositorio privado</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Ruta de acceso local</value>
+    <value>Ruta de acceso local:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licencia</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>No se encontró la dirección URL de destino en el repositorio actual. Vuelva a intentarlo tras una recuperación de cambios.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>El directorio en la ruta de acceso de destino no está vacío.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Ya existe un repositorio en esta ubicación, pero no tiene un repositorio remoto con el nombre "origen".</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>Esta conversación se ha marcado como resuelta</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Los repositorios</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Repositorios de colaborador</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Contribución a los repositorios</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>

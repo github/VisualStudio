@@ -36,7 +36,7 @@ namespace GitHub.Services
         /// <summary>
         /// A service for avoiding deadlocks and marshaling tasks onto the UI thread.
         /// </summary>
-        JoinableTaskFactory JoinableTaskFactory { get; }
+        JoinableTaskContext JoinableTaskContext { get; }
 
         IGitAwareItem HomeSection { get; }
     }

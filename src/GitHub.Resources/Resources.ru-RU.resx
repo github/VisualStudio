@@ -139,7 +139,7 @@
     <value>Введите URL-адрес предприятия</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Введите допустимый URL-адрес предприятия</value>
+    <value>Введите допустимый URL-адрес Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
     <value>Это не сервер предприятия. Введите URL-адрес предприятия</value>
@@ -310,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>Создать вилку репозитория</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Переключить источник</value>
+    <value>Переключить origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>Вы действительно хотите отменить эту проверку? Все ожидающие комментарии будут потеряны.</value>
@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Частный репозиторий</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Локальный путь</value>
+    <value>Локальный путь:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Лицензия</value>
@@ -720,7 +720,7 @@ https://git-scm.com/download/win</value>
     <value>записал</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>Отправьте проверку для</value>
+    <value>Отправьте результаты проверки для</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
     <value>Сводка по вашей проверке</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Каталог в пути назначения не пуст.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>В этом расположении уже существует репозиторий, но у него отсутствует удаленный репозиторий с именем "origin".</value>
@@ -819,7 +819,7 @@ https://git-scm.com/download/win</value>
     <value>В этом расположении уже существует репозиторий, но у него имеется удаленный репозиторий {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
-    <value>Вы уже клонировали в это расположение. Нажмите кнопку "Открыть", чтобы открыть локальный репозиторий.</value>
+    <value>Вы уже клонировали элементы в это расположение. Нажмите кнопку "Открыть", чтобы открыть локальный репозиторий.</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
     <value>Не удается найти URL-адрес GitHub для репозитория</value>
@@ -840,7 +840,7 @@ https://git-scm.com/download/win</value>
     <value>Комментарий</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Закрыть запрос на включение внесенных изменений</value>
+    <value>Закрыть запрос на вытягивание</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
     <value>Закрыть обращение</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>Эта беседа была помечена как разрешенная.</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Ваши хранилища</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Репозитории участника совместной работы</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Добавлял данные в репозитории</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>
