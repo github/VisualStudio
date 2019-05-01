@@ -46,6 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="CompositionServices.cs" />
     <Compile Include="ExtensionServicesFactory.cs" />
     <Compile Include="IExtensionServices.cs" />
