@@ -25,7 +25,7 @@
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Clone}"
-                Content="Clone"
+                Content="{x:Static ghfvs:Resources.OpenFromGitHubClone}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"
                 KeyboardNavigation.TabIndex="5" />
 
@@ -34,7 +34,7 @@
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Open}"
-                Content="Open"
+                Content="{x:Static ghfvs:Resources.Open}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"
                 KeyboardNavigation.TabIndex="6"/>
         </StackPanel>
@@ -45,7 +45,7 @@
                     Command="{Binding Browse}"
                     VerticalContentAlignment="Center"
                     KeyboardNavigation.TabIndex="4">
-                Browse...
+                <x:Static Member="ghfvs:Resources.OpenFromGitHubBrowse" />
             </Button>
             <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
                      VerticalContentAlignment="Center"

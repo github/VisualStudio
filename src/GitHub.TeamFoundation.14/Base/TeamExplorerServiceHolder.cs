@@ -15,26 +15,15 @@ namespace GitHub.VisualStudio.Base
         IServiceProvider serviceProvider;
 
         /// <summary>
-        /// This class relies on IVSGitExt that provides information when VS switches repositories.
-        /// </summary>
-        /// <param name="gitExt">Used for monitoring the active repository.</param>
-        [ImportingConstructor]
-        TeamExplorerServiceHolder(ITeamExplorerContext teamExplorerContext) :
-            this(teamExplorerContext, ThreadHelper.JoinableTaskContext)
-        {
-        }
-
-        /// <summary>
         /// This constructor can be used for unit testing.
         /// </summary>
         /// <param name="gitService">Used for monitoring the active repository.</param>
         /// <param name="joinableTaskContext">Used for switching to the Main thread.</param>
-        public TeamExplorerServiceHolder(ITeamExplorerContext teamExplorerContext, JoinableTaskContext joinableTaskContext)
+        [ImportingConstructor]
+        public TeamExplorerServiceHolder(ITeamExplorerContext teamExplorerContext,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
-            JoinableTaskCollection = joinableTaskContext.CreateCollection();
-            JoinableTaskCollection.DisplayName = nameof(TeamExplorerServiceHolder);
-            JoinableTaskFactory = joinableTaskContext.CreateFactory(JoinableTaskCollection);
-
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
             TeamExplorerContext = teamExplorerContext;
         }
 
@@ -88,8 +77,7 @@ namespace GitHub.VisualStudio.Base
             get { return ServiceProvider.GetServiceSafe<ITeamExplorerPage>(); }
         }
 
-        public JoinableTaskCollection JoinableTaskCollection { get; }
-        public JoinableTaskFactory JoinableTaskFactory { get; }
+        public JoinableTaskContext JoinableTaskContext { get; }
         public ITeamExplorerContext TeamExplorerContext { get; }
     }
 }

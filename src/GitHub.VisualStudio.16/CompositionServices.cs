@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using GitHub.Api;
 using GitHub.Factories;
-using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.Views;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Rothko;
-using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
@@ -28,8 +28,7 @@ namespace GitHub.VisualStudio
 
             var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
             var packageSettings = new PackageSettings(gitHubServiceProvider);
-            var usageService = compositionContainer.GetExportedValue<IUsageService>();
-            var usageTracker = new UsageTracker(gitHubServiceProvider, usageService, packageSettings);
+            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
             compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
 
             return compositionContainer;
@@ -39,17 +38,33 @@ namespace GitHub.VisualStudio
         {
             var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
 
-            var usageTracker = new OutOfProcUsageTracker();
+            var packageSettings = new OutOfProcPackageSettings();
+            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
             compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
 
             return compositionContainer;
         }
 
+        static UsageTracker CreateUsageTracker(CompositionContainer compositionContainer, IPackageSettings packageSettings)
+        {
+            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
+            var usageService = compositionContainer.GetExportedValue<IUsageService>();
+            var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
+            return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
+        }
+
         static CompositionContainer CreateOutOfProcExports()
         {
             var container = new CompositionContainer();
+
             var serviceProvider = new OutOfProcSVsServiceProvider();
             container.ComposeExportedValue<SVsServiceProvider>(serviceProvider);
+
+#pragma warning disable VSSDK005 // Avoid instantiating JoinableTaskContext
+            var joinableTaskContext = new JoinableTaskContext();
+#pragma warning restore VSSDK005 // Avoid instantiating JoinableTaskContext
+            container.ComposeExportedValue(joinableTaskContext);
+
             return container;
         }
 
@@ -214,12 +229,19 @@ namespace GitHub.VisualStudio
         public ExportProvider ExportProvider { get; }
     }
 
-    public class OutOfProcUsageTracker : IUsageTracker
+    public class OutOfProcPackageSettings : IPackageSettings
     {
-        public Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
+        public bool CollectMetrics { get; set; } = true;
+        public bool EnableTraceLogging { get; set; } = true;
+        public bool EditorComments { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public UIState UIState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool HideTeamExplorerWelcomeMessage { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Save()
         {
-            Trace.WriteLine($"IncrementCounter {counter}");
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
     }
 

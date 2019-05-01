@@ -97,6 +97,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\common\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="ThemeControl.xaml.cs">
       <DependentUpon>ThemeControl.xaml</DependentUpon>

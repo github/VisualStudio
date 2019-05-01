@@ -1,0 +1,47 @@
+﻿<ResourceDictionary
+    x:Uid="ResourceDictionary_1" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0">
+
+    <Style x:Uid="Style_1" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment375PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_1"  Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment375PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_2"  Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment375PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_3" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_2" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment310PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_4" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment310PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_5" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment310PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_6" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_11" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment200PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_30" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment200PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_31" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment200PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_32" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_4" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment155PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_10" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment155PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_11" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment155PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_12" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_5" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment133PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_13" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment133PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_14" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment133PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_15" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_6" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironment122PercentFontSizeStyleKey}">
+        <Setter x:Uid="Setter_16" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment122PercentFontSizeKey}}" />
+        <Setter x:Uid="Setter_17" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.Environment122PercentFontWeightKey}}" />
+        <Setter x:Uid="Setter_18" Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    </Style>
+
+    <Style x:Uid="Style_8" TargetType="{x:Type Label}" x:Key="{x:Static vsfx:VsResourceKeys.LabelEnvironmentBoldStyleKey}">
+        <Setter x:Uid="Setter_22" Property="FontSize" Value="{DynamicResource {x:Static vsfx:VsFonts.EnvironmentFontSizeKey}}" />
+        <Setter x:Uid="Setter_23" Property="FontWeight" Value="{DynamicResource {x:Static vsfx:VsFonts.EnvironmentBoldFontWeightKey}}" />
+    </Style>
+
+</ResourceDictionary>

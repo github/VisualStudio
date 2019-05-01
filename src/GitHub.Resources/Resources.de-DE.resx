@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Privates Repository</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Lokaler Pfad</value>
+    <value>Lokaler Pfad:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Lizenz</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Die Ziel-URL wurde im aktuellen Repository nicht gefunden. Versuchen Sie es nach einem Abrufvorgang (fetch) noch einmal.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Das Verzeichnis im Zielpfad ist nicht leer.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber kein Remoterepository namens "origin" aufweist.</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>Diese Konversation wurde als aufgelöst markiert.</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Ihre Repositorys</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Repositorys von Projektmitarbeitern</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Beitrag zu Repositorys</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>

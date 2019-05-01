@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Référentiel privé</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Chemin d'accès local</value>
+    <value>Chemin local :</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licence</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>L'URL cible est introuvable dans le dépôt actuel. Réessayez après une récupération (fetch).</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Le répertoire du chemin de destination n'est pas vide.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Un dépôt existe déjà à cet emplacement, mais il n'a pas de dépôt distant nommé « origin ».</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>Cette conversation a été marquée comme résolue</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Vos dépôts</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Dépôts de collaborateur</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>A contribué aux dépôts</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>
