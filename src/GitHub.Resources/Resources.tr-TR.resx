@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Özel Depo</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Yerel yol</value>
+    <value>Yerel yol:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Lisans</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>Hedef URL geçerli depoda bulunamadı. Getirme işlemi gerçekleştirdikten sonra yeniden deneyin.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>Hedef yoldaki dizin boş değil.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>Bu konumda bir depo zaten var ancak bu deponun "origin" adlı bir uzak deposu yok.</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>Bu konuşma çözümlendi olarak işaretlendi</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>Depolarınız</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>Ortak çalışan depoları</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>Katkıda bulunulan depolar</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>

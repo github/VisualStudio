@@ -499,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>专用存储库</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>本地路径</value>
+    <value>本地路径:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>许可证</value>
@@ -810,7 +810,7 @@ https://git-scm.com/download/win</value>
     <value>当前存储库中找不到目标 URL。请执行提取后重试。</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
-    <value>The directory at the destination path is not empty.</value>
+    <value>目标路径中的目录不为空。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>此位置已存在一个存储库，但该存储库不具有名为 "origin" 的远程库。</value>
@@ -870,12 +870,21 @@ https://git-scm.com/download/win</value>
     <value>此对话标记为已解决</value>
   </data>
   <data name="RepositorySelectYourRepositories" xml:space="preserve">
-    <value>Your repositories</value>
+    <value>你的存储库</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Collaborator repositories</value>
+    <value>协作者存储库</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contributed to repositories</value>
+    <value>已参与存储库</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
   </data>
 </root>

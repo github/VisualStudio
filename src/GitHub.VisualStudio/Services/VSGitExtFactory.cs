@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using GitHub.Logging;
-using GitHub.VisualStudio.Base;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 
 namespace GitHub.Services
@@ -13,12 +12,14 @@ namespace GitHub.Services
         readonly int vsVersion;
         readonly IServiceProvider serviceProvider;
         readonly IGitService gitService;
+        readonly JoinableTaskContext joinableTaskContect;
 
-        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService)
+        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService, JoinableTaskContext joinableTaskContect)
         {
             this.vsVersion = vsVersion;
             this.serviceProvider = serviceProvider;
             this.gitService = gitService;
+            this.joinableTaskContect = joinableTaskContect;
         }
 
         // The GitHub.TeamFoundation.* assemblies target different .NET and Visual Studio versions.
@@ -28,7 +29,7 @@ namespace GitHub.Services
         {
             if(Type.GetType($"GitHub.VisualStudio.Base.VSGitExt, GitHub.TeamFoundation.{vsVersion}", false) is Type type)
             {
-                return (IVSGitExt)Activator.CreateInstance(type, serviceProvider, gitService);
+                return (IVSGitExt)Activator.CreateInstance(type, serviceProvider, gitService, joinableTaskContect);
             }
 
             log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);

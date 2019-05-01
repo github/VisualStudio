@@ -14,17 +14,20 @@
     </Control.Resources>
 
     <DockPanel>
-        <ghfvs:PromptTextBox DockPanel.Dock="Top"
-                             Margin="0,4"
-                             PromptText="Search or enter a URL"
-                             Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
+        <ghfvs:PromptTextBox Name="SearchTextBox"
+                             DockPanel.Dock="Top"
+                             Margin="0,9"
+                             PromptText="{x:Static ghfvs:Resources.OpenFromGitHubSearchOrEnterAUrl}"
+                             Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                             KeyboardNavigation.TabIndex="1" />
 
         <Grid>
             <ListView BorderThickness="0"
                       ItemsSource="{Binding ItemsView}"
                       SelectedItem="{Binding SelectedItem}"
                       VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                      VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                      KeyboardNavigation.TabIndex="2">
                 <ListView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>

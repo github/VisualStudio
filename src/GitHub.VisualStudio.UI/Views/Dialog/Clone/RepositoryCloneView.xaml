@@ -9,6 +9,7 @@
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
              Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
              Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
+             Margin="12,12"
              mc:Ignorable="d" d:DesignHeight="414" d:DesignWidth="440">
     <d:DesignData.DataContext>
         <ghfvs:RepositoryCloneViewModelDesigner/>
@@ -19,35 +20,36 @@
     </Control.Resources>
 
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button
-                Margin="12"
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Clone}"
-                Content="Clone"
-                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"/>
+                Content="{x:Static ghfvs:Resources.OpenFromGitHubClone}"
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneRepositoryButton}"
+                KeyboardNavigation.TabIndex="5" />
 
             <Button
-                Margin="12"
+                Margin="6,0,0,0"
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Open}"
-                Content="Open"
-                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"/>
+                Content="{x:Static ghfvs:Resources.Open}"
+                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.OpenRepositoryButton}"
+                KeyboardNavigation.TabIndex="6"/>
         </StackPanel>
 
-        <DockPanel DockPanel.Dock="Bottom"
-                   Margin="16">
-            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}"/>
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,9,0,0">
+            <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}" />
             <Button DockPanel.Dock="Right"
                     Command="{Binding Browse}"
-                    Style="{DynamicResource GitHubLinkButton}"
-                    VerticalContentAlignment="Center">
-                Browse
+                    VerticalContentAlignment="Center"
+                    KeyboardNavigation.TabIndex="4">
+                <x:Static Member="ghfvs:Resources.OpenFromGitHubBrowse" />
             </Button>
-            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
-                     VerticalContentAlignment="Center" />
+            <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" Margin="6,0"
+                     VerticalContentAlignment="Center"
+                     KeyboardNavigation.TabIndex="3" />
         </DockPanel>
 
         <uic:InfoPanel Message="{Binding PathWarning}"

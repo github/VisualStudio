@@ -19,7 +19,7 @@ namespace GitHub {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -946,7 +946,7 @@ namespace GitHub {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Local path.
+        ///   Looks up a localized string similar to Local path:.
         /// </summary>
         public static string localPathText {
             get {
@@ -1293,6 +1293,33 @@ namespace GitHub {
         public static string OpenFileInSolution {
             get {
                 return ResourceManager.GetString("OpenFileInSolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        public static string OpenFromGitHubBrowse {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubBrowse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clone.
+        /// </summary>
+        public static string OpenFromGitHubClone {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubClone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search or enter a URL.
+        /// </summary>
+        public static string OpenFromGitHubSearchOrEnterAUrl {
+            get {
+                return ResourceManager.GetString("OpenFromGitHubSearchOrEnterAUrl", resourceCulture);
             }
         }
         

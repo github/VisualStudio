@@ -26,9 +26,10 @@ build/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-#NUNIT
+# NUnit
 *.VisualState.xml
 TestResult.xml
+nunit-*.xml
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
@@ -237,6 +238,13 @@ coverage.xml
 
 #Msbuild binary log output
 output.binlog
+
+# KDiff3
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
+*.orig
 
 # Paket dependency manager
 .paket/

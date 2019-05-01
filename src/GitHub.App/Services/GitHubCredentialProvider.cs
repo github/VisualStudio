@@ -6,6 +6,7 @@ using GitHub.Logging;
 using GitHub.Primitives;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 
 namespace GitHub.Services
@@ -18,11 +19,12 @@ namespace GitHub.Services
         readonly IKeychain keychain;
 
         [ImportingConstructor]
-        public GitHubCredentialProvider(IKeychain keychain)
+        public GitHubCredentialProvider(IKeychain keychain, [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             Guard.ArgumentNotNull(keychain, nameof(keychain));
 
             this.keychain = keychain;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         /// <summary>
@@ -38,7 +40,7 @@ namespace GitHub.Services
 
             try
             {
-                var credentials = ThreadHelper.JoinableTaskFactory.Run(async () => await keychain.Load(host));
+                var credentials = JoinableTaskContext.Factory.Run(async () => await keychain.Load(host));
                 return new UsernamePasswordCredentials
                 {
                     Username = credentials.Item1,
@@ -51,5 +53,7 @@ namespace GitHub.Services
                 return null;
             }
         }
+
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }
