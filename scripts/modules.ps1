@@ -183,7 +183,7 @@ New-Module -ScriptBlock {
 
         $manifest = @{
             NewestExtension = @{
-                Version = [string](Read-CurrentVersionVsix)
+                Version = [string](Read-CurrentVersionVsix 'src\GitHub.VisualStudio.Vsix')
                 Commit = [string](Get-HeadSha)
             }
         }
