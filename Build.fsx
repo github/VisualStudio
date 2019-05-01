@@ -18,7 +18,7 @@ let isAppveyor = AppVeyor.detect()
 let forceBumpVersion = Environment.hasEnvironVar "BumpVersion"
 let forceBuildNumber = Environment.environVarOrDefault "BuildNumber"
 
-let runBumpVersion = false
+let runBumpVersion = forceBumpVersion
 
 Target.create "Clean" (fun _ ->
   ["build"]
@@ -27,7 +27,7 @@ Target.create "Clean" (fun _ ->
 
 Target.create "BumpVersion" (fun _ ->
     Trace.logfn "Bumping Version"
-    Shell.Exec("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File Bump-Version -BumpBuild -BuildNumber:" + "") |> ignore
+    Shell.Exec("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:" + "asdf") |> ignore
     ()
 )
 
