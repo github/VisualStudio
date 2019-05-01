@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Powerful collaboration, code review, and code management for open source and private projects (NEEDS LOCALIZATION)..
+        ///   Looks up a localized string similar to GitHub.
         /// </summary>
         internal static string _111 {
             get {
