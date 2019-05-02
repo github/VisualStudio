@@ -5,10 +5,8 @@ open Fake.IO
 open Fake.BuildServer
 open Fake.IO.Globbing.Operators
 open Fake.Core
+open Fake.Core.TargetOperators
 open Fake.DotNet
-open Fake.Core
-open Fake.Core
-open Fake.Core
 
 BuildServer.install [
     AppVeyor.Installer
@@ -52,24 +50,18 @@ Target.create "Build" (fun _ ->
     ()
 )
 
-Target.create "Test" (fun _ ->
-    ()
-)
+Target.create "Test" ignore
 
-Target.create "Coverage" (fun _ ->
-    ()
-)
+Target.create "Coverage" ignore
 
-Target.create "Default" (fun _ -> 
-    ()
-)
+Target.create "Default" ignore
 
-open Fake.Core.TargetOperators
+"Clean" ==> "BumpVersion" =?> ("Build", bumpVersion)
 "Clean" ==> "Build"
-"BumpVersion" =?> ("Build", bumpVersion)
+"Build" ==> "Test"
+"Build" ==> "Coverage"
 
-"Build" ==> "Test" ==> "Default"
-"Build" ==> "Coverage" ==> "Default"
+"Default" <== [ "Clean" ; "Build" ; "Test" ; "Coverage" ]
 
 // start build
 Target.runOrDefaultWithArguments "Default"
