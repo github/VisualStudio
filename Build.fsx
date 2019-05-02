@@ -49,7 +49,8 @@ Target.create "Clean" (fun _ ->
 
 Target.create "BumpVersion" (fun _ ->
     Trace.logfn "Bumping Version"
-    powershell (sprintf "scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:%i" buildNumber.Value)
+    sprintf "scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:%i" buildNumber.Value
+    |> powershell
 )
 
 Target.create "Build" (fun _ ->
