@@ -74,27 +74,6 @@ namespace GitHub.Services
             });
         }
 
-        public Task Fetch(IRepository repository, string remoteName)
-        {
-            Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentNotEmptyString(remoteName, nameof(remoteName));
-
-            return Task.Run(() =>
-            {
-                try
-                {
-                    repository.Network.Fetch(remoteName, new[] { "+refs/heads/*:refs/remotes/origin/*" }, fetchOptions);
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Failed to fetch");
-#if DEBUG
-                    throw;
-#endif
-                }
-            });
-        }
-
         public Task Fetch(IRepository repo, UriString cloneUrl, params string[] refspecs)
         {
             foreach (var remote in repo.Network.Remotes)

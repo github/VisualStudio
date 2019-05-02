@@ -26,19 +26,11 @@ namespace GitHub.Services
         Task Push(IRepository repository, string branchName, string remoteName);
 
         /// <summary>
-        /// Fetches the remote.
-        /// </summary>
-        /// <param name="repository">The repository to pull</param>
-        /// <param name="remoteName">The name of the remote</param>
-        /// <returns></returns>
-        Task Fetch(IRepository repository, string remoteName);
-
-        /// <summary>
         /// Fetches from the remote, using custom refspecs.
         /// </summary>
         /// <param name="repository">The repository to pull</param>
         /// <param name="remoteName">The name of the remote</param>
-        /// <param name="refspecs">The custom refspecs</param>
+        /// <param name="refspecs">The custom refspecs no none to use the default</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
