@@ -30,7 +30,7 @@ namespace GitHub.Services
         /// </summary>
         /// <param name="repository">The repository to pull</param>
         /// <param name="remoteName">The name of the remote</param>
-        /// <param name="refspecs">The custom refspecs no none to use the default</param>
+        /// <param name="refspecs">The custom refspecs or none to use the default</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
