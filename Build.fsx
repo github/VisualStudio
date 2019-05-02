@@ -40,7 +40,7 @@ let buildNumber =
 let bumpVersion =
     match buildNumber, package with
     | (Some(x), true) when x > -1 -> true
-    | _ -> false        
+    | _ -> false
 
 Target.create "Clean" (fun _ ->
   ["build"]
@@ -53,14 +53,42 @@ Target.create "BumpVersion" (fun _ ->
 )
 
 Target.create "Build" (fun _ ->
-    (*
+    let msbuild =
+        !! "c:/Program Files (x86)/Microsoft Visual Studio/2017/*/MSBuild/15.0/Bin/MSBuild.exe"
+        |> Seq.tryHead
+        |> function
+            | None -> failwith "MSBuild not found"
+            | Some(x) -> x
+
+    Trace.logfn "Using msbuild: %s" msbuild
+
+    if forVsInstaller then
+        Directory.create "build/vsinstaller"
+
+    let props =
+        let baseProps = [
+            "Configuration", "Release"
+            "DeployExtension", "false"
+            "VisualStudioVersion", "14.0"
+        ]
+
+        if forVsInstaller then
+            List.append baseProps [
+                "IsProductComponent", "true"
+                "TargetVsixContainer", "true"
+            ]
+        else
+            baseProps
+    
     let setParams (defaults:MSBuildParams) = 
         { defaults with
-            Verbosity = Some(MSBuildVerbosity.Quiet)}
+            Targets = ["Build"]
+            Properties = props
+            Verbosity = Some(MSBuildVerbosity.Minimal)
+            ToolPath = msbuild
+        }
 
     MSBuild.build setParams "./GitHubVS.sln"
-    *)
-    ()
 )
 
 Target.create "Test" ignore
