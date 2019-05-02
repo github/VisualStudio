@@ -14,11 +14,22 @@ BuildServer.install [
     AppVeyor.Installer
 ]
 
-let isAppveyor = AppVeyor.detect()
-let forceBumpVersion = Environment.hasEnvironVar "BumpVersion"
-let forceBuildNumber = Environment.environVarOrDefault "BuildNumber"
+let powershell script =
+    Shell.Exec("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File " + script)
+    |> ignore
 
-let runBumpVersion = forceBumpVersion
+let isAppveyor = AppVeyor.detect()
+
+let buildNumber =
+    match (Environment.environVarOrNone "BuildNumber"), isAppveyor with
+    | Some(x), _ -> Some(x)
+    | None, true -> Some(AppVeyor.Environment.BuildNumber)
+    | _ -> None
+
+let bumpVersion =
+    match buildNumber, (Environment.hasEnvironVar "Package") with
+    | (Some(x), true) -> (int x) > -1
+    | _ -> false        
 
 Target.create "Clean" (fun _ ->
   ["build"]
@@ -27,8 +38,7 @@ Target.create "Clean" (fun _ ->
 
 Target.create "BumpVersion" (fun _ ->
     Trace.logfn "Bumping Version"
-    Shell.Exec("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:" + "asdf") |> ignore
-    ()
+    powershell ("scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:" + buildNumber.Value)
 )
 
 Target.create "Build" (fun _ ->
@@ -56,7 +66,7 @@ Target.create "Default" (fun _ ->
 
 open Fake.Core.TargetOperators
 "Clean" ==> "Build"
-"BumpVersion" =?> ("Build", runBumpVersion)
+"BumpVersion" =?> ("Build", bumpVersion)
 
 "Build" ==> "Test" ==> "Default"
 "Build" ==> "Coverage" ==> "Default"
