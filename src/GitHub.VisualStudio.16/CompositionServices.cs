@@ -129,10 +129,10 @@ namespace GitHub.VisualStudio
             }
             catch (ReflectionTypeLoadException e)
             {
-                Trace.WriteLine(e);
+                Debug.WriteLine(e);
                 foreach (var ex in e.LoaderExceptions)
                 {
-                    Trace.WriteLine(ex);
+                    Debug.WriteLine(ex);
                 }
 
                 types = e.Types.Where(t => t != null).ToArray();
@@ -186,7 +186,7 @@ namespace GitHub.VisualStudio
                 return value as TRet;
             }
 
-            Trace.WriteLine($"Couldn't find service of type {typeof(T)}");
+            Debug.WriteLine($"Couldn't find service of type {typeof(T)}");
             return null;
         }
 
@@ -249,7 +249,7 @@ namespace GitHub.VisualStudio
     {
         public object GetService(Type serviceType)
         {
-            Console.WriteLine($"GetService: {serviceType}");
+            Debug.WriteLine($"GetService: {serviceType}");
             return null;
         }
     }
@@ -263,7 +263,7 @@ namespace GitHub.VisualStudio
             var exports = base.GetExports(definition);
             if (exports.Count() == 0)
             {
-                Trace.WriteLine($"No exports for {definition}");
+                Debug.WriteLine($"No exports for {definition}");
             }
 
             return exports;
