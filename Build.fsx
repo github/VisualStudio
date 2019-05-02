@@ -18,15 +18,28 @@ let powershell script =
 
 let isAppveyor = AppVeyor.detect()
 
+let fullBuild = Environment.hasEnvironVar "GHFVS_KEY"
+Trace.logfn "%s Build" (if fullBuild then "Full" else "Partial")
+
+let forVsInstaller, forPackage =
+    match (Environment.environVarOrNone "BUILD_TYPE") with
+    | Some("vsinstaller") -> true, false
+    | Some("package") -> false, true
+    | _ -> false, false
+
+let package = fullBuild && forPackage
+if package then
+    Trace.logfn "Packaging"
+
 let buildNumber =
     match (Environment.environVarOrNone "BuildNumber"), isAppveyor with
-    | Some(x), _ -> Some(x)
-    | None, true -> Some(AppVeyor.Environment.BuildNumber)
+    | Some(x), _ -> Some(int x)
+    | None, true -> Some(int AppVeyor.Environment.BuildNumber)
     | _ -> None
 
 let bumpVersion =
-    match buildNumber, (Environment.hasEnvironVar "Package") with
-    | (Some(x), true) -> (int x) > -1
+    match buildNumber, package with
+    | (Some(x), true) when x > -1 -> true
     | _ -> false        
 
 Target.create "Clean" (fun _ ->
@@ -36,7 +49,7 @@ Target.create "Clean" (fun _ ->
 
 Target.create "BumpVersion" (fun _ ->
     Trace.logfn "Bumping Version"
-    powershell ("scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:" + buildNumber.Value)
+    powershell (sprintf "scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:%i" buildNumber.Value)
 )
 
 Target.create "Build" (fun _ ->
@@ -54,14 +67,21 @@ Target.create "Test" ignore
 
 Target.create "Coverage" ignore
 
+Target.create "Package" ignore
+
 Target.create "Default" ignore
 
-"Clean" ==> "BumpVersion" =?> ("Build", bumpVersion)
+"Clean" ==> "BumpVersion"
 "Clean" ==> "Build"
+"BumpVersion" =?> ("Build", bumpVersion)
 "Build" ==> "Test"
 "Build" ==> "Coverage"
+"Build" ==> "Package"
 
-"Default" <== [ "Clean" ; "Build" ; "Test" ; "Coverage" ]
+if package then
+    "Default" <== [ "Test" ; "Coverage"; "Package" ]
+else
+    "Default" <== [ "Test" ; "Coverage" ]
 
 // start build
-Target.runOrDefaultWithArguments "Default"
+Target.runOrDefault "Default"
