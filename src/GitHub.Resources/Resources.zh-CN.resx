@@ -880,11 +880,12 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Search or enter a URL</value>
+    
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
-    <value>Browse...</value>
+    <value>浏览...</value>
   </data>
   <data name="OpenFromGitHubClone" xml:space="preserve">
-    <value>Clone</value>
+    <value>克隆</value>
   </data>
 </root>
