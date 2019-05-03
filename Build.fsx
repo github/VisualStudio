@@ -49,6 +49,7 @@ Target.create "Clean" (fun _ ->
 
 Target.create "BumpVersion" (fun _ ->
     Trace.logfn "Bumping Version"
+
     sprintf "scripts\\Bump-Version.ps1 -BumpBuild -BuildNumber:%i" buildNumber.Value
     |> powershell
 )
@@ -70,7 +71,7 @@ Target.create "Build" (fun _ ->
         let baseProps = [
             "Configuration", "Release"
             "DeployExtension", "false"
-            "VisualStudioVersion", "14.0"
+            "VisualStudioVersion", "15.0"
         ]
 
         if forVsInstaller then
