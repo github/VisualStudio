@@ -879,7 +879,7 @@ https://git-scm.com/download/win</value>
     <value>리포지토리에 협력함</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
-    <value>Search or enter a URL</value>
+    <value>URL 검색 또는 입력</value>
     
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
