@@ -60,7 +60,9 @@
     <Compile Include="..\common\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Connect\ConnectToGitHubPackage.cs" />
     <Compile Include="CompositionServices.cs" />
+    <Compile Include="Connect\ConnectToGitHubCommand.cs" />
     <Compile Include="ExtensionServicesFactory.cs" />
     <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
@@ -75,6 +77,9 @@
     <Compile Include="StartPagePackage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="Connect\ConnectToGitHubPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
     <Content Include="Images.imagemanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
