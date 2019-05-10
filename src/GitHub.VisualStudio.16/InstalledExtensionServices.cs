@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
 
@@ -22,6 +23,11 @@ namespace GitHub.VisualStudio
             var assembly = Assembly.LoadFrom(assemblyFile);
             var type = assembly.GetType("GitHub.StartPage.GitHubContainerProvider", true);
             return (ICodeContainerProvider)Activator.CreateInstance(type);
+        }
+
+        public Task LoginAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

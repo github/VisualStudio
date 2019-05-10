@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Design;
 using System.Globalization;
 using System.Threading;
@@ -89,17 +90,10 @@ namespace GitHub.VisualStudio.Connect
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "ConnectToGitHubCommand";
 
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            var factory = new ExtensionServicesFactory(package);
+            var extensionServices = factory.Create();
+            extensionServices.LoginAsync();
         }
     }
 }

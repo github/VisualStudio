@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using GitHub.Models;
 using GitHub.Services;
 using Microsoft;
@@ -9,7 +10,7 @@ using Microsoft.VisualStudio.Shell.CodeContainerManagement;
 using Microsoft.VisualStudio.ComponentModelHost;
 using CodeContainer = Microsoft.VisualStudio.Shell.CodeContainerManagement.CodeContainer;
 using ICodeContainerProvider = Microsoft.VisualStudio.Shell.CodeContainerManagement.ICodeContainerProvider;
-using System.Runtime.InteropServices;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
@@ -18,6 +19,20 @@ namespace GitHub.VisualStudio
         public ICodeContainerProvider GetGitHubContainerProvider()
         {
             return new InBoxGitHubContainerProvider();
+        }
+
+        public async Task LoginAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            var componentModel = await ServiceProvider.GetGlobalServiceAsync<SComponentModel, IComponentModel>();
+            Assumes.Present(componentModel);
+
+            var compositionServices = new CompositionServices();
+            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+
+            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            await dialogService.ShowLoginDialog();
         }
     }
 
