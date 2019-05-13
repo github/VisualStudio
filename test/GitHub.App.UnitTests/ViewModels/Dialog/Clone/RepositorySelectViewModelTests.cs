@@ -18,6 +18,7 @@ public class RepositorySelectViewModelTests
         [TestCase("", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("owner", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("name", "owner", "name", "https://github.com/owner/name", 1)]
+        [TestCase("owner/name ", "owner", "name", "https://github.com/owner/name", 1, Description = "Ignore whitespace in search")]
         [TestCase("owner/name", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("OWNER/NAME", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("https://github.com/owner/name", "owner", "name", "https://github.com/owner/name", 1)]
