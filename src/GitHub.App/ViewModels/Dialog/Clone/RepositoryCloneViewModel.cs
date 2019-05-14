@@ -26,6 +26,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IRepositoryCloneService service;
         readonly IGitService gitService;
         readonly IUsageTracker usageTracker;
+        readonly IDialogService dialogService;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         UriString url;
@@ -40,6 +41,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IRepositoryCloneService service,
             IGitService gitService,
             IUsageTracker usageTracker,
+            IDialogService dialogService,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab)
         {
@@ -48,6 +50,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.service = service;
             this.gitService = gitService;
             this.usageTracker = usageTracker;
+            this.dialogService = dialogService;
 
             GitHubTab = gitHubTab;
             EnterpriseTab = enterpriseTab;
@@ -82,6 +85,14 @@ namespace GitHub.ViewModels.Dialog.Clone
             Open = ReactiveCommand.CreateFromObservable(
                 () => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)),
                 canOpen);
+
+            LoginAsDifferentUser = ReactiveCommand.CreateFromTask(async () =>
+            {
+                if (await dialogService.ShowLoginDialog() is IConnection connection)
+                {
+                    await InitializeAsync(connection);
+                }
+            });
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
@@ -111,6 +122,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public IObservable<object> Done => Observable.Merge(Clone, Open);
 
+        public ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; }
+
         public ReactiveCommand<Unit, Unit> Browse { get; }
 
         public ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
@@ -133,7 +146,11 @@ namespace GitHub.ViewModels.Dialog.Clone
                 EnterpriseTab.Initialize(enterpriseConnection);
             }
 
-            if (connection == enterpriseConnection)
+            if (connection == gitHubConnection)
+            {
+                SelectedTabIndex = 0;
+            }
+            else if (connection == enterpriseConnection)
             {
                 SelectedTabIndex = 1;
             }

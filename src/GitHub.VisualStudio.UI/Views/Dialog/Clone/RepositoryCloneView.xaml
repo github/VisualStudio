@@ -22,6 +22,14 @@
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button
+                Margin="0,0,6,0"
+                HorizontalAlignment="Center"
+                IsDefault="True"
+                Command="{Binding LoginAsDifferentUser}"
+                Content="Login"
+                KeyboardNavigation.TabIndex="5" />
+
+            <Button
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding Clone}"

@@ -53,5 +53,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         /// Gets the command executed when the user clicks "Clone".
         /// </summary>
         ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
+
+        ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; }
     }
 }
