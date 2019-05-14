@@ -33,6 +33,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         RepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
+        IDisposable selectedTabIndexSubscription;
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
@@ -86,13 +87,7 @@ namespace GitHub.ViewModels.Dialog.Clone
                 () => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)),
                 canOpen);
 
-            LoginAsDifferentUser = ReactiveCommand.CreateFromTask(async () =>
-            {
-                if (await dialogService.ShowLoginDialog() is IConnection connection)
-                {
-                    await InitializeAsync(connection);
-                }
-            });
+            LoginAsDifferentUser = ReactiveCommand.CreateFromTask(LoginAsDifferentUserAsync);
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
@@ -170,6 +165,28 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
+        }
+
+        async Task LoginAsDifferentUserAsync()
+        {
+            if (await dialogService.ShowLoginDialog() is IConnection connection)
+            {
+                var connections = await connectionManager.GetLoadedConnections();
+                var gitHubConnection = connections.FirstOrDefault(x => x.HostAddress.IsGitHubDotCom());
+
+                if (connection == gitHubConnection)
+                {
+                    SelectedTabIndex = 0;
+                    GitHubTab.Initialize(connection);
+                    GitHubTab.Activate().Forget();
+                }
+                else
+                {
+                    SelectedTabIndex = 1;
+                    EnterpriseTab.Initialize(connection);
+                    EnterpriseTab.Activate().Forget();
+                }
+            }
         }
 
         void BrowseForDirectory()
