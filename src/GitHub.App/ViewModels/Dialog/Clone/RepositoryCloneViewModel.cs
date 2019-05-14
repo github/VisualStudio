@@ -33,7 +33,6 @@ namespace GitHub.ViewModels.Dialog.Clone
         RepositoryModel previousRepository;
         ObservableAsPropertyHelper<string> pathWarning;
         int selectedTabIndex;
-        IDisposable selectedTabIndexSubscription;
 
         [ImportingConstructor]
         public RepositoryCloneViewModel(
