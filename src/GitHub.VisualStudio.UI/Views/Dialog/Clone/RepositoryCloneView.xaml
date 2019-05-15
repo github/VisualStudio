@@ -26,7 +26,7 @@
                 HorizontalAlignment="Center"
                 IsDefault="True"
                 Command="{Binding LoginAsDifferentUser}"
-                Content="Login"
+                Content="{x:Static ghfvs:Resources.LoginLink}"
                 KeyboardNavigation.TabIndex="5" />
 
             <Button
