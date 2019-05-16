@@ -52,4 +52,7 @@
     <Setter Property="Background" Value="{DynamicResource GitHubBranchNameBackgroundBrush}" />
     <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
   </Style>
+  <Style TargetType="{x:Type FlowDocumentScrollViewer}">
+    <Setter Property="SelectionOpacity" Value="0.4" />
+  </Style>
 </ResourceDictionary>
