@@ -35,9 +35,6 @@
       <SubType>Designer</SubType>
       <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
     </Page>
-    <Page Update="Styles\Markdown.xaml">
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>  
 
 </Project>
