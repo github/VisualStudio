@@ -54,7 +54,14 @@
                                                 Markdown="{TemplateBinding Message}"
                                                 ScrollViewer.CanContentScroll="False"
                                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                                                ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                <markdig:MarkdownViewer.Resources>
+                                    <!-- Don't highlight selected text-->
+                                    <Style TargetType="{x:Type FlowDocumentScrollViewer}">
+                                        <Setter Property="SelectionOpacity" Value="0" />
+                                    </Style>
+                                </markdig:MarkdownViewer.Resources>
+                            </markdig:MarkdownViewer>
                         </DockPanel>
                     </Border>
                 </ControlTemplate>
