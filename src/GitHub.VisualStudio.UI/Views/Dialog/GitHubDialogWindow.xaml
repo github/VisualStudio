@@ -21,8 +21,6 @@
                    FontStretch="Normal"
                    FontStyle="Normal"
                    FontWeight="Normal"
-                   HasMaximizeButton="False"
-                   HasMinimizeButton="False"
                    SnapsToDevicePixels="True"
                    UseLayoutRounding="True"
                    WindowStartupLocation="CenterOwner"
