@@ -20,5 +20,10 @@ namespace GitHub.VisualStudio.Views.Dialog
         {
             Close();
         }
+
+        void Border_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
     }
 }

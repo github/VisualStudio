@@ -45,7 +45,7 @@
     </Window.Resources>
     <Window.ContentTemplate>
         <DataTemplate>
-            <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}">
+            <Border MouseDown="Border_MouseDown" BorderThickness="1" BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}">
                 <DockPanel>
                     <!-- close button and padding -->
                     <shellControls:GlyphButton x:Uid="button_Close"
