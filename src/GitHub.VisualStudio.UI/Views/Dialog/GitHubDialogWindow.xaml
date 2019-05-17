@@ -25,12 +25,22 @@
                    SnapsToDevicePixels="True"
                    UseLayoutRounding="True"
                    WindowStartupLocation="CenterOwner"
+                   WindowStyle="None"
+                   WindowState="Normal" 
+                   ResizeMode="CanResize"
                    Content="{Binding Content}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="0"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
     <Window.Resources>
         <ResourceDictionary>
             <local:ViewLocator x:Key="viewLocator"/>
             <DataTemplate DataType="{x:Type ghfvs:ViewModelBase}">
-                <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
+                <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}">
+                    <ContentControl Content="{Binding Converter={StaticResource viewLocator}}"/>
+                </Border>
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
