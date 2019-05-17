@@ -46,7 +46,7 @@
             <Border MouseDown="Border_MouseDown"
                     BorderThickness="1"
                     Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
-                    BorderBrush="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBorderBrushKey}}">
+                    BorderBrush="{DynamicResource {x:Static vs:ThemedDialogColors.WindowBorderBrushKey}}">
                 <DockPanel>
                     <!-- close button and padding -->
                     <shellControls:GlyphButton x:Uid="button_Close"
