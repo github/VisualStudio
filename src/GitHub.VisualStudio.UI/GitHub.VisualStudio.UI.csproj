@@ -9,6 +9,9 @@
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Shell.ViewManager">
+      <HintPath>..\..\lib\14.0\Microsoft.VisualStudio.Shell.ViewManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />

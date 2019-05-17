@@ -15,5 +15,10 @@ namespace GitHub.VisualStudio.Views.Dialog
             viewModel.Done.Subscribe(_ => Close());
             InitializeComponent();
         }
+
+        void CloseButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
