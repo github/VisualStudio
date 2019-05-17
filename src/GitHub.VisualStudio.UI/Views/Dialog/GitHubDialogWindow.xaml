@@ -14,8 +14,8 @@
                    MinWidth="414"
                    MinHeight="460"
                    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
-                   Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
-                   Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
+                   Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+                   Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
                    FontFamily="Segoe UI"
                    FontSize="12"
                    FontStretch="Normal"
@@ -45,7 +45,7 @@
         <DataTemplate>
             <Border MouseDown="Border_MouseDown"
                     BorderThickness="1"
-                    Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                    Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
                     BorderBrush="{DynamicResource {x:Static vs:ThemedDialogColors.WindowBorderBrushKey}}">
                 <DockPanel>
                     <!-- close button and padding -->
