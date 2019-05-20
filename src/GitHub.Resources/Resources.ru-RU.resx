@@ -879,7 +879,7 @@ https://git-scm.com/download/win</value>
     <value>Добавлял данные в репозитории</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
-    <value>Search or enter a URL</value>
+    <value>Поиск или ввод URL-адреса</value>
     
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
