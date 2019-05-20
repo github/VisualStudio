@@ -27,6 +27,7 @@
                    WindowStyle="None"
                    WindowState="Normal" 
                    ResizeMode="CanResize"
+                   ShowInTaskbar="false"
                    Content="{Binding Content}">
     <WindowChrome.WindowChrome>
         <WindowChrome 
