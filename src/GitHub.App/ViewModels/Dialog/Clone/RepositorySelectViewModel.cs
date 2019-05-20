@@ -186,22 +186,23 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         bool FilterItem(object obj)
         {
-            if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
+            var trimedFilter = Filter?.Trim();
+            if (obj is IRepositoryItemViewModel item && !string.IsNullOrEmpty(trimedFilter))
             {
-                if (new UriString(Filter).IsHypertextTransferProtocol)
+                if (new UriString(trimedFilter).IsHypertextTransferProtocol)
                 {
                     var urlString = item.Url.ToString();
                     var urlStringWithGit = urlString + ".git";
                     var urlStringWithSlash = urlString + "/";
                     return
-                        urlString.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
-                        urlStringWithGit.Contains(Filter, StringComparison.OrdinalIgnoreCase) ||
-                        urlStringWithSlash.Contains(Filter, StringComparison.OrdinalIgnoreCase);
+                        urlString.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithGit.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithSlash.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase);
                 }
                 else
                 {
                     return
-                        item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                        item.Caption.Contains(trimedFilter, StringComparison.CurrentCultureIgnoreCase);
                 }
             }
 
