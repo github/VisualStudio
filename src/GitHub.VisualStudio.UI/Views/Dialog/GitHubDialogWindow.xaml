@@ -51,8 +51,9 @@
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Top">
                         <Label Content="{Binding Title}"
+                               Foreground="{DynamicResource {x:Static ui:ThemedDialogColors.WindowPanelTextBrushKey}}"
                                DockPanel.Dock="Left"
-                               Margin="9,3,0,0"
+                               Margin="9,5,0,0"
                                />
 
                         <!-- close button and padding -->
