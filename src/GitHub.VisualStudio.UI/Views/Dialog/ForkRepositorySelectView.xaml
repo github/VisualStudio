@@ -10,8 +10,8 @@
              xmlns:sampleData="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
              mc:Ignorable="d" 
              xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
-             Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
-             Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
+             Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
              d:DesignHeight="414" d:DesignWidth="440">
 
   <Control.Resources>
