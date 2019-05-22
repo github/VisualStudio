@@ -39,6 +39,12 @@
                 KeyboardNavigation.TabIndex="6"/>
         </StackPanel>
 
+        <TextBlock DockPanel.Dock="Top" TextAlignment="Right">
+            <Hyperlink Command="{Binding LoginAsDifferentUser}">
+                <Run Text="{x:Static ghfvs:Resources.LoginLink}" />
+            </Hyperlink>
+        </TextBlock>
+            
         <DockPanel DockPanel.Dock="Bottom" Margin="0,9,0,0">
             <Label DockPanel.Dock="Left" Content="{x:Static ghfvs:Resources.localPathText}" />
             <Button DockPanel.Dock="Right"

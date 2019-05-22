@@ -888,4 +888,7 @@ https://git-scm.com/download/win</value>
   <data name="OpenFromGitHubClone" xml:space="preserve">
     <value>Klon</value>
   </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Add/Change Accounts</value>
+  </data>
 </root>

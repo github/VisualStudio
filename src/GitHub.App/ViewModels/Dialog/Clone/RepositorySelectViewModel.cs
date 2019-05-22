@@ -129,7 +129,7 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         async Task LoadItems(bool refresh)
         {
-            if (connection == null && !IsLoading) return;
+            if (connection == null || IsLoading) return;
 
             Error = null;
             IsLoading = true;
