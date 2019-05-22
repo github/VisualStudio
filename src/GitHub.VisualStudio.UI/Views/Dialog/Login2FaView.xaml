@@ -11,8 +11,8 @@
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
     xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
-    Background="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
-    Foreground="{DynamicResource {x:Static vs:EnvironmentColors.ToolWindowTextBrushKey}}"
+    Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+    Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>
