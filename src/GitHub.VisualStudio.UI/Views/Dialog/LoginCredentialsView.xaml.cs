@@ -32,7 +32,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
-                SetupSelectedAndVisibleTabBindings(d);
+                SetupSelectedTabBindings(d);
                 d(Disposable.Create(Deactivate));
             });
 
@@ -110,16 +110,8 @@ namespace GitHub.VisualStudio.Views.Dialog
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Error, v => v.enterpriseErrorMessage.UserError));
         }
 
-        void SetupSelectedAndVisibleTabBindings(Action<IDisposable> d)
+        void SetupSelectedTabBindings(Action<IDisposable> d)
         {
-            d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
-                .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.DotComOnly)
-                .BindTo(this, v => v.dotComTab.IsEnabled));
-
-            d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
-                .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.EnterpriseOnly)
-                .BindTo(this, v => v.enterpriseTab.IsEnabled));
-
             d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
                 .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.DotComOnly)
                 .Where(x => x == true)

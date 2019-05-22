@@ -879,12 +879,16 @@ https://git-scm.com/download/win</value>
     <value>Contribución a los repositorios</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
-    <value>Search or enter a URL</value>
+    <value>Buscar o escribir una dirección URL</value>
+    
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
-    <value>Browse...</value>
+    <value>Examinar...</value>
   </data>
   <data name="OpenFromGitHubClone" xml:space="preserve">
-    <value>Clone</value>
+    <value>Clonar</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Add/Change Accounts</value>
   </data>
 </root>

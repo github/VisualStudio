@@ -424,6 +424,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IConnectionManager connectionManager = null,
             IRepositoryCloneService service = null,
             IUsageTracker usageTracker = null,
+            IDialogService dialogService = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
             IGitService gitService = null,
@@ -433,6 +434,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
             service = service ?? CreateRepositoryCloneService(defaultClonePath);
             usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
+            dialogService = dialogService ?? Substitute.For<IDialogService>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             gitService = gitService ?? CreateGitService(true, "https://github.com/owner/repo");
@@ -443,6 +445,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
                 service,
                 gitService,
                 usageTracker,
+                dialogService,
                 gitHubTab,
                 enterpriseTab);
         }

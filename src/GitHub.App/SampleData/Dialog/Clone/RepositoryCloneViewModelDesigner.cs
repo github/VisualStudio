@@ -27,6 +27,7 @@ namespace GitHub.SampleData.Dialog.Clone
         public IRepositorySelectViewModel EnterpriseTab { get; }
         public ReactiveCommand<Unit, Unit> Browse { get; }
         public ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
+        public ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; }
 
         public Task InitializeAsync(IConnection connection)
         {
