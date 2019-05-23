@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace GitHub.Services
             }
         }
 
-        public void RedirectCloseStop(Uri url)
+        public void RedirectLastContext(Uri url)
         {
             lastContext.Response.Redirect(url);
             lastContext.Response.Close();
