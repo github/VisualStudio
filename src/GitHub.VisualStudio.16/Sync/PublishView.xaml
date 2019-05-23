@@ -3,12 +3,74 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:local="clr-namespace:GitHub.VisualStudio;assembly="
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-    <WrapPanel HorizontalAlignment="Right" Margin="0,0,14,0">
-        <Button Content="Publish Git Repo" />
-    </WrapPanel>
+    <UserControl.Resources>
+        <SolidColorBrush
+            x:Key="SubduedTextBrushKey" 
+            Color="{Binding Source={x:Static mtcw:TeamFoundationColors.Instance}, Path=SubduedTextColor, Mode=OneWay}" />
+    </UserControl.Resources>
+
+    <StackPanel Margin="6,0,0,0">
+        
+        <!-- heading -->
+        <Grid Margin="6,6,6,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--Icon -->
+            <imaging:CrispImage
+            Width="32"
+            Height="32"
+            Grid.Column="0"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Top" 
+            Margin="0,2,8,2"
+            SnapsToDevicePixels="True"
+            Visibility="Visible"
+            Moniker="{x:Static local:Images.Logo}" />
+
+            <!--Service name, provider -->
+            <StackPanel Orientation="Vertical"
+                VerticalAlignment="Center"
+                Grid.Column="1">
+                <TextBlock x:Name="Name"     Text="GitHub"  TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                <TextBlock x:Name="Provider" Text="GitHub, Inc" TextTrimming="CharacterEllipsis"
+                           Foreground="{StaticResource SubduedTextBrushKey}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="GetStartedGrid" x:Uid="GetStartedGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <WrapPanel x:Name="GetStartedPanel" Grid.Row="0" Grid.ColumnSpan="2">
+                <!-- Description text -->
+                <TextBlock    x:Name="Description"
+                              x:Uid="Description"
+                              Text="Powerful collaboration, code review, and code management for open source and private projects."
+                              MaxHeight="100"
+                              TextWrapping="Wrap" 
+                              TextTrimming="WordEllipsis" />
+            </WrapPanel>
+            <WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,14,0">
+                <Button x:Uid="publishARepoButton" x:Name="publishARepoButton"
+                            Grid.Column="0" Content="Publish to GitHub" />
+            </WrapPanel>
+        </Grid>
+        
+    </StackPanel>
 
 </UserControl>
