@@ -18,6 +18,7 @@ namespace Microsoft.TeamExplorerSample.Sync
         public const int Priority = 4;
 
         readonly Guid PushToRemoteSectionId = new Guid("99ADF41C-0022-4C03-B3C2-05047A3F6C2C");
+        readonly Guid GitHubPublishSectionId = new Guid("92655B52-360D-4BF5-95C5-D9E9E596AC76");
 
         /// <summary>
         /// Constructor.
@@ -55,6 +56,11 @@ namespace Microsoft.TeamExplorerSample.Sync
                 {
                     pushToRemoteSection.PropertyChanged += Section_PropertyChanged;
                 }
+
+                if (page.GetSection(GitHubPublishSectionId) is ITeamExplorerSection gitHubPublishSection)
+                {
+                    gitHubPublishSection.PropertyChanged += Section_PropertyChanged;
+                }
             }
         }
 
@@ -71,17 +77,21 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         void RefreshVisibility()
         {
+            bool IsSectionVisible(ITeamExplorerPage teamExplorerPage, Guid sectionId)
+            {
+                if (teamExplorerPage.GetSection(sectionId) is ITeamExplorerSection pushToRemoteSection)
+                {
+                    return pushToRemoteSection.SectionContent != null && pushToRemoteSection.IsVisible;
+                }
+
+                return false;
+            }
+
             var visible = false;
 
             if (ServiceProvider.GetService(typeof(ITeamExplorerPage)) is ITeamExplorerPage page)
             {
-                if (page.GetSection(PushToRemoteSectionId) is ITeamExplorerSection pushToRemoteSection)
-                {
-                    if (pushToRemoteSection.SectionContent != null && pushToRemoteSection.IsVisible)
-                    {
-                        visible = true;
-                    }
-                }
+                visible = IsSectionVisible(page, PushToRemoteSectionId) && !IsSectionVisible(page, GitHubPublishSectionId);
             }
 
             if (IsVisible != visible)
