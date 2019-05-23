@@ -16,5 +16,11 @@ namespace GitHub.Api
         /// <param name="cancel">A cancellation token.</param>
         /// <returns>The temporary code included in the callback.</returns>
         Task<string> Listen(string id, CancellationToken cancel);
+
+        /// <summary>
+        /// Redirects the last context to respond with listen and stops the underlying http listener
+        /// </summary>
+        /// <param name="url">Url to redirect to.</param>
+        void RedirectLastContext(Uri url);
     }
 }
