@@ -16,5 +16,7 @@ namespace GitHub.Api
         /// <param name="cancel">A cancellation token.</param>
         /// <returns>The temporary code included in the callback.</returns>
         Task<string> Listen(string id, CancellationToken cancel);
+
+        void RedirectCloseStop(Uri url);
     }
 }
