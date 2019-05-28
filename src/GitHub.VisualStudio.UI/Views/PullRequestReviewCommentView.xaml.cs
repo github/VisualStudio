@@ -6,7 +6,6 @@ using GitHub.Services;
 using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.VisualStudio.UI.Helpers;
-using Microsoft.VisualStudio.Shell;
 using ReactiveUI;
 
 namespace GitHub.VisualStudio.Views
@@ -31,8 +30,7 @@ namespace GitHub.VisualStudio.Views
 
         static IVisualStudioBrowser GetBrowser()
         {
-            var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
-            return serviceProvider.GetService<IVisualStudioBrowser>();
+            return Services.GitHubServiceProvider.GetService<IVisualStudioBrowser>();
         }
 
         void DoOpenOnGitHub()
