@@ -25,7 +25,10 @@ namespace GitHub.VisualStudio.Views.Dialog
 
         void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            DragMove();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
+            }
         }
     }
 }
