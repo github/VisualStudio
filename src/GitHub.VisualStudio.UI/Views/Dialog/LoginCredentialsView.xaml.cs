@@ -48,7 +48,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             this.WhenAnyObservable(
                 x => x.ViewModel.GitHubLogin.LoginViaOAuth,
                 x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
-                .Subscribe(_ => SwitchToThisWindow());
+                .Subscribe(_ => SetForegroundWindow());
 
             hostTabControl.SelectionChanged += (s, e) =>
             {
@@ -125,19 +125,22 @@ namespace GitHub.VisualStudio.Views.Dialog
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
         }
 
-        static void SwitchToThisWindow()
+        static bool SetForegroundWindow()
         {
             var hWnd = Process.GetCurrentProcess().MainWindowHandle;
             if (hWnd != IntPtr.Zero)
             {
-                NativeMethods.SwitchToThisWindow(hWnd, true);
+                return NativeMethods.SetForegroundWindow(hWnd);
             }
+
+            return false;
         }
 
         class NativeMethods
         {
             [DllImport("user32.dll")]
-            internal static extern void SwitchToThisWindow(IntPtr hWnd, bool fAltTab);
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
         }
     }
 }
