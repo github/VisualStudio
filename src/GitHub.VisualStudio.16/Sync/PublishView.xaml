@@ -7,8 +7,7 @@
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
              xmlns:local="clr-namespace:GitHub.VisualStudio;assembly="
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
-             DataContext="{Binding RelativeSource={RelativeSource Self}}">
+             d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
         <SolidColorBrush
@@ -67,7 +66,7 @@
             </WrapPanel>
             <WrapPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,14,0">
                 <Button x:Uid="publishARepoButton" x:Name="publishARepoButton"
-                            Grid.Column="0" Content="Publish to GitHub" />
+                            Grid.Column="0" Content="Publish to GitHub" Command="{Binding PublishToGitHub}" />
             </WrapPanel>
         </Grid>
         

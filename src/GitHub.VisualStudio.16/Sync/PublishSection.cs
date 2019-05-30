@@ -4,7 +4,15 @@
 */
 using System;
 using System.ComponentModel;
+using System.Windows.Input;
+using GitHub.Factories;
+using GitHub.Primitives;
+using GitHub.ViewModels.TeamExplorer;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.ComponentModelHost;
+using GitHub.VisualStudio;
+using Microsoft.VisualStudio.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -19,7 +27,7 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         readonly Guid PushToRemoteSectionId = new Guid("99ADF41C-0022-4C03-B3C2-05047A3F6C2C");
         readonly Guid GitHubPublishSectionId = new Guid("92655B52-360D-4BF5-95C5-D9E9E596AC76");
-
+        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -29,7 +37,9 @@ namespace Microsoft.TeamExplorerSample.Sync
             this.Title = "Publish to GitHub";
             this.IsExpanded = true;
             this.IsBusy = false;
-            this.SectionContent = new PublishView();
+            this.SectionContent = new PublishView(){
+                DataContext = this
+            };
             this.View.ParentSection = this;
         }
 
@@ -40,6 +50,8 @@ namespace Microsoft.TeamExplorerSample.Sync
         {
             get { return this.SectionContent as PublishView; }
         }
+
+        public ICommand PublishToGitHub { get; set; }
 
         /// <summary>
         /// Initialize override.
@@ -62,7 +74,30 @@ namespace Microsoft.TeamExplorerSample.Sync
                     gitHubPublishSection.PropertyChanged += Section_PropertyChanged;
                 }
             }
+
+            PublishToGitHub = new RelayCommand(o => DoPublishToGitHub().Forget());
         }
+
+        async Task DoPublishToGitHub()
+        {
+            var componentModel = await Microsoft.VisualStudio.Shell.ServiceProvider.GetGlobalServiceAsync<SComponentModel, IComponentModel>();
+            ShowPublishDialog(componentModel);
+        }
+
+        void ShowPublishDialog(IComponentModel componentModel)
+        {
+            var compositionServices = new CompositionServices();
+            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+
+            var factory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
+            var viewModel = compositionContainer.GetExportedValue<IRepositoryPublishViewModel>();
+
+            var frameworkElement = factory.CreateView<IRepositoryPublishViewModel>();
+            frameworkElement.DataContext = viewModel;
+
+            this.SectionContent = frameworkElement;
+        }
+
 
         void Section_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

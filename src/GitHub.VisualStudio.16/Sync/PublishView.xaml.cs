@@ -39,12 +39,5 @@ namespace Microsoft.TeamExplorerSample.Sync
         }
         public static readonly DependencyProperty ParentSectionProperty =
             DependencyProperty.Register("ParentSection", typeof(PublishSection), typeof(PublishView));
-
-        /// <summary>
-        /// Set encoding button Click event handler.
-        /// </summary>
-        private void setEncodingButton_Click(object sender, RoutedEventArgs e)
-        {
-        }
     }
 }
