@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
@@ -46,7 +48,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             this.WhenAnyObservable(
                 x => x.ViewModel.GitHubLogin.LoginViaOAuth,
                 x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
-                .Subscribe(_ => Application.Current.MainWindow?.Activate());
+                .Subscribe(_ => SetForegroundWindow());
 
             hostTabControl.SelectionChanged += (s, e) =>
             {
@@ -121,6 +123,24 @@ namespace GitHub.VisualStudio.Views.Dialog
                 .Select(x => x == LoginMode.EnterpriseOnly)
                 .Where(x => x == true)
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
+        }
+
+        static bool SetForegroundWindow()
+        {
+            var hWnd = Process.GetCurrentProcess().MainWindowHandle;
+            if (hWnd != IntPtr.Zero)
+            {
+                return NativeMethods.SetForegroundWindow(hWnd);
+            }
+
+            return false;
+        }
+
+        class NativeMethods
+        {
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
         }
     }
 }
