@@ -101,6 +101,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\Akavache.dll</HintPath>
     </Reference>
+    <Reference Include="Akavache.Sqlite3, Version=6.0.0.0, Culture=neutral, PublicKeyToken=decff03a04a41f69, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\Akavache.Sqlite3.dll</HintPath>
+    </Reference>
     <Reference Include="CredentialManagement, Version=2.9.0.0, Culture=neutral, PublicKeyToken=bc1bd09f2901c82e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\CredentialManagement.dll</HintPath>
@@ -188,6 +192,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\Octokit.GraphQL.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Octokit.Reactive, Version=0.0.0.0, Culture=neutral, PublicKeyToken=5525be5bc50478ea, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\Octokit.Reactive.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="ReactiveUI, Version=8.7.0.0, Culture=neutral, PublicKeyToken=31f8874b2ce7ed44, processorArchitecture=MSIL">
@@ -223,6 +231,18 @@
     <Reference Include="Splat, Version=5.0.0.0, Culture=neutral, PublicKeyToken=79cb2fa33d9108a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\Splat.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2, Version=1.1.11.121, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core, Version=1.1.11.121, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3, Version=1.1.11.121, Culture=neutral, PublicKeyToken=9c301db686d0bd12, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\build\Content\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
