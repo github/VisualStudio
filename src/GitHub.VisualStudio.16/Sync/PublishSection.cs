@@ -20,6 +20,7 @@ using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Composition.Hosting;
+using System.Windows;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -107,14 +108,6 @@ namespace Microsoft.TeamExplorerSample.Sync
             var view = factory.CreateView<IRepositoryPublishViewModel>();
             view.DataContext = viewModel;
 
-            SectionContent = view;
-
-            /*
-
-            var view = factory.CreateView<IRepositoryPublishViewModel>();
-            view.DataContext = viewModel;
-            SectionContent = view;
-
             Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
                     x => view.Unloaded += x,
                     x => view.Unloaded -= x)
@@ -125,7 +118,7 @@ namespace Microsoft.TeamExplorerSample.Sync
                     completed.Dispose();
                 });
 
-            */
+            SectionContent = view;
         }
 
         ExportProvider GetExportProvider()
