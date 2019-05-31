@@ -17,12 +17,43 @@ using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Rothko;
+using static Microsoft.VisualStudio.Composition.NetFxAdapters;
+using ExportProvider = System.ComponentModel.Composition.Hosting.ExportProvider;
 
 namespace GitHub.VisualStudio
 {
+    [Export]
     public class CompositionServices
     {
-        public CompositionContainer CreateVisualStudioCompositionContainer(ExportProvider defaultExportProvider)
+        readonly ExportProvider defaultExportProvider;
+        ExportProvider exportProvider;
+
+        public CompositionServices()
+        {
+        }
+
+        [ImportingConstructor]
+        public CompositionServices(Microsoft.VisualStudio.Composition.ExportProvider defaultExportProvider)
+        {
+            this.defaultExportProvider = defaultExportProvider.AsExportProvider();
+        }
+
+        public ExportProvider GetExportProvider()
+        {
+            return exportProvider = exportProvider ?? CreateCompositionContainer();
+        }
+
+        CompositionContainer CreateCompositionContainer()
+        {
+            if (defaultExportProvider is ExportProvider exportProvider)
+            {
+                return CreateVisualStudioCompositionContainer(exportProvider);
+            }
+
+            return CreateOutOfProcCompositionContainer();
+        }
+
+        static CompositionContainer CreateVisualStudioCompositionContainer(ExportProvider defaultExportProvider)
         {
             var compositionContainer = CreateCompositionContainer(defaultExportProvider);
 
@@ -34,7 +65,7 @@ namespace GitHub.VisualStudio
             return compositionContainer;
         }
 
-        public CompositionContainer CreateOutOfProcCompositionContainer()
+        static CompositionContainer CreateOutOfProcCompositionContainer()
         {
             var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
 

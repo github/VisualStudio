@@ -10,9 +10,7 @@ using GitHub.Primitives;
 using GitHub.ViewModels.TeamExplorer;
 using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.Composition;
 using ReactiveUI;
-using ExportProvider = System.ComponentModel.Composition.Hosting.ExportProvider;
 
 
 namespace Microsoft.TeamExplorerSample.Sync
@@ -23,7 +21,7 @@ namespace Microsoft.TeamExplorerSample.Sync
     [TeamExplorerSection(SectionId, TeamExplorerPageIds.GitCommits, Priority)]
     public class PublishSection : TeamExplorerBaseSection
     {
-        readonly ExportProvider defaultExportProvider;
+        readonly CompositionServices compositionServices;
 
         public const string SectionId = "35B18474-005D-4A2A-9CCF-FFFFEB60F1F5";
         public const int Priority = 4;
@@ -32,9 +30,9 @@ namespace Microsoft.TeamExplorerSample.Sync
         readonly Guid GitHubPublishSectionId = new Guid("92655B52-360D-4BF5-95C5-D9E9E596AC76");
 
         [ImportingConstructor]
-        public PublishSection(VisualStudio.Composition.ExportProvider defaultExportProvider)
+        public PublishSection(CompositionServices compositionServices)
         {
-            this.defaultExportProvider = defaultExportProvider.AsExportProvider();
+            this.compositionServices = compositionServices;
 
             this.Title = "Publish to GitHub";
             this.IsExpanded = true;
@@ -82,7 +80,7 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         void ShowPublishDialog()
         {
-            var exportProvider = GetExportProvider();
+            var exportProvider = compositionServices.GetExportProvider();
 
             var factory = exportProvider.GetExportedValue<IViewViewModelFactory>();
             var viewModel = exportProvider.GetExportedValue<IRepositoryPublishViewModel>();
@@ -110,13 +108,6 @@ namespace Microsoft.TeamExplorerSample.Sync
                 });
 
             SectionContent = view;
-        }
-
-        ExportProvider GetExportProvider()
-        {
-            var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(defaultExportProvider);
-            return compositionContainer;
         }
 
         void Section_PropertyChanged(object sender, PropertyChangedEventArgs e)

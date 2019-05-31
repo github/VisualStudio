@@ -72,14 +72,14 @@ namespace GitHub.VisualStudio
         static async Task<CloneDialogResult> ShowCloneDialogAsync(IComponentModel componentModel,
             IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, string url = null)
         {
-            var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+            var compositionServices = componentModel.DefaultExportProvider.GetExportedValue<CompositionServices>();
+            var exportProvider = compositionServices.GetExportProvider();
 
-            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            var dialogService = exportProvider.GetExportedValue<IDialogService>();
             var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
             if (cloneDialogResult != null)
             {
-                var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
+                var repositoryCloneService = exportProvider.GetExportedValue<IRepositoryCloneService>();
                 await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult, downloadProgress, cancellationToken);
                 return cloneDialogResult;
             }
