@@ -18,6 +18,8 @@ using GitHub.VisualStudio.UI;
 using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.VisualStudio.Shell;
+using System.ComponentModel.Composition.Hosting;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -80,27 +82,15 @@ namespace Microsoft.TeamExplorerSample.Sync
                 }
             }
 
-            PublishToGitHub = new RelayCommand(o => DoPublishToGitHub().Forget());
+            PublishToGitHub = new RelayCommand(o => ShowPublishDialog());
         }
 
-        async Task DoPublishToGitHub()
+        void ShowPublishDialog()
         {
-            var componentModel = ServiceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
-            ShowPublishDialog(componentModel);
-        }
+            var exportProvide = GetExportProvider();
 
-        void ShowPublishDialog(IComponentModel componentModel)
-        {
-            /*
-            var factory = ServiceProvider.GetService<IViewViewModelFactory>();
-            var viewModel = ServiceProvider.GetService<IRepositoryPublishViewModel>();
-            */
-
-            var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
-
-            var factory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
-            var viewModel = compositionContainer.GetExportedValue<IRepositoryPublishViewModel>();
+            var factory = exportProvide.GetExportedValue<IViewViewModelFactory>();
+            var viewModel = exportProvide.GetExportedValue<IRepositoryPublishViewModel>();
 
             var busy = viewModel.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
 
@@ -136,6 +126,15 @@ namespace Microsoft.TeamExplorerSample.Sync
                 });
 
             */
+        }
+
+        ExportProvider GetExportProvider()
+        {
+            var componentModel = ServiceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
+            Assumes.Present(componentModel);
+            var compositionServices = new CompositionServices();
+            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+            return compositionContainer;
         }
 
         void HandleCreatedRepo(LocalRepositoryModel newrepo)
