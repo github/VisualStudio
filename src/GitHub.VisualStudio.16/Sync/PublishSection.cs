@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
@@ -10,8 +10,10 @@ using GitHub.Primitives;
 using GitHub.ViewModels.TeamExplorer;
 using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
-using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Composition;
 using ReactiveUI;
+using ExportProvider = System.ComponentModel.Composition.Hosting.ExportProvider;
+
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -21,18 +23,19 @@ namespace Microsoft.TeamExplorerSample.Sync
     [TeamExplorerSection(SectionId, TeamExplorerPageIds.GitCommits, Priority)]
     public class PublishSection : TeamExplorerBaseSection
     {
+        readonly ExportProvider defaultExportProvider;
+
         public const string SectionId = "35B18474-005D-4A2A-9CCF-FFFFEB60F1F5";
         public const int Priority = 4;
 
         readonly Guid PushToRemoteSectionId = new Guid("99ADF41C-0022-4C03-B3C2-05047A3F6C2C");
         readonly Guid GitHubPublishSectionId = new Guid("92655B52-360D-4BF5-95C5-D9E9E596AC76");
-        
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PublishSection()
-            : base()
+
+        [ImportingConstructor]
+        public PublishSection(VisualStudio.Composition.ExportProvider defaultExportProvider)
         {
+            this.defaultExportProvider = defaultExportProvider.AsExportProvider();
+
             this.Title = "Publish to GitHub";
             this.IsExpanded = true;
             this.IsBusy = false;
@@ -111,10 +114,8 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         ExportProvider GetExportProvider()
         {
-            var componentModel = ServiceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
-            Assumes.Present(componentModel);
             var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(defaultExportProvider);
             return compositionContainer;
         }
 
