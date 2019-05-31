@@ -19,9 +19,13 @@ namespace GitHub.StartPage
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var factory = new ExtensionServicesFactory(this);
-            var services = factory.Create();
-            return services.GetGitHubContainerProvider();
+            var codeContainerProvider = FullExtensionUtilities.FindGitHubContainerProvider(this);
+            if (codeContainerProvider != null)
+            {
+                return codeContainerProvider;
+            }
+
+            return new InBoxGitHubContainerProvider();
         }
     }
 }
