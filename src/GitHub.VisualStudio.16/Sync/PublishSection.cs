@@ -85,7 +85,7 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         async Task DoPublishToGitHub()
         {
-            var componentModel = await Microsoft.VisualStudio.Shell.ServiceProvider.GetGlobalServiceAsync<SComponentModel, IComponentModel>();
+            var componentModel = ServiceProvider.GetService(typeof(SComponentModel)) as IComponentModel;
             ShowPublishDialog(componentModel);
         }
 
@@ -108,8 +108,7 @@ namespace Microsoft.TeamExplorerSample.Sync
                 .Where(x => x == ProgressState.Success)
                 .Subscribe(_ =>
                 {
-                    var teamExplorer =
-                        VisualStudio.Shell.ServiceProvider.GlobalProvider.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
+                    var teamExplorer = ServiceProvider.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
                     teamExplorer?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
 
                     // HandleCreatedRepo(ActiveRepo);
