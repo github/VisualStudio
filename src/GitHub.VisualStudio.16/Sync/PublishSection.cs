@@ -1,26 +1,17 @@
-﻿/*
-* Copyright (c) Microsoft Corporation. All rights reserved. This code released
-* under the terms of the Microsoft Limited Public License (MS-LPL).
-*/
-using System;
+﻿using System;
 using System.ComponentModel;
-using System.Globalization;
+using System.ComponentModel.Composition.Hosting;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 using GitHub.Factories;
-using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.ViewModels.TeamExplorer;
+using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.ComponentModelHost;
-using GitHub.VisualStudio;
-using GitHub.VisualStudio.UI;
-using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
-using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.Shell;
-using System.ComponentModel.Composition.Hosting;
-using System.Windows;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -88,21 +79,18 @@ namespace Microsoft.TeamExplorerSample.Sync
 
         void ShowPublishDialog()
         {
-            var exportProvide = GetExportProvider();
+            var exportProvider = GetExportProvider();
 
-            var factory = exportProvide.GetExportedValue<IViewViewModelFactory>();
-            var viewModel = exportProvide.GetExportedValue<IRepositoryPublishViewModel>();
+            var factory = exportProvider.GetExportedValue<IViewViewModelFactory>();
+            var viewModel = exportProvider.GetExportedValue<IRepositoryPublishViewModel>();
 
             var busy = viewModel.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
-
             var completed = viewModel.PublishRepository
                 .Where(x => x == ProgressState.Success)
                 .Subscribe(_ =>
                 {
                     var teamExplorer = ServiceProvider.GetService(typeof(ITeamExplorer)) as ITeamExplorer;
                     teamExplorer?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-
-                    // HandleCreatedRepo(ActiveRepo);
                 });
 
             var view = factory.CreateView<IRepositoryPublishViewModel>();
@@ -129,48 +117,6 @@ namespace Microsoft.TeamExplorerSample.Sync
             var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
             return compositionContainer;
         }
-
-        void HandleCreatedRepo(LocalRepositoryModel newrepo)
-        {
-            var msg = String.Format(CultureInfo.CurrentCulture, Constants.Notification_RepoCreated, newrepo.Name, newrepo.CloneUrl);
-            msg += " " + String.Format(CultureInfo.CurrentCulture, Constants.Notification_CreateNewProject, newrepo.LocalPath);
-            ShowNotification(newrepo, msg);
-        }
-
-        private void ShowNotification(LocalRepositoryModel newrepo, string msg)
-        {
-//            var teServices = ServiceProvider.TryGetService<ITeamExplorerServices>();
-//
-//            teServices.ClearNotifications();
-//            teServices.ShowMessage(
-//                msg,
-//                new RelayCommand(o =>
-//                {
-//                    var str = o.ToString();
-//                    /* the prefix is the action to perform:
-//                     * u: launch browser with url
-//                     * c: launch create new project dialog
-//                     * o: launch open existing project dialog 
-//                    */
-//                    var prefix = str.Substring(0, 2);
-//                    if (prefix == "u:")
-//                        OpenInBrowser(ServiceProvider.TryGetService<IVisualStudioBrowser>(), new Uri(str.Substring(2)));
-//                    else if (prefix == "o:")
-//                    {
-//                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().OpenSolutionViaDlg(str.Substring(2), 1)))
-//                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-//                    }
-//                    else if (prefix == "c:")
-//                    {
-//                        var vsGitServices = ServiceProvider.TryGetService<IVSGitServices>();
-//                        vsGitServices.SetDefaultProjectPath(newrepo.LocalPath);
-//                        if (ErrorHandler.Succeeded(ServiceProvider.GetSolution().CreateNewProjectViaDlg(null, null, 0)))
-//                            ServiceProvider.TryGetService<ITeamExplorer>()?.NavigateToPage(new Guid(TeamExplorerPageIds.Home), null);
-//                    }
-//                })
-//            );
-        }
-
 
         void Section_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
