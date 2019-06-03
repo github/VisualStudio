@@ -5,13 +5,17 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
+using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Primitives;
+using GitHub.Services;
 using GitHub.ViewModels.TeamExplorer;
 using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
+using Task = System.Threading.Tasks.Task;
 
 
 namespace Microsoft.TeamExplorerSample.Sync
@@ -79,16 +83,29 @@ namespace Microsoft.TeamExplorerSample.Sync
                 }
             }
 
-            PublishToGitHub = new RelayCommand(o => ShowPublishDialog());
+            PublishToGitHub = new RelayCommand(o => ShowPublishDialog().Forget());
         }
 
-        void ShowPublishDialog()
+        async Task ShowPublishDialog()
         {
             var exportProvider = compositionServices.GetExportProvider();
 
+            var connectionManager = exportProvider.GetExportedValue<IConnectionManager>();
+            var loggedIn = await connectionManager.IsLoggedIn();
+            if (!loggedIn)
+            {
+                var dialogService = exportProvider.GetExportedValue<IDialogService>();
+                var connection = await dialogService.ShowLoginDialog();
+
+                if (connection == null)
+                {
+                    return;
+                }
+            }
+
             var factory = exportProvider.GetExportedValue<IViewViewModelFactory>();
             var viewModel = exportProvider.GetExportedValue<IRepositoryPublishViewModel>();
-
+            
             var busy = viewModel.WhenAnyValue(x => x.IsBusy).Subscribe(x => IsBusy = x);
             var completed = viewModel.PublishRepository
                 .Where(x => x == ProgressState.Success)
