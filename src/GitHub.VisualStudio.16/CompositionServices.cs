@@ -14,6 +14,7 @@ using GitHub.Settings;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.Views;
 using GitHub.VisualStudio.Views.Dialog.Clone;
+using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Rothko;
@@ -139,6 +140,7 @@ namespace GitHub.VisualStudio
         static void EnsureLoaded(Type type)
         {
             // Ensure the containing assembly has been loaded
+            Assumes.NotNull(type);
         }
 
         static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
