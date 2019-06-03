@@ -92,10 +92,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="UI\GitHub.Resources.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -137,7 +133,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\GitHub.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="GitHub.Resources, Version=2.9.0.0, Culture=neutral, PublicKeyToken=bc1bd09f2901c82e, processorArchitecture=MSIL">
+    <Reference Include="GitHub.Resources, Version=2.10.2.0, Culture=neutral, PublicKeyToken=bc1bd09f2901c82e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\build\Content\GitHub.Resources.dll</HintPath>
     </Reference>

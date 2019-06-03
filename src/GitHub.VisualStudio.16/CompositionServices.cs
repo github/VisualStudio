@@ -123,6 +123,9 @@ namespace GitHub.VisualStudio
             // HACK: Stop ViewLocator from attempting to fetch a global service
             var viewViewModelFactory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
             InitializeViewLocator(viewViewModelFactory);
+            
+            // Ensure GitHub.Resources.dll has been loaded and it visible to XAML
+            EnsureLoaded(typeof(GitHub.Resources));
 
             return compositionContainer;
         }
@@ -131,6 +134,11 @@ namespace GitHub.VisualStudio
         {
             var factoryProviderFiled = typeof(ViewLocator).GetField("factoryProvider", BindingFlags.Static | BindingFlags.NonPublic);
             factoryProviderFiled.SetValue(null, viewViewModelFactory);
+        }
+
+        static void EnsureLoaded(Type type)
+        {
+            // Ensure the containing assembly has been loaded
         }
 
         static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
