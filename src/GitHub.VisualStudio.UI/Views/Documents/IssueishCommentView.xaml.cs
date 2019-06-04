@@ -9,7 +9,6 @@ using GitHub.UI;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Documents;
 using GitHub.VisualStudio.UI.Helpers;
-using Microsoft.VisualStudio.Shell;
 
 namespace GitHub.VisualStudio.Views.Documents
 {
@@ -28,8 +27,7 @@ namespace GitHub.VisualStudio.Views.Documents
 
         static IVisualStudioBrowser GetBrowser()
         {
-            var serviceProvider = (IGitHubServiceProvider)Package.GetGlobalService(typeof(IGitHubServiceProvider));
-            return serviceProvider.GetService<IVisualStudioBrowser>();
+            return Services.GitHubServiceProvider.GetService<IVisualStudioBrowser>();
         }
 
         void DoOpenOnGitHub()

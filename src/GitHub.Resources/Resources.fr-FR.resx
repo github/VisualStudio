@@ -439,7 +439,7 @@ https://git-scm.com/download/win</value>
     <value>Chemin d'accès</value>
   </data>
   <data name="IssuesNavigationItemText" xml:space="preserve">
-    <value>Questions</value>
+    <value>Problèmes</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
     <value>Graphes</value>
@@ -889,6 +889,6 @@ https://git-scm.com/download/win</value>
     <value>Cloner</value>
   </data>
   <data name="AddChangeAccounts" xml:space="preserve">
-    <value>Add/Change Accounts</value>
+    <value>Ajouter/Changer des comptes</value>
   </data>
 </root>

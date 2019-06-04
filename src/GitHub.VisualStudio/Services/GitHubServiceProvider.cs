@@ -27,8 +27,6 @@ namespace GitHub.VisualStudio
     /// </summary>
     public class GitHubServiceProvider : IGitHubServiceProvider, IDisposable
     {
-        public static IGitHubServiceProvider Instance => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider;
-
         class OwnedComposablePart
         {
             public object Owner { get; set; }

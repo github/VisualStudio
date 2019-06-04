@@ -8,11 +8,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using GitHub.Api;
-using GitHub.Factories;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.VisualStudio.Settings;
-using GitHub.VisualStudio.Views;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
@@ -117,24 +115,15 @@ namespace GitHub.VisualStudio
 
             var gitHubServiceProvider = new MyGitHubServiceProvider(compositionContainer);
             compositionContainer.ComposeExportedValue<IGitHubServiceProvider>(gitHubServiceProvider);
+            Services.UnitTestServiceProvider = gitHubServiceProvider; // Use gitHubServiceProvider as global provider 
 
             var loginManager = CreateLoginManager(compositionContainer);
             compositionContainer.ComposeExportedValue<ILoginManager>(loginManager);
 
-            // HACK: Stop ViewLocator from attempting to fetch a global service
-            var viewViewModelFactory = compositionContainer.GetExportedValue<IViewViewModelFactory>();
-            InitializeViewLocator(viewViewModelFactory);
-            
             // Ensure GitHub.Resources.dll has been loaded and it visible to XAML
             EnsureLoaded(typeof(GitHub.Resources));
 
             return compositionContainer;
-        }
-
-        static void InitializeViewLocator(IViewViewModelFactory viewViewModelFactory)
-        {
-            var factoryProviderFiled = typeof(ViewLocator).GetField("factoryProvider", BindingFlags.Static | BindingFlags.NonPublic);
-            factoryProviderFiled.SetValue(null, viewViewModelFactory);
         }
 
         static void EnsureLoaded(Type type)
@@ -233,6 +222,11 @@ namespace GitHub.VisualStudio
 
         public object GetService(Type serviceType)
         {
+            if (serviceType == typeof(IGitHubServiceProvider))
+            {
+                return this;
+            }
+
             return serviceProvider.GetService(serviceType);
         }
 
