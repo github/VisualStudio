@@ -448,7 +448,7 @@ https://git-scm.com/download/win</value>
     <value>GitHub에 게시</value>
   </data>
   <data name="BlurbText" xml:space="preserve">
-    <value>오픈 소스 및 개인 프로젝트에 대한 강력한 공동 작업, 코드 검토 및 코드 관리.</value>
+    <value>오픈 소스 및 프라이빗 프로젝트에 대한 강력한 협업, 코드 검토 및 코드 관리.</value>
   </data>
   <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
     <value>연결...</value>
@@ -550,7 +550,7 @@ https://git-scm.com/download/win</value>
     <value>설명</value>
   </data>
   <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
-    <value>이 리포지토리를 GitHub에 게시하고 오픈 소스 및 개인 프로젝트에 대한 강력한 공동 작업, 코드 검토 및 코드 관리를 가져옵니다.</value>
+    <value>이 리포지토리를 GitHub에 게시하고 오픈 소스 및 프라이빗 프로젝트에 대한 강력한 협업, 코드 검토 및 코드 관리를 가져옵니다.</value>
   </data>
   <data name="NotAGitHubRepository" xml:space="preserve">
     <value>이 리포지토리가 GitHub에 없습니다.</value>
@@ -889,6 +889,6 @@ https://git-scm.com/download/win</value>
     <value>복제</value>
   </data>
   <data name="AddChangeAccounts" xml:space="preserve">
-    <value>Add/Change Accounts</value>
+    <value>계정 추가/변경</value>
   </data>
 </root>
