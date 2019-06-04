@@ -41,7 +41,7 @@
 
         <TextBlock DockPanel.Dock="Top" TextAlignment="Right">
             <Hyperlink Command="{Binding LoginAsDifferentUser}">
-                <Run Text="{x:Static ghfvs:Resources.LoginLink}" />
+                <Run Text="{x:Static ghfvs:Resources.AddChangeAccounts}" />
             </Hyperlink>
         </TextBlock>
             
