@@ -66,12 +66,7 @@
     <Compile Include="Base\TeamExplorerBasePage.cs" />
     <Compile Include="Base\TeamExplorerBaseSection.cs" />
     <Compile Include="CompositionServices.cs" />
-    <Compile Include="ExtensionServicesFactory.cs" />
     <Compile Include="FullExtensionUtilities.cs" />
-    <Compile Include="Home\GitHubHomeContent.xaml.cs">
-      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Home\HomeSection.cs" />
     <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
     <Compile Include="InBoxGitHubContainerProvider.cs" />
