@@ -8,9 +8,9 @@ namespace GitHub.VisualStudio.UI.Views
     /// <summary>
     /// Interaction logic for GitHubHomeSection.xaml
     /// </summary>
-    public partial class GitHubHomeContent : UserControl
+    public partial class HomeSectionView : UserControl
     {
-        public GitHubHomeContent()
+        public HomeSectionView()
         {
             InitializeComponent();
 
@@ -27,6 +27,6 @@ namespace GitHub.VisualStudio.UI.Views
             DependencyProperty.Register(
                 "ViewModel",
                 typeof(IGitHubHomeSection),
-                typeof(GitHubHomeContent));
+                typeof(HomeSectionView));
     }
 }

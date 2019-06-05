@@ -66,14 +66,15 @@
     <Compile Include="Base\TeamExplorerBasePage.cs" />
     <Compile Include="Base\TeamExplorerBaseSection.cs" />
     <Compile Include="CompositionServices.cs" />
-    <Compile Include="Home\GitHubHomeContent.xaml.cs">
-      <DependentUpon>GitHubHomeContent.xaml</DependentUpon>
+    <Compile Include="Home\HomeSectionView.xaml.cs">
+      <DependentUpon>HomeSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Home\HomeSection.cs" />
     <Compile Include="FullExtensionUtilities.cs" />
     <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
     <Compile Include="InBoxGitHubContainerProvider.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -294,7 +295,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Home\GitHubHomeContent.xaml">
+    <Page Include="Home\HomeSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

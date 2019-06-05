@@ -10,6 +10,7 @@ using System.Reflection;
 using GitHub.Api;
 using GitHub.Services;
 using GitHub.Settings;
+using GitHub.VisualStudio.Base;
 using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft;
@@ -122,6 +123,13 @@ namespace GitHub.VisualStudio
 
             // Ensure GitHub.Resources.dll has been loaded and it visible to XAML
             EnsureLoaded(typeof(GitHub.Resources));
+
+            var serviceProvider = gitHubServiceProvider;
+            var gitService = compositionContainer.GetExportedValue<IGitService>();
+            var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
+
+            var vsGitExt = new VSGitExt(serviceProvider, gitService, joinableTaskContext);
+            compositionContainer.ComposeExportedValue<IVSGitExt>(vsGitExt);
 
             return compositionContainer;
         }

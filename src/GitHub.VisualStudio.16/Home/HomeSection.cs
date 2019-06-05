@@ -4,8 +4,16 @@
 */
 using System;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
+using GitHub.Primitives;
+using GitHub.Services;
+using GitHub.VisualStudio;
+using GitHub.VisualStudio.Annotations;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
+using ReactiveUI;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -15,73 +23,44 @@ namespace Microsoft.TeamExplorerSample.Sync
     [TeamExplorerSection(SectionId, TeamExplorerPageIds.Home, Priority)]
     public class HomeSection : TeamExplorerBaseSection
     {
+        readonly CompositionServices compositionServices;
+
         public const string SectionId = "C655016C-CDCF-4E04-8B8F-DD769B740A8A";
         public const int Priority = 10;
-
-        readonly static Guid GitHubHomeSectionId = new Guid("72008232-2104-4FA0-A189-61B0C6F91198");
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public HomeSection()
+        [ImportingConstructor]
+        public HomeSection(CompositionServices compositionServices)
             : base()
         {
+            this.compositionServices = compositionServices;
+
             Title = "GitHub";
             this.IsExpanded = true;
             this.IsBusy = false;
-            View = new GitHubHomeContent();
-            View.DataContext = this;
         }
 
         public override void Initialize(object sender, SectionInitializeEventArgs e)
         {
             base.Initialize(sender, e);
 
-            RefreshVisibility();
+            var isInstalled = FullExtensionUtilities.IsInstalled(ServiceProvider);
 
-            if (ServiceProvider.GetService(typeof(ITeamExplorerPage)) is ITeamExplorerPage page)
+            if (isInstalled)
             {
-                if (page.GetSection(GitHubHomeSectionId) is ITeamExplorerSection githubHomeSection)
-                {
-                    githubHomeSection.PropertyChanged += Section_PropertyChanged;
-                }
-            }
-        }
-
-        void Section_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ITeamExplorerSection.IsVisible):
-                case nameof(ITeamExplorerSection.SectionContent):
-                    RefreshVisibility();
-                    break;
-            }
-        }
-
-        void RefreshVisibility()
-        {
-            bool IsSectionVisible(ITeamExplorerPage teamExplorerPage, Guid sectionId)
-            {
-                if (teamExplorerPage.GetSection(sectionId) is ITeamExplorerSection pushToRemoteSection)
-                {
-                    return pushToRemoteSection.SectionContent != null && pushToRemoteSection.IsVisible;
-                }
-
-                return false;
+                IsVisible = false;
+                return;
             }
 
-            var visible = false;
+            var exportProvider = this.compositionServices.GetExportProvider();
+            var homeSectionViewModel = exportProvider.GetExportedValue<HomeSectionViewModel>();
 
-            if (ServiceProvider.GetService(typeof(ITeamExplorerPage)) is ITeamExplorerPage page)
+            View = new HomeSectionView
             {
-                visible = !IsSectionVisible(page, GitHubHomeSectionId);
-            }
-
-            if (IsVisible != visible)
-            {
-                IsVisible = visible;
-            }
+                DataContext = homeSectionViewModel
+            };
         }
 
         public override async void Refresh()
@@ -89,10 +68,56 @@ namespace Microsoft.TeamExplorerSample.Sync
             base.Refresh();
         }
 
-        protected GitHubHomeContent View
+        protected HomeSectionView View
         {
-            get { return SectionContent as GitHubHomeContent; }
+            get { return SectionContent as HomeSectionView; }
             set { SectionContent = value; }
+        }
+    }
+
+    [Export]
+    public class HomeSectionViewModel: INotifyPropertyChanged
+    {
+        UriString cloneUrl;
+
+        [ImportingConstructor]
+        public HomeSectionViewModel(CompositionServices compositionServices)
+        {
+            var exportProvider = compositionServices.GetExportProvider();
+            var teamExplorerContext = exportProvider.GetExportedValue<ITeamExplorerContext>();
+            teamExplorerContext.PropertyChanged += TeamExplorerContextOnPropertyChanged;
+        }
+
+        void TeamExplorerContextOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var teamExplorerContext = (ITeamExplorerContext) sender;
+            if (e.PropertyName == nameof(ITeamExplorerContext.ActiveRepository))
+            {
+                if (teamExplorerContext.ActiveRepository != null)
+                {
+                    this.CloneUrl = teamExplorerContext.ActiveRepository.CloneUrl;
+                }
+            }
+        }
+
+        public UriString CloneUrl
+        {
+            get { return cloneUrl; }
+            set
+            {
+                if (cloneUrl != value)
+                {
+                    cloneUrl = value;
+                    OnPropertyChanged(nameof(CloneUrl));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
