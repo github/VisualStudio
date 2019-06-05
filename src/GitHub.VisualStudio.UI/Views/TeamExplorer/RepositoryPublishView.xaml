@@ -5,6 +5,7 @@
                                        xmlns:ghfvs="https://github.com/github/VisualStudio"
                                        xmlns:local="clr-namespace:GitHub.VisualStudio.Views.TeamExplorer"
                                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                       xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                        Margin="0"
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
@@ -40,6 +41,8 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Height" Value="23" />
         </Style>
+        
+        <Style TargetType="Hyperlink" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.ThemedDialogHyperlinkStyleKey}}" />
     </ResourceDictionary>
   </Control.Resources>
 
