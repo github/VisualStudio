@@ -47,6 +47,12 @@
               Orientation="Vertical"
               Style="{DynamicResource DialogContainerStackPanel}">
 
+    <TextBlock TextAlignment="Right">
+        <Hyperlink Command="{Binding LoginAsDifferentUser}">
+            <Run Text="{x:Static ghfvs:Resources.AddChangeAccounts}" />
+        </Hyperlink>
+    </TextBlock>
+      
     <DockPanel Margin="0,0,0,13" VerticalAlignment="Top">
       <ghfvs:OcticonImage x:Name="octokit"
                        Width="32"
