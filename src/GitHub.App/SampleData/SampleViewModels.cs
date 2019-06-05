@@ -214,6 +214,12 @@ namespace GitHub.SampleData
             private set;
         }
 
+        public ReactiveCommand<Unit, Unit> LoginAsDifferentUser
+        {
+            get;
+            private set;
+        }
+
         public IReadOnlyObservableCollection<IConnection> Connections
         {
             get;

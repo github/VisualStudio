@@ -13,14 +13,6 @@ using System.Runtime.InteropServices;
 
 namespace GitHub.VisualStudio
 {
-    public class InBoxExtensionServices : IExtensionServices
-    {
-        public ICodeContainerProvider GetGitHubContainerProvider()
-        {
-            return new InBoxGitHubContainerProvider();
-        }
-    }
-
     [Guid(Guids.CodeContainerProviderId)]
     public class InBoxGitHubContainerProvider : ICodeContainerProvider
     {
@@ -37,12 +29,7 @@ namespace GitHub.VisualStudio
 
         async Task<CodeContainer> RunAcquisitionAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, string url = null)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            var componentModel = await ServiceProvider.GetGlobalServiceAsync<SComponentModel, IComponentModel>();
-            Assumes.Present(componentModel);
-
-            var result = await ShowCloneDialogAsync(componentModel, downloadProgress, cancellationToken, url);
+            var result = await ShowCloneDialogAsync(downloadProgress, cancellationToken, url);
             if (result == null)
             {
                 return null;
@@ -69,17 +56,21 @@ namespace GitHub.VisualStudio
             return codeContainer;
         }
 
-        static async Task<CloneDialogResult> ShowCloneDialogAsync(IComponentModel componentModel,
-            IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken, string url = null)
+        async Task<CloneDialogResult> ShowCloneDialogAsync(IProgress<ServiceProgressData> downloadProgress,
+            CancellationToken cancellationToken, string url = null)
         {
-            var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateVisualStudioCompositionContainer(componentModel.DefaultExportProvider);
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            var dialogService = compositionContainer.GetExportedValue<IDialogService>();
+            var componentModel = await ServiceProvider.GetGlobalServiceAsync<SComponentModel, IComponentModel>();
+            Assumes.Present(componentModel);
+            var compositionServices = componentModel.DefaultExportProvider.GetExportedValue<CompositionServices>();
+            var exportProvider = compositionServices.GetExportProvider();
+
+            var dialogService = exportProvider.GetExportedValue<IDialogService>();
             var cloneDialogResult = await dialogService.ShowCloneDialog(null, url);
             if (cloneDialogResult != null)
             {
-                var repositoryCloneService = compositionContainer.GetExportedValue<IRepositoryCloneService>();
+                var repositoryCloneService = exportProvider.GetExportedValue<IRepositoryCloneService>();
                 await repositoryCloneService.CloneOrOpenRepository(cloneDialogResult, downloadProgress, cancellationToken);
                 return cloneDialogResult;
             }
