@@ -70,7 +70,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             {
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
-                Icon = GetIcon(false, true, false);
+                Icon = GetIcon(false, false);
 
                 // We want to display a welcome message but only if Team Explorer isn't
                 // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
-                Icon = GetIcon(repo.Private, true, repo.Fork);
+                Icon = GetIcon(repo.Private, repo.Fork);
                 IsLoggedIn = await IsUserAuthenticated();
             }
             else
@@ -102,10 +102,9 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             base.Refresh();
         }
 
-        static Octicon GetIcon(bool isPrivate, bool isHosted, bool isFork)
+        static Octicon GetIcon(bool isPrivate, bool isFork)
         {
-            return !isHosted ? Octicon.device_desktop
-                : isPrivate ? Octicon.@lock
+            return isPrivate ? Octicon.@lock
                 : isFork ? Octicon.repo_forked : Octicon.repo;
         }
 
