@@ -78,7 +78,7 @@ namespace Microsoft.TeamExplorerSample.Sync
     [Export]
     public class HomeSectionViewModel: INotifyPropertyChanged
     {
-        UriString cloneUrl;
+        string cloneUrl;
 
         [ImportingConstructor]
         public HomeSectionViewModel(CompositionServices compositionServices)
@@ -95,12 +95,12 @@ namespace Microsoft.TeamExplorerSample.Sync
             {
                 if (teamExplorerContext.ActiveRepository != null)
                 {
-                    this.CloneUrl = teamExplorerContext.ActiveRepository.CloneUrl;
+                    this.CloneUrl = teamExplorerContext.ActiveRepository?.CloneUrl?.ToRepositoryUrl()?.ToString();
                 }
             }
         }
 
-        public UriString CloneUrl
+        public string CloneUrl
         {
             get { return cloneUrl; }
             set
