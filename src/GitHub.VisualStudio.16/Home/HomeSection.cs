@@ -2,18 +2,21 @@
 * Copyright (c) Microsoft Corporation. All rights reserved. This code released
 * under the terms of the Microsoft Limited Public License (MS-LPL).
 */
+
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using GitHub.Api;
+using GitHub.Extensions;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.UI;
 using GitHub.VisualStudio;
-using GitHub.VisualStudio.Annotations;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
-using ReactiveUI;
+using Octokit;
 
 namespace Microsoft.TeamExplorerSample.Sync
 {
@@ -63,11 +66,6 @@ namespace Microsoft.TeamExplorerSample.Sync
             };
         }
 
-        public override async void Refresh()
-        {
-            base.Refresh();
-        }
-
         protected HomeSectionView View
         {
             get { return SectionContent as HomeSectionView; }
@@ -78,7 +76,12 @@ namespace Microsoft.TeamExplorerSample.Sync
     [Export]
     public class HomeSectionViewModel: INotifyPropertyChanged
     {
-        string cloneUrl;
+        readonly ISimpleApiClientFactory apiFactory;
+
+        string repoUrl;
+        string repoName;
+        ISimpleApiClient simpleApiClient;
+        Octicon icon;
 
         [ImportingConstructor]
         public HomeSectionViewModel(CompositionServices compositionServices)
@@ -86,6 +89,8 @@ namespace Microsoft.TeamExplorerSample.Sync
             var exportProvider = compositionServices.GetExportProvider();
             var teamExplorerContext = exportProvider.GetExportedValue<ITeamExplorerContext>();
             teamExplorerContext.PropertyChanged += TeamExplorerContextOnPropertyChanged;
+
+            apiFactory = exportProvider.GetExportedValue<ISimpleApiClientFactory>();
         }
 
         void TeamExplorerContextOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -93,22 +98,70 @@ namespace Microsoft.TeamExplorerSample.Sync
             var teamExplorerContext = (ITeamExplorerContext) sender;
             if (e.PropertyName == nameof(ITeamExplorerContext.ActiveRepository))
             {
-                if (teamExplorerContext.ActiveRepository != null)
+                var cloneUrl = teamExplorerContext.ActiveRepository?.CloneUrl;
+                var repositoryUri = cloneUrl?.ToRepositoryUrl();
+                RepoUrl = repositoryUri?.ToString();
+                RepoName = cloneUrl?.NameWithOwner;
+                Icon = GetIcon();
+
+                if (RepoUrl != null)
                 {
-                    this.CloneUrl = teamExplorerContext.ActiveRepository?.CloneUrl?.ToRepositoryUrl()?.ToString();
+                    UpdateRepositoryIconAsync().Forget();
                 }
             }
         }
 
-        public string CloneUrl
+        async Task UpdateRepositoryIconAsync()
         {
-            get { return cloneUrl; }
+            if (RepoUrl == null)
+                return;
+
+            if (simpleApiClient != null)
+            {
+                apiFactory.ClearFromCache(simpleApiClient);
+                simpleApiClient = null;
+            }
+
+            simpleApiClient = await apiFactory.Create(new UriString(repoUrl));
+            var repository = await simpleApiClient.GetRepository();
+            Icon = GetIcon(repository);
+        }
+
+        public Octicon Icon
+        {
+            get { return icon; }
             set
             {
-                if (cloneUrl != value)
+                if (icon != value)
+                { 
+                    icon = value;
+                    OnPropertyChanged(nameof(RepoUrl));
+                }
+            }
+        }
+
+        public string RepoUrl
+        {
+            get { return repoUrl; }
+            set
+            {
+                if (repoUrl != value)
                 {
-                    cloneUrl = value;
-                    OnPropertyChanged(nameof(CloneUrl));
+                    repoUrl = value;
+                    OnPropertyChanged(nameof(RepoUrl));
+                }
+            }
+        }
+
+        public string RepoName
+        {
+            get { return repoName; }
+            set
+            {
+                if (repoName != value)
+                {
+                    repoName = value;
+                    OnPropertyChanged(nameof(RepoName));
                 }
             }
         }
@@ -118,6 +171,15 @@ namespace Microsoft.TeamExplorerSample.Sync
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        static Octicon GetIcon(Repository repo = null)
+        {
+            var isPrivate = repo?.Private ?? false;
+            var isFork = repo?.Fork ?? false;
+
+            return isPrivate ? Octicon.@lock
+                : isFork ? Octicon.repo_forked : Octicon.repo;
         }
     }
 }

@@ -14,6 +14,7 @@ using GitHub.VisualStudio.Helpers;
 using GitHub.VisualStudio.UI;
 using GitHub.VisualStudio.UI.Views;
 using Microsoft.TeamFoundation.Controls;
+using Octokit;
 
 namespace GitHub.VisualStudio.TeamExplorer.Home
 {
@@ -70,7 +71,7 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             {
                 RepoName = ActiveRepoName;
                 RepoUrl = ActiveRepoUri.ToString();
-                Icon = GetIcon(false, false);
+                Icon = GetIcon();
 
                 // We want to display a welcome message but only if Team Explorer isn't
                 // already displaying the "Install 3rd Party Tools" message and the current repo is hosted on GitHub. 
@@ -82,7 +83,8 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
                 Debug.Assert(SimpleApiClient != null,
                     "If we're in this block, simpleApiClient cannot be null. It was created by UpdateStatus");
                 var repo = await SimpleApiClient.GetRepository();
-                Icon = GetIcon(repo.Private, repo.Fork);
+                var octicon = GetIcon(repo);
+                Icon = octicon;
                 IsLoggedIn = await IsUserAuthenticated();
             }
             else
@@ -102,8 +104,11 @@ namespace GitHub.VisualStudio.TeamExplorer.Home
             base.Refresh();
         }
 
-        static Octicon GetIcon(bool isPrivate, bool isFork)
+        static Octicon GetIcon(Repository repo = null)
         {
+            var isPrivate = repo?.Private ?? false;
+            var isFork = repo?.Fork ?? false;
+
             return isPrivate ? Octicon.@lock
                 : isFork ? Octicon.repo_forked : Octicon.repo;
         }

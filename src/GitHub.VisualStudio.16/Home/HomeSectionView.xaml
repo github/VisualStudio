@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:ui="https://github.com/github/VisualStudio"
              Width="Auto"
              Height="auto"
              DataContext="{Binding ViewModel}"
@@ -16,9 +17,19 @@
     </UserControl.Resources>
 
     <StackPanel>
+        <ui:OcticonImage
+            Width="32"
+            Height="32"
+            Margin="0,0,8,0"
+            VerticalAlignment="Center"
+            DockPanel.Dock="Left"
+            Icon="{Binding Icon}" />
+
+        <Label Content="{Binding RepoName}" />
+
         <TextBlock TextAlignment="Left">
             <Hyperlink>
-                <Run Text="{Binding CloneUrl}" />
+                <Run Text="{Binding RepoUrl}" />
             </Hyperlink>
         </TextBlock>
     </StackPanel>

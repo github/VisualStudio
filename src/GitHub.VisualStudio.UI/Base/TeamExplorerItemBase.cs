@@ -24,7 +24,7 @@ namespace GitHub.VisualStudio.Base
             get { return simpleApiClient; }
             set
             {
-                if (simpleApiClient != value && value == null)
+                if (simpleApiClient != value && value != null)
                     apiFactory.ClearFromCache(simpleApiClient);
                 simpleApiClient = value;
             }
