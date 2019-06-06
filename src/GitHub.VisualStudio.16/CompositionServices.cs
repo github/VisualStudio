@@ -34,8 +34,13 @@ namespace GitHub.VisualStudio
 
         [ImportingConstructor]
         public CompositionServices(Microsoft.VisualStudio.Composition.ExportProvider defaultExportProvider)
+            : this(defaultExportProvider.AsExportProvider())
         {
-            this.defaultExportProvider = defaultExportProvider.AsExportProvider();
+        }
+
+        public CompositionServices(ExportProvider defaultExportProvider)
+        {
+            this.defaultExportProvider = defaultExportProvider;
         }
 
         public ExportProvider GetExportProvider()
