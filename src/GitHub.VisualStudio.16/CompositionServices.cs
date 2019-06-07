@@ -6,8 +6,11 @@ using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using GitHub.Api;
+using GitHub.Factories;
+using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
 using GitHub.VisualStudio.Base;
@@ -19,6 +22,7 @@ using Microsoft.VisualStudio.Threading;
 using Rothko;
 using static Microsoft.VisualStudio.Composition.NetFxAdapters;
 using ExportProvider = System.ComponentModel.Composition.Hosting.ExportProvider;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio
 {
@@ -58,7 +62,12 @@ namespace GitHub.VisualStudio
 
         ExportProvider CreateMinimalExportProvider()
         {
-            var catalog = new LoggingCatalog(new TypeCatalog(typeof(GitService), typeof(RepositoryFacade)));
+            var catalog = new LoggingCatalog(new TypeCatalog(
+                typeof(GitService), typeof(RepositoryFacade), 
+                typeof(TeamExplorerContext), typeof(PullRequestService), typeof(GitClient), typeof(GitHubCredentialProvider),
+                typeof(WindowsKeychain), typeof(Rothko.OperatingSystemFacade), typeof(ApiClientFactory), typeof(GraphQLClientFactory),
+                typeof(Program)
+            ));
             var compositionContainer = new CompositionContainer(catalog, defaultExportProvider);
             var serviceProvider = compositionContainer.GetExportedValue<SVsServiceProvider>();
             var gitService = compositionContainer.GetExportedValue<IGitService>();
@@ -69,7 +78,19 @@ namespace GitHub.VisualStudio
                 new VSGitExt(serviceProvider, contextFactory, gitService, joinableTaskContext);
             compositionContainer.ComposeExportedValue<IVSGitExt>(vsGitExt);
 
+            // HACK: The minimal ExportProvider shouldn't depend on IUsageTracker
+            compositionContainer.ComposeExportedValue<IUsageTracker>(new MinimalUsageTracker());
+
             return compositionContainer;
+        }
+
+        class MinimalUsageTracker : IUsageTracker
+        {
+            public Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
+            {
+                Debug.WriteLine($"IncrementCounter {counter.Name}");
+                return Task.CompletedTask;
+            }
         }
 
         CompositionContainer CreateCompositionContainer()

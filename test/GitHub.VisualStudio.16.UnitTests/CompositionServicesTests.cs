@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 public class CompositionServicesTests
 {
-    class TheGetMinimalExportProviderMethod
+    public class TheGetMinimalExportProviderMethod
     {
         [Test]
         public void Exports_IGitService()
@@ -33,6 +33,42 @@ public class CompositionServicesTests
             var exportProvider = target.GetMinimalExportProvider();
 
             var gitExt = exportProvider.GetExportedValue<IVSGitExt>();
+            Assert.NotNull(gitExt);
+        }
+
+        [Test]
+        public void Exports_IUsageTracker()
+        {
+            var compositionContainer = CreateDefaultCompositionContainer();
+            var target = new CompositionServices(compositionContainer);
+
+            var exportProvider = target.GetMinimalExportProvider();
+
+            var usageTracker = exportProvider.GetExportedValue<IUsageTracker>();
+            Assert.NotNull(usageTracker);
+        }
+
+        [Test]
+        public void Exports_IGitClient()
+        {
+            var compositionContainer = CreateDefaultCompositionContainer();
+            var target = new CompositionServices(compositionContainer);
+
+            var exportProvider = target.GetMinimalExportProvider();
+
+            var gitClient = exportProvider.GetExportedValue<IGitClient>();
+            Assert.NotNull(gitClient);
+        }
+
+        [Test]
+        public void Exports_ITeamExplorerContext()
+        {
+            var compositionContainer = CreateDefaultCompositionContainer();
+            var target = new CompositionServices(compositionContainer);
+
+            var exportProvider = target.GetMinimalExportProvider();
+
+            var gitExt = exportProvider.GetExportedValue<ITeamExplorerContext>();
             Assert.NotNull(gitExt);
         }
 

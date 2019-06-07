@@ -13,7 +13,7 @@ namespace GitHub.Services
 {
     [Export(typeof(IGitHubCredentialProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    class GitHubCredentialProvider : IGitHubCredentialProvider
+    public class GitHubCredentialProvider : IGitHubCredentialProvider
     {
         static readonly ILogger log = LogManager.ForContext<GitHubCredentialProvider>();
         readonly IKeychain keychain;
