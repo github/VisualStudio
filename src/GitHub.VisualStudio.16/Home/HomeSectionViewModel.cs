@@ -30,11 +30,11 @@ namespace Microsoft.TeamExplorerSample.Sync
         [ImportingConstructor]
         public HomeSectionViewModel(CompositionServices compositionServices)
         {
-            var exportProvider = compositionServices.GetExportProvider();
-            var teamExplorerContext = exportProvider.GetExportedValue<ITeamExplorerContext>();
+            var minimalExportProvider = compositionServices.GetMinimalExportProvider();
+            var teamExplorerContext = minimalExportProvider.GetExportedValue<ITeamExplorerContext>();
             teamExplorerContext.PropertyChanged += TeamExplorerContextOnPropertyChanged;
 
-            apiFactory = exportProvider.GetExportedValue<ISimpleApiClientFactory>();
+            apiFactory = minimalExportProvider.GetExportedValue<ISimpleApiClientFactory>();
         }
 
         void TeamExplorerContextOnPropertyChanged(object sender, PropertyChangedEventArgs e)
