@@ -66,7 +66,7 @@ namespace GitHub.VisualStudio.Base
         async Task InitializeAsync()
         {
             gitExt = await GetServiceAsync<IGitExt>();
-            if (gitService == null)
+            if (gitExt == null)
             {
                 log.Error("Couldn't find IGitExt service");
                 return;
