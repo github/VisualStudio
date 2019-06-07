@@ -25,7 +25,7 @@
             DockPanel.Dock="Left"
             Icon="{Binding Icon}" />
 
-        <Label Content="{Binding RepoName}" />
+        <TextBlock Text="{Binding RepoName}" />
 
         <TextBlock TextAlignment="Left">
             <Hyperlink>
