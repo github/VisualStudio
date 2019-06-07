@@ -71,6 +71,7 @@
     </Compile>
     <Compile Include="Home\HomeSection.cs" />
     <Compile Include="FullExtensionUtilities.cs" />
+    <Compile Include="Home\HomeSectionViewModel.cs" />
     <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
     <Compile Include="InBoxGitHubContainerProvider.cs" />
