@@ -26,9 +26,11 @@ namespace GitHub.VisualStudio
     public class CompositionServices
     {
         readonly ExportProvider defaultExportProvider;
+        readonly IPackageSettings packageSettings;
         ExportProvider exportProvider;
+        ExportProvider minimalExportProvider;
 
-        public CompositionServices()
+        public CompositionServices() : this(CreateOutOfProcExports(), new OutOfProcPackageSettings())
         {
         }
 
@@ -38,9 +40,15 @@ namespace GitHub.VisualStudio
         {
         }
 
-        public CompositionServices(ExportProvider defaultExportProvider)
+        public CompositionServices(ExportProvider defaultExportProvider, IPackageSettings packageSettings = null)
         {
             this.defaultExportProvider = defaultExportProvider;
+            this.packageSettings = packageSettings;
+        }
+
+        public ExportProvider GetMinimalExportProvider()
+        {
+            return minimalExportProvider = minimalExportProvider ?? CreateMinimalExportProvider();
         }
 
         public ExportProvider GetExportProvider()
@@ -48,42 +56,40 @@ namespace GitHub.VisualStudio
             return exportProvider = exportProvider ?? CreateCompositionContainer();
         }
 
+        ExportProvider CreateMinimalExportProvider()
+        {
+            var catalog = new LoggingCatalog(new TypeCatalog(typeof(GitService), typeof(RepositoryFacade)));
+            var compositionContainer = new CompositionContainer(catalog, defaultExportProvider);
+            var serviceProvider = compositionContainer.GetExportedValue<SVsServiceProvider>();
+            var gitService = compositionContainer.GetExportedValue<IGitService>();
+            var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
+            var contextFactory = compositionContainer.GetExportedValueOrDefault<IVSUIContextFactory>();
+            var vsGitExt = contextFactory == null ?
+                new VSGitExt(serviceProvider, gitService, joinableTaskContext) :
+                new VSGitExt(serviceProvider, contextFactory, gitService, joinableTaskContext);
+            compositionContainer.ComposeExportedValue<IVSGitExt>(vsGitExt);
+
+            return compositionContainer;
+        }
+
         CompositionContainer CreateCompositionContainer()
         {
-            if (defaultExportProvider is ExportProvider exportProvider)
-            {
-                return CreateVisualStudioCompositionContainer(exportProvider);
-            }
+            var minimalExportProvider = GetMinimalExportProvider();
+            var compositionContainer = CreateCompositionContainer(minimalExportProvider);
 
-            return CreateOutOfProcCompositionContainer();
-        }
-
-        static CompositionContainer CreateVisualStudioCompositionContainer(ExportProvider defaultExportProvider)
-        {
-            var compositionContainer = CreateCompositionContainer(defaultExportProvider);
-
-            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
-            var packageSettings = new PackageSettings(gitHubServiceProvider);
-            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
+            var usageTracker = CreateUsageTracker(compositionContainer);
             compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
+
+            var gitExt = minimalExportProvider.GetExportedValue<IVSGitExt>();
+            compositionContainer.ComposeExportedValue(gitExt);
 
             return compositionContainer;
         }
 
-        static CompositionContainer CreateOutOfProcCompositionContainer()
-        {
-            var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
-
-            var packageSettings = new OutOfProcPackageSettings();
-            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
-            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
-
-            return compositionContainer;
-        }
-
-        static UsageTracker CreateUsageTracker(CompositionContainer compositionContainer, IPackageSettings packageSettings)
+        UsageTracker CreateUsageTracker(CompositionContainer compositionContainer)
         {
             var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
+            var packageSettings = this.packageSettings ?? new PackageSettings(compositionContainer.GetExportedValue<IGitHubServiceProvider>());
             var usageService = compositionContainer.GetExportedValue<IUsageService>();
             var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
             return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
@@ -104,7 +110,7 @@ namespace GitHub.VisualStudio
             return container;
         }
 
-        static CompositionContainer CreateCompositionContainer(ExportProvider defaultExportProvider)
+        static CompositionContainer CreateCompositionContainer(ExportProvider minimalExportProvider)
         {
             var catalog = new LoggingCatalog(
                 GetCatalog(typeof(DialogService).Assembly), // GitHub.App
@@ -117,7 +123,7 @@ namespace GitHub.VisualStudio
                 GetCatalog(typeof(IOperatingSystem).Assembly) // Rothko
             );
 
-            var compositionContainer = new CompositionContainer(catalog, defaultExportProvider);
+            var compositionContainer = new CompositionContainer(catalog, minimalExportProvider);
 
             var gitHubServiceProvider = new MyGitHubServiceProvider(compositionContainer);
             compositionContainer.ComposeExportedValue<IGitHubServiceProvider>(gitHubServiceProvider);
@@ -128,13 +134,6 @@ namespace GitHub.VisualStudio
 
             // Ensure GitHub.Resources.dll has been loaded and it visible to XAML
             EnsureLoaded(typeof(GitHub.Resources));
-
-            var serviceProvider = gitHubServiceProvider;
-            var gitService = compositionContainer.GetExportedValue<IGitService>();
-            var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
-
-            var vsGitExt = new VSGitExt(serviceProvider, gitService, joinableTaskContext);
-            compositionContainer.ComposeExportedValue<IVSGitExt>(vsGitExt);
 
             return compositionContainer;
         }
