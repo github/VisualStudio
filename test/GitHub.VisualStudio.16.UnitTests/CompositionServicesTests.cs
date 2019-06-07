@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using GitHub.Api;
 using GitHub.Services;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -22,6 +23,18 @@ public class CompositionServicesTests
 
             var gitService = exportProvider.GetExportedValue<IGitService>();
             Assert.NotNull(gitService);
+        }
+
+        [Test]
+        public void Exports_ISimpleApiClientFactory()
+        {
+            var compositionContainer = CreateDefaultCompositionContainer();
+            var target = new CompositionServices(compositionContainer);
+
+            var exportProvider = target.GetMinimalExportProvider();
+
+            var simpleApiClientFactory = exportProvider.GetExportedValue<ISimpleApiClientFactory>();
+            Assert.NotNull(simpleApiClientFactory);
         }
 
         [Test]

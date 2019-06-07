@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using GitHub.Api;
 using GitHub.Factories;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Services;
 using GitHub.Settings;
@@ -63,10 +64,12 @@ namespace GitHub.VisualStudio
         ExportProvider CreateMinimalExportProvider()
         {
             var catalog = new LoggingCatalog(new TypeCatalog(
-                typeof(GitService), typeof(RepositoryFacade), 
+                typeof(GitService), typeof(RepositoryFacade),
+
                 typeof(TeamExplorerContext), typeof(PullRequestService), typeof(GitClient), typeof(GitHubCredentialProvider),
-                typeof(WindowsKeychain), typeof(Rothko.OperatingSystemFacade), typeof(ApiClientFactory), typeof(GraphQLClientFactory),
-                typeof(Program)
+                typeof(WindowsKeychain), typeof(Rothko.OperatingSystemFacade), typeof(ApiClientFactory), typeof(GraphQLClientFactory), typeof(Program),
+
+                typeof(SimpleApiClientFactory), typeof(WikiProbe), typeof(ExportedEnterpriseProbe), typeof(ExportedHttpClient)
             ));
             var compositionContainer = new CompositionContainer(catalog, defaultExportProvider);
             var serviceProvider = compositionContainer.GetExportedValue<SVsServiceProvider>();
