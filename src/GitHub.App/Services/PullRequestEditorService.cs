@@ -119,8 +119,12 @@ namespace GitHub.Services
 
                     if (!workingDirectory)
                     {
-                        AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
-                        EnableNavigateToEditor(textView, session);
+                        var gitPath = FindGitPath(session.LocalRepository, fullPath);
+                        if (gitPath != null)
+                        {
+                            AddBufferTag(wpfTextView.TextBuffer, session, gitPath, commitSha, null);
+                            EnableNavigateToEditor(textView, session);
+                        }
                     }
                 }
 
@@ -485,6 +489,17 @@ namespace GitHub.Services
             return Path.Combine(localPath, relativePath);
         }
 
+        static string FindGitPath(LocalRepositoryModel localRepository, string path)
+        {
+            var basePath = localRepository.LocalPath + Path.DirectorySeparatorChar;
+            if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+            {
+                return path.Substring(basePath.Length).Replace(Path.DirectorySeparatorChar, '/');
+            }
+
+            return null;
+        }
+
         string GetText(IVsTextView textView)
         {
             IVsTextLines buffer;
@@ -561,13 +576,15 @@ namespace GitHub.Services
         void AddBufferTag(
             ITextBuffer buffer,
             IPullRequestSession session,
-            string path,
+            string gitPath,
             string commitSha,
             DiffSide? side)
         {
+            Guard.ArgumentIsGitPath(gitPath, nameof(gitPath));
+
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, commitSha, side));
+                () => new PullRequestTextBufferInfo(session, gitPath, commitSha, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -575,7 +592,7 @@ namespace GitHub.Services
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, path, commitSha, side);
+                    AddBufferTag(source, session, gitPath, commitSha, side);
                 }
             }
         }

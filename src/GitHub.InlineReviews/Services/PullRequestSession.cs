@@ -111,22 +111,6 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public string GetRelativePath(string path)
-        {
-            if (Path.IsPathRooted(path))
-            {
-                var basePath = LocalRepository.LocalPath;
-
-                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
-                {
-                    return path.Substring(basePath.Length + 1);
-                }
-            }
-
-            return null;
-        }
-
-        /// <inheritdoc/>
         public async Task PostReviewComment(
             string body,
             string commitId,
