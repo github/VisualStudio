@@ -10,6 +10,6 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the path to the file or directory, relative to the root of the repository.
         /// </summary>
-        string GitRelativePath { get; }
+        string RelativePath { get; }
     }
 }

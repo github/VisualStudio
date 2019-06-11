@@ -41,7 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
             FileName = Path.GetFileName(relativePath);
-            GitRelativePath = relativePath.Replace("/", "\\");
+            RelativePath = relativePath.Replace("/", "\\");
             Sha = sha;
             Status = status;
             OldPath = oldPath;
@@ -72,7 +72,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the path to the file, relative to the root of the repository.
         /// </summary>
-        public string GitRelativePath { get; }
+        public string RelativePath { get; }
 
         /// <summary>
         /// Gets the old path of a moved/renamed file, relative to the root of the repository.

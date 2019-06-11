@@ -500,7 +500,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         public string GetLocalFilePath(IPullRequestFileNode file)
         {
-            return Path.Combine(LocalRepository.LocalPath, file.GitRelativePath);
+            return Path.Combine(LocalRepository.LocalPath, file.RelativePath);
         }
 
         /// <inheritdoc/>

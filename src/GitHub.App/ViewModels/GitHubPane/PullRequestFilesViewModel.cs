@@ -46,14 +46,14 @@ namespace GitHub.ViewModels.GitHubPane
             this.service = service;
 
             DiffFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
-                editorService.OpenDiff(pullRequestSession, x.GitRelativePath, "HEAD"));
+                editorService.OpenDiff(pullRequestSession, x.RelativePath, "HEAD"));
             ViewFile = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(x =>
-                editorService.OpenFile(pullRequestSession, x.GitRelativePath, false));
+                editorService.OpenFile(pullRequestSession, x.RelativePath, false));
             DiffFileWithWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
-                x => editorService.OpenDiff(pullRequestSession, x.GitRelativePath),
+                x => editorService.OpenDiff(pullRequestSession, x.RelativePath),
                 isBranchCheckedOut);
             OpenFileInWorkingDirectory = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
-                x => editorService.OpenFile(pullRequestSession, x.GitRelativePath, true),
+                x => editorService.OpenFile(pullRequestSession, x.RelativePath, true),
                 isBranchCheckedOut);
 
             OpenFirstComment = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(async file =>
@@ -62,7 +62,7 @@ namespace GitHub.ViewModels.GitHubPane
 
                 if (thread != null)
                 {
-                    await editorService.OpenDiff(pullRequestSession, file.GitRelativePath, thread);
+                    await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
 
@@ -86,7 +86,7 @@ namespace GitHub.ViewModels.GitHubPane
                 //AnnotationModel.EndLine is a 1-based number
                 //EditorService.OpenDiff takes a 0-based line number to start searching AFTER and will open the next tag
                 var nextInlineCommentFromLine = annotationModel.EndLine - 2;
-                await editorService.OpenDiff(pullRequestSession, file.GitRelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
             }
         }
 
@@ -159,7 +159,7 @@ namespace GitHub.ViewModels.GitHubPane
                             }));
                     }
 
-                    var dir = GetDirectory(Path.GetDirectoryName(node.GitRelativePath), dirs);
+                    var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
                     dir.Files.Add(node);
                 }
             }
@@ -233,7 +233,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         async Task<IInlineCommentThreadModel> GetFirstCommentThread(IPullRequestFileNode file)
         {
-            var sessionFile = await pullRequestSession.GetFile(file.GitRelativePath);
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
             var threads = sessionFile.InlineCommentThreads.AsEnumerable();
 
             if (commentFilter != null)
@@ -247,7 +247,7 @@ namespace GitHub.ViewModels.GitHubPane
         async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
             CheckAnnotationLevel annotationLevel)
         {
-            var sessionFile = await pullRequestSession.GetFile(file.GitRelativePath);
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
             var annotations = sessionFile.InlineAnnotations;
 
             return annotations.OrderBy(model => model.EndLine).FirstOrDefault(model => model.AnnotationLevel == annotationLevel);

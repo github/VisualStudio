@@ -16,7 +16,7 @@ namespace GitHub.ViewModels.GitHubPane
         public PullRequestDirectoryNode(string relativePath)
         {
             DirectoryName = System.IO.Path.GetFileName(relativePath);
-            GitRelativePath = relativePath.Replace("/", "\\");
+            RelativePath = relativePath.Replace("/", "\\");
             Directories = new List<IPullRequestDirectoryNode>();
             Files = new List<IPullRequestFileNode>();
         }
@@ -29,7 +29,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the path to the directory, relative to the root of the repository using '/' as directory separator.
         /// </summary>
-        public string GitRelativePath { get; }
+        public string RelativePath { get; }
 
         /// <summary>
         /// Gets the directory children of the node.
