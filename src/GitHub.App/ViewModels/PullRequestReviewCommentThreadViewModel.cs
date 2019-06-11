@@ -197,7 +197,7 @@ namespace GitHub.ViewModels
                     await Session.PostReviewComment(
                         comment.Body,
                         File.CommitSha,
-                        File.RelativePath.Replace("\\", "/"),
+                        File.GitRelativePath.Replace("\\", "/"),
                         File.Diff,
                         diffPosition.DiffLineNumber).ConfigureAwait(false);
                 }
@@ -255,7 +255,7 @@ namespace GitHub.ViewModels
             return GetDraftKeys(
                 Session.LocalRepository.CloneUrl.WithOwner(Session.RepositoryOwner),
                 Session.PullRequest.Number,
-                File.RelativePath,
+                File.GitRelativePath,
                 LineNumber);
         }
         

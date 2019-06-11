@@ -78,7 +78,7 @@ namespace GitHub.InlineReviews.Margins
             var sessionFile = await FindSessionFile();
             if (sessionFile != null)
             {
-                viewModel.FileName = Path.GetFileName(sessionFile.RelativePath);
+                viewModel.FileName = Path.GetFileName(sessionFile.GitRelativePath);
                 viewModel.CommentsInFile = sessionFile.InlineCommentThreads?.Count ?? -1;
                 viewModel.Enabled = sessionFile.Diff.Count > 0;
             }

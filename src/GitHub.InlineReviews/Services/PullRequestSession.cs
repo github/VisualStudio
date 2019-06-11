@@ -292,9 +292,9 @@ namespace GitHub.InlineReviews.Services
             var mergeBaseSha = await GetMergeBase();
             file.BaseSha = PullRequest.BaseRefSha;
             file.CommitSha = file.IsTrackingHead ? PullRequest.HeadRefSha : file.CommitSha;
-            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.RelativePath);
-            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.RelativePath, file.Diff, file.CommitSha);
-            file.InlineAnnotations = service.BuildAnnotations(PullRequest, file.RelativePath);
+            file.Diff = await service.Diff(LocalRepository, mergeBaseSha, file.CommitSha, file.GitRelativePath);
+            file.InlineCommentThreads = service.BuildCommentThreads(PullRequest, file.GitRelativePath, file.Diff, file.CommitSha);
+            file.InlineAnnotations = service.BuildAnnotations(PullRequest, file.GitRelativePath);
         }
 
         void UpdatePendingReview()

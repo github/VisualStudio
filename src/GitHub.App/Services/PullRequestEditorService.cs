@@ -104,9 +104,9 @@ namespace GitHub.Services
                     fileName = await pullRequestService.ExtractToTempFile(
                         session.LocalRepository,
                         session.PullRequest,
-                        file.RelativePath,
+                        file.GitRelativePath,
                         file.CommitSha,
-                        pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath));
+                        pullRequestService.GetEncoding(session.LocalRepository, file.GitRelativePath));
                     commitSha = file.CommitSha;
                 }
 
@@ -153,7 +153,7 @@ namespace GitHub.Services
                 var workingDirectory = headSha == null;
                 var file = await session.GetFile(relativePath, headSha ?? "HEAD");
                 var mergeBase = await pullRequestService.GetMergeBase(session.LocalRepository, session.PullRequest);
-                var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.RelativePath);
+                var encoding = pullRequestService.GetEncoding(session.LocalRepository, file.GitRelativePath);
                 var rightFile = workingDirectory ?
                     Path.Combine(session.LocalRepository.LocalPath, relativePath) :
                     await pullRequestService.ExtractToTempFile(
@@ -176,10 +176,10 @@ namespace GitHub.Services
                     mergeBase,
                     encoding);
                 var leftPath = await GetBaseFileName(session, file);
-                var rightPath = file.RelativePath;
+                var rightPath = file.GitRelativePath;
                 var leftLabel = $"{leftPath};{session.GetBaseBranchDisplay()}";
                 var rightLabel = workingDirectory ? rightPath : $"{rightPath};PR {session.PullRequest.Number}";
-                var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
+                var caption = $"Diff - {Path.GetFileName(file.GitRelativePath)}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
                 var openThread = (line: -1, side: DiffSide.Left);
@@ -659,9 +659,9 @@ namespace GitHub.Services
                 session.LocalRepository,
                 session.PullRequest))
             {
-                var fileChange = changes.FirstOrDefault(x => x.Path == file.RelativePath);
+                var fileChange = changes.FirstOrDefault(x => x.Path == file.GitRelativePath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    fileChange.OldPath : file.RelativePath;
+                    fileChange.OldPath : file.GitRelativePath;
             }
         }
 

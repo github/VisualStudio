@@ -164,7 +164,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
         static IPullRequestSessionFile CreateFile(string relativePath = "file.cs")
         {
             var result = Substitute.For<IPullRequestSessionFile>();
-            result.RelativePath.Returns(relativePath);
+            result.GitRelativePath.Returns(relativePath);
             return result;
         }
 

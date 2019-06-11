@@ -40,9 +40,9 @@ namespace GitHub.Models
         bool IsTrackingHead { get; }
 
         /// <summary>
-        /// Gets the path to the file relative to the repository.
+        /// Gets the path to the file relative to the repository using '/' as directory separator.
         /// </summary>
-        string RelativePath { get; }
+        string GitRelativePath { get; }
 
         /// <summary>
         /// Gets the diff between the PR merge base and the current state of the file.

@@ -280,14 +280,14 @@ namespace GitHub.InlineReviews.Services
                     session.LocalRepository,
                     mergeBase,
                     session.PullRequest.HeadRefSha,
-                    file.RelativePath,
+                    file.GitRelativePath,
                     contents);
 
                 if (rebuildThreads)
                 {
                     file.InlineCommentThreads = sessionService.BuildCommentThreads(
                         session.PullRequest,
-                        file.RelativePath,
+                        file.GitRelativePath,
                         file.Diff,
                         session.PullRequest.HeadRefSha);
                 }
@@ -387,7 +387,7 @@ namespace GitHub.InlineReviews.Services
             byte[] content)
         {
             var repo = session.LocalRepository;
-            return await sessionService.IsUnmodifiedAndPushed(repo, file.RelativePath, content) ?
+            return await sessionService.IsUnmodifiedAndPushed(repo, file.GitRelativePath, content) ?
                    await sessionService.GetTipSha(repo) : null;
         }
 

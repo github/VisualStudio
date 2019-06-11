@@ -31,23 +31,23 @@ namespace GitHub.InlineReviews.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionFile"/> class.
         /// </summary>
-        /// <param name="relativePath">
-        /// The Git relative path to the file in the repository.
+        /// <param name="gitRelativePath">
+        /// The relative path to the file in the repository using '/' as directory separator.
         /// </param>
         /// <param name="commitSha">
         /// The commit to pin the file to, or "HEAD" to follow the pull request head.
         /// </param>
-        public PullRequestSessionFile(string relativePath, string commitSha = "HEAD")
+        public PullRequestSessionFile(string gitRelativePath, string commitSha = "HEAD")
         {
-            Guard.ArgumentIsGitPath(relativePath, nameof(relativePath));
+            Guard.ArgumentIsGitPath(gitRelativePath, nameof(gitRelativePath));
 
-            RelativePath = relativePath;
+            GitRelativePath = gitRelativePath;
             this.commitSha = commitSha;
             IsTrackingHead = commitSha == "HEAD";
         }
 
         /// <inheritdoc/>
-        public string RelativePath { get; }
+        public string GitRelativePath { get; }
 
         /// <inheritdoc/>
         public IReadOnlyList<DiffChunk> Diff
