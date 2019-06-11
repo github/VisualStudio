@@ -119,7 +119,7 @@ namespace GitHub.Services
 
                     if (!workingDirectory)
                     {
-                        var gitPath = FindGitPath(session.LocalRepository, fullPath);
+                        var gitPath = FindGitRelativePath(session.LocalRepository, fullPath);
                         if (gitPath != null)
                         {
                             AddBufferTag(wpfTextView.TextBuffer, session, gitPath, commitSha, null);
@@ -489,7 +489,7 @@ namespace GitHub.Services
             return Path.Combine(localPath, relativePath);
         }
 
-        static string FindGitPath(LocalRepositoryModel localRepository, string path)
+        static string FindGitRelativePath(LocalRepositoryModel localRepository, string path)
         {
             var basePath = localRepository.LocalPath + Path.DirectorySeparatorChar;
             if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
