@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
@@ -31,17 +32,15 @@ namespace GitHub.InlineReviews.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestSessionFile"/> class.
         /// </summary>
-        /// <param name="gitRelativePath">
-        /// The relative path to the file in the repository using '/' as directory separator.
+        /// <param name="relativePath">
+        /// The relative path to the file in the repository.
         /// </param>
         /// <param name="commitSha">
         /// The commit to pin the file to, or "HEAD" to follow the pull request head.
         /// </param>
-        public PullRequestSessionFile(string gitRelativePath, string commitSha = "HEAD")
+        public PullRequestSessionFile(string relativePath, string commitSha = "HEAD")
         {
-            Guard.ArgumentIsGitPath(gitRelativePath, nameof(gitRelativePath));
-
-            GitRelativePath = gitRelativePath;
+            GitRelativePath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
             this.commitSha = commitSha;
             IsTrackingHead = commitSha == "HEAD";
         }
