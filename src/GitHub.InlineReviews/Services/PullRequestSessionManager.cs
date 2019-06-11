@@ -92,8 +92,9 @@ namespace GitHub.InlineReviews.Services
             {
                 var dispose = new CompositeDisposable();
 
+                var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
                 result = new PullRequestSessionLiveFile(
-                    relativePath,
+                    gitPath,
                     textBuffer,
                     sessionService.CreateRebuildSignal());
 
