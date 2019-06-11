@@ -214,7 +214,7 @@ namespace GitHub.InlineReviews.Tags
             fileSubscription?.Dispose();
             fileSubscription = null;
 
-            relativePath = sessionManager.GetRelativePath(buffer);
+            relativePath = sessionManager.GetGitRelativePath(buffer);
 
             if (relativePath != null)
             {

@@ -423,7 +423,7 @@ namespace GitHub.InlineReviews.UnitTests.Tags
                 var result = Substitute.For<IPullRequestSessionManager>();
                 result.GetLiveFile("file.cs", Arg.Any<ITextView>(), Arg.Any<ITextBuffer>())
                     .Returns(Task.FromResult(file));
-                result.GetRelativePath(null).ReturnsForAnyArgs("file.cs");
+                result.GetGitRelativePath(null).ReturnsForAnyArgs("file.cs");
                 return result;
             }
         }

@@ -110,7 +110,7 @@ namespace GitHub.InlineReviews.Margins
                 return null;
             }
 
-            var relativePath = sessionManager.GetRelativePath(textView.TextBuffer);
+            var relativePath = sessionManager.GetGitRelativePath(textView.TextBuffer);
             if (relativePath == null)
             {
                 return null;

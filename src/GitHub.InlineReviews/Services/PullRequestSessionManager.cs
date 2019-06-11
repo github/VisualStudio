@@ -128,18 +128,20 @@ namespace GitHub.InlineReviews.Services
         }
 
         /// <inheritdoc/>
-        public string GetRelativePath(ITextBuffer buffer)
+        public string GetGitRelativePath(ITextBuffer buffer)
         {
             var document = sessionService.GetDocument(buffer);
             var path = document?.FilePath;
 
             if (!string.IsNullOrWhiteSpace(path) && Path.IsPathRooted(path) && repository != null)
             {
-                var basePath = repository.LocalPath;
+                var basePath = repository.LocalPath + Path.DirectorySeparatorChar;
 
                 if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
                 {
-                    return path.Substring(basePath.Length + 1);
+                    var relativePath = path.Substring(basePath.Length);
+                    var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+                    return gitPath;
                 }
             }
 

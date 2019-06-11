@@ -125,7 +125,7 @@ namespace GitHub.Commands
                     return;
                 }
 
-                var relativePath = sessionManager.Value.GetRelativePath(textView.TextBuffer);
+                var relativePath = sessionManager.Value.GetGitRelativePath(textView.TextBuffer);
                 if (relativePath == null)
                 {
                     ShowErrorInStatusBar("File isn't part of repository");
@@ -193,7 +193,7 @@ namespace GitHub.Commands
                 var session = sessionManager.Value.CurrentSession;
                 if (session != null)
                 {
-                    var relativePath = sessionManager.Value.GetRelativePath(textView.TextBuffer);
+                    var relativePath = sessionManager.Value.GetGitRelativePath(textView.TextBuffer);
                     if (relativePath != null)
                     {
                         // Active text view is part of a repository

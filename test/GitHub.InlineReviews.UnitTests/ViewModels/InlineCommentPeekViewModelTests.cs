@@ -360,7 +360,7 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var result = Substitute.For<IPullRequestSessionManager>();
             result.CurrentSession.Returns(session);
             result.GetLiveFile(relativePath, Arg.Any<ITextView>(), Arg.Any<ITextBuffer>()).Returns(file);
-            result.GetRelativePath(Arg.Any<ITextBuffer>()).Returns(relativePath);
+            result.GetGitRelativePath(Arg.Any<ITextBuffer>()).Returns(relativePath);
             result.GetTextBufferInfo(Arg.Any<ITextBuffer>()).Returns(textBufferInfo);
 
             return result;

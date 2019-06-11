@@ -57,13 +57,13 @@ namespace GitHub.Services
 
         /// <summary>
         /// Gets the path of a document displayed in a text buffer, relative to the current
-        /// repository.
+        /// repository and using '/' as directory separator.
         /// </summary>
         /// <param name="buffer">The text buffer.</param>
         /// <returns>
         /// The relative path, or null if the buffer does not represent a file in the repository.
         /// </returns>
-        string GetRelativePath(ITextBuffer buffer);
+        string GetGitRelativePath(ITextBuffer buffer);
 
         /// <summary>
         /// Gets an <see cref="IPullRequestSession"/> for a pull request.
