@@ -197,7 +197,7 @@ namespace GitHub.ViewModels
                     await Session.PostReviewComment(
                         comment.Body,
                         File.CommitSha,
-                        File.GitRelativePath.Replace("\\", "/"),
+                        File.GitRelativePath,
                         File.Diff,
                         diffPosition.DiffLineNumber).ConfigureAwait(false);
                 }

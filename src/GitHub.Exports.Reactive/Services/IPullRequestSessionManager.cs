@@ -46,7 +46,7 @@ namespace GitHub.Services
         /// <summary>
         /// Gets an <see cref="IPullRequestSessionFile"/> that tracks the live state of a document.
         /// </summary>
-        /// <param name="relativePath">The Git relative path to the file in the repository.</param>
+        /// <param name="relativePath">The relative path to the file in the repository.</param>
         /// <param name="textView">The text view that is showing the file.</param>
         /// <param name="textBuffer">The text buffer with the file contents.</param>
         /// <returns>An <see cref="IPullRequestSessionLiveFile"/>.</returns>
