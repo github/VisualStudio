@@ -224,7 +224,7 @@ namespace GitHub.ViewModels.GitHubPane
         {
             if (file.Status == PullRequestFileStatus.Renamed)
             {
-                var fileName = file.FileName.Replace("/", "\\");
+                var fileName = file.FileName;
                 return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
             }
 
