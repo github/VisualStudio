@@ -27,7 +27,7 @@ namespace GitHub.ViewModels.GitHubPane
         public string DirectoryName { get; }
 
         /// <summary>
-        /// Gets the path to the directory, relative to the root of the repository using '/' as directory separator.
+        /// Gets the path to the directory, relative to the root of the repository.
         /// </summary>
         public string RelativePath { get; }
 
