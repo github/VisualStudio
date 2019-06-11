@@ -38,8 +38,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.That(dir1.Directories, Has.One.Items);
             Assert.That(dir1.Files[0].FileName, Is.EqualTo("f1.cs"));
             Assert.That(dir1.Files[1].FileName, Is.EqualTo("f2.cs"));
-            Assert.That(dir1.Files[0].RelativePath, Is.EqualTo("dir1\\f1.cs"));
-            Assert.That(dir1.Files[1].RelativePath, Is.EqualTo("dir1\\f2.cs"));
+            Assert.That(dir1.Files[0].GitRelativePath, Is.EqualTo("dir1\\f1.cs"));
+            Assert.That(dir1.Files[1].GitRelativePath, Is.EqualTo("dir1\\f2.cs"));
 
             var dir1a = (PullRequestDirectoryNode)dir1.Directories[0];
             Assert.That(dir1a.DirectoryName, Is.EqualTo("dir1a"));
