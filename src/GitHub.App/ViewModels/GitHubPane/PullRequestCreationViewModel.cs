@@ -41,6 +41,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly IMessageDraftStore draftStore;
         readonly IGitService gitService;
         readonly IScheduler timerScheduler;
+        readonly IUsageTracker usageTracker;
         readonly CompositeDisposable disposables = new CompositeDisposable();
         LocalRepositoryModel activeLocalRepo;
         ObservableAsPropertyHelper<RemoteRepositoryModel> githubRepository;
@@ -53,8 +54,9 @@ namespace GitHub.ViewModels.GitHubPane
             INotificationService notifications,
             IMessageDraftStore draftStore,
             IGitService gitService,
-            IAutoCompleteAdvisor autoCompleteAdvisor)
-            : this(modelServiceFactory, service, notifications, draftStore, gitService, autoCompleteAdvisor, DefaultScheduler.Instance)
+            IAutoCompleteAdvisor autoCompleteAdvisor,
+            IUsageTracker usageTracker)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, autoCompleteAdvisor, usageTracker, DefaultScheduler.Instance)
         {
         }
 
@@ -65,6 +67,7 @@ namespace GitHub.ViewModels.GitHubPane
             IMessageDraftStore draftStore,
             IGitService gitService,
             IAutoCompleteAdvisor autoCompleteAdvisor,
+            IUsageTracker usageTracker,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
@@ -81,6 +84,7 @@ namespace GitHub.ViewModels.GitHubPane
             this.gitService = gitService;
             this.AutoCompleteAdvisor = autoCompleteAdvisor;
             this.timerScheduler = timerScheduler;
+            this.usageTracker = usageTracker;
 
             this.WhenAnyValue(x => x.Branches)
                 .WhereNotNull()
@@ -107,8 +111,16 @@ namespace GitHub.ViewModels.GitHubPane
                 .Subscribe(x => notifications.ShowError(BranchValidator.ValidationResult.Message));
 
             CreatePullRequest = ReactiveCommand.CreateFromObservable(
-                () => service
-                    .CreatePullRequest(modelService, activeLocalRepo, TargetBranch.Repository, SourceBranch, TargetBranch, PRTitle, Description ?? String.Empty)
+                () => Observable.FromAsync(async () =>
+                    {
+                        var pullRequestModel = await service
+                            .CreatePullRequest(modelService, activeLocalRepo, TargetBranch.Repository, SourceBranch,
+                                TargetBranch, PRTitle, Description ?? String.Empty);
+
+                        await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
+
+                        return pullRequestModel;
+                    })
                     .Catch<IPullRequestModel, Exception>(ex =>
                     {
                         log.Error(ex, "Error creating pull request");
@@ -120,6 +132,7 @@ namespace GitHub.ViewModels.GitHubPane
                         return Observable.Empty<IPullRequestModel>();
                     }),
                 whenAnyValidationResultChanges);
+
             CreatePullRequest.Subscribe(pr =>
             {
                 notifications.ShowMessage(String.Format(CultureInfo.CurrentCulture, Resources.PRCreatedUpstream, SourceBranch.DisplayName, TargetBranch.Repository.Owner + "/" + TargetBranch.Repository.Name + "#" + pr.Number,

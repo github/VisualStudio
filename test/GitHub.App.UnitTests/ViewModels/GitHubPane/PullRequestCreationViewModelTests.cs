@@ -147,10 +147,10 @@ public class PullRequestCreationViewModelTests : TestBaseClass
     public async Task TargetBranchDisplayNameIncludesRepoOwnerWhenForkAsync()
     {
         var data = PrepareTestData("octokit.net", "shana", "master", "octokit", "master", "origin", true, true);
-        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IApiClientFactory>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IApiClientFactory>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem());
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Empty<string>());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor);
+            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>());
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
         Assert.That("octokit/master", Is.EqualTo(vm.TargetBranch.DisplayName));
     }
@@ -184,9 +184,9 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var targetBranch = data.TargetBranch;
         var ms = data.ModelService;
 
-        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IApiClientFactory>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem(), Substitute.For<IUsageTracker>());
+        var prservice = new PullRequestService(data.GitClient, data.GitService, Substitute.For<IVSGitExt>(), Substitute.For<IApiClientFactory>(), Substitute.For<IGraphQLClientFactory>(), data.ServiceProvider.GetOperatingSystem());
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor);
+            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>());
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         // the TargetBranch property gets set to whatever the repo default is (we assume master here),
@@ -229,7 +229,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         prservice.GetPullRequestTemplate(data.ActiveRepo).Returns(Observable.Return("Test PR template"));
 
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor);
+            Substitute.For<IMessageDraftStore>(), data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>());
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         Assert.That("Test PR template", Is.EqualTo(vm.Description));
@@ -249,7 +249,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
 
         var prservice = Substitute.For<IPullRequestService>();
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            draftStore, data.GitService, data.AutoCompleteAdvisor);
+            draftStore, data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>());
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         Assert.That(vm.PRTitle, Is.EqualTo("This is a Title."));
@@ -264,7 +264,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var draftStore = Substitute.For<IMessageDraftStore>();
         var prservice = Substitute.For<IPullRequestService>();
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            draftStore, data.GitService, data.AutoCompleteAdvisor, scheduler);
+            draftStore, data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>(), scheduler);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         vm.Description = "Body changed.";
@@ -287,7 +287,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var draftStore = Substitute.For<IMessageDraftStore>();
         var prservice = Substitute.For<IPullRequestService>();
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService,
-            draftStore, data.GitService, data.AutoCompleteAdvisor, scheduler);
+            draftStore, data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>(), scheduler);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         vm.PRTitle = "Title changed.";
@@ -310,7 +310,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var draftStore = Substitute.For<IMessageDraftStore>();
         var prservice = Substitute.For<IPullRequestService>();
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService, draftStore,
-            data.GitService, data.AutoCompleteAdvisor, scheduler);
+            data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>(), scheduler);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         await vm.CreatePullRequest.Execute();
@@ -326,7 +326,7 @@ public class PullRequestCreationViewModelTests : TestBaseClass
         var draftStore = Substitute.For<IMessageDraftStore>();
         var prservice = Substitute.For<IPullRequestService>();
         var vm = new PullRequestCreationViewModel(data.GetModelServiceFactory(), prservice, data.NotificationService, draftStore,
-            data.GitService, data.AutoCompleteAdvisor, scheduler);
+            data.GitService, data.AutoCompleteAdvisor, Substitute.For<IUsageTracker>(), scheduler);
         await vm.InitializeAsync(data.ActiveRepo, data.Connection);
 
         await vm.Cancel.Execute();
