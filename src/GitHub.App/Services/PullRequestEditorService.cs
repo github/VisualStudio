@@ -120,11 +120,8 @@ namespace GitHub.Services
                     if (!workingDirectory)
                     {
                         var gitPath = FindGitRelativePath(session.LocalRepository, fullPath);
-                        if (gitPath != null)
-                        {
-                            AddBufferTag(wpfTextView.TextBuffer, session, gitPath, commitSha, null);
-                            EnableNavigateToEditor(textView, session);
-                        }
+                        AddBufferTag(wpfTextView.TextBuffer, session, gitPath, commitSha, null);
+                        EnableNavigateToEditor(textView, session);
                     }
                 }
 
@@ -497,7 +494,7 @@ namespace GitHub.Services
                 return path.Substring(basePath.Length).Replace(Path.DirectorySeparatorChar, '/');
             }
 
-            return null;
+            throw new ArgumentException($"Path '{path}' is not in the working directory '{localRepository.LocalPath}'");
         }
 
         string GetText(IVsTextView textView)
