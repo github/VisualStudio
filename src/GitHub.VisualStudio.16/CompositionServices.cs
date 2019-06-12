@@ -81,19 +81,7 @@ namespace GitHub.VisualStudio
                 new VSGitExt(serviceProvider, contextFactory, gitService, joinableTaskContext);
             compositionContainer.ComposeExportedValue<IVSGitExt>(vsGitExt);
 
-            // HACK: The minimal ExportProvider shouldn't depend on IUsageTracker
-            compositionContainer.ComposeExportedValue<IUsageTracker>(new MinimalUsageTracker());
-
             return compositionContainer;
-        }
-
-        class MinimalUsageTracker : IUsageTracker
-        {
-            public Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
-            {
-                Debug.WriteLine($"IncrementCounter {counter.Name}");
-                return Task.CompletedTask;
-            }
         }
 
         CompositionContainer CreateCompositionContainer()
