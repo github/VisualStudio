@@ -60,7 +60,6 @@ namespace GitHub.Services
         readonly IVSGitExt gitExt;
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IOperatingSystem os;
-        readonly IUsageTracker usageTracker;
 
         readonly IDictionary<string, (string commitId, string repoPath)> tempFileMappings;
 
@@ -71,8 +70,7 @@ namespace GitHub.Services
             IVSGitExt gitExt,
             IApiClientFactory apiClientFactory,
             IGraphQLClientFactory graphqlFactory,
-            IOperatingSystem os,
-            IUsageTracker usageTracker)
+            IOperatingSystem os)
             : base(apiClientFactory, graphqlFactory)
         {
             this.gitClient = gitClient;
@@ -80,7 +78,6 @@ namespace GitHub.Services
             this.gitExt = gitExt;
             this.graphqlFactory = graphqlFactory;
             this.os = os;
-            this.usageTracker = usageTracker;
             this.tempFileMappings = new Dictionary<string, (string commitId, string repoPath)>(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -1011,7 +1008,6 @@ namespace GitHub.Services
                 var ret = await modelService.CreatePullRequest(sourceRepository, targetRepository, sourceBranch, targetBranch, title, body);
                 await MarkBranchAsPullRequest(repo, sourceBranch.Name, targetRepository.CloneUrl.Owner, ret.Number);
                 gitExt.RefreshActiveRepositories();
-                await usageTracker.IncrementCounter(x => x.NumberOfUpstreamPullRequests);
                 return ret;
             }
         }
