@@ -95,13 +95,13 @@ namespace GitHub.InlineReviews.Services
             PullRequestDetailModel pullRequest,
             string relativePath)
         {
-            relativePath = relativePath.Replace("\\", "/");
+            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
 
             return pullRequest.CheckSuites
                 ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun }))
                 .SelectMany(arg =>
                     arg.checkRun.Annotations
-                        .Where(annotation => annotation.Path == relativePath)
+                        .Where(annotation => annotation.Path == gitPath)
                         .Select(annotation => new InlineAnnotationModel(arg.checkSuite, arg.checkRun, annotation)))
                 .OrderBy(tuple => tuple.StartLine)
                 .ToArray();
@@ -114,10 +114,10 @@ namespace GitHub.InlineReviews.Services
             IReadOnlyList<DiffChunk> diff,
             string headSha)
         {
-            relativePath = relativePath.Replace("\\", "/");
+            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
 
             var threadsByPosition = pullRequest.Threads
-                .Where(x => x.Path == relativePath)
+                .Where(x => x.Path == gitPath)
                 .OrderBy(x => x.Id)
                 .GroupBy(x => Tuple.Create(x.OriginalCommitSha, x.OriginalPosition));
             var threads = new List<IInlineCommentThreadModel>();

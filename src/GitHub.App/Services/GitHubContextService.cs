@@ -404,16 +404,17 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path)
+        public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string relativePath)
         {
-            Guard.ArgumentNotNull(path, nameof(repositoryDir));
-            Guard.ArgumentNotNull(path, nameof(commitish));
-            Guard.ArgumentIsGitPath(path, nameof(path));
+            Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
+            Guard.ArgumentNotNull(commitish, nameof(commitish));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
             using (var repo = gitService.GetRepository(repositoryDir))
             {
                 var commit = repo.Lookup<Commit>(commitish);
-                var paths = new[] { path };
+                var paths = new[] { gitPath };
 
                 return repo.Diff.Compare<Patch>(commit.Tree, DiffTargets.WorkingDirectory, paths).Count() > 0;
             }

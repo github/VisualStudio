@@ -573,15 +573,13 @@ namespace GitHub.Services
         void AddBufferTag(
             ITextBuffer buffer,
             IPullRequestSession session,
-            string gitPath,
+            string relativePath,
             string commitSha,
             DiffSide? side)
         {
-            Guard.ArgumentIsGitPath(gitPath, nameof(gitPath));
-
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, gitPath, commitSha, side));
+                () => new PullRequestTextBufferInfo(session, relativePath, commitSha, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -589,7 +587,7 @@ namespace GitHub.Services
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, gitPath, commitSha, side);
+                    AddBufferTag(source, session, relativePath, commitSha, side);
                 }
             }
         }
@@ -656,9 +654,10 @@ namespace GitHub.Services
                 session.LocalRepository,
                 session.PullRequest))
             {
-                var fileChange = changes.FirstOrDefault(x => x.Path == file.RelativePath);
+                var gitPath = file.RelativePath.Replace(Path.DirectorySeparatorChar, '/');
+                var fileChange = changes.FirstOrDefault(x => x.Path == gitPath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    fileChange.OldPath : file.RelativePath;
+                    fileChange.OldPath.Replace('/', Path.DirectorySeparatorChar) : file.RelativePath;
             }
         }
 

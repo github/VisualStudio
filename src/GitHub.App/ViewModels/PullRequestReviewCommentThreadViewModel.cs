@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -197,7 +198,7 @@ namespace GitHub.ViewModels
                     await Session.PostReviewComment(
                         comment.Body,
                         File.CommitSha,
-                        File.RelativePath.Replace("\\", "/"),
+                        File.RelativePath.Replace(Path.DirectorySeparatorChar, '/'),
                         File.Diff,
                         diffPosition.DiffLineNumber).ConfigureAwait(false);
                 }
@@ -234,8 +235,8 @@ namespace GitHub.ViewModels
             string relativePath,
             int lineNumber)
         {
-            relativePath = relativePath.Replace("\\", "/");
-            var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{relativePath}");
+            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{gitPath}");
             return (key, lineNumber.ToString(CultureInfo.InvariantCulture));
         }
 

@@ -90,13 +90,13 @@ namespace GitHub.Services
         /// <param name="repository">The repository</param>
         /// <param name="sha1">The SHA of the first commit.</param>
         /// <param name="sha2">The SHA of the second commit.</param>
-        /// <param name="path">The relative path to the file (using '/' directory separator).</param>
+        /// <param name="path">The relative path to the file.</param>
         /// <param name="contents">The contents to compare with the file.</param>
         /// <returns>
         /// A <see cref="Patch"/> object or null if the commit could not be found in the repository.
         /// </returns>
         /// <exception cref="ArgumentException">If <paramref name="path"/> contains a '\'.</exception>
-        Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents);
+        Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string relativePath, byte[] contents);
 
         /// <summary>
         /// Compares two commits.

@@ -81,12 +81,12 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 PullRequestSessionFile file;
-                var normalizedPath = relativePath.Replace("\\", "/");
-                var key = normalizedPath + '@' + commitSha;
+                var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+                var key = gitPath + '@' + commitSha;
 
                 if (!fileIndex.TryGetValue(key, out file))
                 {
-                    file = new PullRequestSessionFile(normalizedPath, commitSha);
+                    file = new PullRequestSessionFile(relativePath, commitSha);
                     await UpdateFile(file);
                     fileIndex.Add(key, file);
                 }
