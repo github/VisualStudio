@@ -90,13 +90,12 @@ namespace GitHub.Services
 
             try
             {
-                var fullPath = GetAbsolutePath(session.LocalRepository, relativePath);
                 string fileName;
                 string commitSha;
 
                 if (workingDirectory)
                 {
-                    fileName = fullPath;
+                    fileName = Path.Combine(session.LocalRepository.LocalPath, relativePath);
                     commitSha = null;
                 }
                 else
@@ -477,13 +476,6 @@ namespace GitHub.Services
             }
 
             return matchingLine;
-        }
-
-        static string GetAbsolutePath(LocalRepositoryModel localRepository, string relativePath)
-        {
-            var localPath = localRepository.LocalPath;
-            relativePath = Paths.ToRelativePath(relativePath);
-            return Path.Combine(localPath, relativePath);
         }
 
         string GetText(IVsTextView textView)
