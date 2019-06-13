@@ -95,7 +95,7 @@ namespace GitHub.InlineReviews.Services
             PullRequestDetailModel pullRequest,
             string relativePath)
         {
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
 
             return pullRequest.CheckSuites
                 ?.SelectMany(checkSuite => checkSuite.CheckRuns.Select(checkRun => new { checkSuite, checkRun }))
@@ -114,7 +114,7 @@ namespace GitHub.InlineReviews.Services
             IReadOnlyList<DiffChunk> diff,
             string headSha)
         {
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
 
             var threadsByPosition = pullRequest.Threads
                 .Where(x => x.Path == gitPath)

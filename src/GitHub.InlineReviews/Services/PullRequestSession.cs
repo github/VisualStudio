@@ -81,7 +81,7 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 PullRequestSessionFile file;
-                var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+                var gitPath = Paths.ToGitPath(relativePath);
                 var key = gitPath + '@' + commitSha;
 
                 if (!fileIndex.TryGetValue(key, out file))

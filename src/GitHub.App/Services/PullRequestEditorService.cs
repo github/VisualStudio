@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using EnvDTE;
 using GitHub.Commands;
+using GitHub.Primitives;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Models.Drafts;
@@ -482,7 +483,7 @@ namespace GitHub.Services
         static string GetAbsolutePath(LocalRepositoryModel localRepository, string relativePath)
         {
             var localPath = localRepository.LocalPath;
-            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+            relativePath = Paths.ToRelativePath(relativePath);
             return Path.Combine(localPath, relativePath);
         }
 
@@ -491,7 +492,7 @@ namespace GitHub.Services
             var basePath = localRepository.LocalPath + Path.DirectorySeparatorChar;
             if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
             {
-                return path.Substring(basePath.Length).Replace(Path.DirectorySeparatorChar, '/');
+                return Paths.ToGitPath(path.Substring(basePath.Length));
             }
 
             throw new ArgumentException($"Path '{path}' is not in the working directory '{localRepository.LocalPath}'");
@@ -654,10 +655,10 @@ namespace GitHub.Services
                 session.LocalRepository,
                 session.PullRequest))
             {
-                var gitPath = file.RelativePath.Replace(Path.DirectorySeparatorChar, '/');
+                var gitPath = Paths.ToGitPath(file.RelativePath);
                 var fileChange = changes.FirstOrDefault(x => x.Path == gitPath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    fileChange.OldPath.Replace('/', Path.DirectorySeparatorChar) : file.RelativePath;
+                    Paths.ToRelativePath(fileChange.OldPath) : file.RelativePath;
             }
         }
 

@@ -241,7 +241,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit1 = repository.Lookup<Commit>(sha1);
@@ -269,7 +269,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit1 = repository.Lookup<Commit>(sha1);

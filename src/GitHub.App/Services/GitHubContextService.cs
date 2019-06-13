@@ -282,7 +282,8 @@ namespace GitHub.Services
                 return false;
             }
 
-            var fullPath = Path.Combine(repositoryDir, path.Replace('/', '\\'));
+            var relativePath = Paths.ToRelativePath(path);
+            var fullPath = Path.Combine(repositoryDir, relativePath);
             var textView = OpenDocument(fullPath);
             SetSelection(textView, context);
             return true;
@@ -410,7 +411,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(commitish, nameof(commitish));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             using (var repo = gitService.GetRepository(repositoryDir))
             {
                 var commit = repo.Lookup<Commit>(commitish);

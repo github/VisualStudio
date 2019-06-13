@@ -779,7 +779,7 @@ namespace GitHub.Services
             Encoding encoding)
         {
             var tempFilePath = CalculateTempFileName(relativePath, commitSha, encoding);
-            var gitPath = relativePath.TrimStart('/').Replace('\\', '/');
+            var gitPath = Paths.ToGitPath(relativePath);
 
             if (!File.Exists(tempFilePath))
             {

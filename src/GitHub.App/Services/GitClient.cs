@@ -265,7 +265,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
@@ -285,7 +285,7 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
@@ -315,7 +315,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 if (repository.RetrieveStatus(gitPath) == FileStatus.Unaltered)

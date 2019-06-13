@@ -198,7 +198,7 @@ namespace GitHub.ViewModels
                     await Session.PostReviewComment(
                         comment.Body,
                         File.CommitSha,
-                        File.RelativePath.Replace(Path.DirectorySeparatorChar, '/'),
+                        Paths.ToGitPath(File.RelativePath),
                         File.Diff,
                         diffPosition.DiffLineNumber).ConfigureAwait(false);
                 }
@@ -235,7 +235,7 @@ namespace GitHub.ViewModels
             string relativePath,
             int lineNumber)
         {
-            var gitPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            var gitPath = Paths.ToGitPath(relativePath);
             var key = Invariant($"pr-review-comment|{cloneUri}|{pullRequestNumber}|{gitPath}");
             return (key, lineNumber.ToString(CultureInfo.InvariantCulture));
         }
