@@ -125,7 +125,8 @@ New-Module -ScriptBlock {
         }
 
         if ($enableBuildCrossCheck) {
-            $flag3	= "-logger:%userprofile%\.nuget\packages\BCC-MSBuildLog\1.0.0\tools\net472\BCCMSBuildLog.dll"
+			$userprofile = $ENV:UserProfile
+            $flag3	= "-logger:$userprofile\.nuget\packages\BCC-MSBuildLog\1.0.0\tools\net472\BCCMSBuildLog.dll"
         }
 
         Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=16.0 /bl:output.binlog $flag1 $flag2 $flag3"
