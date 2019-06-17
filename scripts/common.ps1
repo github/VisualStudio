@@ -31,23 +31,18 @@ function Create-TempDirectory {
     New-Item -Type Directory $path
 }
 
-function Build-Solution([string]$solution,[string]$target,[string]$configuration, [bool]$ForVSInstaller, [bool]$enableBuildCrossCheck) {
+function Build-Solution([string]$solution,[string]$target,[string]$configuration, [bool]$ForVSInstaller) {
     Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed }
     $flag1 = ""
     $flag2 = ""
-    $flag3 = ""
     if ($ForVSInstaller) {
         $flag1 = "/p:IsProductComponent=true"
         $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\GitHub.VisualStudio.vsix"
         new-item -Path $rootDirectory\build\vsinstaller -ItemType Directory -Force | Out-Null
     }
 
-	if ($$enableBuildCrossCheck) {
-		$flag3	= "-logger:%userprofile%\.nuget\packages\BCC-MSBuildLog\1.0.0\tools\net472\BCCMSBuildLog.dll"
-	}
-
-    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2 $flag3"
-    Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2 $flag3 }
+    Write-Output "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2"
+    Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=14.0 $flag1 $flag2 }
 }
 
 function Push-Changes([string]$branch) {

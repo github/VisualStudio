@@ -108,12 +108,13 @@ New-Module -ScriptBlock {
         $msbuild
     }
 
-    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [string]$VsixFileName, [bool]$Deploy = $false) {
+    function Build-Solution([string]$solution, [string]$target, [string]$configuration, [switch]$ForVSInstaller = $false, [string]$VsixFileName, [bool]$Deploy = $false, [bool]$enableBuildCrossCheck = $false) {
         $msbuild = Find-MSBuild
 
         Run-Command -Fatal { & $nuget restore $solution -NonInteractive -Verbosity detailed -MSBuildPath (Split-Path -parent $msbuild) }
         $flag1 = ""
         $flag2 = ""
+        $flag3 = ""
         if ($ForVSInstaller) {
             $flag1 = "/p:IsProductComponent=true"
             $flag2 = "/p:TargetVsixContainer=$rootDirectory\build\vsinstaller\$VsixFileName"
@@ -123,8 +124,12 @@ New-Module -ScriptBlock {
             $flag1 = "/p:Package=Skip"
         }
 
-        Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=16.0 /bl:output.binlog $flag1 $flag2"
-        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=16.0 /bl:output.binlog $flag1 $flag2 }
+        if ($enableBuildCrossCheck) {
+            $flag3	= "-logger:%userprofile%\.nuget\packages\BCC-MSBuildLog\1.0.0\tools\net472\BCCMSBuildLog.dll"
+        }
+
+        Write-Host "$msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=16.0 /bl:output.binlog $flag1 $flag2 $flag3"
+        Run-Command -Fatal { & $msbuild $solution /target:$target /property:Configuration=$configuration /p:DeployExtension=false /verbosity:minimal /p:VisualStudioVersion=16.0 /bl:output.binlog $flag1 $flag2 $flag3 }
     }
 
     Export-ModuleMember -Function Find-MSBuild,Build-Solution
