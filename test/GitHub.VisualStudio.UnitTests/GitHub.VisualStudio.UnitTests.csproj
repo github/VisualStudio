@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCC-MSBuildLog" Version="1.0.0" />
     <PackageReference Include="Codecov" Version="1.1.0" />
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
     <PackageReference Include="NCrunch.Framework" Version="3.17.0" />
