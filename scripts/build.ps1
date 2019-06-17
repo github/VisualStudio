@@ -80,10 +80,10 @@ if ($Package) {
     Write-Output "Building GitHub for Visual Studio"
 }
 
-Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller -VsixFileName:GitHub.VisualStudio.vsix
+Build-Solution GitHubVs.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller -VsixFileName:GitHub.VisualStudio.vsix -enableBuildCrossCheck:$true
 
 Push-Location src
-Build-Solution GitHub.VisualStudio.16.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller -VsixFileName:GitHub.VisualStudio.16.vsix
+Build-Solution GitHub.VisualStudio.16.sln "Build" $config -Deploy:$Package -ForVSInstaller:$ForVSInstaller -VsixFileName:GitHub.VisualStudio.16.vsix -enableBuildCrossCheck:$false
 Pop-Location
 
 Pop-Location
