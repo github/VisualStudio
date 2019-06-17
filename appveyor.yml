@@ -2,6 +2,7 @@ os: Visual Studio 2019 Preview
 version: '2.10.2.{build}'
 skip_tags: true
 
+install:
 - ps: |
     $full_build = Test-Path env:GHFVS_KEY
     $forVSInstaller = $env:BUILD_TYPE -eq "vsinstaller"
