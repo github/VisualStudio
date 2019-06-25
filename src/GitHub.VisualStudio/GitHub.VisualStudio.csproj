@@ -296,6 +296,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>16.0.233</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

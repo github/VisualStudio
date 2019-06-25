@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Telemetry;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
@@ -15,6 +17,12 @@ namespace GitHub.Services
 {
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
+        private const int TelemetryVersion = 1; // Please update the version every time you want to indicate a change in telemetry logic when the extension itself is updated
+        private const string TelemetryVersionProperty = "TelemetryVersion";
+
+        private const string EventNameBase = "vs/github/extension/";
+        private const string PropertyBase = "vs.github.extension.";
+
         static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
 
@@ -52,10 +60,21 @@ namespace GitHub.Services
             var usage = await GetCurrentReport(data);
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            log.Verbose("Increment counter {Name}", propertyInfo.Name);
+            var eventName = propertyInfo.Name;
+            log.Verbose("Increment counter {Name}", eventName);
             var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
             await service.WriteLocalData(data);
+
+            const string numberOfPrefix = "numberof";
+            if (eventName.IndexOf(numberOfPrefix, StringComparison.InvariantCultureIgnoreCase) != -1)
+            {
+                eventName = eventName.Substring(numberOfPrefix.Length);
+            }
+
+            var operation = new OperationEvent(EventNameBase + eventName, TelemetryResult.Success);
+            operation.Properties[PropertyBase + TelemetryVersionProperty] = TelemetryVersion;
+            TelemetryService.DefaultSession.PostEvent(operation);
         }
 
         IDisposable StartTimer()
