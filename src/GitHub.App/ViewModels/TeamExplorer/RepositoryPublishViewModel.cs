@@ -136,9 +136,12 @@ namespace GitHub.ViewModels.TeamExplorer
             get { return isHostComboBoxVisible.Value; }
         }
 
-        Task LoginAsDifferentUserAsync()
+        async Task LoginAsDifferentUserAsync()
         {
-            return dialogService.ShowLoginDialog();
+            if (await dialogService.ShowLoginDialog() is IConnection connection)
+            {
+                SelectedConnection = connection;
+            }
         }
 
         ReactiveCommand<Unit, ProgressState> InitializePublishRepositoryCommand()
