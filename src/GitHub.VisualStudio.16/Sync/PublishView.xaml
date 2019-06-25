@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mtcw="clr-namespace:Microsoft.TeamFoundation.Controls.WPF;assembly=Microsoft.TeamFoundation.Controls"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -68,7 +69,7 @@
                 <!-- Description text -->
                 <TextBlock    x:Name="Description"
                               x:Uid="Description"
-                              Text="Powerful collaboration, code review, and code management for open source and private projects."
+                              Text="{x:Static ghfvs:Resources.BlurbText}"
                               MaxHeight="100"
                               TextWrapping="Wrap" 
                               TextTrimming="WordEllipsis"
