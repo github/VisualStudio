@@ -159,11 +159,11 @@ namespace Microsoft.TeamExplorerSample.Sync
         {
             if (SectionContent == null)
             {
-                Title = "Publish to GitHub";
+                // This line also ensures that the GitHub.Resourcess assembly has been loaded before we use it from XAML
+                Title = GitHub.Resources.GitHubPublishSectionTitle;
                 IsExpanded = true;
                 IsBusy = false;
 
-                Assumes.NotNull(GitHub.Resources.BlurbText); // Ensure GitHub.Resourcess has been loaded before we use it from XAML
                 SectionContent = new PublishView()
                 {
                     DataContext = this
