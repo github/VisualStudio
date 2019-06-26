@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using Microsoft.TeamFoundation.Controls;
 
-namespace Microsoft.TeamExplorerSample
+namespace GitHub.VisualStudio
 {
     /// <summary>
     /// Team Explorer page base class.

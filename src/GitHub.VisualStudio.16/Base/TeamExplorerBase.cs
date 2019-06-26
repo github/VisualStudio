@@ -8,7 +8,7 @@ using System.Diagnostics;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Controls;
 
-namespace Microsoft.TeamExplorerSample
+namespace GitHub.VisualStudio
 {
     /// <summary>
     /// Team Explorer plugin common base class.

@@ -7,7 +7,7 @@ using System.ComponentModel.Composition;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.TeamExplorerSample
+namespace GitHub.VisualStudio
 {
     /// <summary>
     /// Team Explorer base navigation link class.

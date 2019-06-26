@@ -10,7 +10,6 @@ using GitHub.Factories;
 using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.TeamExplorer;
-using GitHub.VisualStudio;
 using Microsoft.TeamFoundation.Controls;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -18,7 +17,7 @@ using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
 
 
-namespace Microsoft.TeamExplorerSample.Sync
+namespace GitHub.VisualStudio.Sync
 {
     /// <summary>
     /// Publish section.
