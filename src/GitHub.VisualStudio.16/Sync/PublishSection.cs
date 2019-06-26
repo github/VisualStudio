@@ -38,14 +38,6 @@ namespace GitHub.VisualStudio.Sync
             this.compositionServices = compositionServices;
         }
 
-        /// <summary>
-        /// Get the view.
-        /// </summary>
-        protected PublishView View
-        {
-            get { return this.SectionContent as PublishView; }
-        }
-
         public ICommand PublishToGitHub { get; set; }
 
         /// <summary>
@@ -167,8 +159,6 @@ namespace GitHub.VisualStudio.Sync
                 {
                     DataContext = this
                 };
-
-                View.ParentSection = this;
             }
         }
 
