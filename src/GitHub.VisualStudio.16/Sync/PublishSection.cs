@@ -37,14 +37,6 @@ namespace Microsoft.TeamExplorerSample.Sync
         public PublishSection(CompositionServices compositionServices)
         {
             this.compositionServices = compositionServices;
-
-            this.Title = "Publish to GitHub";
-            this.IsExpanded = true;
-            this.IsBusy = false;
-            this.SectionContent = new PublishView(){
-                DataContext = this
-            };
-            this.View.ParentSection = this;
         }
 
         /// <summary>
@@ -83,10 +75,10 @@ namespace Microsoft.TeamExplorerSample.Sync
                 }
             }
 
-            PublishToGitHub = new RelayCommand(o => ShowPublishDialog().Forget());
+            PublishToGitHub = new RelayCommand(o => ShowPublishDialogAsync().Forget());
         }
 
-        async Task ShowPublishDialog()
+        async Task ShowPublishDialogAsync()
         {
             var exportProvider = compositionServices.GetExportProvider();
 
@@ -153,7 +145,31 @@ namespace Microsoft.TeamExplorerSample.Sync
 
             if (IsVisible != visible)
             {
+                if (visible)
+                {
+                    // Don't initialize the view until it becomes visible
+                    EnsureSectionInitialized();
+                }
+
                 IsVisible = visible;
+            }
+        }
+
+        void EnsureSectionInitialized()
+        {
+            if (SectionContent == null)
+            {
+                Title = "Publish to GitHub";
+                IsExpanded = true;
+                IsBusy = false;
+
+                Assumes.NotNull(GitHub.Resources.BlurbText); // Ensure GitHub.Resourcess has been loaded before we use it from XAML
+                SectionContent = new PublishView()
+                {
+                    DataContext = this
+                };
+
+                View.ParentSection = this;
             }
         }
 
