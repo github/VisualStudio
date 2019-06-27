@@ -58,8 +58,8 @@ namespace GitHub.VisualStudio
 
             var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
             var packageSettings = new PackageSettings(gitHubServiceProvider);
-            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
-            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
+            var usageTracker = UsageTrackerFactory.CreateUsageTracker(compositionContainer, packageSettings);
+            compositionContainer.ComposeExportedValue(usageTracker);
 
             return compositionContainer;
         }
@@ -69,18 +69,21 @@ namespace GitHub.VisualStudio
             var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
 
             var packageSettings = new OutOfProcPackageSettings();
-            var usageTracker = CreateUsageTracker(compositionContainer, packageSettings);
-            compositionContainer.ComposeExportedValue<IUsageTracker>(usageTracker);
+            var usageTracker = UsageTrackerFactory.CreateUsageTracker(compositionContainer, packageSettings);
+            compositionContainer.ComposeExportedValue(usageTracker);
 
             return compositionContainer;
         }
 
-        static UsageTracker CreateUsageTracker(CompositionContainer compositionContainer, IPackageSettings packageSettings)
+        class UsageTrackerFactory
         {
-            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
-            var usageService = compositionContainer.GetExportedValue<IUsageService>();
-            var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
-            return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
+            internal static IUsageTracker CreateUsageTracker(CompositionContainer compositionContainer, IPackageSettings packageSettings)
+            {
+                var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
+                var usageService = compositionContainer.GetExportedValue<IUsageService>();
+                var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
+                return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
+            }
         }
 
         static CompositionContainer CreateOutOfProcExports()
@@ -117,8 +120,8 @@ namespace GitHub.VisualStudio
             compositionContainer.ComposeExportedValue<IGitHubServiceProvider>(gitHubServiceProvider);
             Services.UnitTestServiceProvider = gitHubServiceProvider; // Use gitHubServiceProvider as global provider 
 
-            var loginManager = CreateLoginManager(compositionContainer);
-            compositionContainer.ComposeExportedValue<ILoginManager>(loginManager);
+            var loginManager = LoginManagerFactory.CreateLoginManager(compositionContainer);
+            compositionContainer.ComposeExportedValue(loginManager);
 
             // Ensure GitHub.Resources.dll has been loaded and it visible to XAML
             EnsureLoaded(typeof(GitHub.Resources));
@@ -132,22 +135,25 @@ namespace GitHub.VisualStudio
             Assumes.NotNull(type);
         }
 
-        static LoginManager CreateLoginManager(CompositionContainer compositionContainer)
+        class LoginManagerFactory
         {
-            var keychain = compositionContainer.GetExportedValue<IKeychain>();
-            var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() => compositionContainer.GetExportedValue<ITwoFactorChallengeHandler>());
-            var oauthListener = compositionContainer.GetExportedValue<IOAuthCallbackListener>();
-            var loginManager = new LoginManager(
-                    keychain,
-                    lazy2Fa,
-                    oauthListener,
-                    ApiClientConfiguration.ClientId,
-                    ApiClientConfiguration.ClientSecret,
-                    ApiClientConfiguration.MinimumScopes,
-                    ApiClientConfiguration.RequestedScopes,
-                    ApiClientConfiguration.AuthorizationNote,
-                    ApiClientConfiguration.MachineFingerprint);
-            return loginManager;
+            internal static ILoginManager CreateLoginManager(CompositionContainer compositionContainer)
+            {
+                var keychain = compositionContainer.GetExportedValue<IKeychain>();
+                var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() => compositionContainer.GetExportedValue<ITwoFactorChallengeHandler>());
+                var oauthListener = compositionContainer.GetExportedValue<IOAuthCallbackListener>();
+                var loginManager = new LoginManager(
+                        keychain,
+                        lazy2Fa,
+                        oauthListener,
+                        ApiClientConfiguration.ClientId,
+                        ApiClientConfiguration.ClientSecret,
+                        ApiClientConfiguration.MinimumScopes,
+                        ApiClientConfiguration.RequestedScopes,
+                        ApiClientConfiguration.AuthorizationNote,
+                        ApiClientConfiguration.MachineFingerprint);
+                return loginManager;
+            }
         }
 
         static TypeCatalog GetCatalog(Assembly assembly)
