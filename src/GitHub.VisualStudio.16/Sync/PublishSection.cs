@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using GitHub.Extensions;
 using GitHub.Factories;
-using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.TeamExplorer;
 using Microsoft.TeamFoundation.Controls;
@@ -15,6 +14,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using ReactiveUI;
 using Task = System.Threading.Tasks.Task;
+using RelayCommand = Microsoft.TeamFoundation.MVVM.RelayCommand;
 
 
 namespace GitHub.VisualStudio.Sync
