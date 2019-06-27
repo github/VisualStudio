@@ -93,17 +93,17 @@ namespace GitHub.ViewModels.TeamExplorer
             if (!string.IsNullOrEmpty(defaultRepositoryName))
                 RepositoryName = defaultRepositoryName;
 
-            this.WhenAny(x => x.SelectedConnection, x => x.SelectedAccount,
-                (a,b) => true)
-                .Where(x => RepositoryNameValidator.ValidationResult != null && SafeRepositoryNameWarningValidator.ValidationResult != null)
-                .Subscribe(async _ =>
-                {
-                    var name = RepositoryName;
-                    RepositoryName = null;
-                    await RepositoryNameValidator.ResetAsync();
-                    await SafeRepositoryNameWarningValidator.ResetAsync();
-                    RepositoryName = name;
-                });
+//            this.WhenAny(x => x.SelectedConnection, x => x.SelectedAccount,
+//                (a,b) => true)
+//                .Where(x => RepositoryNameValidator.ValidationResult != null && SafeRepositoryNameWarningValidator.ValidationResult != null)
+//                .Subscribe(async _ =>
+//                {
+//                    var name = RepositoryName;
+//                    RepositoryName = null;
+//                    await RepositoryNameValidator.ResetAsync();
+//                    await SafeRepositoryNameWarningValidator.ResetAsync();
+//                    RepositoryName = name;
+//                });
         }
 
         public ReactiveCommand<Unit, ProgressState> PublishRepository { get; private set; }
@@ -173,20 +173,22 @@ namespace GitHub.ViewModels.TeamExplorer
 
         void InitializeValidation()
         {
-            var nonNullRepositoryName = this.WhenAny(
-                x => x.RepositoryName,
-                x => x.Value)
-                .WhereNotNull();
+            var nameValidationConditions = this.WhenAny(model => model.RepositoryName,
+                    model => model.SelectedConnection,
+                    model => model.SelectedAccount,
+                    (repositoryName, connection, account) => (repositoryName: repositoryName.Value,
+                        connection: connection.Value, account: account.Value))
+                .Where(tuple => tuple.repositoryName != null);
 
-            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .IfNullOrEmpty(Resources.RepositoryNameValidatorEmpty)
-                .IfTrue(x => x.Length > 100, Resources.RepositoryNameValidatorTooLong);
+            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nameValidationConditions)
+                .IfTrue(tuple => string.IsNullOrEmpty(tuple.repositoryName), Resources.RepositoryNameValidatorEmpty)
+                .IfTrue(tuple => tuple.repositoryName.Length > 100, Resources.RepositoryNameValidatorTooLong);
 
-            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .Add(repoName =>
+            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nameValidationConditions)
+                .Add(tuple =>
                 {
-                    var parsedReference = GetSafeRepositoryName(repoName);
-                    return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
+                    var parsedReference = GetSafeRepositoryName(tuple.repositoryName);
+                    return parsedReference != tuple.repositoryName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
         }
     }

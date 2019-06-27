@@ -52,7 +52,7 @@ namespace GitHub.ViewModels
             set { this.RaiseAndSetIfChanged(ref repositoryName, value); }
         }
 
-        public ReactivePropertyValidator<string> RepositoryNameValidator { get; protected set; }
+        public ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> RepositoryNameValidator { get; protected set; }
 
         /// <summary>
         /// Name of the repository after fixing it to be safe (dashes instead of spaces, etc)
@@ -62,7 +62,7 @@ namespace GitHub.ViewModels
             get { return safeRepositoryName.Value; }
         }
 
-        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator { get; protected set; }
+        public ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> SafeRepositoryNameWarningValidator { get; protected set; }
 
         IAccount selectedAccount;
         /// <summary>
