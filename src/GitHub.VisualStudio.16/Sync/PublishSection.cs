@@ -127,22 +127,16 @@ namespace GitHub.VisualStudio.Sync
 
         void RefreshVisibility()
         {
-            var visible = false;
-
-            if (ServiceProvider.GetService(typeof(ITeamExplorerPage)) is ITeamExplorerPage page)
+            var isVisible = IsSectionVisible(PushToRemoteSectionId);
+            if (IsVisible != isVisible)
             {
-                visible = IsSectionVisible(page, PushToRemoteSectionId);
-            }
-
-            if (IsVisible != visible)
-            {
-                if (visible)
+                if (isVisible)
                 {
-                    // Don't initialize the view until it becomes visible
+                    // Initialize the view when it becomes visible
                     EnsureSectionInitialized();
                 }
 
-                IsVisible = visible;
+                IsVisible = isVisible;
             }
         }
 
@@ -162,14 +156,10 @@ namespace GitHub.VisualStudio.Sync
             }
         }
 
-        bool IsSectionVisible(ITeamExplorerPage teamExplorerPage, Guid sectionId)
-        {
-            if (teamExplorerPage.GetSection(sectionId) is ITeamExplorerSection pushToRemoteSection)
-            {
-                return pushToRemoteSection.SectionContent != null && pushToRemoteSection.IsVisible;
-            }
-
-            return false;
-        }
+        bool IsSectionVisible(Guid sectionId) =>
+            ServiceProvider.GetService(typeof(ITeamExplorerPage)) is ITeamExplorerPage page &&
+            page.GetSection(sectionId) is ITeamExplorerSection section &&
+            section.SectionContent != null &&
+            section.IsVisible;
     }
 }
