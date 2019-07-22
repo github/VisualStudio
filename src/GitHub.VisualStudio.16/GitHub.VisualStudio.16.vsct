@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable
+  xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Import the standard ImageCatalogGuid monikers -->
+  <Include href="KnownImageIds.vsct"/>
+  
+  <!--  This is the file that defines the actual layout and type of the commands.
+        It is divided in different sections (e.g. command definition, command
+        placement, ...), with each defining a specific set of properties.
+        See the comment before each section for more details about how to
+        use it. -->
+
+  <!--  The VSCT compiler (the tool that translates this file into the binary 
+        format that VisualStudio will consume) has the ability to run a preprocessor 
+        on the vsct file; this preprocessor is (usually) the C++ preprocessor, so 
+        it is possible to define includes and macros with the same syntax used 
+        in C++ files. Using this ability of the compiler here, we include some files 
+        defining some of the constants that we will use inside the file. -->
+
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h"/>
+
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h"/>
+
+  <!--The Commands section is where we the commands, menus and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidGitHubEssentialsPkg">
+
+    <Groups>
+      <Group guid="guidGitHubEssentialsCmdSet" id="idGitHubMenuGroup" priority="0x0500">
+        <Parent guid="guidManageConnections" id="idManageConnections" />
+      </Group>
+    </Groups>
+
+    <!-- Parenting of buttons is done in the CommandPlacements section -->
+    <Buttons>
+      <Button guid="guidGitHubEssentialsCmdSet" id="addConnectionCommand" type="Button">
+        <Icon guid="guidImages" id="logo" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>&amp;Connect to GitHub...</ButtonText>
+          <CanonicalName>.GitHub.ConnectToGitHub</CanonicalName>
+          <LocCanonicalName>.GitHub.ConnectToGitHub</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+
+  </Commands>
+
+  <CommandPlacements>
+
+    <!-- Add Connection (Team Explorer) command -->
+    <CommandPlacement guid="guidGitHubEssentialsCmdSet" id="addConnectionCommand" priority="0x0100">
+      <Parent guid="guidGitHubEssentialsCmdSet" id="idGitHubMenuGroup"/>
+    </CommandPlacement>
+
+  </CommandPlacements>
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidGitHubEssentialsPkg" value="{c3a2c467-6b73-4909-8ce7-12a456ea77d7}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidGitHubEssentialsCmdSet" value="{8de10943-8643-4f81-88a3-83b81d204ff4}">
+      <IDSymbol name="addConnectionCommand" value="0x110"/>
+      <IDSymbol name="idGitHubMenuGroup" value="0x1020"/>
+    </GuidSymbol>
+
+    <!-- This is the Manage Connections menu -->
+    <GuidSymbol name="guidManageConnections" value="{0a014553-a0aa-46dd-8d6b-b8e3178ca435}">
+      <IDSymbol name="idManageConnections" value="0x1009"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{de556d01-f3bc-4521-abc3-3e04b537f9c9}" >
+      <IDSymbol name="logo" value="1" />
+    </GuidSymbol>
+
+  </Symbols>
+
+</CommandTable>

@@ -67,6 +67,12 @@
     <Compile Include="Base\TeamExplorerBaseSection.cs" />
     <Compile Include="CompositionServices.cs" />
     <Compile Include="FullExtensionUtilities.cs" />
+    <Compile Include="GitHub.VisualStudio.16.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GitHub.VisualStudio.16.vsct</DependentUpon>
+    </Compile>
+    <Compile Include="GitHubEssentialsPackage.cs" />
     <Compile Include="IExtensionServices.cs" />
     <Compile Include="Images.imagemanifest.cs" />
     <Compile Include="InBoxGitHubContainerProvider.cs" />
@@ -83,6 +89,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <VSCTCompile Include="GitHub.VisualStudio.16.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+      <Generator>VsctGenerator</Generator>
+      <LastGenOutput>GitHub.VisualStudio.16.cs</LastGenOutput>
+    </VSCTCompile>
     <Content Include="Images.imagemanifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
