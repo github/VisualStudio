@@ -40,6 +40,7 @@
       <Button guid="guidGitHubEssentialsCmdSet" id="addConnectionCommand" type="Button">
         <Icon guid="guidImages" id="logo" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>&amp;Connect to GitHub...</ButtonText>
           <CanonicalName>.GitHub.ConnectToGitHub</CanonicalName>
@@ -49,6 +50,10 @@
     </Buttons>
 
   </Commands>
+
+  <VisibilityConstraints>
+    <VisibilityItem guid="guidGitHubEssentialsCmdSet" id="addConnectionCommand" context="GitHubExtensionNotEnabledUIContext"/>
+  </VisibilityConstraints>  
 
   <CommandPlacements>
 
@@ -78,6 +83,8 @@
       <IDSymbol name="logo" value="1" />
     </GuidSymbol>
 
+    <GuidSymbol name="GitHubExtensionNotEnabledUIContext" value="{051e3758-7cce-4dc6-849c-7f7356f538db}" />
+    
   </Symbols>
 
 </CommandTable>

@@ -23,6 +23,9 @@ namespace GitHub.VisualStudio
 
         public const string guidImagesString = "de556d01-f3bc-4521-abc3-3e04b537f9c9";
         public static Guid guidImages = new Guid(guidImagesString);
+
+        public const string GitHubExtensionNotEnabledUIContextString = "051e3758-7cce-4dc6-849c-7f7356f538db";
+        public static Guid GitHubExtensionNotEnabledUIContext = new Guid(GitHubExtensionNotEnabledUIContextString);
     }
     /// <summary>
     /// Helper class that encapsulates all CommandIDs uses across VS Package.

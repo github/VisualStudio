@@ -14,6 +14,14 @@ namespace GitHub.VisualStudio
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(PackageGuids.guidGitHubEssentialsPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideUIContextRule(PackageGuids.GitHubExtensionNotEnabledUIContextString,
+        name: "GitHub extension not enabled",
+        expression: "!GitHubPackageExists",
+        termNames: new[] { "GitHubPackageExists" },
+        termValues: new[]
+        {
+            @"ConfigSettingsStoreQuery:Packages\{c3d3dc68-c977-411f-b3e8-03b0dccf7dfc}\AllowsBackgroundLoad"
+        })]
     public class GitHubEssentialsPackage : AsyncPackage
     {
         IComponentModel componentModel;
