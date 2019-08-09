@@ -21,11 +21,11 @@ namespace GitHub.Primitives
         }
 
         /// <summary>
-        /// Convert from a Git path to a relative path.
+        /// Convert from a Git path to a path that uses the Windows directory separator ('\').
         /// </summary>
-        /// <param name="gitPath">A working directory relative path which uses the '/' directory separator.</param>
-        /// <returns>A relative paht that uses the <see cref="Path.DirectorySeparatorChar"/> directory separator.</returns>
-        public static string ToRelativePath(string gitPath)
+        /// <param name="gitPath">A relative path that uses the '/' directory separator.</param>
+        /// <returns>A relative path that uses the <see cref="Path.DirectorySeparatorChar"/> directory separator ('\' on Windows).</returns>
+        public static string ToWindowsPath(string gitPath)
         {
             return gitPath.Replace(GitDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }

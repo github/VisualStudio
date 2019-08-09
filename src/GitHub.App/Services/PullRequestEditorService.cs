@@ -638,7 +638,7 @@ namespace GitHub.Services
                 var gitPath = Paths.ToGitPath(file.RelativePath);
                 var fileChange = changes.FirstOrDefault(x => x.Path == gitPath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    Paths.ToRelativePath(fileChange.OldPath) : file.RelativePath;
+                    Paths.ToWindowsPath(fileChange.OldPath) : file.RelativePath;
             }
         }
 

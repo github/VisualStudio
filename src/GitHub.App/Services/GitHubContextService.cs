@@ -282,7 +282,7 @@ namespace GitHub.Services
                 return false;
             }
 
-            var relativePath = Paths.ToRelativePath(path);
+            var relativePath = Paths.ToWindowsPath(path);
             var fullPath = Path.Combine(repositoryDir, relativePath);
             var textView = OpenDocument(fullPath);
             SetSelection(textView, context);

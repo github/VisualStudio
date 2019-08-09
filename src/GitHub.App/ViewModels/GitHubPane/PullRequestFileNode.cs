@@ -42,7 +42,7 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
             FileName = Path.GetFileName(relativeOrGitPath);
-            RelativePath = Paths.ToRelativePath(relativeOrGitPath);
+            RelativePath = Paths.ToWindowsPath(relativeOrGitPath);
             Sha = sha;
             Status = status;
             OldPath = oldPath;
