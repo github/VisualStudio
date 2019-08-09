@@ -7,14 +7,9 @@ namespace GitHub.Extensions
 {
     public static class Guard
     {
-        public static void ArgumentIsGitPath(string value, string name)
+        public static void ArgumentIsRelativePath(string value, string name)
         {
             ArgumentNotNull(value, name);
-
-            if (value.Contains('\\'))
-            {
-                throw new ArgumentException($"The value '{value}' must use '/' not '\\' as directory separator", name);
-            }
 
             if (Path.IsPathRooted(value))
             {

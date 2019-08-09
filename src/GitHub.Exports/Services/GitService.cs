@@ -234,13 +234,14 @@ namespace GitHub.Services
             IRepository repository,
             string sha1,
             string sha2,
-            string path)
+            string relativePath)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha2));
-            Guard.ArgumentIsGitPath(path, nameof(path));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit1 = repository.Lookup<Commit>(sha1);
@@ -251,7 +252,7 @@ namespace GitHub.Services
                     return repository.Diff.Compare<Patch>(
                         commit1.Tree,
                         commit2.Tree,
-                        new[] { path },
+                        new[] { gitPath },
                         defaultCompareOptions);
                 }
                 else
@@ -261,27 +262,28 @@ namespace GitHub.Services
             });
         }
 
-        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents)
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string relativePath, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(sha1, nameof(sha1));
             Guard.ArgumentNotEmptyString(sha2, nameof(sha1));
-            Guard.ArgumentIsGitPath(path, nameof(path));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit1 = repository.Lookup<Commit>(sha1);
                 var commit2 = repository.Lookup<Commit>(sha2);
 
                 var treeChanges = repository.Diff.Compare<TreeChanges>(commit1.Tree, commit2.Tree, defaultCompareOptions);
-                var change = treeChanges.FirstOrDefault(x => x.Path == path);
+                var change = treeChanges.FirstOrDefault(x => x.Path == gitPath);
                 var oldPath = change?.OldPath;
 
                 if (commit1 != null && oldPath != null)
                 {
                     var contentStream = contents != null ? new MemoryStream(contents) : new MemoryStream();
                     var blob1 = commit1[oldPath]?.Target as Blob ?? repository.ObjectDatabase.CreateBlob(new MemoryStream());
-                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, path);
+                    var blob2 = repository.ObjectDatabase.CreateBlob(contentStream, gitPath);
                     return repository.Diff.Compare(blob1, blob2, defaultCompareOptions);
                 }
 
