@@ -95,27 +95,5 @@
         <CheckBox x:Name="chkEnableTraceLogging" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_EnableTraceLoggingText}" />
       </DockPanel>
     </GroupBox>
-    <GroupBox
-            Margin="8,0,8,0"
-            VerticalAlignment="Top"
-            BorderBrush="LightGray"
-            BorderThickness="1"
-            Padding="6 8 6 8"
-            Style="{DynamicResource GroupBoxFlat}">
-      <GroupBox.Header>
-        <Run Text="{x:Static ghfvs:Resources.Options_ExperimentalTitle}" />
-      </GroupBox.Header>
-      <DockPanel>
-        <WrapPanel DockPanel.Dock="Top">
-          <CheckBox x:Name="chkEditorComments" VerticalAlignment="Center" Content="{x:Static ghfvs:Resources.Options_EditorCommentsLabel}" />
-        </WrapPanel>
-        <TextBlock DockPanel.Dock="Bottom" TextWrapping="Wrap">
-          <LineBreak />
-          <Italic>
-              <Run Text="{x:Static ghfvs:Resources.Options_ExperimentalNote}" />
-          </Italic>
-        </TextBlock>
-      </DockPanel>
-    </GroupBox>
   </StackPanel>
 </UserControl>

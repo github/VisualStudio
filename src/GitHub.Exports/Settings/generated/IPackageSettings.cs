@@ -8,11 +8,6 @@
       "default": 'true'
     },
     {
-      "name": "EditorComments",
-      "type": "bool",
-      "default": "false"
-    },
-    {
       "name": "UIState",
       "type": "object",
       "typename": "UIState",
@@ -40,7 +35,6 @@ namespace GitHub.Settings
     {
         void Save();
         bool CollectMetrics { get; set; }
-        bool EditorComments { get; set; }
         UIState UIState { get; set; }
         bool HideTeamExplorerWelcomeMessage { get; set; }
         bool EnableTraceLogging { get; set; }
