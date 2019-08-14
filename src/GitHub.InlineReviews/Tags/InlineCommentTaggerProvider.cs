@@ -16,6 +16,9 @@ namespace GitHub.InlineReviews.Tags
     [Export(typeof(IViewTaggerProvider))]
     [ContentType("text")]
     [TagType(typeof(ShowInlineCommentTag))]
+    [TextViewRole("LEFTDIFF")]
+    [TextViewRole("RIGHTDIFF")]
+    [TextViewRole("INLINEDIFF")]
     class InlineCommentTaggerProvider : IViewTaggerProvider
     {
         readonly IPullRequestSessionManager sessionManager;
