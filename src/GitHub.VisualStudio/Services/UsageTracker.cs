@@ -62,19 +62,44 @@ namespace GitHub.Services
             var propertyInfo = (PropertyInfo)property.Member;
             var eventName = propertyInfo.Name;
             log.Verbose("Increment counter {Name}", eventName);
-            var value = (int)propertyInfo.GetValue(usage.Measures);
-            propertyInfo.SetValue(usage.Measures, value + 1);
-            await service.WriteLocalData(data);
 
-            const string numberOfPrefix = "numberof";
-            if (eventName.IndexOf(numberOfPrefix, StringComparison.InvariantCultureIgnoreCase) != -1)
+            await ReportGitHubMetrics(propertyInfo, eventName, usage, data);
+
+            ReportMicrosoftTelemetry(eventName);
+        }
+
+        static void ReportMicrosoftTelemetry(string eventName)
+        {
+            try
             {
-                eventName = eventName.Substring(numberOfPrefix.Length);
-            }
+                const string numberOfPrefix = "numberof";
+                if (eventName.IndexOf(numberOfPrefix, StringComparison.InvariantCultureIgnoreCase) != -1)
+                {
+                    eventName = eventName.Substring(numberOfPrefix.Length);
+                }
 
-            var operation = new OperationEvent(EventNameBase + eventName, TelemetryResult.Success);
-            operation.Properties[PropertyBase + TelemetryVersionProperty] = TelemetryVersion;
-            TelemetryService.DefaultSession.PostEvent(operation);
+                var operation = new TelemetryEvent(EventNameBase + eventName);
+                operation.Properties[PropertyBase + TelemetryVersionProperty] = TelemetryVersion;
+                TelemetryService.DefaultSession.PostEvent(operation);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error recording Microsoft Telmetry");
+            }
+        }
+
+        async Task ReportGitHubMetrics(PropertyInfo propertyInfo, string eventName, UsageModel usage, UsageData data)
+        {
+            try
+            {
+                var value = (int) propertyInfo.GetValue(usage.Measures);
+                propertyInfo.SetValue(usage.Measures, value + 1);
+                await service.WriteLocalData(data);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error recording GitHub Metrics");
+            }
         }
 
         IDisposable StartTimer()
