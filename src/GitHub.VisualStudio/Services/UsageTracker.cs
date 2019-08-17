@@ -19,12 +19,12 @@ namespace GitHub.Services
     {
         private const int TelemetryVersion = 1; // Please update the version every time you want to indicate a change in telemetry logic when the extension itself is updated
 
-        private const string EventNamePrefix = "vs/github/";
+        private const string EventNamePrefix = "vs/github/usagetracker/";
         private const string PropertyPrefix = "vs.github.";
 
         static class Event
         {
-            public const string UsageTracker = EventNamePrefix + nameof(UsageTracker);
+            public const string UsageTracker = EventNamePrefix + "increment-counter";
         }
 
         static class Property
@@ -41,9 +41,9 @@ namespace GitHub.Services
 
         bool initialized;
         IMetricsService client;
-        IUsageService service;
+        readonly IUsageService service;
         IConnectionManager connectionManager;
-        IPackageSettings userSettings;
+        readonly IPackageSettings userSettings;
         IVSServices vsservices;
         IDisposable timer;
         bool firstTick = true;
@@ -75,7 +75,7 @@ namespace GitHub.Services
             var counterName = propertyInfo.Name;
             log.Verbose("Increment counter {Name}", counterName);
 
-            var updateTask = UpdateUsageMetrics(propertyInfo, counterName);
+            var updateTask = UpdateUsageMetrics(propertyInfo);
 
             LogTelemetryEvent(counterName);
 
@@ -94,13 +94,19 @@ namespace GitHub.Services
             operation.Properties[Property.TelemetryVersion] = TelemetryVersion;
             operation.Properties[Property.CounterName] = counterName;
             operation.Properties[Property.ExtensionVersion] = AssemblyVersionInformation.Version;
-            operation.Properties[Property.IsGitHubUser] = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
-            operation.Properties[Property.IsEnterpriseUser] = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+            operation.Properties[Property.IsGitHubUser] = IsGitHubUser;
+            operation.Properties[Property.IsEnterpriseUser] = IsEnterpriseUser;
 
             TelemetryService.DefaultSession.PostEvent(operation);
         }
 
-        async Task UpdateUsageMetrics(PropertyInfo propertyInfo, string eventName)
+        bool IsEnterpriseUser =>
+            this.connectionManager?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        bool IsGitHubUser =>
+            this.connectionManager?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        async Task UpdateUsageMetrics(PropertyInfo propertyInfo)
         {
             var data = await service.ReadLocalData();
             var usage = await GetCurrentReport(data);
@@ -191,8 +197,8 @@ namespace GitHub.Services
             current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
             current.Dimensions.VSVersion = vsservices.VSVersion;
 
-            current.Dimensions.IsGitHubUser = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
-            current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+            current.Dimensions.IsGitHubUser = IsGitHubUser;
+            current.Dimensions.IsEnterpriseUser = IsEnterpriseUser;
             return current;
         }
 
