@@ -18,10 +18,23 @@ namespace GitHub.Services
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
         private const int TelemetryVersion = 1; // Please update the version every time you want to indicate a change in telemetry logic when the extension itself is updated
-        private const string TelemetryVersionProperty = "TelemetryVersion";
 
-        private const string EventNameBase = "vs/github/extension/";
-        private const string PropertyBase = "vs.github.extension.";
+        private const string EventNamePrefix = "vs/github/";
+        private const string PropertyPrefix = "vs.github.";
+
+        static class Event
+        {
+            public const string UsageTracker = EventNamePrefix + nameof(UsageTracker);
+        }
+
+        static class Property
+        {
+            public const string TelemetryVersion = PropertyPrefix + nameof(TelemetryVersion);
+            public const string CounterName = PropertyPrefix + nameof(CounterName);
+            public const string ExtensionVersion = PropertyPrefix + nameof(ExtensionVersion);
+            public const string IsGitHubUser = PropertyPrefix + nameof(IsGitHubUser);
+            public const string IsEnterpriseUser = PropertyPrefix + nameof(IsEnterpriseUser);
+        }
 
         static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
@@ -56,50 +69,46 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             await Initialize();
-            var data = await service.ReadLocalData();
-            var usage = await GetCurrentReport(data);
+
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            var eventName = propertyInfo.Name;
-            log.Verbose("Increment counter {Name}", eventName);
+            var counterName = propertyInfo.Name;
+            log.Verbose("Increment counter {Name}", counterName);
 
-            await ReportGitHubMetrics(propertyInfo, eventName, usage, data);
+            var updateTask = UpdateUsageMetrics(propertyInfo, counterName);
 
-            ReportMicrosoftTelemetry(eventName);
+            LogTelemetryEvent(counterName);
+
+            await updateTask;
         }
 
-        static void ReportMicrosoftTelemetry(string eventName)
+        void LogTelemetryEvent(string counterName)
         {
-            try
+            const string numberOfPrefix = "numberof";
+            if (counterName.StartsWith(numberOfPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                const string numberOfPrefix = "numberof";
-                if (eventName.IndexOf(numberOfPrefix, StringComparison.InvariantCultureIgnoreCase) != -1)
-                {
-                    eventName = eventName.Substring(numberOfPrefix.Length);
-                }
+                counterName = counterName.Substring(numberOfPrefix.Length);
+            }
 
-                var operation = new TelemetryEvent(EventNameBase + eventName);
-                operation.Properties[PropertyBase + TelemetryVersionProperty] = TelemetryVersion;
-                TelemetryService.DefaultSession.PostEvent(operation);
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "Error recording Microsoft Telmetry");
-            }
+            var operation = new TelemetryEvent(Event.UsageTracker);
+            operation.Properties[Property.TelemetryVersion] = TelemetryVersion;
+            operation.Properties[Property.CounterName] = counterName;
+            operation.Properties[Property.ExtensionVersion] = AssemblyVersionInformation.Version;
+            operation.Properties[Property.IsGitHubUser] = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
+            operation.Properties[Property.IsEnterpriseUser] = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+
+            TelemetryService.DefaultSession.PostEvent(operation);
         }
 
-        async Task ReportGitHubMetrics(PropertyInfo propertyInfo, string eventName, UsageModel usage, UsageData data)
+        async Task UpdateUsageMetrics(PropertyInfo propertyInfo, string eventName)
         {
-            try
-            {
-                var value = (int) propertyInfo.GetValue(usage.Measures);
-                propertyInfo.SetValue(usage.Measures, value + 1);
-                await service.WriteLocalData(data);
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "Error recording GitHub Metrics");
-            }
+            var data = await service.ReadLocalData();
+            var usage = await GetCurrentReport(data);
+
+            var value = (int) propertyInfo.GetValue(usage.Measures);
+            propertyInfo.SetValue(usage.Measures, value + 1);
+
+            await service.WriteLocalData(data);
         }
 
         IDisposable StartTimer()
