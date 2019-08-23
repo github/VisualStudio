@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="f4fbb70d-dee2-4dee-b322-bd74e3010e8f" Version="2.10.2.0" Language="en-US" Publisher="GitHub, Inc" />
+    <Identity Id="f4fbb70d-dee2-4dee-b322-bd74e3010e8f" Version="2.10.4.0" Language="en-US" Publisher="GitHub, Inc" />
     <DisplayName>GitHub Essentials</DisplayName>
     <Description>Clone or checkout code from GitHub</Description>
     <PackageId>GitHub.VisualStudio.16</PackageId>
