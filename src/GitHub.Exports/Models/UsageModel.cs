@@ -5,6 +5,7 @@
 
 namespace GitHub.Models
 {
+    // this is a usage model
     public class UsageModel
     {
         public DimensionsModel Dimensions { get; set; } = new DimensionsModel();
