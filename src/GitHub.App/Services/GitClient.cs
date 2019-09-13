@@ -259,40 +259,42 @@ namespace GitHub.Services
             });
         }
 
-        public Task<string> ExtractFile(IRepository repository, string commitSha, string fileName)
+        public Task<string> ExtractFile(IRepository repository, string commitSha, string relativePath)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if (commit == null)
                 {
-                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
+                    throw new FileNotFoundException("Couldn't find '" + gitPath + "' at commit " + commitSha + ".");
                 }
 
-                var blob = commit[fileName]?.Target as Blob;
+                var blob = commit[gitPath]?.Target as Blob;
                 return blob?.GetContentText();
             });
         }
 
-        public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string fileName)
+        public Task<byte[]> ExtractFileBinary(IRepository repository, string commitSha, string relativePath)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
             Guard.ArgumentNotEmptyString(commitSha, nameof(commitSha));
-            Guard.ArgumentIsGitPath(fileName, nameof(fileName));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
                 var commit = repository.Lookup<Commit>(commitSha);
                 if (commit == null)
                 {
-                    throw new FileNotFoundException("Couldn't find '" + fileName + "' at commit " + commitSha + ".");
+                    throw new FileNotFoundException("Couldn't find '" + gitPath + "' at commit " + commitSha + ".");
                 }
 
-                var blob = commit[fileName]?.Target as Blob;
+                var blob = commit[gitPath]?.Target as Blob;
 
                 if (blob != null)
                 {
@@ -308,16 +310,17 @@ namespace GitHub.Services
             });
         }
 
-        public Task<bool> IsModified(IRepository repository, string path, byte[] contents)
+        public Task<bool> IsModified(IRepository repository, string relativePath, byte[] contents)
         {
             Guard.ArgumentNotNull(repository, nameof(repository));
-            Guard.ArgumentIsGitPath(path, nameof(path));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
 
+            var gitPath = Paths.ToGitPath(relativePath);
             return Task.Run(() =>
             {
-                if (repository.RetrieveStatus(path) == FileStatus.Unaltered)
+                if (repository.RetrieveStatus(gitPath) == FileStatus.Unaltered)
                 {
-                    var treeEntry = repository.Head[path];
+                    var treeEntry = repository.Head[gitPath];
                     if (treeEntry?.TargetType != TreeEntryTargetType.Blob)
                     {
                         return false;
@@ -326,7 +329,7 @@ namespace GitHub.Services
                     var blob1 = (Blob)treeEntry.Target;
                     using (var s = contents != null ? new MemoryStream(contents) : new MemoryStream())
                     {
-                        var blob2 = repository.ObjectDatabase.CreateBlob(s, path);
+                        var blob2 = repository.ObjectDatabase.CreateBlob(s, gitPath);
                         var diff = repository.Diff.Compare(blob1, blob2);
                         return diff.LinesAdded != 0 || diff.LinesDeleted != 0;
                     }
