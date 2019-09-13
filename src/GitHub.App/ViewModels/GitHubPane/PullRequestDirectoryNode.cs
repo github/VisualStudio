@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GitHub.Primitives;
 
 namespace GitHub.ViewModels.GitHubPane
 {
@@ -12,11 +13,11 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestDirectoryNode"/> class.
         /// </summary>
-        /// <param name="relativePath">The path to the directory, relative to the repository.</param>
-        public PullRequestDirectoryNode(string relativePath)
+        /// <param name="relativeOrGitPath">The path to the directory, relative to the repository.</param>
+        public PullRequestDirectoryNode(string relativeOrGitPath)
         {
-            DirectoryName = System.IO.Path.GetFileName(relativePath);
-            RelativePath = relativePath.Replace("/", "\\");
+            DirectoryName = System.IO.Path.GetFileName(relativeOrGitPath);
+            RelativePath = Paths.ToWindowsPath(relativeOrGitPath);
             Directories = new List<IPullRequestDirectoryNode>();
             Files = new List<IPullRequestFileNode>();
         }

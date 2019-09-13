@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using NUnit.Framework;
@@ -61,7 +62,7 @@ public class GitServiceIntegrationTests
 
 
         [Test]
-        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        public async Task Path_Can_Use_Windows_Directory_Separator()
         {
             using (var temp = new TempRepository())
             {
@@ -72,8 +73,10 @@ public class GitServiceIntegrationTests
                 var commit2 = AddCommit(temp.Repository, path, newContent);
                 var target = new GitService(new RepositoryFacade());
 
-                Assert.ThrowsAsync<ArgumentException>(() =>
-                    target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path));
+                var patch = await target.Compare(temp.Repository, commit1.Sha, commit2.Sha, path);
+
+                var gitPath = Paths.ToGitPath(path);
+                Assert.That(patch.Count(c => c.Path == gitPath), Is.EqualTo(1));
             }
         }
     }
@@ -134,7 +137,7 @@ public class GitServiceIntegrationTests
         }
 
         [Test]
-        public void Path_Must_Not_Use_Windows_Directory_Separator()
+        public async Task Path_Can_Use_Windows_Directory_Separator()
         {
             using (var temp = new TempRepository())
             {
@@ -146,8 +149,10 @@ public class GitServiceIntegrationTests
                 var contentBytes = new UTF8Encoding(false).GetBytes(newContent);
                 var target = new GitService(new RepositoryFacade());
 
-                Assert.ThrowsAsync<ArgumentException>(() =>
-                    target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes));
+                var contentChanges = await target.CompareWith(temp.Repository, commit1.Sha, commit2.Sha, path, contentBytes);
+
+                Assert.That(contentChanges.LinesAdded, Is.EqualTo(1));
+                Assert.That(contentChanges.LinesDeleted, Is.EqualTo(1));
             }
         }
     }
