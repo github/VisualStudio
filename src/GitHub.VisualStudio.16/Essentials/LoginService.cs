@@ -7,6 +7,9 @@ using Microsoft.VisualStudio.Threading;
 
 namespace GitHub.VisualStudio.Essentials
 {
+    /// <summary>
+    /// MEF export for showing the GitHub login dialog.
+    /// </summary>
     [Export(typeof(ILoginService))]
     public class LoginService : ILoginService
     {
@@ -25,6 +28,10 @@ namespace GitHub.VisualStudio.Essentials
             this.joinableTaskContext = joinableTaskContext;
         }
 
+        /// <summary>
+        /// Show the login dialog from the legacy GitHub extension if installed or
+        /// from the GitHub Essentials extension.
+        /// </summary>
         public void ShowLoginDialog()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
