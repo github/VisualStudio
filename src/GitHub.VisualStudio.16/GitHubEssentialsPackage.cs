@@ -2,12 +2,11 @@
 using System.Threading;
 using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
-using EnvDTE;
-using GitHub.Services;
 using Microsoft;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using GitHub.VisualStudio.Essentials;
 
 namespace GitHub.VisualStudio
 {
@@ -44,23 +43,8 @@ namespace GitHub.VisualStudio
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (FullExtensionUtilities.IsInstalled(this))
-            {
-                if (GetService(typeof(DTE)) is DTE dte &&
-                    dte.Commands is var commands &&
-                    commands.Item(Guids.guidGitHubCmdSet, PkgCmdIDList.addConnectionCommand) is Command command &&
-                    command.IsAvailable)
-                {
-                    commands.Raise(command.Guid, command.ID, null, null);
-                }
-            }
-            else
-            {
-                var compositionServices = componentModel.DefaultExportProvider.GetExportedValue<CompositionServices>();
-                var exportProvider = compositionServices.GetExportProvider();
-                var dialogService = exportProvider.GetExportedValue<IDialogService>();
-                JoinableTaskFactory.Run(() => dialogService.ShowLoginDialog());
-            }
+            var loginService = componentModel.DefaultExportProvider.GetExportedValue<LoginService>();
+            loginService.ShowLoginDialog();
         }
     }
 }

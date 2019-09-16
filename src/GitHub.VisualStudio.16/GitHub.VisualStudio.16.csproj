@@ -66,6 +66,8 @@
     <Compile Include="Base\TeamExplorerBasePage.cs" />
     <Compile Include="Base\TeamExplorerBaseSection.cs" />
     <Compile Include="CompositionServices.cs" />
+    <Compile Include="Essentials\ILoginService.cs" />
+    <Compile Include="Essentials\LoginService.cs" />
     <Compile Include="FullExtensionUtilities.cs" />
     <Compile Include="GitHub.VisualStudio.16.cs">
       <AutoGen>True</AutoGen>
