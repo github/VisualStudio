@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Telemetry;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
@@ -15,14 +17,33 @@ namespace GitHub.Services
 {
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
+        private const int TelemetryVersion = 1; // Please update the version every time you want to indicate a change in telemetry logic when the extension itself is updated
+
+        private const string EventNamePrefix = "vs/github/usagetracker/";
+        private const string PropertyPrefix = "vs.github.";
+
+        static class Event
+        {
+            public const string UsageTracker = EventNamePrefix + "increment-counter";
+        }
+
+        static class Property
+        {
+            public const string TelemetryVersion = PropertyPrefix + nameof(TelemetryVersion);
+            public const string CounterName = PropertyPrefix + nameof(CounterName);
+            public const string ExtensionVersion = PropertyPrefix + nameof(ExtensionVersion);
+            public const string IsGitHubUser = PropertyPrefix + nameof(IsGitHubUser);
+            public const string IsEnterpriseUser = PropertyPrefix + nameof(IsEnterpriseUser);
+        }
+
         static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
 
         bool initialized;
         IMetricsService client;
-        IUsageService service;
+        readonly IUsageService service;
         IConnectionManager connectionManager;
-        IPackageSettings userSettings;
+        readonly IPackageSettings userSettings;
         IVSServices vsservices;
         IDisposable timer;
         bool firstTick = true;
@@ -48,13 +69,51 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             await Initialize();
-            var data = await service.ReadLocalData();
-            var usage = await GetCurrentReport(data);
+
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            log.Verbose("Increment counter {Name}", propertyInfo.Name);
-            var value = (int)propertyInfo.GetValue(usage.Measures);
+            var counterName = propertyInfo.Name;
+            log.Verbose("Increment counter {Name}", counterName);
+
+            var updateTask = UpdateUsageMetrics(propertyInfo);
+
+            LogTelemetryEvent(counterName);
+
+            await updateTask;
+        }
+
+        void LogTelemetryEvent(string counterName)
+        {
+            const string numberOfPrefix = "numberof";
+            if (counterName.StartsWith(numberOfPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                counterName = counterName.Substring(numberOfPrefix.Length);
+            }
+
+            var operation = new TelemetryEvent(Event.UsageTracker);
+            operation.Properties[Property.TelemetryVersion] = TelemetryVersion;
+            operation.Properties[Property.CounterName] = counterName;
+            operation.Properties[Property.ExtensionVersion] = AssemblyVersionInformation.Version;
+            operation.Properties[Property.IsGitHubUser] = IsGitHubUser;
+            operation.Properties[Property.IsEnterpriseUser] = IsEnterpriseUser;
+
+            TelemetryService.DefaultSession.PostEvent(operation);
+        }
+
+        bool IsEnterpriseUser =>
+            this.connectionManager?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        bool IsGitHubUser =>
+            this.connectionManager?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        async Task UpdateUsageMetrics(PropertyInfo propertyInfo)
+        {
+            var data = await service.ReadLocalData();
+            var usage = await GetCurrentReport(data);
+
+            var value = (int) propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
+
             await service.WriteLocalData(data);
         }
 
@@ -138,8 +197,8 @@ namespace GitHub.Services
             current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
             current.Dimensions.VSVersion = vsservices.VSVersion;
 
-            current.Dimensions.IsGitHubUser = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
-            current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+            current.Dimensions.IsGitHubUser = IsGitHubUser;
+            current.Dimensions.IsEnterpriseUser = IsEnterpriseUser;
             return current;
         }
 
