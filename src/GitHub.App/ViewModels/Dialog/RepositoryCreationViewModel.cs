@@ -72,22 +72,21 @@ namespace GitHub.ViewModels.Dialog
                 .IfContainsInvalidPathChars(Resources.RepositoryCreationClonePathInvalidCharacters)
                 .IfPathNotRooted(Resources.RepositoryCreationClonePathInvalid);
 
-            var nonNullRepositoryName = this.WhenAny(
-                x => x.RepositoryName,
-                x => x.BaseRepositoryPath,
-                (x, y) => x.Value)
-                .WhereNotNull();
+            var nameValidationConditions = this.WhenAny(
+                    model => model.RepositoryName,
+                    model => model.SelectedAccount,
+                    (repositoryName, account) => (repositoryName: repositoryName.Value, connection: (IConnection) null, account: account.Value))
+                .Where(tuple => tuple.repositoryName != null);
 
-            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .IfNullOrEmpty(Resources.RepositoryNameValidatorEmpty)
-                .IfTrue(x => x.Length > 100, Resources.RepositoryNameValidatorTooLong)
-                .IfTrue(IsAlreadyRepoAtPath, Resources.RepositoryNameValidatorAlreadyExists);
+            RepositoryNameValidator = ReactivePropertyValidator.ForObservable(nameValidationConditions)
+                .IfTrue(tuple => string.IsNullOrEmpty(tuple.repositoryName), Resources.RepositoryNameValidatorEmpty)
+                .IfTrue(tuple => tuple.repositoryName.Length > 100, Resources.RepositoryNameValidatorTooLong);
 
-            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nonNullRepositoryName)
-                .Add(repoName =>
+            SafeRepositoryNameWarningValidator = ReactivePropertyValidator.ForObservable(nameValidationConditions)
+                .Add(tuple =>
                 {
-                    var parsedReference = GetSafeRepositoryName(repoName);
-                    return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
+                    var parsedReference = GetSafeRepositoryName(tuple.repositoryName);
+                    return parsedReference != tuple.repositoryName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
 
             CreateRepository = InitializeCreateRepositoryCommand();

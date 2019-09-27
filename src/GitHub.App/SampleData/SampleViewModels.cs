@@ -109,7 +109,7 @@ namespace GitHub.SampleData
             set;
         }
 
-        public ReactivePropertyValidator<string> RepositoryNameValidator
+        public ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> SafeRepositoryNameWarningValidator
         {
             get;
             private set;
@@ -127,7 +127,7 @@ namespace GitHub.SampleData
             private set;
         }
 
-        public ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator
+        public ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> RepositoryNameValidator
         {
             get;
             private set;

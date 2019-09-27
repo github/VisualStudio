@@ -25,8 +25,8 @@ namespace GitHub.ViewModels
         /// dashes.
         /// </summary>
         string SafeRepositoryName { get; }
-        ReactivePropertyValidator<string> RepositoryNameValidator { get; }
-        ReactivePropertyValidator<string> SafeRepositoryNameWarningValidator { get; }
+        ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> RepositoryNameValidator { get; }
+        ReactivePropertyValidator<(string repositoryName, IConnection connection, IAccount account)> SafeRepositoryNameWarningValidator { get; }
 
         string Description { get; set; }
 
