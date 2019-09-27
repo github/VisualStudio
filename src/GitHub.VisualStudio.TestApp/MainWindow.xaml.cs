@@ -71,11 +71,13 @@ namespace GitHub.VisualStudio.TestApp
         CompositionContainer CreateCompositionContainer()
         {
             var compositionServices = new CompositionServices();
-            var compositionContainer = compositionServices.CreateOutOfProcCompositionContainer();
+            var exportProvider = compositionServices.GetExportProvider();
 
-            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
+            var compositionContainer = new CompositionContainer(exportProvider);
+            var gitHubServiceProvider = exportProvider.GetExportedValue<IGitHubServiceProvider>();
             var externalShowDialogService = new ExternalShowDialogService(gitHubServiceProvider, this);
             compositionContainer.ComposeExportedValue<IShowDialogService>(externalShowDialogService);
+
             return compositionContainer;
         }
     }

@@ -36,7 +36,7 @@ public class RepositoryPublishViewModelTests
             factory = factory ?? Substitute.For<IModelServiceFactory>();
 
             return new RepositoryPublishViewModel(service, notificationService, connectionManager,
-                factory, Substitute.For<IUsageTracker>());
+                factory, Substitute.For<IDialogService>(), Substitute.For<IUsageTracker>());
         }
 
         public static void SetupConnections(List<HostAddress> adds, List<IConnection> conns, string uri)
