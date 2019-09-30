@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
-using Microsoft.VisualStudio.Telemetry;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
@@ -17,25 +15,6 @@ namespace GitHub.Services
 {
     public sealed class UsageTracker : IUsageTracker, IDisposable
     {
-        private const int TelemetryVersion = 1; // Please update the version every time you want to indicate a change in telemetry logic when the extension itself is updated
-
-        private const string EventNamePrefix = "vs/github/usagetracker/";
-        private const string PropertyPrefix = "vs.github.";
-
-        static class Event
-        {
-            public const string UsageTracker = EventNamePrefix + "increment-counter";
-        }
-
-        static class Property
-        {
-            public const string TelemetryVersion = PropertyPrefix + nameof(TelemetryVersion);
-            public const string CounterName = PropertyPrefix + nameof(CounterName);
-            public const string ExtensionVersion = PropertyPrefix + nameof(ExtensionVersion);
-            public const string IsGitHubUser = PropertyPrefix + nameof(IsGitHubUser);
-            public const string IsEnterpriseUser = PropertyPrefix + nameof(IsEnterpriseUser);
-        }
-
         static readonly ILogger log = LogManager.ForContext<UsageTracker>();
         readonly IGitHubServiceProvider gitHubServiceProvider;
 
@@ -44,7 +23,9 @@ namespace GitHub.Services
         readonly IUsageService service;
         IConnectionManager connectionManager;
         readonly IPackageSettings userSettings;
+        readonly bool vsTelemetry;
         IVSServices vsservices;
+        IUsageTracker visualStudioUsageTracker;
         IDisposable timer;
         bool firstTick = true;
 
@@ -52,12 +33,15 @@ namespace GitHub.Services
             IGitHubServiceProvider gitHubServiceProvider,
             IUsageService service,
             IPackageSettings settings,
-            JoinableTaskContext joinableTaskContext)
+            JoinableTaskContext joinableTaskContext,
+            bool vsTelemetry)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
             JoinableTaskContext = joinableTaskContext;
+            this.vsTelemetry = vsTelemetry;
+
             timer = StartTimer();
         }
 
@@ -77,27 +61,13 @@ namespace GitHub.Services
 
             var updateTask = UpdateUsageMetrics(propertyInfo);
 
-            LogTelemetryEvent(counterName);
-
-            await updateTask;
-        }
-
-        void LogTelemetryEvent(string counterName)
-        {
-            const string numberOfPrefix = "numberof";
-            if (counterName.StartsWith(numberOfPrefix, StringComparison.OrdinalIgnoreCase))
+            if (visualStudioUsageTracker != null)
             {
-                counterName = counterName.Substring(numberOfPrefix.Length);
+                // Not available on Visual Studio 2015
+                await visualStudioUsageTracker.IncrementCounter(counter);
             }
 
-            var operation = new TelemetryEvent(Event.UsageTracker);
-            operation.Properties[Property.TelemetryVersion] = TelemetryVersion;
-            operation.Properties[Property.CounterName] = counterName;
-            operation.Properties[Property.ExtensionVersion] = AssemblyVersionInformation.Version;
-            operation.Properties[Property.IsGitHubUser] = IsGitHubUser;
-            operation.Properties[Property.IsEnterpriseUser] = IsEnterpriseUser;
-
-            TelemetryService.DefaultSession.PostEvent(operation);
+            await updateTask;
         }
 
         bool IsEnterpriseUser =>
@@ -111,7 +81,7 @@ namespace GitHub.Services
             var data = await service.ReadLocalData();
             var usage = await GetCurrentReport(data);
 
-            var value = (int) propertyInfo.GetValue(usage.Measures);
+            var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
 
             await service.WriteLocalData(data);
@@ -134,6 +104,13 @@ namespace GitHub.Services
             client = gitHubServiceProvider.TryGetService<IMetricsService>();
             connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
             vsservices = gitHubServiceProvider.GetService<IVSServices>();
+
+            if (vsTelemetry)
+            {
+                log.Verbose("Creating VisualStudioUsageTracker");
+                visualStudioUsageTracker = new VisualStudioUsageTracker(connectionManager);
+            }
+
             initialized = true;
         }
 
