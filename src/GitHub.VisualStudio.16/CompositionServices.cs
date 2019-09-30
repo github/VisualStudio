@@ -82,7 +82,7 @@ namespace GitHub.VisualStudio
                 var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
                 var usageService = compositionContainer.GetExportedValue<IUsageService>();
                 var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
-                return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
+                return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext, vsTelemetry: true);
             }
         }
 

@@ -23,6 +23,7 @@ namespace GitHub.Services
         readonly IUsageService service;
         IConnectionManager connectionManager;
         readonly IPackageSettings userSettings;
+        readonly bool vsTelemetry;
         IVSServices vsservices;
         IUsageTracker visualStudioUsageTracker;
         IDisposable timer;
@@ -32,12 +33,15 @@ namespace GitHub.Services
             IGitHubServiceProvider gitHubServiceProvider,
             IUsageService service,
             IPackageSettings settings,
-            JoinableTaskContext joinableTaskContext)
+            JoinableTaskContext joinableTaskContext,
+            bool vsTelemetry)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
             JoinableTaskContext = joinableTaskContext;
+            this.vsTelemetry = vsTelemetry;
+
             timer = StartTimer();
         }
 
@@ -101,9 +105,7 @@ namespace GitHub.Services
             connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
             vsservices = gitHubServiceProvider.GetService<IVSServices>();
 
-            // Only create VisualStudioUsageTracker on Visual Studio 2017 and above
-            var dte = gitHubServiceProvider.GetService<EnvDTE.DTE>();
-            if (new Version(dte.Version) >= new Version(15, 0))
+            if (vsTelemetry)
             {
                 log.Verbose("Creating VisualStudioUsageTracker");
                 visualStudioUsageTracker = new VisualStudioUsageTracker(connectionManager);
