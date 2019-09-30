@@ -1,5 +1,5 @@
 os: Visual Studio 2019 Preview
-version: '2.10.6.{build}'
+version: '2.10.7.{build}'
 skip_tags: true
 
 install:
