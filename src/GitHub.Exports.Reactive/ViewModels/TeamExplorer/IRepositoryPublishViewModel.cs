@@ -20,6 +20,11 @@ namespace GitHub.ViewModels.TeamExplorer
         ReactiveCommand<Unit, ProgressState> PublishRepository { get; }
 
         /// <summary>
+        /// Command that shows login dialog.
+        /// </summary>
+        ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; }
+
+        /// <summary>
         /// Determines whether the host combo box is visible. Only true if the user is logged into more than one host.
         /// </summary>
         bool IsHostComboBoxVisible { get; }

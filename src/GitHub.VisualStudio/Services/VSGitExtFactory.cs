@@ -1,6 +1,6 @@
 ﻿using System;
 using GitHub.Logging;
-using GitHub.VisualStudio.Base;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 
 namespace GitHub.Services
@@ -12,32 +12,28 @@ namespace GitHub.Services
         readonly int vsVersion;
         readonly IServiceProvider serviceProvider;
         readonly IGitService gitService;
+        readonly JoinableTaskContext joinableTaskContect;
 
-        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService)
+        public VSGitExtFactory(int vsVersion, IServiceProvider serviceProvider, IGitService gitService, JoinableTaskContext joinableTaskContect)
         {
             this.vsVersion = vsVersion;
             this.serviceProvider = serviceProvider;
             this.gitService = gitService;
+            this.joinableTaskContect = joinableTaskContect;
         }
 
+        // The GitHub.TeamFoundation.* assemblies target different .NET and Visual Studio versions.
+        // We can't reference all of their projects directly, so instead we use reflection to retrieve
+        // and instantiate the correct implementation.
         public IVSGitExt Create()
         {
-            switch (vsVersion)
+            if(Type.GetType($"GitHub.VisualStudio.Base.VSGitExt, GitHub.TeamFoundation.{vsVersion}", false) is Type type)
             {
-                case 14:
-                    return Create(() => new VSGitExt14(serviceProvider, gitService));
-                case 15:
-                    return Create(() => new VSGitExt15(serviceProvider, gitService));
-                case 16:
-                    return Create(() => new VSGitExt16(serviceProvider, gitService));
-                default:
-                    log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
-                    return null;
+                return (IVSGitExt)Activator.CreateInstance(type, serviceProvider, gitService, joinableTaskContect);
             }
-        }
 
-        // NOTE: We're being careful to only reference VSGitExt14 and VSGitExt15 from inside a lambda expression.
-        // This ensures that only the type that's compatible with the running DTE version is loaded.
-        static IVSGitExt Create(Func<IVSGitExt> factory) => factory.Invoke();
+            log.Error("There is no IVSGitExt implementation for DTE version {Version}", vsVersion);
+            return null;
+        }
     }
 }

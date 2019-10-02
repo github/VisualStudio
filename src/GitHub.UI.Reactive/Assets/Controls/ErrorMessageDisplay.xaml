@@ -4,7 +4,6 @@
                     xmlns:uirx="clr-namespace:GitHub.UI">
 
     <Style x:Key="ErrorMessageStyle" TargetType="{x:Type uirx:ErrorMessageDisplay}">
-        <Setter Property="Foreground" Value="{DynamicResource GHTextBrush}" />
         <Setter Property="IconFill" Value="{DynamicResource GitHubErrorBrush}" />
         <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
         <Setter Property="Template">

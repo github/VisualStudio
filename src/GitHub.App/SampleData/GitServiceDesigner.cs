@@ -15,5 +15,8 @@ namespace GitHub.SampleData
         public IRepository GetRepository(string path) => null;
         public UriString GetUri(string path, string remote = "origin") => null;
         public UriString GetUri(IRepository repository, string remote = "origin") => null;
+        public Task<Patch> Compare(IRepository repository, string sha1, string sha2, string relativePath) => null;
+        public Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents) => null;
+        public Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false) => null;
     }
 }

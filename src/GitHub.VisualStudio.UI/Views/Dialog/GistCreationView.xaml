@@ -5,53 +5,50 @@
                                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                                xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
                                xmlns:ghfvs="https://github.com/github/VisualStudio"
+                               xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
                                mc:Ignorable="d"
                                d:DesignWidth="414"
                                d:DesignHeight="440"
+                               xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+                               Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+                               Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
                                AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.GistCreationControlCustom}">
     <Control.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-                <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ResourceDictionary Source="DialogStyles.xaml" />
     </Control.Resources>
+
     <DockPanel Style="{DynamicResource DialogContainerDockPanel}">
         <ghfvs:OcticonImage Icon="logo_github" Style="{DynamicResource GitHubLogo}" Margin="0,10,0,-10" Panel.ZIndex="100" DockPanel.Dock="Top" />
 
-        <ghfvs:OcticonCircleButton
+        <Button
             DockPanel.Dock="Bottom"
             IsDefault="True"
             Margin="0"
             x:Name="createGistButton"
             HorizontalAlignment="Center"
-            Icon="check">
-            <TextBlock Text="{x:Static ghfvs:Resources.CreateLink}"/>
-        </ghfvs:OcticonCircleButton>
+            Content="{x:Static ghfvs:Resources.CreateLink}">
+        </Button>
 
         <StackPanel>
-            <ghfvs:HorizontalShadowDivider />
+            <controls:HorizontalShadowDivider />
             <Grid
                 FocusManager.IsFocusScope="True"
                 Margin="30,-10,30,10"
                 FocusVisualStyle="{x:Null}">
 
                 <Grid.Resources>
-
-                    <Style TargetType="{x:Type Label}">
-                        <Setter Property="Foreground" Value="{StaticResource GHTextBrush}" />
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
                         <Setter Property="VerticalAlignment" Value="Center" />
                         <Setter Property="HorizontalAlignment" Value="Right" />
                         <Setter Property="Margin" Value="0,0,10,0" />
                         <Setter Property="Padding" Value="0" />
                     </Style>
 
-                    <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource RoundedPromptTextBox}">
+                    <Style TargetType="{x:Type ghfvs:PromptTextBox}" BasedOn="{StaticResource {x:Type ghfvs:PromptTextBox}}">
                         <Setter Property="Margin" Value="0,5" />
                     </Style>
 
-                    <Style TargetType="{x:Type Button}">
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                         <Setter Property="Padding" Value="0" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
                     </Style>
@@ -90,8 +87,6 @@
                     Grid.Column="1"
                     Grid.Row="3"
                     Content="{x:Static ghfvs:Resources.makePrivateGist}"
-                    Style="{DynamicResource BlueRoundedCheckBox}"
-                    Padding="8,4,0,4" 
                     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PrivateGistCheckBox}" />
 
                 <ghfvs:ErrorMessageDisplay

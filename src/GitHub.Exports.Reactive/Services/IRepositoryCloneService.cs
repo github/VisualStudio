@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -27,11 +26,13 @@ namespace GitHub.Services
         /// System.IProgress&lt;Microsoft.VisualStudio.Shell.ServiceProgressData&gt;, but
         /// as that type is only available in VS2017+ it is typed as <see cref="object"/> here.
         /// </param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns></returns>
         Task CloneRepository(
             string cloneUrl,
             string repositoryPath,
-            object progress = null);
+            object progress = null,
+            CancellationToken? cancellationToken = null);
 
         /// <summary>
         /// Clones the specified repository into the specified directory or opens it if the directory already exists.
@@ -45,7 +46,8 @@ namespace GitHub.Services
         /// <returns></returns>
         Task CloneOrOpenRepository(
             CloneDialogResult cloneDialogResult,
-            object progress = null);
+            object progress = null,
+            CancellationToken? cancellationToken = null);
 
         /// <summary>
         /// Checks whether the specified destination directory already exists.
@@ -57,6 +59,15 @@ namespace GitHub.Services
         bool DestinationDirectoryExists(string path);
 
         /// <summary>
+        /// Checks whether the specified destination directory is empty.
+        /// </summary>
+        /// <param name="path">The destination path.</param>
+        /// <returns>
+        /// true if a directory is empty <paramref name="path"/>; otherwise false.
+        /// </returns>
+        bool DestinationDirectoryEmpty(string path);
+
+        /// <summary>
         /// Checks whether the specified destination file already exists.
         /// </summary>
         /// <param name="path">The destination file.</param>
@@ -65,6 +76,6 @@ namespace GitHub.Services
         /// </returns>
         bool DestinationFileExists(string path);
 
-        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address);
+        Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address, bool refresh = false);
     }
 }

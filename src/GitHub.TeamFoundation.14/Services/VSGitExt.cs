@@ -15,24 +15,6 @@ using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.VisualStudio.Base
 {
-    // This is a workaround to avoid using reference aliases, which don't currently work with <PackageReference>.
-#if TEAMEXPLORER14
-    public class VSGitExt14 : VSGitExt
-    {
-        public VSGitExt14(IServiceProvider serviceProvider, IGitService gitService) : base(serviceProvider, gitService) { }
-    }
-#elif TEAMEXPLORER15
-    public class VSGitExt15 : VSGitExt
-    {
-        public VSGitExt15(IServiceProvider serviceProvider, IGitService gitService) : base(serviceProvider, gitService) { }
-    }
-#elif TEAMEXPLORER16
-    public class VSGitExt16 : VSGitExt
-    {
-        public VSGitExt16(IServiceProvider serviceProvider, IGitService gitService) : base(serviceProvider, gitService) { }
-    }
-#endif
-
     /// <summary>
     /// This service acts as an always available version of <see cref="IGitExt"/>.
     /// </summary>
@@ -51,8 +33,9 @@ namespace GitHub.VisualStudio.Base
         IGitExt gitExt;
         IReadOnlyList<LocalRepositoryModel> activeRepositories;
 
-        public VSGitExt(IServiceProvider serviceProvider, IGitService gitService)
-            : this(serviceProvider, new VSUIContextFactory(), gitService, ThreadHelper.JoinableTaskContext)
+        /// NOTE: Used by VSGitExtFactory.
+        public VSGitExt(IServiceProvider serviceProvider, IGitService gitService, JoinableTaskContext joinableTaskContext)
+            : this(serviceProvider, new VSUIContextFactory(), gitService, joinableTaskContext)
         {
         }
 

@@ -39,7 +39,6 @@ namespace GitHub.ViewModels.Dialog
         readonly IModelServiceFactory modelServiceFactory;
         readonly IRepositoryCreationService repositoryCreationService;
         readonly ObservableAsPropertyHelper<bool> isCreating;
-        readonly ObservableAsPropertyHelper<bool> canKeepPrivate;
         readonly IOperatingSystem operatingSystem;
         readonly IUsageTracker usageTracker;
         ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
@@ -91,14 +90,7 @@ namespace GitHub.ViewModels.Dialog
                     return parsedReference != repoName ? String.Format(CultureInfo.CurrentCulture, Resources.SafeRepositoryNameWarning, parsedReference) : null;
                 });
 
-            this.WhenAny(x => x.BaseRepositoryPathValidator.ValidationResult, x => x.Value)
-                .Subscribe();
-
             CreateRepository = InitializeCreateRepositoryCommand();
-
-            canKeepPrivate = CanKeepPrivateObservable.CombineLatest(CreateRepository.IsExecuting,
-                (canKeep, publishing) => canKeep && !publishing)
-                .ToProperty(this, x => x.CanKeepPrivate);
 
             isCreating = CreateRepository.IsExecuting
                 .ToProperty(this, x => x.IsCreating);
@@ -127,11 +119,6 @@ namespace GitHub.ViewModels.Dialog
         /// Is running the creation process
         /// </summary>
         public bool IsCreating { get { return isCreating.Value; } }
-
-        /// <summary>
-        /// If the repo can be made private (depends on the user plan)
-        /// </summary>
-        public bool CanKeepPrivate { get { return canKeepPrivate.Value; } }
 
         IReadOnlyList<GitIgnoreItem> gitIgnoreTemplates;
         public IReadOnlyList<GitIgnoreItem> GitIgnoreTemplates

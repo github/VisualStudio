@@ -39,7 +39,8 @@ New-Module -ScriptBlock {
     }
 
     function Write-Version([System.Version]$version) {
-        Write-VersionVsixManifest $version
+        Write-VersionVsixManifest $version 'src\GitHub.VisualStudio.Vsix'
+        Write-VersionVsixManifest $version 'src\GitHub.VisualStudio.16'
         Write-VersionSolutionInfo $version
         Write-VersionAppVeyor $version
         Write-DirectoryBuildProps $version

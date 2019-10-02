@@ -6,9 +6,11 @@ using Octokit;
 using ReactiveUI;
 using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Helpers;
 using GitHub.Extensions;
 using GitHub.ViewModels.Dialog;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Authentication
 {
@@ -17,6 +19,12 @@ namespace GitHub.Authentication
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TwoFactorChallengeHandler : ReactiveObject, IDelegatingTwoFactorChallengeHandler
     {
+        [ImportingConstructor]
+        public TwoFactorChallengeHandler([Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
+        {            
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
+        }
+
         ILogin2FaViewModel twoFactorDialog;
         public IViewModel CurrentViewModel
         {
@@ -33,7 +41,7 @@ namespace GitHub.Authentication
         {
             Guard.ArgumentNotNull(exception, nameof(exception));
 
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             var userError = new TwoFactorRequiredUserError(exception);
             var result = await twoFactorDialog.Show(userError);
@@ -50,8 +58,10 @@ namespace GitHub.Authentication
 
         public async Task ChallengeFailed(Exception exception)
         {
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
             twoFactorDialog.Cancel();
         }
+
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

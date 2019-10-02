@@ -32,10 +32,16 @@ namespace GitHub.VisualStudio.Views
         /// <param name="culture">Unused.</param>
         /// <returns>
         /// A new instance of a view for the specified view model, or an error string if a view
-        /// could not be located.
+        /// could not be located. A null view model will return null.
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+            {
+                // Return null for a null view model
+                return null;
+            }
+
             var exportViewModelAttribute = value.GetType().GetCustomAttributes(typeof(ExportAttribute), false)
                 .OfType<ExportAttribute>()
                 .Where(x => typeof(IViewModel).IsAssignableFrom(x.ContractType))

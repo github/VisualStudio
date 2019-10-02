@@ -1,0 +1,23 @@
+﻿<Application x:Class="GitHub.VisualStudio.TestApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Common/VsFonts.xaml" />
+                <ResourceDictionary Source="Themes/FontScalingLabelStyle.xaml" />
+                <ResourceDictionary Source="Themes/FontScalingTextBlockStyle.xaml" />
+                <ResourceDictionary Source="Themes/CommonControlsButtonStyle.xaml" />
+                <ResourceDictionary Source="Themes/CommonControlsCheckboxStyle.xaml" />
+                <ResourceDictionary Source="Themes/CommonControlsComboboxStyle.xaml" />
+                <ResourceDictionary Source="Themes/CommonControlsTextboxStyle.xaml" />
+                <ResourceDictionary Source="Themes/ThemedDialogStyles.xaml" />
+                <ResourceDictionary Source="Themes/HighContrast/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <ResourceDictionary x:Key="{x:Static vsfx:VsResourceKeys.ThemedDialogDefaultStylesKey}" Source="Themes/ThemedDialogDefaultStyles.xaml" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

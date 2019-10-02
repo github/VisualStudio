@@ -9,7 +9,7 @@
     <VsixType>v3</VsixType>
     <IsProductComponent>false</IsProductComponent>
     <ExtensionInstallationFolder>GitHub\GitHub</ExtensionInstallationFolder>
-    <XlfLanguages>zh-CN</XlfLanguages>
+    <XlfLanguages>cs-CZ;de-DE;es-ES;fr-FR;it-IT;ja-JP;ko-KR;pl-PL;pt-BR;ru-RU;tr-TR;zh-CN;zh-TW</XlfLanguages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -24,14 +24,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitHub.VisualStudio</RootNamespace>
     <AssemblyName>GitHub.VisualStudio</AssemblyName>
-    <StartAction>Program</StartAction>
-    <StartProgram Condition=" '$(StartProgram)' == '' ">$(DevEnvDir)\devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
     <LangVersion>7.3</LangVersion>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <ZipPackageCompressionLevel>Normal</ZipPackageCompressionLevel>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,9 +37,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CreateVsixContainer>True</CreateVsixContainer>
-    <DeployExtension>True</DeployExtension>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <CreateVsixContainer>False</CreateVsixContainer>
+    <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -64,7 +59,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CreateVsixContainer>True</CreateVsixContainer>
+    <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>True</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
   </PropertyGroup>
@@ -86,9 +81,6 @@
   <Import Project="..\common\signing.props" />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.TeamFoundation.Controls">
-      <HintPath>..\..\lib\14.0\Microsoft.TeamFoundation.Controls.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -118,6 +110,7 @@
     <Compile Include="Commands\LinkCommandBase.cs" />
     <Compile Include="Commands\CopyLinkCommand.cs" />
     <Compile Include="Commands\OpenLinkCommand.cs" />
+    <Compile Include="Commands\OpenIssueishDocumentCommand.cs" />
     <Compile Include="Commands\SyncSubmodulesCommand.cs" />
     <Compile Include="Commands\ShowCurrentPullRequestCommand.cs" />
     <Compile Include="Commands\ShowGitHubPaneCommand.cs" />
@@ -136,6 +129,7 @@
     <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
+    <Compile Include="Services\VisualStudioUsageTracker.cs" />
     <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
@@ -153,7 +147,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GitHubPackage.cs" />
     <Compile Include="Services\GitHubServiceProvider.cs" />
+    <Compile Include="UI\AsyncPaneBase.cs" />
     <Compile Include="UI\GitHubPane.cs" />
+    <Compile Include="UI\IssueishDocumentPane.cs" />
     <Compile Include="UI\Settings\OptionsControl.xaml.cs">
       <DependentUpon>OptionsControl.xaml</DependentUpon>
     </Compile>
@@ -166,31 +162,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\logo_128x128.png">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Resources\preview_200x200.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="GitHub.VisualStudio.imagemanifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Settings\generated\PackageSettingsGen.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <CustomToolNamespace>GitHub.VisualStudio.Settings</CustomToolNamespace>
       <LastGenOutput>PackageSettingsGen.cs</LastGenOutput>
     </Content>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
-    </None>
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
     </None>
     <None Include="..\..\build\version" />
   </ItemGroup>
@@ -204,10 +182,6 @@
     <CodeAnalysisDictionary Include="..\common\CodeAnalysisDictionary.xml">
       <Link>Properties\CodeAnalysisDictionary.xml</Link>
     </CodeAnalysisDictionary>
-    <Content Include="LICENSE.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Resource Include="Resources\default_org_avatar.png" />
     <Resource Include="Resources\default_user_avatar.png" />
   </ItemGroup>
@@ -255,39 +229,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Core\Akavache.Core.csproj">
-      <Project>{9e17369d-da49-48c1-9767-c5178a17bfb8}</Project>
-      <Name>Akavache.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\akavache\src\Akavache.Sqlite3\Akavache.Sqlite3.csproj">
-      <Project>{a003b735-6f6c-4df8-a663-78651a1b6ce0}</Project>
-      <Name>Akavache.Sqlite3</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL.Core\Octokit.GraphQL.Core.csproj">
-      <Project>{3321ce72-26ed-4d1e-a8f5-6901fb783007}</Project>
-      <Name>Octokit.GraphQL.Core</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj">
-      <Project>{791b408c-0abc-465b-9eb1-a2422d67f418}</Project>
-      <Name>Octokit.GraphQL</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\submodules\octokit.net\Octokit.Reactive\Octokit.Reactive.csproj">
-      <Project>{674b69b8-0780-4d54-ae2b-c15821fa51cb}</Project>
-      <Name>Octokit.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
       <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
       <Name>Octokit</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\..\submodules\reactiveui\src\ReactiveUI.Events.WPF\ReactiveUI.Events.WPF.csproj">
       <Project>{86c54b27-717f-478c-ac8c-01f1c68a56c5}</Project>
@@ -301,126 +246,50 @@
       <Project>{a4f579f3-77d3-450a-aacc-f2653ef11e69}</Project>
       <Name>ReactiveUI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\submodules\splat\src\Splat\Splat.csproj">
-      <Project>{ad0306b7-f88e-44a4-ab36-1d04822e9234}</Project>
-      <Name>Splat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CredentialManagement\CredentialManagement.csproj">
-      <Project>{41a47c5b-c606-45b4-b83c-22b9239e4da0}</Project>
-      <Name>CredentialManagement</Name>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.Api\GitHub.Api.csproj">
       <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
       <Name>GitHub.Api</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.App\GitHub.App.csproj">
       <Project>{1a1da411-8d1f-4578-80a6-04576bea2dc5}</Project>
       <Name>GitHub.App</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
       <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
       <Name>GitHub.Exports.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj">
       <Project>{9aea02db-02b5-409c-b0ca-115d05331a6b}</Project>
       <Name>GitHub.Exports</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.Extensions.Reactive\GitHub.Extensions.Reactive.csproj">
-      <Project>{6559e128-8b40-49a5-85a8-05565ed0c7e3}</Project>
-      <Name>GitHub.Extensions.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Extensions\GitHub.Extensions.csproj">
       <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
       <Name>GitHub.Extensions</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Logging\GitHub.Logging.csproj">
       <Project>{8d73575a-a89f-47cc-b153-b47dd06837f0}</Project>
       <Name>GitHub.Logging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.InlineReviews\GitHub.InlineReviews.csproj">
-      <Project>{7f5ed78b-74a3-4406-a299-70cfb5885b8b}</Project>
-      <Name>GitHub.InlineReviews</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj">
       <Project>{54e8d71a-aabb-4698-95fe-7f11612b8e59}</Project>
       <Name>GitHub.Resources</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;SatelliteDllsProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
       <Project>{2d3d2834-33be-45ca-b3cc-12f853557d7b}</Project>
       <Name>GitHub.Services.Vssdk</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GitHub.StartPage\GitHub.StartPage.csproj">
-      <Project>{50e277b8-8580-487a-8f8e-5c3b9fbf0f77}</Project>
-      <PrivateAssets>All</PrivateAssets>
-      <Name>GitHub.StartPage</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;PkgdefProjectOutputGroup</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
-      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720d}</Project>
-      <Name>GitHub.TeamFoundation.14</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj">
-      <Project>{161dbf01-1dbf-4b00-8551-c5c00f26720e}</Project>
-      <Name>GitHub.TeamFoundation.15</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.TeamFoundation.16\GitHub.TeamFoundation.16.csproj">
-      <Project>{F08BD4BC-B5DF-4193-9B01-6D0BBE101BD7}</Project>
-      <Name>GitHub.TeamFoundation.16</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
-    <ProjectReference Include="..\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
-      <Project>{158b05e8-fdbc-4d71-b871-c96e28d5adf5}</Project>
-      <Name>GitHub.UI.Reactive</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\GitHub.UI\GitHub.UI.csproj">
       <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
       <Name>GitHub.UI</Name>
-      <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
     <ProjectReference Include="..\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
       <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
       <Name>GitHub.VisualStudio.UI</Name>
       <Private>True</Private>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;GetCopyToOutputDirectoryItems;DebugSymbolsProjectOutputGroup</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup;</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -428,6 +297,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>15.0.691-master31907920</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -436,25 +308,11 @@
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
       <Version>14.1.24720</Version>
     </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- Include a reference to this package so that x86|x64\e_sqlite3.dll are copied to the output directory -->
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3">
-      <Version>1.1.11</Version>
-    </PackageReference>
-  </ItemGroup>
-  <!-- Include required NuGet dependencies-->
-  <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
-    <ItemGroup>
-      <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'System.ValueTuple'" />
-      <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Newtonsoft.Json'" />
-      <VSIXSourceItem VSIXSubPath="x86" Include="@(Content)" Condition="'%(Content.Link)' == 'x86\e_sqlite3.dll'" />
-      <VSIXSourceItem VSIXSubPath="x64" Include="@(Content)" Condition="'%(Content.Link)' == 'x64\e_sqlite3.dll'" />
-    </ItemGroup>
-  </Target>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != '' And '$(NCrunch)' != '1'" />
   <Import Project="packaging.targets" />

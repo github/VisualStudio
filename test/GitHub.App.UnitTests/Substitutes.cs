@@ -10,6 +10,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using GitHub.Factories;
 using GitHub.Api;
+using Microsoft.VisualStudio.Threading;
 
 namespace UnitTests
 {
@@ -30,31 +31,7 @@ namespace UnitTests
             }, constructorArguments);
         }
 
-
-        // public static IGitRepositoriesExt IGitRepositoriesExt { get { return Substitute.For<IGitRepositoriesExt>(); } }
         public static IGitService IGitService { get { return Substitute.For<IGitService>(); } }
-
-        public static IVSGitServices IVSGitServices
-        {
-            get
-            {
-                var ret = Substitute.For<IVSGitServices>();
-                ret.GetLocalClonePathFromGitProvider().Returns(@"c:\foo\bar");
-                return ret;
-            }
-        }
-
-        public static IOperatingSystem OperatingSystem
-        {
-            get
-            {
-                var ret = Substitute.For<IOperatingSystem>();
-                // this expansion happens when the GetLocalClonePathFromGitProvider call is setup by default
-                // see IVSServices property above
-                ret.Environment.ExpandEnvironmentVariables(Args.String).Returns(x => x[0]);
-                return ret;
-            }
-        }
 
         public static IViewViewModelFactory ViewViewModelFactory { get { return Substitute.For<IViewViewModelFactory>(); } }
 
@@ -109,11 +86,10 @@ namespace UnitTests
             ret.GetService(typeof(SComponentModel)).Returns(cm);
             Services.UnitTestServiceProvider = ret;
 
-            var os = OperatingSystem;
-            var vsgit = IVSGitServices;
-            var clone = cloneService ?? new RepositoryCloneService(os, vsgit, Substitute.For<ITeamExplorerServices>(),
+            var clone = cloneService ?? new RepositoryCloneService(Substitute.For<IOperatingSystem>(),
+                Substitute.For<IVSGitServices>(), Substitute.For<ITeamExplorerServices>(),
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                Substitute.For<IUsageTracker>(), ret);
+                Substitute.For<IUsageTracker>(), ret, new JoinableTaskContext());
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitService)).Returns(gitservice);
@@ -123,8 +99,8 @@ namespace UnitTests
             ret.GetService(typeof(IGitHubContextService)).Returns(Substitute.For<IGitHubContextService>());
             ret.GetService(typeof(IVSGitExt)).Returns(Substitute.For<IVSGitExt>());
             ret.GetService(typeof(IUsageTracker)).Returns(Substitute.For<IUsageTracker>());
-            ret.GetService(typeof(IVSGitServices)).Returns(vsgit);
-            ret.GetService(typeof(IOperatingSystem)).Returns(os);
+            ret.GetService(typeof(IVSGitServices)).Returns(Substitute.For<IVSGitServices>());
+            ret.GetService(typeof(IOperatingSystem)).Returns(Substitute.For<IOperatingSystem>());
             ret.GetService(typeof(IRepositoryCloneService)).Returns(clone);
             ret.GetService(typeof(IRepositoryCreationService)).Returns(create);
             ret.GetService(typeof(IViewViewModelFactory)).Returns(ViewViewModelFactory);

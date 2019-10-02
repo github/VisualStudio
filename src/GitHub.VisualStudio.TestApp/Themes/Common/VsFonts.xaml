@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0">
+    <FontFamily x:Key="{x:Static shell:VsFonts.EnvironmentFontFamilyKey}">Segoe UI</FontFamily>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.EnvironmentFontSizeKey}">12</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment375PercentFontSizeKey}">45</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment310PercentFontSizeKey}">37.2</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment200PercentFontSizeKey}">24</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment155PercentFontSizeKey}">18.6</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment133PercentFontSizeKey}">15.96</Double>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.Environment122PercentFontSizeKey}">14.64</Double>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment375PercentFontWeightKey}">Light</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment310PercentFontWeightKey}">Light</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment200PercentFontWeightKey}">350</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment155PercentFontWeightKey}">Normal</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment133PercentFontWeightKey}">Normal</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.Environment122PercentFontWeightKey}">Normal</FontWeight>
+    <FontWeight x:Key="{x:Static shell:VsFonts.EnvironmentBoldFontWeightKey}">Bold</FontWeight>
+    <FontFamily x:Key="{x:Static shell:VsFonts.CaptionFontFamilyKey}">Segoe UI</FontFamily>
+    <Double xmlns="clr-namespace:System;assembly=mscorlib" x:Key="{x:Static shell:VsFonts.CaptionFontSizeKey}">12</Double>
+    <FontWeight x:Key="{x:Static shell:VsFonts.CaptionFontWeightKey}">Normal</FontWeight>
+</ResourceDictionary>

@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Classification;
 using GitHub.Services;
 using GitHub.VisualStudio;
-using GitHub.InlineReviews.Services;
 
 namespace GitHub.InlineReviews.Margins
 {
@@ -16,7 +15,9 @@ namespace GitHub.InlineReviews.Margins
     [Order(After = PredefinedMarginNames.Glyph)]
     [MarginContainer(PredefinedMarginNames.Left)]
     [ContentType("text")]
-    [TextViewRole(PredefinedTextViewRoles.Interactive)]
+    [TextViewRole("LEFTDIFF")]
+    [TextViewRole("RIGHTDIFF")]
+    [TextViewRole("INLINEDIFF")]    
     internal sealed class InlineCommentMarginProvider : IWpfTextViewMarginProvider
     {
         readonly Lazy<IEditorFormatMapService> editorFormatMapService;

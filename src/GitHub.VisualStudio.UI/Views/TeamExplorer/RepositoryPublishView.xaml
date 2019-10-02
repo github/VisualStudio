@@ -5,11 +5,14 @@
                                        xmlns:ghfvs="https://github.com/github/VisualStudio"
                                        xmlns:local="clr-namespace:GitHub.VisualStudio.Views.TeamExplorer"
                                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                                       xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
                                        Margin="0"
                                        d:DesignHeight="440"
                                        d:DesignWidth="414"
                                        Background="{DynamicResource GitHubVsToolWindowBackground}"
-                                       d:DataContext="{d:DesignInstance Type=ghfvs:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
+                                       Foreground="{DynamicResource GitHubVsWindowText}"
+                                       xmlns:sd="clr-namespace:GitHub.SampleData;assembly=GitHub.App"
+                                       d:DataContext="{d:DesignInstance Type=sd:RepositoryPublishViewModelDesigner, IsDesignTimeCreatable=True}"
                                        mc:Ignorable="d"
                                        AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerSyncGitHubRepositoryPublishCustom}" 
                                        IsEnabled="{Binding IsBusy, Converter={ghfvs:InverseBooleanConverter}}">
@@ -38,6 +41,8 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Height" Value="23" />
         </Style>
+        
+        <Style TargetType="Hyperlink" BasedOn="{StaticResource {x:Static vsfx:VsResourceKeys.ThemedDialogHyperlinkStyleKey}}" />
     </ResourceDictionary>
   </Control.Resources>
 
@@ -45,6 +50,12 @@
               Orientation="Vertical"
               Style="{DynamicResource DialogContainerStackPanel}">
 
+    <TextBlock TextAlignment="Right">
+        <Hyperlink Command="{Binding LoginAsDifferentUser}">
+            <Run Text="{x:Static ghfvs:Resources.AddChangeAccounts}" />
+        </Hyperlink>
+    </TextBlock>
+      
     <DockPanel Margin="0,0,0,13" VerticalAlignment="Top">
       <ghfvs:OcticonImage x:Name="octokit"
                        Width="32"
@@ -129,26 +140,9 @@
         <CheckBox x:Name="makePrivate"
               Margin="0,8,0,0"
               IsChecked="{Binding KeepPrivate}"
-              IsEnabled="{Binding CanKeepPrivate}"
               Style="{StaticResource VSStyledCheckBox}"
-              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPrivateRepositoryCheckBox}" >
-            <TextBlock Background="{DynamicResource GitHubVsToolWindowBackground}"
-                 Foreground="{DynamicResource GitHubVsToolWindowText}"
-                 TextWrapping="Wrap">
-                <TextBlock.Resources>
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Resources>
-                <TextBlock.Inlines>
-                    <Run Text="{x:Static ghfvs:Resources.makePrivateContent}" />
-                </TextBlock.Inlines>
-            </TextBlock>
-        </CheckBox>
+              Content="{x:Static ghfvs:Resources.makePrivateContent}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerPrivateRepositoryCheckBox}" />
 
         <Button x:Name="publishRepositoryButton"
             Margin="0,8,0,0"

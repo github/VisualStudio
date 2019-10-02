@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="VsBrushes.xaml" />
+        <ResourceDictionary Source="VsColors.xaml" />
+        <ResourceDictionary Source="CommonControlsColors.xaml" />
+        <ResourceDictionary Source="ThemedDialogColors.xaml" />
+        <ResourceDictionary Source="EnvironmentColors.xaml" />
+        <ResourceDictionary Source="TreeViewColors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
