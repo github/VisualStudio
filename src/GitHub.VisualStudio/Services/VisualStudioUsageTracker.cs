@@ -21,9 +21,9 @@ namespace GitHub.Services
         const string EventNamePrefix = "vs/github/usagetracker/";
         const string PropertyPrefix = "vs.github.";
 
-        readonly IConnectionManager connectionManager;
+        readonly Lazy<IConnectionManager> connectionManager;
 
-        public VisualStudioUsageTracker(IConnectionManager connectionManager)
+        public VisualStudioUsageTracker(Lazy<IConnectionManager> connectionManager)
         {
             this.connectionManager = connectionManager;
         }
@@ -57,10 +57,10 @@ namespace GitHub.Services
         }
 
         bool IsEnterpriseUser =>
-            connectionManager?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
+            connectionManager.Value?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
 
         bool IsGitHubUser =>
-            connectionManager?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
+            connectionManager.Value?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
 
         static class Event
         {

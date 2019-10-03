@@ -21,7 +21,7 @@ namespace GitHub.Services
         bool initialized;
         IMetricsService client;
         readonly IUsageService service;
-        IConnectionManager connectionManager;
+        Lazy<IConnectionManager> connectionManager;
         readonly IPackageSettings userSettings;
         readonly bool vsTelemetry;
         IVSServices vsservices;
@@ -71,10 +71,10 @@ namespace GitHub.Services
         }
 
         bool IsEnterpriseUser =>
-            this.connectionManager?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
+            connectionManager.Value?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
 
         bool IsGitHubUser =>
-            this.connectionManager?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
+            connectionManager.Value?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
 
         async Task UpdateUsageMetrics(PropertyInfo propertyInfo)
         {
@@ -102,7 +102,7 @@ namespace GitHub.Services
             await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             client = gitHubServiceProvider.TryGetService<IMetricsService>();
-            connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+            connectionManager = new Lazy<IConnectionManager>(() => gitHubServiceProvider.GetService<IConnectionManager>());
             vsservices = gitHubServiceProvider.GetService<IVSServices>();
 
             if (vsTelemetry)
