@@ -47,13 +47,14 @@ steps:
     filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
     arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
-- task: VSBuild@1
+- task: MSBuild@1
   displayName: GitHub for Visual Studio
   inputs:
     solution: $(githubvsSolution)
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    vsVersion: "16.0"
+    msbuildVersion: '16.0'
+    msbuildArguments: '/property:DeployExtension=False'
 
 - task: MSBuild@1
   displayName: GitHub Essentials
