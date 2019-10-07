@@ -55,13 +55,14 @@ steps:
     configuration: '$(buildConfiguration)'
     vsVersion: "16.0"
 
-- task: VSBuild@1
+- task: MSBuild@1
   displayName: GitHub Essentials
   inputs:
     solution: $(essentialsSolution)
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    vsVersion: "16.0"
+    msbuildVersion: '16.0'
+    msbuildArguments: '/property:DeployExtension=False'
 
 - task: VSTest@2
   inputs:
