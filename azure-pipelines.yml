@@ -72,7 +72,12 @@ steps:
     diagnosticsEnabled: true
     runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
 
+- task: CopyFiles@2
+  inputs:
+    contents: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix' 
-    artifactName: 'vsix' 
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: 'vsix'
