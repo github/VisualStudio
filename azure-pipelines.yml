@@ -30,8 +30,12 @@ steps:
 #    nugetConfigPath: nuget.config
 
 # Instead run nuget manually.
-- script: tools\nuget\nuget.exe restore
-  displayName: NuGet restore
+
+- script: tools\nuget\nuget.exe restore GitHubVS.sln
+  displayName: NuGet restore GitHubVS.sln
+
+- script: tools\nuget\nuget.exe restore src\GitHub.VisualStudio.16.sln
+  displayName: NuGet restore src\GitHub.VisualStudio.16.sln
 
 # Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
 # version with the azure BuildId
