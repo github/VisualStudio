@@ -43,8 +43,16 @@ steps:
     displayName: Bump version
 
 - task: VSBuild@1
+  displayName: GitHub for Visual Studio
   inputs:
     solution: GitHubVS.sln
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSBuild@1
+  displayName: GitHub Essentials
+  inputs:
+    solution: src\GitHub.VisualStudio.16.sln
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
