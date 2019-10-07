@@ -7,7 +7,8 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
+  githubvsSolution: 'GitHubVS.sln'
+  essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -31,25 +32,25 @@ steps:
 
 # Instead run nuget manually.
 
-- script: tools\nuget\nuget.exe restore GitHubVS.sln
-  displayName: NuGet restore GitHubVS.sln
+- script: tools\nuget\nuget.exe restore $(githubvsSolution)
+  displayName: NuGet restore $(githubvsSolution)
 
-- script: tools\nuget\nuget.exe restore src\GitHub.VisualStudio.16.sln
-  displayName: NuGet restore src\GitHub.VisualStudio.16.sln
+- script: tools\nuget\nuget.exe restore $(essentialsSolution)
+  displayName: NuGet restore $(essentialsSolution)
 
 # Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
 # version with the azure BuildId
 - task: PowerShell@2
+  displayName: Bump version
   inputs:
     targetType: filePath
     filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
     arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
-    displayName: Bump version
 
 - task: VSBuild@1
   displayName: GitHub for Visual Studio
   inputs:
-    solution: GitHubVS.sln
+    solution: $(githubvsSolution)
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: "16.0"
@@ -57,7 +58,7 @@ steps:
 - task: VSBuild@1
   displayName: GitHub Essentials
   inputs:
-    solution: src\GitHub.VisualStudio.16.sln
+    solution: $(essentialsSolution)
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: "16.0"
@@ -73,5 +74,5 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)\build\Release\GitHub.VisualStudio.vsix' 
+    pathtoPublish: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix' 
     artifactName: 'vsix' 
