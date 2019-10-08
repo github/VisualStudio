@@ -13,14 +13,8 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: InstallSSHKey@0
-  inputs:
-    hostName: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
-    sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCx/AxLjr4mhH7XFlbISb65GBxQnVnKh1owmAT1bK/Qt1b4/Z0SL68IvV88DpgLyKbica2giEVfKo/Z4dkO+P8M2bGXrNgazzfO910DlR+e1vt8BSU/Dbvscz0i1lsfKb3PnfSouCkQev6Th0v+hBdgkuackWgaBw22DDLkp9Uf/cAo+QYLz56p5KVctEESRRgGgIIlZyUc8OYDMSU2wQhG9x31mSyJ4ODuOZsi1RgBBHrgUb2QRhLJ9nZWfQgGBRDxGYTKLWiWIQwgSVQ9x1Az/Rei+CbPRvLcVGg+5vHt8lcu+HxEgrY4IsjXdMqosPqxQ+TT6f+G4GQDn8+IQ4wOpTVi84PkOQX3JPE2QSJwWA0AHNe5NTSns6WWYQyzxFJYBN2pLPuMnj9/+ozV3GaeQqn47WHfUH3s5IawNQPTFDxcl4qsmU66Ybfqa4eFIPEvCCp1leQcuXyDHxKLq80x1szN4kn0oyL2W0zbkwTaZG4I5l4Rto0hErUf3qx7FlZjMGEFMdJVskgnRMkKdqngF0FmSYQICpmqqYD8TydUc6jxZVOCvFF5gbqwxV/F2lk10D7FnetUNeWvpcZKbFUX4e5Ff15vibJZp4/5FUbksv+glfbPwk6tGuNj3xPFODP7KG8Y5wtcbknX11XI0vi+iL8TxL0Vk30TpZUMXWYYvQ==
-    sshKeySecureFile: id_rsa
-
-- script: git submodule init && git submodule deinit script && git submodule update
-  displayName: Submodule init
+- checkout: self
+  submodules: true
 
 # Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
 #- task: NuGetToolInstaller@0
