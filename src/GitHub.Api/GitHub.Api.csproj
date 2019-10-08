@@ -8,11 +8,11 @@
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <Target Name="AddClientSecret" BeforeTargets="BeforeCompile"
-          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration_User.cs">
-    <Error Condition="'$(GitHubVS_ClientId)' == ''" Text="Please define a 'GitHubVS_ClientId' environment variable" />
-    <Error Condition="'$(GitHubVS_ClientSecret)' == ''" Text="Please define a 'GitHubVS_ClientSecret' environment variable" />
+          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs">
+    <Error Condition="'$(GitHubVS_ClientId)' == '' OR '$(GitHubVS_ClientSecret)' == ''"
+          Text="Please define 'GitHubVS_ClientId' and 'GitHubVS_ClientSecret' environment variables and restart Visual Studio" />
     <PropertyGroup>
-      <GeneratedFilePath>$(IntermediateOutputPath)ApiClientConfiguration_User.cs</GeneratedFilePath>
+      <GeneratedFilePath>$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs</GeneratedFilePath>
       <GeneratedText>
         <![CDATA[
 namespace GitHub.Api
