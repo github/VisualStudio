@@ -7,13 +7,35 @@
   
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
-  <ItemGroup Condition="$(Buildtype) == 'Internal'">
-    <Compile Remove="ApiClientConfiguration_User.cs" />
-    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs">
-      <Link>ApiClientConfiguration_User.cs</Link>
-    </Compile>
-  </ItemGroup>
-
+  <Target Name="AddClientSecret" BeforeTargets="BeforeCompile" Condition="$(Buildtype) == 'Internal'"
+          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration_User.cs">
+    <Error Condition="'$(GitHubVS_ClientId)' == ''" Text="Please define a 'GitHubVS_ClientId' environment variable" />
+    <Error Condition="'$(GitHubVS_ClientSecret)' == ''" Text="Please define a 'GitHubVS_ClientSecret' environment variable" />
+    <PropertyGroup>
+      <GeneratedFilePath>$(IntermediateOutputPath)ApiClientConfiguration_User.cs</GeneratedFilePath>
+      <GeneratedText>
+        <![CDATA[
+namespace GitHub.Api
+{
+  static partial class ApiClientConfiguration
+  {
+    static partial void Configure()
+    {
+      ClientId = "$(GitHubVS_ClientId)"%3b
+      ClientSecret = "$(GitHubVS_ClientSecret)"%3b
+    }
+  }
+}
+]]>
+      </GeneratedText>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="ApiClientConfiguration_User.cs" />
+      <Compile Include="$(GeneratedFilePath)" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(GeneratedFilePath)" Lines="$(GeneratedText)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+  </Target>
+  
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Net.Http" />
