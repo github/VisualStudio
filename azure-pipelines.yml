@@ -4,10 +4,11 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 pool:
-  vmImage: 'VS2017-Win2016'
+  vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
+  githubvsSolution: 'GitHubVS.sln'
+  essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -30,23 +31,39 @@ steps:
 #    nugetConfigPath: nuget.config
 
 # Instead run nuget manually.
-- script: tools\nuget\nuget.exe restore
-  displayName: NuGet restore
+
+- script: tools\nuget\nuget.exe restore $(githubvsSolution)
+  displayName: NuGet restore $(githubvsSolution)
+
+- script: tools\nuget\nuget.exe restore $(essentialsSolution)
+  displayName: NuGet restore $(essentialsSolution)
 
 # Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
 # version with the azure BuildId
 - task: PowerShell@2
+  displayName: Bump version
   inputs:
     targetType: filePath
     filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
     arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
-    displayName: Bump version
 
-- task: VSBuild@1
+- task: MSBuild@1
+  displayName: GitHub for Visual Studio
   inputs:
-    solution: GitHubVS.sln
+    solution: $(githubvsSolution)
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    msbuildVersion: '16.0'
+    msbuildArguments: '/property:DeployExtension=False'
+
+- task: MSBuild@1
+  displayName: GitHub Essentials
+  inputs:
+    solution: $(essentialsSolution)
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildVersion: '16.0'
+    msbuildArguments: '/property:DeployExtension=False'
 
 - task: VSTest@2
   inputs:
@@ -57,7 +74,12 @@ steps:
     diagnosticsEnabled: true
     runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
 
+- task: CopyFiles@2
+  inputs:
+    contents: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)\build\Release\GitHub.VisualStudio.vsix' 
-    artifactName: 'vsix' 
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: 'vsix'
