@@ -7,7 +7,7 @@
   
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
-  <Target Name="AddClientSecret" BeforeTargets="BeforeCompile" Condition="$(Buildtype) == 'Internal'"
+  <Target Name="AddClientSecret" BeforeTargets="BeforeCompile"
           Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration_User.cs">
     <Error Condition="'$(GitHubVS_ClientId)' == ''" Text="Please define a 'GitHubVS_ClientId' environment variable" />
     <Error Condition="'$(GitHubVS_ClientSecret)' == ''" Text="Please define a 'GitHubVS_ClientSecret' environment variable" />
@@ -30,7 +30,6 @@ namespace GitHub.Api
       </GeneratedText>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Remove="ApiClientConfiguration_User.cs" />
       <Compile Include="$(GeneratedFilePath)" />
     </ItemGroup>
     <WriteLinesToFile File="$(GeneratedFilePath)" Lines="$(GeneratedText)" WriteOnlyWhenDifferent="true" Overwrite="true" />
