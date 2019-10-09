@@ -7,6 +7,7 @@ pool:
   vmImage: 'windows-latest'
 
 strategy:
+  maxParallel: 2
   matrix:
     VSMarketplace:
       IsProductComponent: false
