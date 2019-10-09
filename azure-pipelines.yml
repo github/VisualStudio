@@ -10,8 +10,10 @@ strategy:
   maxParallel: 2
   matrix:
     VSMarketplace:
+      MatrixName: 'VSMarketplace'
       IsProductComponent: false
     VSInstaller:
+      MatrixName: 'VSInstaller'
       IsProductComponent: true
 
 variables:
@@ -56,7 +58,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+    msbuildArguments: '/property:TargetVsixContainer=$(Build.SourcesDirectory)\build\$(buildConfiguration)\GitHub.VisualStudio-$(MatrixName).vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
 
 - task: MSBuild@1
   displayName: GitHub Essentials
@@ -65,7 +67,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:IsProductComponent=$(IsProductComponent);DeployExtension=False'
+    msbuildArguments: '/property:TargetVsixContainer=$(Build.SourcesDirectory)\build\$(buildConfiguration)\GitHub.VisualStudio.16-$(MatrixName).vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
 
 - task: VSTest@2
   inputs:
