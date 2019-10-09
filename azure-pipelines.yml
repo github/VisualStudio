@@ -6,6 +6,9 @@
 pool:
   vmImage: 'windows-latest'
 
+workspace:
+  clean: outputs
+
 strategy:
   maxParallel: 2
   matrix:
