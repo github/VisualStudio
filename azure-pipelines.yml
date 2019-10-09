@@ -78,7 +78,9 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    contents: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix'
+    contents: |
+      '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix'
+      '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.json'
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
