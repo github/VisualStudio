@@ -58,7 +58,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:TargetVsixContainer=$(Build.SourcesDirectory)\build\$(buildConfiguration)\GitHub.VisualStudio-$(MatrixName).vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+    msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
 
 - task: MSBuild@1
   displayName: GitHub Essentials
@@ -67,7 +67,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:TargetVsixContainer=$(Build.SourcesDirectory)\build\$(buildConfiguration)\GitHub.VisualStudio.16-$(MatrixName).vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
+    msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.16.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
 
 - task: VSTest@2
   inputs:
@@ -77,13 +77,6 @@ steps:
     configuration: '$(buildConfiguration)'
     diagnosticsEnabled: true
     runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
-
-- task: CopyFiles@2
-  inputs:
-    contents: |
-      $(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix
-      $(Build.SourcesDirectory)\build\$(buildConfiguration)\*.json
-    targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
   inputs:
