@@ -10,7 +10,7 @@
   <Target Name="AddClientSecret" BeforeTargets="BeforeCompile"
           Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs">
     <Error Condition="'$(GitHubVS_ClientId)' == '' OR '$(GitHubVS_ClientSecret)' == ''"
-          Text="Please define 'GitHubVS_ClientId' and 'GitHubVS_ClientSecret' environment variables and restart Visual Studio" />
+          Text="Please define 'GitHubVS_ClientId' and 'GitHubVS_ClientSecret' environment variables (restart Visual Studio if necessary)" />
     <PropertyGroup>
       <GeneratedFilePath>$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs</GeneratedFilePath>
       <GeneratedText>
