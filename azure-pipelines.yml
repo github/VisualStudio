@@ -51,6 +51,9 @@ steps:
     filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
     arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
+- script: mkdir $(Build.ArtifactStagingDirectory)\$(MatrixName)
+  displayName: Create VSIX staging directory
+
 - task: MSBuild@1
   displayName: GitHub for Visual Studio
   inputs:
