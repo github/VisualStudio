@@ -6,6 +6,13 @@
 pool:
   vmImage: 'windows-latest'
 
+strategy:
+  matrix:
+    VSMarketplace:
+      IsProductComponent: false
+    VSInstaller:
+      IsProductComponent: true
+
 variables:
   githubvsSolution: 'GitHubVS.sln'
   essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
@@ -48,7 +55,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+    msbuildArguments: '/property:IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
 
 - task: MSBuild@1
   displayName: GitHub Essentials
@@ -57,7 +64,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildVersion: '16.0'
-    msbuildArguments: '/property:DeployExtension=False'
+    msbuildArguments: '/property:IsProductComponent=$(IsProductComponent);DeployExtension=False'
 
 - task: VSTest@2
   inputs:
