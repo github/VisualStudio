@@ -89,8 +89,8 @@ jobs:
   displayName: 'Publish GitHub for Visual Studio and GitHub Essentials'
   pool:
     vmImage: 'windows-latest'
-    steps:
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: $(Build.ArtifactStagingDirectory)
-        artifactName: 'vsix'
+  steps:
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
