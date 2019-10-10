@@ -55,8 +55,7 @@ jobs:
       filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
       arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
-  - script: mkdir $(ArtifactDirectory)
-    continueOnError: true
+  - pwsh: mkdir $(ArtifactDirectory) -Force
     displayName: Create VSIX staging directory
 
   - task: MSBuild@1
