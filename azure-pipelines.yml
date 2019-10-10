@@ -12,68 +12,93 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
-- checkout: self
-  submodules: true
+jobs:
+- job: build_and_test
+  displayName: 'Build/test GitHub for VS and Essentials'
 
-# Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
-#- task: NuGetToolInstaller@0
-#- task: NuGetCommand@2
-#  inputs:
-#    restoreSolution: '$(solution)'
-#    feedsToUse: 'config'
-#    nugetConfigPath: nuget.config
+  strategy:
+    maxParallel: 2
+    matrix:
+      VSMarketplace:
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)'
+        IsProductComponent: false
+      VSInstaller:
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)\VSInstaller'
+        IsProductComponent: true
 
-# Instead run nuget manually.
+  steps:
+  - checkout: self
+    submodules: true
 
-- script: tools\nuget\nuget.exe restore $(githubvsSolution)
-  displayName: NuGet restore $(githubvsSolution)
+  # Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
+  #- task: NuGetToolInstaller@0
+  #- task: NuGetCommand@2
+  #  inputs:
+  #    restoreSolution: '$(solution)'
+  #    feedsToUse: 'config'
+  #    nugetConfigPath: nuget.config
 
-- script: tools\nuget\nuget.exe restore $(essentialsSolution)
-  displayName: NuGet restore $(essentialsSolution)
+  # Instead run nuget manually.
 
-# Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
-# version with the azure BuildId
-- task: PowerShell@2
-  displayName: Bump version
-  inputs:
-    targetType: filePath
-    filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
-    arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
+  - script: tools\nuget\nuget.exe restore $(githubvsSolution)
+    displayName: NuGet restore $(githubvsSolution)
 
-- task: MSBuild@1
-  displayName: GitHub for Visual Studio
-  inputs:
-    solution: $(githubvsSolution)
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildVersion: '16.0'
-    msbuildArguments: '/property:DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+  - script: tools\nuget\nuget.exe restore $(essentialsSolution)
+    displayName: NuGet restore $(essentialsSolution)
 
-- task: MSBuild@1
-  displayName: GitHub Essentials
-  inputs:
-    solution: $(essentialsSolution)
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildVersion: '16.0'
-    msbuildArguments: '/property:DeployExtension=False'
+  # Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
+  # version with the azure BuildId
+  - task: PowerShell@2
+    displayName: Bump version
+    inputs:
+      targetType: filePath
+      filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
+      arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
-- task: VSTest@2
-  inputs:
-    searchFolder: '$(Build.SourcesDirectory)\test'
-    testAssemblyVer2: '**\bin\**\*Tests.dll'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    diagnosticsEnabled: true
-    runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
+  - pwsh: mkdir $(ArtifactDirectory) -Force
+    displayName: Create VSIX staging directory
 
-- task: CopyFiles@2
-  inputs:
-    contents: '$(Build.SourcesDirectory)\build\$(buildConfiguration)\*.vsix'
-    targetFolder: $(Build.ArtifactStagingDirectory)
+  - task: MSBuild@1
+    displayName: GitHub for Visual Studio
+    inputs:
+      solution: $(githubvsSolution)
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildVersion: '16.0'
+      msbuildArguments: >
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
+        /p:GitHubVS_ClientId=$(GitHubVS_ClientId)
+        /p:GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: $(Build.ArtifactStagingDirectory)
-    artifactName: 'vsix'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
+
+  - task: MSBuild@1
+    displayName: GitHub Essentials
+    inputs:
+      solution: $(essentialsSolution)
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildVersion: '16.0'
+      msbuildArguments: >
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
+
+  - task: VSTest@2
+    inputs:
+      searchFolder: '$(Build.SourcesDirectory)\test'
+      testAssemblyVer2: '**\bin\**\*Tests.dll'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      diagnosticsEnabled: true
+      runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
