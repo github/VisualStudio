@@ -67,6 +67,11 @@ jobs:
       msbuildVersion: '16.0'
       msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
 
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
+
   - task: MSBuild@1
     displayName: GitHub Essentials
     inputs:
@@ -89,11 +94,3 @@ jobs:
       configuration: '$(buildConfiguration)'
       diagnosticsEnabled: true
       runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
-
-- job: publish
-  displayName: 'Publish GitHub for Visual Studio and GitHub Essentials'
-  steps:
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: 'vsix'
