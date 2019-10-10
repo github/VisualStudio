@@ -65,7 +65,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: |
+      msbuildArguments: >
         /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix
         /p:IsProductComponent=$(IsProductComponent)
         /p:DeployExtension=False
@@ -84,7 +84,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: |
+      msbuildArguments: >
         /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
         /p:IsProductComponent=$(IsProductComponent)
         /p:DeployExtension=False
