@@ -318,7 +318,6 @@
   <Import Project="packaging.targets" />
   <!-- For regenerating templates on build -->
   <Import Project="..\common\t4.targets" />
-  <Import Project="versioning.targets" />
   <!--
     This is a workaround for allowing neutral CTO resource produced from *.vsct to go in the main assembly.
     We move the neutral *.cto file to be categorized as WithCulture=true,Culture=en to prevent the tools from falsely reporting:
