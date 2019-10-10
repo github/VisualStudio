@@ -3,12 +3,12 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
+pool:
+  vmImage: 'windows-latest'
+
 jobs:
 - job: build_and_test
   displayName: 'Build and test GitHub for Visual Studio and GitHub Essentials'
-
-  pool:
-    vmImage: 'windows-latest'
 
   strategy:
     maxParallel: 2
@@ -87,8 +87,6 @@ jobs:
 
 - job: publish
   displayName: 'Publish GitHub for Visual Studio and GitHub Essentials'
-  pool:
-    vmImage: 'windows-latest'
   steps:
   - task: PublishBuildArtifacts@1
     inputs:
