@@ -56,6 +56,7 @@ jobs:
       arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
   - script: mkdir $(ArtifactDirectory)
+    continueOnError: true
     displayName: Create VSIX staging directory
 
   - task: MSBuild@1
