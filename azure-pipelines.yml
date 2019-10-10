@@ -6,6 +6,12 @@
 pool:
   vmImage: 'windows-latest'
 
+variables:
+  githubvsSolution: 'GitHubVS.sln'
+  essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
 jobs:
 - job: build_and_test
   displayName: 'Build/test GitHub for VS and Essentials'
@@ -19,12 +25,6 @@ jobs:
       VSInstaller:
         MatrixName: 'VSInstaller'
         IsProductComponent: true
-
-  variables:
-    githubvsSolution: 'GitHubVS.sln'
-    essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
-    buildPlatform: 'Any CPU'
-    buildConfiguration: 'Release'
 
   steps:
   - checkout: self
