@@ -76,6 +76,11 @@ jobs:
       msbuildVersion: '16.0'
       msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.16.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
 
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
+
   - task: VSTest@2
     inputs:
       searchFolder: '$(Build.SourcesDirectory)\test'
