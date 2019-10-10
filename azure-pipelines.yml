@@ -20,10 +20,10 @@ jobs:
     maxParallel: 2
     matrix:
       VSMarketplace:
-        MatrixName: 'VSMarketplace'
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)\VSMarketplace'
         IsProductComponent: false
       VSInstaller:
-        MatrixName: 'VSInstaller'
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)\VSInstaller'
         IsProductComponent: true
 
   steps:
@@ -55,7 +55,7 @@ jobs:
       filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
       arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
 
-  - script: mkdir $(Build.ArtifactStagingDirectory)\$(MatrixName)
+  - script: mkdir $(ArtifactDirectory)
     displayName: Create VSIX staging directory
 
   - task: MSBuild@1
@@ -65,7 +65,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+      msbuildArguments: '/property:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
 
   - task: PublishBuildArtifacts@1
     inputs:
@@ -79,7 +79,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: '/property:TargetVsixContainer=$(Build.ArtifactStagingDirectory)\$(MatrixName)\GitHub.VisualStudio.16.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
+      msbuildArguments: '/property:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
 
   - task: PublishBuildArtifacts@1
     inputs:
