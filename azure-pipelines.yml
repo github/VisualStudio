@@ -8,7 +8,7 @@ pool:
 
 jobs:
 - job: build_and_test
-  displayName: 'Build and test GitHub for Visual Studio and GitHub Essentials'
+  displayName: 'Build/test GitHub for VS and Essentials'
 
   strategy:
     maxParallel: 2
