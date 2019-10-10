@@ -65,7 +65,12 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: '/property:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False;GitHubVS_ClientId=$(GitHubVS_ClientId);GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)'
+      msbuildArguments: |
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
+        /p:GitHubVS_ClientId=$(GitHubVS_ClientId)
+        /p:GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)
 
   - task: PublishBuildArtifacts@1
     inputs:
@@ -79,7 +84,10 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       msbuildVersion: '16.0'
-      msbuildArguments: '/property:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix;IsProductComponent=$(IsProductComponent);DeployExtension=False'
+      msbuildArguments: |
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
 
   - task: PublishBuildArtifacts@1
     inputs:
