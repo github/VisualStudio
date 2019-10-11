@@ -5,6 +5,9 @@
     "^refs/heads/master$",
     "^refs/heads/v\\d+(?:\\.\\d+)?$"
   ],
+  "assemblyVersion": {
+    "precision": "revision"
+  },
   "cloudBuild": {
     "buildNumber": {
       "enabled": false
