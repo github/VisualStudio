@@ -170,7 +170,6 @@
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
-    <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="GitHub.VisualStudio.vsct">
