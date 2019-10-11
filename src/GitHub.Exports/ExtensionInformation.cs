@@ -1,6 +1,6 @@
-﻿namespace GitHub.Settings
+﻿namespace GitHub
 {
-    public static class AssemblyVersionInformation
+    public static class ExtensionInformation
     {
         // HACK: For some reason ThisAssembly.AssemblyFileVersion can't be referenced
         // directly from inside GitHub.VisualStudio.
