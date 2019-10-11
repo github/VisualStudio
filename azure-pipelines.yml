@@ -46,15 +46,6 @@ jobs:
   - script: tools\nuget\nuget.exe restore $(essentialsSolution)
     displayName: NuGet restore $(essentialsSolution)
 
-  # Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
-  # version with the azure BuildId
-  - task: PowerShell@2
-    displayName: Bump version
-    inputs:
-      targetType: filePath
-      filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
-      arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
-
   - pwsh: mkdir $(ArtifactDirectory) -Force
     displayName: Create VSIX staging directory
 
