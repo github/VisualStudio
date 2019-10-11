@@ -40,6 +40,16 @@ jobs:
 
   # Instead run nuget manually.
 
+  - task: DotNetCoreCLI@2  
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . nbgv
+    displayName: Install NBGV tool
+
+  - script: nbgv cloud
+    displayName: Set the cloud build number
+
   - script: tools\nuget\nuget.exe restore $(githubvsSolution)
     displayName: NuGet restore $(githubvsSolution)
 
