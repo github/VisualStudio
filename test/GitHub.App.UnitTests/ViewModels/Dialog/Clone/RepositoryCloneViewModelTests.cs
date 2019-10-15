@@ -273,21 +273,21 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Description = "Path unchanged")]
         [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1\\changed", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Repo name changed")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1", "owner2/repo2", "c:\\base\\owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\owner1", "owner2/repo2", "c:\\base\\repo2",
             Description = "Repo name deleted")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\base", "owner2/repo2", "c:\\base\\owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base", "owner2/repo2", "c:\\repo2",
             Description = "Base path reverted")]
 
         [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base\\owner1\\changed", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
             Description = "Base path and repo name changed")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base\\owner1", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base\\owner1", "owner2/repo2", "c:\\new\\base\\repo2",
             Description = "Base path changed and repo name deleted")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base", "owner2/repo2", "c:\\new\\base\\owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "c:\\new\\base", "owner2/repo2", "c:\\new\\repo2",
             Description = "Base path changed and repo owner/name deleted")]
 
         [TestCase("c:\\base", "owner1/repo1", "", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Base path cleared")]
-        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\owner2\\repo2",
+        [TestCase("c:\\base", "owner1/repo1", "c:\\base\\repo1", "owner2/repo2", "c:\\base\\repo2",
             Description = "Owner deleted")]
         [TestCase("c:\\base", "same/same", "c:\\base\\same\\same", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Owner and repo have same name")]

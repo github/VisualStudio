@@ -210,55 +210,26 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                var basePath = GetUpdatedBasePath(Path);
-                previousRepository = repository;
-                Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
-            }
-        }
-
-        string GetUpdatedBasePath(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                return service.DefaultClonePath;
-            }
-
-            if (previousRepository == null)
-            {
-                return path;
-            }
-
-            if (FindDirWithout(path, previousRepository?.Owner, 2) is string dirWithoutOwner)
-            {
-                return dirWithoutOwner;
-            }
-
-            if (FindDirWithout(path, previousRepository?.Name, 1) is string dirWithoutRepo)
-            {
-                return dirWithoutRepo;
-            }
-
-            return path;
-
-            string FindDirWithout(string dir, string match, int levels)
-            {
-                string dirWithout = null;
-                for (var i = 0; i < 2; i++)
+                if (previousRepository != null && !string.IsNullOrEmpty(Path))
                 {
-                    if (string.IsNullOrEmpty(dir))
+                    var basePath = System.IO.Path.GetDirectoryName(Path);
+                    var ownerName = System.IO.Path.GetFileName(basePath);
+                    if (previousRepository.Owner == ownerName)
                     {
-                        break;
+                        basePath = System.IO.Path.GetDirectoryName(basePath);
+                        Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
                     }
-
-                    var name = System.IO.Path.GetFileName(dir);
-                    dir = System.IO.Path.GetDirectoryName(dir);
-                    if (name == match)
+                    else
                     {
-                        dirWithout = dir;
+                        Path = System.IO.Path.Combine(basePath, repository.Name);
                     }
                 }
+                else
+                {
+                    Path = System.IO.Path.Combine(service.DefaultClonePath, repository.Owner, repository.Name);
+                }
 
-                return dirWithout;
+                previousRepository = repository;
             }
         }
 
