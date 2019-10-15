@@ -3,7 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.IO" #>
-<#@ assembly name="$(PackageDir)\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll" #>
+<#@ assembly name="$(USERPROFILE)\.nuget\packages\Newtonsoft.Json\6.0.8\lib\net45\Newtonsoft.Json.dll" #>
 <#@ import namespace="Newtonsoft.Json.Linq" #>
 <#@ output extension=".cs" #>
 <#
