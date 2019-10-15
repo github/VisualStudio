@@ -210,22 +210,30 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                if (previousRepository != null && !string.IsNullOrEmpty(Path))
+                try
                 {
-                    var basePath = System.IO.Path.GetDirectoryName(Path);
-                    var ownerName = System.IO.Path.GetFileName(basePath);
-                    if (previousRepository.Owner == ownerName)
+                    if (previousRepository != null && !string.IsNullOrEmpty(Path))
                     {
-                        basePath = System.IO.Path.GetDirectoryName(basePath);
-                        Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
+                        var basePath = System.IO.Path.GetDirectoryName(Path);
+                        var ownerName = System.IO.Path.GetFileName(basePath);
+                        if (previousRepository.Owner == ownerName)
+                        {
+                            basePath = System.IO.Path.GetDirectoryName(basePath);
+                            Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
+                        }
+                        else
+                        {
+                            Path = System.IO.Path.Combine(basePath, repository.Name);
+                        }
                     }
                     else
                     {
-                        Path = System.IO.Path.Combine(basePath, repository.Name);
+                        Path = System.IO.Path.Combine(service.DefaultClonePath, repository.Owner, repository.Name);
                     }
                 }
-                else
+                catch (Exception)
                 {
+                    // Reset illegal paths
                     Path = System.IO.Path.Combine(service.DefaultClonePath, repository.Owner, repository.Name);
                 }
 

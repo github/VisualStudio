@@ -291,6 +291,9 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Description = "Owner deleted")]
         [TestCase("c:\\base", "same/same", "c:\\base\\same\\same", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Owner and repo have same name")]
+
+        [TestCase("c:\\base", "owner1/repo1", ":", "owner2/repo2", "c:\\base\\owner2\\repo2",
+            Description = "The path is not of a legal form")]
         public void User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
         {
             var target = CreateTarget(defaultClonePath: defaultClonePath);
