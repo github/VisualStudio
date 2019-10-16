@@ -11,6 +11,7 @@ using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
@@ -39,6 +40,7 @@ namespace GitHub.Services
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IGitHubContextService gitHubContextService;
         readonly IUsageTracker usageTracker;
+        readonly Lazy<IPackageSettings> packageSettings;
         readonly Lazy<EnvDTE.DTE> dte;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
@@ -51,6 +53,7 @@ namespace GitHub.Services
             IGitHubContextService gitHubContextService,
             IUsageTracker usageTracker,
             IGitHubServiceProvider sp,
+            Lazy<IPackageSettings> packageSettings,
             [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.operatingSystem = operatingSystem;
@@ -59,10 +62,9 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
+            this.packageSettings = packageSettings;
             dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
             JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
-
-            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
         /// <inheritdoc/>
@@ -220,7 +222,8 @@ namespace GitHub.Services
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
-                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
+                var defaultClonePath = GetDefaultClonePath();
+                if (repositoryPath.StartsWith(defaultClonePath, StringComparison.OrdinalIgnoreCase))
                 {
                     // Count the number of times users clone into the Default Repository Location
                     await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
@@ -251,7 +254,23 @@ namespace GitHub.Services
                 : fallbackPath;
         }
 
-        public string DefaultClonePath { get { return defaultClonePath; } }
+        public void SetDefaultClonePath(string repositoryPath, UriString cloneUrl) => throw new NotImplementedException();
+
+        public string GetDefaultClonePath(UriString cloneUrl = null)
+        {
+            var defaultPath = packageSettings.Value.DefaultRepositoryLocation;
+            if (string.IsNullOrEmpty(defaultPath))
+            {
+                defaultPath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
+            }
+
+            if (cloneUrl == null)
+            {
+                return defaultPath;
+            }
+
+            return Path.Combine(defaultPath, cloneUrl.Host, cloneUrl.RepositoryName);
+        }
 
         JoinableTaskContext JoinableTaskContext { get; }
 

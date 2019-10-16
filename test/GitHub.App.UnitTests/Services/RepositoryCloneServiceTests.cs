@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
@@ -157,19 +158,21 @@ public class RepositoryCloneServiceTests
 
         static RepositoryCloneService CreateRepositoryCloneService(IOperatingSystem operatingSystem = null,
             IVSGitServices vsGitServices = null, IUsageTracker usageTracker = null,
-            ITeamExplorerServices teamExplorerServices = null, IGitHubServiceProvider serviceProvider = null)
+            ITeamExplorerServices teamExplorerServices = null, IGitHubServiceProvider serviceProvider = null,
+            IPackageSettings packageSettings = null)
         {
             operatingSystem = operatingSystem ?? Substitute.For<IOperatingSystem>();
             vsGitServices = vsGitServices ?? Substitute.For<IVSGitServices>();
             usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
             teamExplorerServices = teamExplorerServices ?? Substitute.For<ITeamExplorerServices>();
             serviceProvider = serviceProvider ?? Substitute.For<IGitHubServiceProvider>();
+            packageSettings = packageSettings ?? Substitute.For<IPackageSettings>();
 
             operatingSystem.Environment.ExpandEnvironmentVariables(Args.String).Returns(x => x[0]);
 
             return new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                usageTracker, serviceProvider, new JoinableTaskContext());
+                usageTracker, serviceProvider, new Lazy<IPackageSettings>(() => packageSettings), new JoinableTaskContext());
         }
     }
 }

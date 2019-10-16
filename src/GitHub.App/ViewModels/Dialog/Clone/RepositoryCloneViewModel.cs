@@ -59,7 +59,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             var repository = this.WhenAnyValue(x => x.SelectedTabIndex)
                 .SelectMany(x => tabs[x].WhenAnyValue(tab => tab.Repository));
 
-            Path = service.DefaultClonePath;
+            Path = service.GetDefaultClonePath();
             repository.Subscribe(x => UpdatePath(x));
 
             pathWarning = Observable.CombineLatest(
@@ -228,13 +228,13 @@ namespace GitHub.ViewModels.Dialog.Clone
                     }
                     else
                     {
-                        Path = System.IO.Path.Combine(service.DefaultClonePath, repository.Owner, repository.Name);
+                        Path = service.GetDefaultClonePath(repository.CloneUrl);
                     }
                 }
                 catch (Exception)
                 {
                     // Reset illegal paths
-                    Path = System.IO.Path.Combine(service.DefaultClonePath, repository.Owner, repository.Name);
+                    Path = service.GetDefaultClonePath(repository.CloneUrl);
                 }
 
                 previousRepository = repository;

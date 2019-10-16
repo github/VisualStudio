@@ -11,10 +11,14 @@ namespace GitHub.Services
     public interface IRepositoryCloneService
     {
         /// <summary>
-        /// Default path to clone things to, used as fallback if we can't find the correct path
-        /// from VS.
+        /// Get the default clone path for a given clone URL.
         /// </summary>
-        string DefaultClonePath { get; }
+        string GetDefaultClonePath(UriString cloneUrl = null);
+
+        /// <summary>
+        /// Infer the default clone path and layout from an example repository path and clone URL.
+        /// </summary>
+        void SetDefaultClonePath(string repositoryPath, UriString cloneUrl);
 
         /// <summary>
         /// Clones the specificed repository into the specified directory.

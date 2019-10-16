@@ -412,7 +412,12 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositoryCloneService CreateRepositoryCloneService(string defaultClonePath)
         {
             var result = Substitute.For<IRepositoryCloneService>();
-            result.DefaultClonePath.Returns(defaultClonePath);
+            result.GetDefaultClonePath(null).ReturnsForAnyArgs(x =>
+            {
+                var cloneUrl = x.Arg<UriString>();
+                if (cloneUrl == null) return defaultClonePath;
+                return Path.Combine(defaultClonePath, cloneUrl.Owner, cloneUrl.RepositoryName);
+            });
             result.DestinationDirectoryExists(directoryExists).Returns(true);
             result.DestinationDirectoryExists(directoryEmpty).Returns(true);
             result.DestinationDirectoryEmpty(directoryEmpty).Returns(true);
