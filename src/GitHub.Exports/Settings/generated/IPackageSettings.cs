@@ -44,5 +44,7 @@ namespace GitHub.Settings
         UIState UIState { get; set; }
         bool HideTeamExplorerWelcomeMessage { get; set; }
         bool EnableTraceLogging { get; set; }
+        string DefaultRepositoryLocation { get; set; }
+        string DefaultRepositoryLayout { get; set; }
     }
 }
