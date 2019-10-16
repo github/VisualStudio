@@ -228,6 +228,8 @@ namespace GitHub.Services
                     // Count the number of times users clone into the Default Repository Location
                     await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
                 }
+
+                SetDefaultClonePath(repositoryPath, cloneUrl);
             }
             catch (Exception ex)
             {
@@ -254,7 +256,17 @@ namespace GitHub.Services
                 : fallbackPath;
         }
 
-        public void SetDefaultClonePath(string repositoryPath, UriString cloneUrl) => throw new NotImplementedException();
+        public void SetDefaultClonePath(string repositoryPath, UriString cloneUrl)
+        {
+            var possibleOwnerPath = Path.GetDirectoryName(repositoryPath);
+            var possibleOwner = Path.GetFileName(possibleOwnerPath);
+            var defaultPath = string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.OrdinalIgnoreCase) ?
+                Path.GetDirectoryName(possibleOwnerPath) : possibleOwnerPath;
+
+            log.Information("Setting DefaultRepositoryLocation to {Location}", defaultPath);
+            packageSettings.Value.DefaultRepositoryLocation = defaultPath;
+            packageSettings.Value.Save();
+        }
 
         public string GetDefaultClonePath(UriString cloneUrl = null)
         {
@@ -269,7 +281,7 @@ namespace GitHub.Services
                 return defaultPath;
             }
 
-            return Path.Combine(defaultPath, cloneUrl.Host, cloneUrl.RepositoryName);
+            return Path.Combine(defaultPath, cloneUrl.Owner, cloneUrl.RepositoryName);
         }
 
         JoinableTaskContext JoinableTaskContext { get; }
