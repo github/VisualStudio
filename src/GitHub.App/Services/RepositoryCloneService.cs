@@ -333,10 +333,5 @@ namespace GitHub.Services
             Name,     // Layout repositories by name
             OwnerName // Layout repositories by owner and name
         }
-
-        class OrganizationAdapter
-        {
-            public IReadOnlyList<RepositoryListItemModel> Repositories { get; set; }
-        }
     }
 }
