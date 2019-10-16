@@ -260,11 +260,26 @@ namespace GitHub.Services
         {
             var possibleOwnerPath = Path.GetDirectoryName(repositoryPath);
             var possibleOwner = Path.GetFileName(possibleOwnerPath);
-            var defaultPath = string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.OrdinalIgnoreCase) ?
-                Path.GetDirectoryName(possibleOwnerPath) : possibleOwnerPath;
+
+            string defaultPath;
+            RepositoryLayout repositoryLayout;
+            if (string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.OrdinalIgnoreCase))
+            {
+                repositoryLayout = RepositoryLayout.OwnerName;
+                defaultPath = Path.GetDirectoryName(possibleOwnerPath);
+            }
+            else
+            {
+                repositoryLayout = RepositoryLayout.Name;
+                defaultPath = possibleOwnerPath;
+            }
 
             log.Information("Setting DefaultRepositoryLocation to {Location}", defaultPath);
             packageSettings.Value.DefaultRepositoryLocation = defaultPath;
+
+            log.Information("Setting DefaultRepositoryLayout to {Layout}", repositoryLayout);
+            SetDefaultRepositoryLayout(repositoryLayout);
+
             packageSettings.Value.Save();
         }
 
@@ -281,10 +296,43 @@ namespace GitHub.Services
                 return defaultPath;
             }
 
-            return Path.Combine(defaultPath, cloneUrl.Owner, cloneUrl.RepositoryName);
+            var repositoryLayout = GetDefaultRepositoryLayout();
+            switch (repositoryLayout)
+            {
+                case RepositoryLayout.Name:
+                    return Path.Combine(defaultPath, cloneUrl.RepositoryName);
+                case RepositoryLayout.OwnerName:
+                    return Path.Combine(defaultPath, cloneUrl.Owner, cloneUrl.RepositoryName);
+                default:
+                    throw new ArgumentException($"Unknown repository layout: {repositoryLayout}");
+
+            }
+        }
+
+        RepositoryLayout GetDefaultRepositoryLayout()
+        {
+            RepositoryLayout repositoryLayout;
+            if (!Enum.TryParse(packageSettings.Value.DefaultRepositoryLayout, out repositoryLayout))
+            {
+                repositoryLayout = RepositoryLayout.OwnerName;
+            }
+
+            return repositoryLayout;
+        }
+
+        void SetDefaultRepositoryLayout(RepositoryLayout repositoryLayout)
+        {
+            packageSettings.Value.DefaultRepositoryLayout = repositoryLayout.ToString();
         }
 
         JoinableTaskContext JoinableTaskContext { get; }
+
+        enum RepositoryLayout
+        {
+            
+            Name,     // Layout repositories by name
+            OwnerName // Layout repositories by owner and name
+        }
 
         class OrganizationAdapter
         {
