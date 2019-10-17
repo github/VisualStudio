@@ -7,10 +7,5 @@
   ],
   "assemblyVersion": {
     "precision": "revision"
-  },
-  "cloudBuild": {
-    "buildNumber": {
-      "enabled": false
-    }
   }
 }
