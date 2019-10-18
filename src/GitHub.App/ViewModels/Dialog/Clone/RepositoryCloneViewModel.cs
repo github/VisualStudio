@@ -214,17 +214,8 @@ namespace GitHub.ViewModels.Dialog.Clone
                 {
                     if (previousRepository != null && !string.IsNullOrEmpty(Path))
                     {
-                        var basePath = System.IO.Path.GetDirectoryName(Path);
-                        var ownerName = System.IO.Path.GetFileName(basePath);
-                        if (previousRepository.Owner == ownerName)
-                        {
-                            basePath = System.IO.Path.GetDirectoryName(basePath);
-                            Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
-                        }
-                        else
-                        {
-                            Path = System.IO.Path.Combine(basePath, repository.Name);
-                        }
+                        var (path, layout) = RepositoryLayoutUtilities.GetDefaultPathAndLayout(Path, previousRepository.CloneUrl);
+                        Path = RepositoryLayoutUtilities.GetDefaultRepositoryPath(repository.CloneUrl, path, layout);
                     }
                     else
                     {
