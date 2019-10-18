@@ -171,36 +171,32 @@ public class RepositoryCloneServiceTests
             var cloneService = CreateRepositoryCloneService();
 
             cloneService.SetDefaultClonePath(targetPath, cloneUrl);
-            var defaultPath = cloneService.GetDefaultClonePath();
 
-            Assert.That(defaultPath, Is.EqualTo(expectedDefaultPath));
+            Assert.That(cloneService.DefaultClonePath, Is.EqualTo(expectedDefaultPath));
         }
     }
 
-    public class TheGetDefaultClonePathMethod
+    public class TheDefaultClonePathProperty
     {
-        [TestCase(@"c:\source\owner\name", "https://github.com/owner/name", "https://github.com/newOwner/newName", @"c:\source\newOwner\newName")]
-        [TestCase(@"c:\source\name", "https://github.com/owner/name", "https://github.com/newOwner/newName", @"c:\source\newName")]
-        public void GetDefaultClonePath(string setTargetPath, string setCloneUrl, string getCloneUrl, string expectedDefaultPath)
+        [TestCase(@"c:\source\owner\name", "https://github.com/owner/name", @"c:\source")]
+        [TestCase(@"c:\source\name", "https://github.com/owner/name", @"c:\source")]
+        public void GetDefaultClonePath(string setTargetPath, string setCloneUrl, string expectedDefaultPath)
         {
             var cloneService = CreateRepositoryCloneService();
 
             cloneService.SetDefaultClonePath(setTargetPath, setCloneUrl);
-            var defaultPath = cloneService.GetDefaultClonePath(getCloneUrl);
 
-            Assert.That(defaultPath, Is.EqualTo(expectedDefaultPath));
+            Assert.That(cloneService.DefaultClonePath, Is.EqualTo(expectedDefaultPath));
         }
-
-        [TestCase(@"c:\default", "https://github.com/owner/repositoryName", @"c:\default\owner\repositoryName")]
-        public void Defaults_To_Owner_Name_Layout(string localClonePath, string getCloneUrl, string expectedDefaultPath)
+    }
+    public class TheDefaultRepositoryLayoutProperty
+    {
+        [Test]
+        public void Defaults_To_Owner_Name_Layout()
         {
-            var vsGitServices = Substitute.For<IVSGitServices>();
-            vsGitServices.GetLocalClonePathFromGitProvider().Returns(localClonePath);
-            var cloneService = CreateRepositoryCloneService(vsGitServices: vsGitServices);
+            var cloneService = CreateRepositoryCloneService();
 
-            var defaultPath = cloneService.GetDefaultClonePath(getCloneUrl);
-
-            Assert.That(defaultPath, Is.EqualTo(expectedDefaultPath));
+            Assert.That(cloneService.DefaultRepositoryLayout, Is.EqualTo(RepositoryLayout.OwnerName));
         }
     }
 

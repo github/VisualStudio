@@ -222,8 +222,7 @@ namespace GitHub.Services
                 await vsGitServices.Clone(cloneUrl, repositoryPath, true, progress, cancellationToken);
                 await usageTracker.IncrementCounter(x => x.NumberOfClones);
 
-                var defaultClonePath = GetDefaultClonePath();
-                if (repositoryPath.StartsWith(defaultClonePath, StringComparison.OrdinalIgnoreCase))
+                if (repositoryPath.StartsWith(DefaultClonePath, StringComparison.OrdinalIgnoreCase))
                 {
                     // Count the number of times users clone into the Default Repository Location
                     await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
@@ -269,22 +268,23 @@ namespace GitHub.Services
             packageSettings.Value.Save();
         }
 
-        public string GetDefaultClonePath(UriString cloneUrl = null)
+        public RepositoryLayout DefaultRepositoryLayout
         {
-            var defaultPath = packageSettings.Value.DefaultRepositoryLocation;
-            if (string.IsNullOrEmpty(defaultPath))
-            {
-                defaultPath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
-            }
+            get => RepositoryLayoutUtilities.GetRepositoryLayout(packageSettings.Value.DefaultRepositoryLayout);
+        }
 
-            if (cloneUrl == null)
+        public string DefaultClonePath
+        {
+            get
             {
-                return defaultPath;
-            }
+                var defaultPath = packageSettings.Value.DefaultRepositoryLocation;
+                if (!string.IsNullOrEmpty(defaultPath))
+                {
+                    return defaultPath;
+                }
 
-            var repositoryLayoutSetting = packageSettings.Value.DefaultRepositoryLayout;
-            var repositoryLayout = RepositoryLayoutUtilities.GetRepositoryLayout(repositoryLayoutSetting);
-            return RepositoryLayoutUtilities.GetDefaultRepositoryPath(cloneUrl, defaultPath, repositoryLayout);
+                return GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
+            }
         }
 
         JoinableTaskContext JoinableTaskContext { get; }
