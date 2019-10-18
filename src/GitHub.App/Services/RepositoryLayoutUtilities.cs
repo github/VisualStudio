@@ -12,6 +12,7 @@ namespace GitHub.Services
             {
                 case RepositoryLayout.Name:
                     return Path.Combine(defaultPath, cloneUrl.RepositoryName);
+                case RepositoryLayout.Default:
                 case RepositoryLayout.OwnerName:
                     return Path.Combine(defaultPath, cloneUrl.Owner, cloneUrl.RepositoryName);
                 default:
@@ -22,13 +23,8 @@ namespace GitHub.Services
 
         public static RepositoryLayout GetRepositoryLayout(string repositoryLayoutSetting)
         {
-            RepositoryLayout repositoryLayout;
-            if (!Enum.TryParse(repositoryLayoutSetting, out repositoryLayout))
-            {
-                repositoryLayout = RepositoryLayout.OwnerName;
-            }
-
-            return repositoryLayout;
+            return Enum.TryParse(repositoryLayoutSetting, out RepositoryLayout repositoryLayout) ?
+                repositoryLayout : RepositoryLayout.Default;
         }
 
         public static (string, RepositoryLayout) GetDefaultPathAndLayout(string repositoryPath, UriString cloneUrl)

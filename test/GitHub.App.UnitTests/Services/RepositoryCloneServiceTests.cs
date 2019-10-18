@@ -192,11 +192,11 @@ public class RepositoryCloneServiceTests
     public class TheDefaultRepositoryLayoutProperty
     {
         [Test]
-        public void Defaults_To_Owner_Name_Layout()
+        public void Defaults_To_Default_Layout()
         {
             var cloneService = CreateRepositoryCloneService();
 
-            Assert.That(cloneService.DefaultRepositoryLayout, Is.EqualTo(RepositoryLayout.OwnerName));
+            Assert.That(cloneService.DefaultRepositoryLayout, Is.EqualTo(RepositoryLayout.Default));
         }
     }
 
