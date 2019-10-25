@@ -31,7 +31,7 @@ namespace GitHub.Services
         {
             var possibleOwnerPath = Path.GetDirectoryName(repositoryPath);
             var possibleOwner = Path.GetFileName(possibleOwnerPath);
-            if (string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.Ordinal))
             {
                 return (Path.GetDirectoryName(possibleOwnerPath), RepositoryLayout.OwnerName);
             }

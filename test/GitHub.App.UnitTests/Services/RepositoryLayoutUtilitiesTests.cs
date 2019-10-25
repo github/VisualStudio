@@ -16,6 +16,17 @@ public static class RepositoryLayoutUtilitiesTests
 
             Assert.That((path, layout), Is.EqualTo((expectPath, expectLayout)));
         }
+
+        [TestCase(@"c:\GitHub\VisualStudio", "https://github.com/github/VisualStudio", @"c:\GitHub", RepositoryLayout.Name)]
+        [TestCase(@"c:\GitHub\github\VisualStudio", "https://github.com/github/VisualStudio", @"c:\GitHub", RepositoryLayout.OwnerName)]
+        [TestCase(@"c:\github", "https://github.com/github/github", @"c:\", RepositoryLayout.Name)]
+        [TestCase(@"c:\github\github", "https://github.com/github/github", @"c:\", RepositoryLayout.OwnerName)]
+        public void Case_Sensitive_Owner(string repositoryPath, string cloneUrl, string expectPath, RepositoryLayout expectLayout)
+        {
+            var (path, layout) = RepositoryLayoutUtilities.GetDefaultPathAndLayout(repositoryPath, cloneUrl);
+
+            Assert.That((path, layout), Is.EqualTo((expectPath, expectLayout)));
+        }
     }
 
     public class TheGetRepositoryLayoutMethod
