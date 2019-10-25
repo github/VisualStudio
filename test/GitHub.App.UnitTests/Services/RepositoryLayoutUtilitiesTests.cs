@@ -17,4 +17,18 @@ public static class RepositoryLayoutUtilitiesTests
             Assert.That((path, layout), Is.EqualTo((expectPath, expectLayout)));
         }
     }
+
+    public class TheGetRepositoryLayoutMethod
+    {
+        [TestCase("Name", RepositoryLayout.Name)]
+        [TestCase("OwnerName", RepositoryLayout.OwnerName)]
+        [TestCase("Default", RepositoryLayout.Default)]
+        [TestCase("__UNKNOWN__", RepositoryLayout.Default)]
+        public void GetDefaultPathAndLayout(string setting, RepositoryLayout expectedLayout)
+        {
+            var layout = RepositoryLayoutUtilities.GetRepositoryLayout(setting);
+
+            Assert.That(layout, Is.EqualTo(expectedLayout));
+        }
+    }
 }
