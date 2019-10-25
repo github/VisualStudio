@@ -24,7 +24,7 @@ namespace MetricsTests
         public void ShouldStartTimer()
         {
             var service = Substitute.For<IUsageService>();
-            var target = new UsageTracker(CreateServiceProvider(), service, CreatePackageSettings(), new JoinableTaskContext());
+            var target = new UsageTracker(CreateServiceProvider(), service, CreatePackageSettings(), new JoinableTaskContext(), vsTelemetry: false);
 
             service.Received(1).StartTimer(Arg.Any<Func<Task>>(), TimeSpan.FromMinutes(3), TimeSpan.FromDays(1));
         }
@@ -111,7 +111,8 @@ namespace MetricsTests
                 CreateServiceProvider(),
                 usageService,
                 CreatePackageSettings(),
-                new JoinableTaskContext());
+                new JoinableTaskContext(),
+                vsTelemetry: false);
 
             await target.IncrementCounter(x => x.NumberOfClones);
             UsageData result = usageService.ReceivedCalls().First(x => x.GetMethodInfo().Name == "WriteLocalData").GetArguments()[0] as UsageData;
@@ -128,7 +129,8 @@ namespace MetricsTests
                 CreateServiceProvider(),
                 service,
                 CreatePackageSettings(),
-                new JoinableTaskContext());
+                new JoinableTaskContext(),
+                vsTelemetry: false);
 
             await target.IncrementCounter(x => x.NumberOfClones);
             await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data => 
@@ -155,7 +157,8 @@ namespace MetricsTests
                 CreateServiceProvider(),
                 service,
                 CreatePackageSettings(),
-                new JoinableTaskContext());
+                new JoinableTaskContext(),
+                vsTelemetry: false);
 
             await target.IncrementCounter(x => x.NumberOfClones);
             await service.Received(1).WriteLocalData(Arg.Is<UsageData>(data =>
@@ -177,7 +180,7 @@ namespace MetricsTests
             service.WhenForAnyArgs(x => x.StartTimer(null, new TimeSpan(), new TimeSpan()))
                 .Do(x => tick = x.ArgAt<Func<Task>>(0));
 
-            var target = new UsageTracker(serviceProvider, service, CreatePackageSettings(), new JoinableTaskContext());
+            var target = new UsageTracker(serviceProvider, service, CreatePackageSettings(), new JoinableTaskContext(), vsTelemetry: false);
 
             return Tuple.Create(target, tick);
         }

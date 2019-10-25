@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using GitHub.App;
+using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
 using GitHub.Factories;
@@ -29,6 +29,7 @@ namespace GitHub.ViewModels.TeamExplorer
         readonly IRepositoryPublishService repositoryPublishService;
         readonly INotificationService notificationService;
         readonly IModelServiceFactory modelServiceFactory;
+        readonly IDialogService dialogService;
         readonly ObservableAsPropertyHelper<IReadOnlyList<IAccount>> accounts;
         readonly ObservableAsPropertyHelper<bool> isHostComboBoxVisible;
         readonly IUsageTracker usageTracker;
@@ -39,6 +40,7 @@ namespace GitHub.ViewModels.TeamExplorer
             INotificationService notificationService,
             IConnectionManager connectionManager,
             IModelServiceFactory modelServiceFactory,
+            IDialogService dialogService,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(repositoryPublishService, nameof(repositoryPublishService));
@@ -46,10 +48,12 @@ namespace GitHub.ViewModels.TeamExplorer
             Guard.ArgumentNotNull(connectionManager, nameof(connectionManager));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
+            Guard.ArgumentNotNull(dialogService, nameof(dialogService));
 
             this.notificationService = notificationService;
             this.usageTracker = usageTracker;
             this.modelServiceFactory = modelServiceFactory;
+            this.dialogService = dialogService;
 
             Connections = connectionManager.Connections;
             this.repositoryPublishService = repositoryPublishService;
@@ -83,6 +87,8 @@ namespace GitHub.ViewModels.TeamExplorer
             PublishRepository = InitializePublishRepositoryCommand();
             PublishRepository.IsExecuting.Subscribe(x => IsBusy = x);
 
+            LoginAsDifferentUser = ReactiveCommand.CreateFromTask(LoginAsDifferentUserAsync);
+
             var defaultRepositoryName = repositoryPublishService.LocalRepositoryName;
             if (!string.IsNullOrEmpty(defaultRepositoryName))
                 RepositoryName = defaultRepositoryName;
@@ -101,6 +107,9 @@ namespace GitHub.ViewModels.TeamExplorer
         }
 
         public ReactiveCommand<Unit, ProgressState> PublishRepository { get; private set; }
+
+        public ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; private set; }
+
         public IReadOnlyObservableCollection<IConnection> Connections { get; private set; }
 
         bool isBusy;
@@ -125,6 +134,14 @@ namespace GitHub.ViewModels.TeamExplorer
         public bool IsHostComboBoxVisible
         {
             get { return isHostComboBoxVisible.Value; }
+        }
+
+        async Task LoginAsDifferentUserAsync()
+        {
+            if (await dialogService.ShowLoginDialog() is IConnection connection)
+            {
+                SelectedConnection = connection;
+            }
         }
 
         ReactiveCommand<Unit, ProgressState> InitializePublishRepositoryCommand()
