@@ -31,4 +31,17 @@ public static class RepositoryLayoutUtilitiesTests
             Assert.That(layout, Is.EqualTo(expectedLayout));
         }
     }
+
+    public class TheGetDefaultRepositoryPathMethod
+    {
+        [TestCase("https://github.com/github/VisualStudio", @"c:\source", RepositoryLayout.Name, @"c:\source\VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio", @"c:\source", RepositoryLayout.OwnerName, @"c:\source\github\VisualStudio")]
+        [TestCase("https://github.com/github/VisualStudio", @"c:\source", RepositoryLayout.Default, @"c:\source\github\VisualStudio")]
+        public void GetDefaultRepositoryPath(string cloneUrl, string defaultPath, RepositoryLayout repositoryLayout, string expectedPath)
+        {
+            var path = RepositoryLayoutUtilities.GetDefaultRepositoryPath(cloneUrl, defaultPath, repositoryLayout);
+
+            Assert.That(path, Is.EqualTo(expectedPath));
+        }
+    }
 }
