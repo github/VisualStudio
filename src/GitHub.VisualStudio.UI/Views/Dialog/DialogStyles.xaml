@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.14.0"
+                    xmlns:ghfvs="https://github.com/github/VisualStudio">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type TextBlock}" x:Key="GitHubH1TextBlock" BasedOn="{StaticResource {x:Static shell:VsResourceKeys.TextBlockEnvironment200PercentFontSizeStyleKey}}" />
+    <Style TargetType="{x:Type TextBlock}" x:Key="GitHubDescriptionTextBlock" BasedOn="{StaticResource {x:Static shell:VsResourceKeys.TextBlockEnvironment122PercentFontSizeStyleKey}}" />
+</ResourceDictionary>

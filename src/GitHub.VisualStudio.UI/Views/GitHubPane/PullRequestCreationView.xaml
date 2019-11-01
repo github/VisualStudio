@@ -9,6 +9,7 @@
                                       d:DesignHeight="450"
                                       d:DesignWidth="300"
                                       Background="{DynamicResource GitHubVsToolWindowBackground}"
+                                      Foreground="{DynamicResource GitHubVsWindowText}"
                                       DataContext="{Binding ViewModel}"
                                       IsEnabled="{Binding IsBusy, Converter={ghfvs:InverseBooleanConverter}}"
                                       AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationViewCustom}"
@@ -149,18 +150,30 @@
                             SpellCheck.IsEnabled="True"
                             AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationTitleTextBox}"/>
 
-        <ghfvs:PromptTextBox Grid.Row="2"
-                            MinHeight="100"
-                            Margin="10,5"
-                            AcceptsReturn="True"
-                            PromptText="{x:Static ghfvs:Resources.Description}"
-                            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                            Style="{DynamicResource GitHubVsPromptTextBox}"
-                            VerticalScrollBarVisibility="Auto"
-                            TextWrapping="Wrap"
-                            SpellCheck.IsEnabled="True"
-                            AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestCreationDescriptionTextBox}"/>
-        
+        <ghfvs:AutoCompleteBox
+            Grid.Row="3"
+            MinHeight="100"
+            Margin="10,5"
+            Advisor="{Binding AutoCompleteAdvisor}"
+            >
+            <ghfvs:AutoCompleteBox.ItemTemplate>
+                <DataTemplate>
+                    <ghfvs:AutoCompleteSuggestionView ViewModel="{Binding}" />
+                </DataTemplate>
+            </ghfvs:AutoCompleteBox.ItemTemplate>
+            <ghfvs:AutoCompleteBox.InputElement>
+                <ghfvs:TextBoxAutoCompleteTextInput>
+                    <ghfvs:PromptTextBox AcceptsReturn="True"
+                                         PromptText="{x:Static ghfvs:Resources.Description}"
+                                         Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{DynamicResource GitHubVsPromptTextBox}"
+                                         VerticalScrollBarVisibility="Auto"
+                                         TextWrapping="Wrap"
+                                         SpellCheck.IsEnabled="True"/>
+                </ghfvs:TextBoxAutoCompleteTextInput>
+            </ghfvs:AutoCompleteBox.InputElement>
+        </ghfvs:AutoCompleteBox>
+
         <ghfvs:ValidationMessage x:Name="titleValidationMessage"
                                 Grid.Row="3"
                                 Fill="{StaticResource GitHubWarningBrush}"

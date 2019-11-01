@@ -5,9 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using EnvDTE;
 using GitHub.Commands;
+using GitHub.Primitives;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.ViewModels;
 using GitHub.VisualStudio;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Editor;
@@ -18,7 +22,6 @@ using Microsoft.VisualStudio.Text.Differencing;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
-using EnvDTE;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
@@ -39,6 +42,8 @@ namespace GitHub.Services
         readonly IStatusBarNotificationService statusBar;
         readonly IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand;
         readonly IEditorOptionsFactoryService editorOptionsFactoryService;
+        readonly IMessageDraftStore draftStore;
+        readonly IInlineCommentPeekService peekService;
         readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
@@ -49,6 +54,8 @@ namespace GitHub.Services
             IStatusBarNotificationService statusBar,
             IGoToSolutionOrPullRequestFileCommand goToSolutionOrPullRequestFileCommand,
             IEditorOptionsFactoryService editorOptionsFactoryService,
+            IMessageDraftStore draftStore,
+            IInlineCommentPeekService peekService,
             IUsageTracker usageTracker)
         {
             Guard.ArgumentNotNull(serviceProvider, nameof(serviceProvider));
@@ -58,6 +65,8 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(goToSolutionOrPullRequestFileCommand));
             Guard.ArgumentNotNull(goToSolutionOrPullRequestFileCommand, nameof(editorOptionsFactoryService));
             Guard.ArgumentNotNull(usageTracker, nameof(usageTracker));
+            Guard.ArgumentNotNull(peekService, nameof(peekService));
+            Guard.ArgumentNotNull(draftStore, nameof(draftStore));
 
             this.serviceProvider = serviceProvider;
             this.pullRequestService = pullRequestService;
@@ -65,6 +74,8 @@ namespace GitHub.Services
             this.statusBar = statusBar;
             this.goToSolutionOrPullRequestFileCommand = goToSolutionOrPullRequestFileCommand;
             this.editorOptionsFactoryService = editorOptionsFactoryService;
+            this.draftStore = draftStore;
+            this.peekService = peekService;
             this.usageTracker = usageTracker;
         }
 
@@ -79,13 +90,12 @@ namespace GitHub.Services
 
             try
             {
-                var fullPath = GetAbsolutePath(session.LocalRepository, relativePath);
                 string fileName;
                 string commitSha;
 
                 if (workingDirectory)
                 {
-                    fileName = fullPath;
+                    fileName = Path.Combine(session.LocalRepository.LocalPath, relativePath);
                     commitSha = null;
                 }
                 else
@@ -109,7 +119,7 @@ namespace GitHub.Services
 
                     if (!workingDirectory)
                     {
-                        AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
+                        AddBufferTag(wpfTextView.TextBuffer, session, relativePath, commitSha, null);
                         EnableNavigateToEditor(textView, session);
                     }
                 }
@@ -129,7 +139,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDiff)
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, bool scrollToFirstDraftOrDiff)
         {
             Guard.ArgumentNotNull(session, nameof(session));
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
@@ -168,10 +178,35 @@ namespace GitHub.Services
                 var caption = $"Diff - {Path.GetFileName(file.RelativePath)}";
                 var options = __VSDIFFSERVICEOPTIONS.VSDIFFOPT_DetectBinaryFiles |
                     __VSDIFFSERVICEOPTIONS.VSDIFFOPT_LeftFileIsTemporary;
+                var openThread = (line: -1, side: DiffSide.Left);
+                var scrollToFirstDiff = false;
 
                 if (!workingDirectory)
                 {
                     options |= __VSDIFFSERVICEOPTIONS.VSDIFFOPT_RightFileIsTemporary;
+                }
+
+                if (scrollToFirstDraftOrDiff)
+                {
+                    var (key, _) = PullRequestReviewCommentThreadViewModel.GetDraftKeys(
+                        session.LocalRepository.CloneUrl.WithOwner(session.RepositoryOwner),
+                        session.PullRequest.Number,
+                        relativePath,
+                        0);
+                    var drafts = (await draftStore.GetDrafts<PullRequestReviewCommentDraft>(key)
+                        .ConfigureAwait(true))
+                        .OrderByDescending(x => x.data.UpdatedAt)
+                        .ToList();
+
+                    if (drafts.Count > 0 && int.TryParse(drafts[0].secondaryKey, out var line))
+                    {
+                        openThread = (line, drafts[0].data.Side);
+                        scrollToFirstDiff = false;
+                    }
+                    else
+                    {
+                        scrollToFirstDiff = true;
+                    }
                 }
 
                 IVsWindowFrame frame;
@@ -197,12 +232,12 @@ namespace GitHub.Services
 
                 var leftText = diffViewer.LeftView.TextBuffer.CurrentSnapshot.GetText();
                 var rightText = diffViewer.RightView.TextBuffer.CurrentSnapshot.GetText();
-                if (leftText == string.Empty)
+                if (leftText.Length == 0)
                 {
                     // Don't show LeftView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.RightViewOnly;
                 }
-                else if (rightText == string.Empty)
+                else if (rightText.Length == 0)
                 {
                     // Don't show RightView when empty.
                     diffViewer.ViewMode = DifferenceViewMode.LeftViewOnly;
@@ -228,6 +263,18 @@ namespace GitHub.Services
                 else
                     await usageTracker.IncrementCounter(x => x.NumberOfPRDetailsViewChanges);
 
+                if (openThread.line != -1)
+                {
+                    var view = diffViewer.ViewMode == DifferenceViewMode.Inline ?
+                        diffViewer.InlineView :
+                        openThread.side == DiffSide.Left ? diffViewer.LeftView : diffViewer.RightView;
+                    
+                    // HACK: We need to wait here for the view to initialize or the peek session won't appear.
+                    // There must be a better way of doing this.
+                    await Task.Delay(1500).ConfigureAwait(true);
+                    peekService.Show(view, openThread.side, openThread.line);
+                }
+
                 return diffViewer;
             }
             catch (Exception e)
@@ -238,7 +285,7 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IDifferenceViewer> OpenDiff(
+        public Task<IDifferenceViewer> OpenDiff(
             IPullRequestSession session,
             string relativePath,
             IInlineCommentThreadModel thread)
@@ -247,11 +294,17 @@ namespace GitHub.Services
             Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
             Guard.ArgumentNotNull(thread, nameof(thread));
 
-            var diffViewer = await OpenDiff(session, relativePath, thread.CommitSha, scrollToFirstDiff: false);
+            return OpenDiff(session, relativePath, thread.CommitSha, thread.LineNumber - 1);
+        }
 
-            var param = (object)new InlineCommentNavigationParams
+        /// <inheritdoc/>
+        public async Task<IDifferenceViewer> OpenDiff(IPullRequestSession session, string relativePath, string headSha, int nextInlineTagFromLine)
+        {
+            var diffViewer = await OpenDiff(session, relativePath, headSha, scrollToFirstDraftOrDiff: false);
+
+            var param = (object) new InlineCommentNavigationParams
             {
-                FromLine = thread.LineNumber - 1,
+                FromLine = nextInlineTagFromLine,
             };
 
             // HACK: We need to wait here for the inline comment tags to initialize so we can find the next inline comment.
@@ -383,7 +436,7 @@ namespace GitHub.Services
         /// <param name="line">The 0-based line we're navigating from.</param>
         /// <param name="matchedLines">The number of similar matched lines in <see cref="toLines"/></param>
         /// <returns>Find the nearest matching line in <see cref="toLines"/>.</returns>
-        public int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
+        public static int FindNearestMatchingLine(IList<string> fromLines, IList<string> toLines, int line, out int matchedLines)
         {
             line = line < fromLines.Count ? line : fromLines.Count - 1; // VS shows one extra line at end
             var fromLine = fromLines[line];
@@ -423,13 +476,6 @@ namespace GitHub.Services
             }
 
             return matchingLine;
-        }
-
-        static string GetAbsolutePath(ILocalRepositoryModel localRepository, string relativePath)
-        {
-            var localPath = localRepository.LocalPath;
-            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(localPath, relativePath);
         }
 
         string GetText(IVsTextView textView)
@@ -508,13 +554,13 @@ namespace GitHub.Services
         void AddBufferTag(
             ITextBuffer buffer,
             IPullRequestSession session,
-            string path,
+            string relativePath,
             string commitSha,
             DiffSide? side)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, commitSha, side));
+                () => new PullRequestTextBufferInfo(session, relativePath, commitSha, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -522,7 +568,7 @@ namespace GitHub.Services
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, path, commitSha, side);
+                    AddBufferTag(source, session, relativePath, commitSha, side);
                 }
             }
         }
@@ -589,9 +635,10 @@ namespace GitHub.Services
                 session.LocalRepository,
                 session.PullRequest))
             {
-                var fileChange = changes.FirstOrDefault(x => x.Path == file.RelativePath);
+                var gitPath = Paths.ToGitPath(file.RelativePath);
+                var fileChange = changes.FirstOrDefault(x => x.Path == gitPath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    fileChange.OldPath : file.RelativePath;
+                    Paths.ToWindowsPath(fileChange.OldPath) : file.RelativePath;
             }
         }
 

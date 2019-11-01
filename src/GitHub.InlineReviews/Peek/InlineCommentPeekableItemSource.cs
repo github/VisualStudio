@@ -16,19 +16,19 @@ namespace GitHub.InlineReviews.Peek
         readonly IPullRequestSessionManager sessionManager;
         readonly INextInlineCommentCommand nextCommentCommand;
         readonly IPreviousInlineCommentCommand previousCommentCommand;
-        readonly ICommentService commentService;
+        readonly IViewViewModelFactory factory;
 
         public InlineCommentPeekableItemSource(IInlineCommentPeekService peekService,
             IPullRequestSessionManager sessionManager,
             INextInlineCommentCommand nextCommentCommand,
             IPreviousInlineCommentCommand previousCommentCommand,
-            ICommentService commentService)
+            IViewViewModelFactory factory)
         {
             this.peekService = peekService;
             this.sessionManager = sessionManager;
             this.nextCommentCommand = nextCommentCommand;
             this.previousCommentCommand = previousCommentCommand;
-            this.commentService = commentService;
+            this.factory = factory;
         }
 
         public void AugmentPeekSession(IPeekSession session, IList<IPeekableItem> peekableItems)
@@ -41,7 +41,7 @@ namespace GitHub.InlineReviews.Peek
                     sessionManager,
                     nextCommentCommand,
                     previousCommentCommand,
-                    commentService);
+                    factory);
                 viewModel.Initialize().Forget();
                 peekableItems.Add(new InlineCommentPeekableItem(viewModel));
             }

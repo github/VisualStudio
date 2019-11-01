@@ -146,7 +146,10 @@ namespace GitHub.ViewModels
             {
                 if (x == owner.ersatzUser) return -1;
                 if (y == owner.ersatzUser) return 1;
-                return ((IActorViewModel)x).Login.CompareTo(((IActorViewModel)y).Login);
+                return string.Compare(
+                    ((IActorViewModel)x).Login,
+                    ((IActorViewModel)y).Login,
+                    StringComparison.Ordinal);
             }
         }
     }

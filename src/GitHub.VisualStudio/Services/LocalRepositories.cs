@@ -3,8 +3,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Models;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -21,26 +23,29 @@ namespace GitHub.Services
         readonly IVSGitServices vsGitServices;
 
         [ImportingConstructor]
-        public LocalRepositories(IVSGitServices vsGitServices)
+        public LocalRepositories(IVSGitServices vsGitServices, [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.vsGitServices = vsGitServices;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         /// <inheritdoc/>
         public async Task Refresh()
         {
-            await ThreadingHelper.SwitchToPoolThreadAsync();
+            await TaskScheduler.Default;
             var list = vsGitServices.GetKnownRepositories();
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             repositories.Except(list).ToList().ForEach(x => repositories.Remove(x));
             list.Except(repositories).ToList().ForEach(x => repositories.Add(x));
         }
 
-        readonly ObservableCollectionEx<ILocalRepositoryModel> repositories
-            = new ObservableCollectionEx<ILocalRepositoryModel>();
+        readonly ObservableCollectionEx<LocalRepositoryModel> repositories
+            = new ObservableCollectionEx<LocalRepositoryModel>();
 
         /// <inheritdoc/>
-        public IReadOnlyObservableCollection<ILocalRepositoryModel> Repositories => repositories;
+        public IReadOnlyObservableCollection<LocalRepositoryModel> Repositories => repositories;
+
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

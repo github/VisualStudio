@@ -20,8 +20,8 @@ public class RepositoryModelTests
         public void SameContentEqualsTrue(string name1, string url1, string path1, string name2, string url2, string path2)
         {
             var gitService = Substitute.For<IGitService>();
-            var a = new LocalRepositoryModel(name1, new UriString(url1), path1, gitService);
-            var b = new LocalRepositoryModel(name2, new UriString(url2), path2, gitService);
+            var a = new LocalRepositoryModel { Name = name1, CloneUrl = url1, LocalPath = path1 };
+            var b = new LocalRepositoryModel { Name = name2, CloneUrl = url2, LocalPath = path2 };
             Assert.That(a, Is.EqualTo(b));
             Assert.False(a == b);
             Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
@@ -47,39 +47,6 @@ public class RepositoryModelTests
             Assert.That(a, Is.Not.EqualTo(b));
             Assert.False(a == b);
             Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
-        }
-    }
-
-    //[Collection("PackageServiceProvider global data tests")]
-    public class PathConstructorTests : TestBaseClass
-    {
-        [Test]
-        public void NoRemoteUrl()
-        {
-            using (var temp = new TempDirectory())
-            {
-                var gitService = Substitute.For<IGitService>();
-                var repo = Substitute.For<IRepository>();
-                var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitService.GetUri(path.FullName).Returns((UriString)null);
-                var model = new LocalRepositoryModel(path.FullName, gitService);
-                Assert.That("repo-name", Is.EqualTo(model.Name));
-            }
-        }
-
-        [Test]
-        public void WithRemoteUrl()
-        {
-            using (var temp = new TempDirectory())
-            {
-                var gitService = Substitute.For<IGitService>();
-                var repo = Substitute.For<IRepository>();
-                var path = temp.Directory.CreateSubdirectory("repo-name");
-                gitService.GetUri(path.FullName).Returns(new UriString("https://github.com/user/repo-name"));
-                var model = new LocalRepositoryModel(path.FullName, gitService);
-                Assert.That("repo-name", Is.EqualTo(model.Name));
-                Assert.That("user", Is.EqualTo(model.Owner));
-            }
         }
     }
 

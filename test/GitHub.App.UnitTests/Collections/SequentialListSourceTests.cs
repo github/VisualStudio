@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -105,7 +106,7 @@ namespace GitHub.App.UnitTests.Collections
 
             protected override async Task<Page<string>> LoadPage(string after)
             {
-                var page = after != null ? int.Parse(after) : 0;
+                var page = after != null ? int.Parse(after, CultureInfo.InvariantCulture) : 0;
 
                 if (loadTrigger != null)
                 {
@@ -121,7 +122,7 @@ namespace GitHub.App.UnitTests.Collections
 
                 return new Page<string>
                 {
-                    EndCursor = (page + 1).ToString(),
+                    EndCursor = (page + 1).ToString(CultureInfo.InvariantCulture),
                     HasNextPage = page < PageCount,
                     Items = Enumerable.Range(page * PageSize, PageSize).Select(x => "Item " + x).ToList(),
                     TotalCount = PageSize * PageCount,

@@ -5,11 +5,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using Serilog;
 using Rothko;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.Shell;
 using Environment = System.Environment;
 using Task = System.Threading.Tasks.Task;
 
@@ -31,10 +32,12 @@ namespace GitHub.Services
         Guid? userGuid;
 
         [ImportingConstructor]
-        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment)
+        public UsageService(IGitHubServiceProvider serviceProvider, IEnvironment environment,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.serviceProvider = serviceProvider;
             this.environment = environment;
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
         }
 
         public void Dispose()
@@ -85,11 +88,13 @@ namespace GitHub.Services
         public IDisposable StartTimer(Func<Task> callback, TimeSpan dueTime, TimeSpan period)
         {
             return new Timer(
+#pragma warning disable VSTHRD101 // Avoid unsupported async delegates
                 async _ =>
                 {
                     try { await callback(); }
                     catch (Exception ex) { log.Warning(ex, "Failed submitting usage data"); }
                 },
+#pragma warning restore VSTHRD101 // Avoid unsupported async delegates
                 null,
                 dueTime,
                 period);
@@ -133,7 +138,7 @@ namespace GitHub.Services
         {
             if (storePath == null)
             {
-                await ThreadingHelper.SwitchToMainThreadAsync();
+                await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
                 var program = serviceProvider.GetService<IProgram>();
 
@@ -184,5 +189,7 @@ namespace GitHub.Services
         {
             public Guid UserGuid { get; set; }
         }
+
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

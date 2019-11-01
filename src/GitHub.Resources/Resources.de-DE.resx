@@ -1,0 +1,894 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>Wählen Sie einen enthaltenden Ordner für Ihr neues Repository aus.</value>
+  </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Aus GitHub öffnen</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>Mit Github.com konnte keine Verbindung hergestellt werden.</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>GitHub-Gist erstellen</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>{0}-Repository erstellen</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>Geben Sie eine Enterprise-URL ein.</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>Geben Sie eine gültige Enterprise-URL ein.</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>Kein Enterprise-Server. Geben Sie eine Enterprise-URL ein.</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(Kennwort vergessen?)</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>Stellen Sie sicher, dass Sie zur Anmeldung Ihr Kennwort und kein persönliches Zugriffstoken verwenden.</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Überprüfen Sie Ihren Benutzernamen und das Kennwort, und versuchen Sie es dann noch mal.</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Fehler bei der Anmeldung.</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Verbindung mit GitHub herstellen</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>Geben Sie Ihr Kennwort ein.</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>Pull Request für Branch **{0}** wurde unter [{1}]({2}) erfolgreich erstellt.</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>Geben Sie einen Titel für den Pull Request ein.</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>Quell- und Zielbranch dürfen nicht identisch sein.</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>Der Quellpfad ist im Remoterepository nicht vorhanden, haben Sie ihn mithilfe von Push übertragen?</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>Geben Sie einen Repositorypfad ein.</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>Geben Sie einen gültigen Pfad ein.</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>Der Pfad enthält ungültige Zeichen.</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>Der Pfad ist zu lang.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>Das Repository "{0}/{1}" ist bereits vorhanden.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>Ändern Sie den Repositorynamen, oder wählen Sie ein anderes Konto aus, und versuchen Sie es noch mal.</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>Kontingent für private Repositorys überschritten.</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>Ein Repository mit dem gleichen Namen ist an diesem Speicherort bereits vorhanden.</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>Geben Sie einen Repositorynamen ein.</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>Der Repositoryname muss weniger als 100 Zeichen enthalten.</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>Wird als "{0}" erstellt.</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>Öffnen Sie die App zur zweistufigen Authentifizierung auf Ihrem Gerät, um Ihren Authentifizierungscode anzuzeigen.</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>Wir haben Ihnen eine SMS mit dem Authentifizierungscode gesendet.</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>Zweistufige Authentifizierung erforderlich</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>Geben Sie hier einen Authentifizierungscode für die Anmeldung ein.</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>Geben Sie Ihren Benutzernamen oder Ihre E-Mail-Adresse ein.</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>Der Benutzername oder die E-Mail-Adresse darf keine Leerzeichen enthalten.</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Requests</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>hinzufügen</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>Forken</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[ungültig]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>Vor dem Pushvorgang muss ein Pull erfolgen.</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>Es liegen keine Commits für einen Pullvorgang vor.</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>Es liegen keine Commits für einen Pushvorgang vor.</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*Keine Beschreibung angegeben.*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>"{0}" auschecken</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>Bei "{0}" auschecken</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>Per Pull aus {0}-Branch "{1}" übertragen</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>Per Push zu {0}-Branch "{1}" übertragen</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>Remoterepository</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>umbenennen</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>Das Quellrepository ist nicht mehr verfügbar.</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>Auschecken nicht möglich, weil für Ihr Arbeitsverzeichnis ausgecheckte Änderungen vorliegen.</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>{0} Untermodule synchronisieren</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>"Git.exe" wurde in PATH nicht gefunden.
+
+Installieren Sie Git für Windows:
+https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Genehmigt</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>Angeforderte Änderungen</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Kommentiert</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>InBearbeitung</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Drücken Sie die EINGABETASTE, um zum Editor zu navigieren.</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Checken Sie den PR-Branch aus, bevor Sie zum Editor navigieren.</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>Drücken Sie die EINGABETASTE, um zum Editor zu navigieren. (PR-Branch muss ausgecheckt sein.)</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Repository forken</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Ursprung wechseln</value>
+  </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Möchten Sie diesen Review abbrechen? Alle ausstehenden Kommentare gehen verloren.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>Review abbrechen</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>Im Zielpfad ist eine Datei vorhanden.</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Abmeldung erforderlich.</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>Vor {0:N0} Tag</value>
+  </data>
+  <data name="days" xml:space="preserve">
+    <value>Vor {0:N0} Tagen</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>Vor {0:N0} Stunde</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>Vor {0:N0} Stunden</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>jetzt</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>Vor {0:N0} Minute</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>Vor {0:N0} Minuten</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>Vor {0:N0} Monat</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>Vor {0:N0} Monaten</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>Vor {0:N0} Sekunde</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>Vor {0:N0} Sekunden</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>Vor {0:N0} Jahr</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>Vor {0:N0} Jahren</value>
+  </data>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>Ungültiger Authentifizierungscode.</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>Geben Sie den Code erneut ein, oder klicken Sie auf die Schaltfläche "Erneut senden", um einen neuen Authentifizierungscode zu erhalten.</value>
+  </data>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>Authentifizierungscode gesendet!</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>Wenn Sie keinen Authentifizierungscode erhalten, wenden Sie sich an support@github.com.</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>Durchsuchen</value>
+  </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>Mit Github.com konnte keine Verbindung hergestellt werden.</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>Verbindung mit dem Server nicht möglich.</value>
+  </data>
+  <data name="CreateLink" xml:space="preserve">
+    <value>Erstellen</value>
+  </data>
+  <data name="DescriptionOptional" xml:space="preserve">
+    <value>Beschreibung (optional)</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>In Browser öffnen</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>Gist wurde erstellt.</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Fehler beim Erstellen von Gist.</value>
+  </data>
+  <data name="prUpdatedByText" xml:space="preserve">
+    <value>durch</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Datenschutz</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Helfen Sie uns bei der Verbesserung unserer Produkte, indem Sie anonyme Nutzungsdaten senden.</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Das Kopieren in die Zwischenablage war nicht möglich. Versuchen Sie es noch mal.</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Der Link wurde in die Zwischenablage kopiert.</value>
+  </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Das Repository wurde erfolgreich erstellt.</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Privates Gist</value>
+  </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>Dateiname</value>
+  </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>Sie sind nicht bei {0} angemeldet, daher tritt bei bestimmten Git-Vorgängen möglicherweise ein Fehler auf. [Jetzt anmelden]({1})</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>Puls</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>Pfad</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Probleme</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>Diagramme</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>In GitHub veröffentlichen</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>Leistungsstarke Funktionen für Zusammenarbeit, Code Review und Codeverwaltung für Open Source- und private Projekte.</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>Verbindung herstellen...</value>
+  </data>
+  <data name="CloneLink" xml:space="preserve">
+    <value>Klonen</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>Überprüfen</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>Zweistufige Authentifizierung</value>
+  </data>
+  <data name="SignUpLink" xml:space="preserve">
+    <value>Registrieren</value>
+  </data>
+  <data name="SignOutLink" xml:space="preserve">
+    <value>Abmelden</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>Code erneut an Ihr registriertes SMS-Gerät senden</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>Erneut senden</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>Repositoryname</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>Dieses Repository weist kein Remoterepository auf. Füllen Sie das Formular aus, um es in GitHub zu veröffentlichen.</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>Veröffentlichen</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>oder</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>Öffnen Sie die App zur zweistufigen Authentifizierung auf Ihrem Gerät, um Ihren Authentifizierungscode anzuzeigen.</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>Keine Repositorys.</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>Privates Repository</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>Lokaler Pfad:</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>Lizenz</value>
+  </data>
+  <data name="learnMoreLink" xml:space="preserve">
+    <value>Weitere Informationen</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Git ignorieren</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>Repositorys durchsuchen</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>Einige oder alle Repositorys wurden möglicherweise nicht geladen. Schließen Sie das Dialogfeld, und versuchen Sie es noch mal.</value>
+  </data>
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
+    <value>Fehler beim Laden von Repositorys.</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>GitHub Enterprise-Serveradresse</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>Der Host ist nicht verfügbar, oder es handelt sich nicht um einen GitHub Enterprise-Server. Überprüfen Sie die Adresse, und versuchen Sie es noch mal.</value>
+  </data>
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
+    <value>Benutzername oder E-Mail-Adresse</value>
+  </data>
+  <data name="PasswordPrompt" xml:space="preserve">
+    <value>Kennwort</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>Prüfen Sie Ihre Internetverbindung, und versuchen Sie es noch mal.</value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>Sie verfügen nicht über GitHub Enterprise? </value>
+  </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>Sie haben noch kein Konto? </value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Titel (erforderlich)</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Beschreibung</value>
+  </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>Veröffentlichen Sie dieses Repository in GitHub, und erhalten Sie leistungsstarke Funktionen für Zusammenarbeit, Code Review und Codeverwaltung für Open Source- und private Projekte.</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>Dieses Repository befindet sich nicht auf GitHub.</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>Kein Repository</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>Hier wurde kein Git-Repository gefunden. Öffnen Sie ein Git-Projekt, oder klicken Sie in einem Projekt auf "Datei" &gt; "Zur Quellcodeverwaltung hinzufügen", um den Vorgang zu starten.</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Konto erstellen</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>Branches filtern</value>
+  </data>
+  <data name="PublishToGitHubButton" xml:space="preserve">
+    <value>In GitHub veröffentlichen</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>Erste Schritte</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>Anmelden...</value>
+  </data>
+  <data name="LocalBranchUpToDate" xml:space="preserve">
+    <value>Lokaler Branch auf dem neuesten Stand</value>
+  </data>
+  <data name="ChangesCountFormat" xml:space="preserve">
+    <value>Änderungen ({0})</value>
+  </data>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>Änderungen anzeigen</value>
+  </data>
+  <data name="CompareFileAsDefaultAction" xml:space="preserve">
+    <value>Datei vergleichen als Standardaktion</value>
+  </data>
+  <data name="ViewFile" xml:space="preserve">
+    <value>Datei anzeigen</value>
+  </data>
+  <data name="OpenFileAsDefaultAction" xml:space="preserve">
+    <value>Datei öffnen als Standardaktion</value>
+  </data>
+  <data name="SwitchToListView" xml:space="preserve">
+    <value>Zur Listenansicht wechseln</value>
+  </data>
+  <data name="SwitchToTreeView" xml:space="preserve">
+    <value>Zur Strukturansicht wechseln</value>
+  </data>
+  <data name="UpdatedFormat" xml:space="preserve">
+    <value>"{0}" aktualisiert.</value>
+  </data>
+  <data name="OpenPROnGitHubToolTip" xml:space="preserve">
+    <value>Pull Request in GitHub anzeigen</value>
+  </data>
+  <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
+    <value>Willkommen bei GitHub für Visual Studio! Sehen Sie sich doch unser [Training](show-training) oder die [Dokumentation](show-docs) an.
+
+[Nicht erneut anzeigen](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>Aktualisiert</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>PR-Kommentare in Editor-Rand anzeigen</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Experimentelle Features</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>Diese Features werden in einer zukünftigen Version möglicherweise geändert.</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>Änderungen in Projektmappe anzeigen</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Datei in Projektmappe öffnen</value>
+  </data>
+  <data name="TokenPrompt" xml:space="preserve">
+    <value>Token</value>
+  </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>Review fortsetzen</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>Review hinzufügen</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>Reviewer</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>Reviewkommentar hinzufügen</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>Einzelnen Kommentar hinzufügen</value>
+  </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>Fork</value>
+  </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>Debugging</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>Ablaufprotokollierung aktivieren</value>
+  </data>
+  <data name="BlendDialogText" xml:space="preserve">
+    <value>Die GitHub-Erweiterung ist innerhalb von Blend nicht verfügbar.</value>
+  </data>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>Kommentar aktualisieren</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Ausstehend</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>Review starten</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>Sie müssen für Ihre Änderungen einen Commit und einen Pushvorgang ausführen, um hier einen Kommentar hinzuzufügen.</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>Vorheriger Kommentar</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>Nächster Kommentar</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>Pull Request anzeigen, auschecken oder erstellen</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Zurück</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>Repository forken</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>Repository forken</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> Lokale Repositorys aktualisieren</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>zum Verweis auf</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>Pull Request erstellen</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>Bei GitHub anmelden</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>schrieb</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>Review übermitteln für</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>Ihre Reviewzusammenfassung</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>Nur Kommentar</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Genehmigen</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>Änderungen anfordern</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Kommentare</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>Veraltete Kommentare</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Neues Element erstellen</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>Zugewiesene Person</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>Mit Ihrem Browser anmelden</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>Nach Autor filtern</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>Fork auswählen</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>Möchten Sie diesen Kommentar wirklich löschen?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>Kommentar löschen</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Wiederholen</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>Es liegen keine offenen Pull Requests vor.</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>Mithilfe von Pull Requests können Sie andere Benutzer über Änderungen informieren, die Sie per Push an ein Repository in GitHub übertragen haben.</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>Mit Ihren Suchkriterien stimmen keine Ergebnisse überein.</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>Zum Einstieg können Sie folgende Aktionen durchführen:</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>Pull Request erstellen</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>Repository unter "{0}" öffnen?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>Die Ziel-URL weist einen anderen Besitzer für das aktuelle Repository auf.</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>Es liegt kein aktives Repository für die Navigation vor.</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>Die Arbeitsdatei unterscheidet sich von der Datei unter "{0}". Checken Sie den entsprechenden Branch, Pull Request oder Commit aus.</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>Öffnen Sie das Repository "{0}", und versuchen Sie es noch mal.</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>Öffnen von "{0}" aus nicht möglich. Derzeit werden nur URLs unterstützt, die mit Repositorydateien verknüpft sind.</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>In der Zwischenablage wurde keine GitHub-URL gefunden.</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>Die Ziel-URL wurde im aktuellen Repository nicht gefunden. Versuchen Sie es nach einem Abrufvorgang (fetch) noch einmal.</value>
+  </data>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Das Verzeichnis im Zielpfad ist nicht leer.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber kein Remoterepository namens "origin" aufweist.</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>An diesem Speicherort ist bereits ein Repository vorhanden, das aber ein Remoterepository "{0}" aufweist.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>Sie haben bereits einen Klonvorgang in diesen Speicherort durchgeführt. Klicken Sie auf "Öffnen", um das lokale Repository zu öffnen.</value>
+  </data>
+  <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
+    <value>Die GitHub-URL für das Repository wurde nicht gefunden.</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
+    <value>Für Repositorys muss ein Remoterepository namens "origin" definiert sein, damit die entsprechende GitHub-URL gefunden wird.</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
+    <value>Benennen Sie eines der vorhandenen Remoterepositorys in "origin" um, oder fügen Sie ein neues Remoterepository namens "origin" hinzu, und führen Sie einen Abrufvorgang (fetch) durch. Dies kann über die Befehlszeile oder durch Klicken auf die untenstehende Schaltfläche erfolgen.</value>
+  </data>
+  <data name="CouldntFindCorrespondingFile" xml:space="preserve">
+    <value>Die entsprechende Datei für "{0}" wurde im Repository nicht gefunden. Führen Sie "git fetch" aus, oder checken Sie den Ziel-Pull Request aus.</value>
+  </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>Letzte {0} mithilfe von Push übertragene Elemente</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Kommentar</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Pull Request schließen</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Issue schließen</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Schließen und kommentieren</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Erneut öffnen und kommentieren</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Issue öffnen</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Pull Request erneut öffnen</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} Commits</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>Einige Commits hinzugefügt</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>und weitere</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Diese Konversation wurde als aufgelöst markiert.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Ihre Repositorys</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Repositorys von Projektmitarbeitern</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Beitrag zu Repositorys</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>URL suchen oder eingeben</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Durchsuchen...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Klonen</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Konten hinzufügen/ändern</value>
+  </data>
+</root>

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
@@ -65,6 +66,29 @@ namespace GitHub.ViewModels.GitHubPane
                     await editorService.OpenDiff(pullRequestSession, file.RelativePath, thread);
                 }
             });
+
+            OpenFirstAnnotationNotice = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Notice));
+
+            OpenFirstAnnotationWarning = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Warning));
+
+            OpenFirstAnnotationFailure = ReactiveCommand.CreateFromTask<IPullRequestFileNode>(
+                async file => await OpenFirstAnnotation(editorService, file, CheckAnnotationLevel.Failure));
+        }
+
+        private async Task OpenFirstAnnotation(IPullRequestEditorService editorService, IPullRequestFileNode file,
+            CheckAnnotationLevel checkAnnotationLevel)
+        {
+            var annotationModel = await GetFirstAnnotation(file, checkAnnotationLevel);
+
+            if (annotationModel != null)
+            {
+                //AnnotationModel.EndLine is a 1-based number
+                //EditorService.OpenDiff takes a 0-based line number to start searching AFTER and will open the next tag
+                var nextInlineCommentFromLine = annotationModel.EndLine - 2;
+                await editorService.OpenDiff(pullRequestSession, file.RelativePath, annotationModel.HeadSha, nextInlineCommentFromLine);
+            }
         }
 
         /// <inheritdoc/>
@@ -122,6 +146,18 @@ namespace GitHub.ViewModels.GitHubPane
                     {
                         subscriptions.Add(file.WhenAnyValue(x => x.InlineCommentThreads)
                             .Subscribe(x => node.CommentCount = CountComments(x, filter)));
+
+                        subscriptions.Add(file.WhenAnyValue(x => x.InlineAnnotations)
+                            .Subscribe(x =>
+                            {
+                                var noticeCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Notice);
+                                var warningCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Warning);
+                                var failureCount = x.Count(model => model.AnnotationLevel == CheckAnnotationLevel.Failure);
+
+                                node.AnnotationNoticeCount = noticeCount;
+                                node.AnnotationWarningCount = warningCount;
+                                node.AnnotationFailureCount = failureCount;
+                            }));
                     }
 
                     var dir = GetDirectory(Path.GetDirectoryName(node.RelativePath), dirs);
@@ -147,6 +183,15 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstComment { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationNotice { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationWarning { get; }
+
+        /// <inheritdoc/>
+        public ReactiveCommand<IPullRequestFileNode, Unit> OpenFirstAnnotationFailure { get; }
 
         static int CountComments(
             IEnumerable<IInlineCommentThreadModel> thread,
@@ -180,8 +225,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             if (file.Status == PullRequestFileStatus.Renamed)
             {
-                var fileName = file.FileName.Replace("/", "\\");
-                return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
+                var gitPath = Paths.ToGitPath(file.FileName);
+                return changes?.Renamed.FirstOrDefault(x => x.Path == gitPath)?.OldPath;
             }
 
             return null;
@@ -198,6 +243,15 @@ namespace GitHub.ViewModels.GitHubPane
             }
 
             return threads.FirstOrDefault();
+        }
+
+        async Task<InlineAnnotationModel> GetFirstAnnotation(IPullRequestFileNode file,
+            CheckAnnotationLevel annotationLevel)
+        {
+            var sessionFile = await pullRequestSession.GetFile(file.RelativePath);
+            var annotations = sessionFile.InlineAnnotations;
+
+            return annotations.OrderBy(model => model.EndLine).FirstOrDefault(model => model.AnnotationLevel == annotationLevel);
         }
 
         /// <summary>

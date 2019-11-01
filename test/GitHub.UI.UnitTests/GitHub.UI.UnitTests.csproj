@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +16,7 @@
   
   <ItemGroup>
     <Compile Include="..\Helpers\AppDomainContext.cs" />
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <Compile Include="..\Helpers\ResourceDictionaryUtilities.cs" />
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />

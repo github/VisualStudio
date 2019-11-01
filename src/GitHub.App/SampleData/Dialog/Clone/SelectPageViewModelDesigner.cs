@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using GitHub.Models;
 using GitHub.ViewModels;
 using GitHub.ViewModels.Dialog.Clone;
+using ReactiveUI;
 
 namespace GitHub.SampleData.Dialog.Clone
 {
@@ -38,7 +40,7 @@ namespace GitHub.SampleData.Dialog.Clone
         public IReadOnlyList<IRepositoryItemViewModel> Items { get; }
         public ICollectionView ItemsView { get; }
         public IRepositoryItemViewModel SelectedItem { get; set; }
-        public IRepositoryModel Repository { get; }
+        public RepositoryModel Repository { get; }
 
         public void Initialize(IConnection connection)
         {

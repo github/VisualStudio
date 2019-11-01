@@ -157,6 +157,8 @@ namespace GitHub.Api
             await keychain.Save("[oauth]", token.AccessToken, hostAddress).ConfigureAwait(false);
             var result = await ReadUserWithRetry(client).ConfigureAwait(false);
             await keychain.Save(result.User.Login, token.AccessToken, hostAddress).ConfigureAwait(false);
+            oauthListener.RedirectLastContext(hostAddress.WebUri.Append(result.User.Login));
+
             return result;
         }
 
@@ -289,7 +291,7 @@ namespace GitHub.Api
             }
         }
 
-        ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
+        static ApplicationAuthorization EnsureNonNullAuthorization(ApplicationAuthorization auth)
         {
             // If a mock IGitHubClient is not set up correctly, it can return null from
             // IGutHubClient.Authorization.Create - this will cause an infinite loop in Login()

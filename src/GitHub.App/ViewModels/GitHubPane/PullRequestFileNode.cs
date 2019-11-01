@@ -3,6 +3,7 @@ using System.IO;
 using GitHub.App;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -13,12 +14,15 @@ namespace GitHub.ViewModels.GitHubPane
     public class PullRequestFileNode : ReactiveObject, IPullRequestFileNode
     {
         int commentCount;
+        int annotationNoticeCount;
+        int annotationWarningCount;
+        int _annotationFailureCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PullRequestFileNode"/> class.
         /// </summary>
         /// <param name="repositoryPath">The absolute path to the repository.</param>
-        /// <param name="relativePath">The path to the file, relative to the repository.</param>
+        /// <param name="relativeOrGitPath">The path to the file, relative to the repository.</param>
         /// <param name="sha">The SHA of the file.</param>
         /// <param name="status">The way the file was changed.</param>
         /// <param name="statusDisplay">The string to display in the [message] box next to the filename.</param>
@@ -28,17 +32,17 @@ namespace GitHub.ViewModels.GitHubPane
         /// </param>
         public PullRequestFileNode(
             string repositoryPath,
-            string relativePath,
+            string relativeOrGitPath,
             string sha,
             PullRequestFileStatus status,
             string oldPath)
         {
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
-            Guard.ArgumentNotEmptyString(relativePath, nameof(relativePath));
+            Guard.ArgumentNotEmptyString(relativeOrGitPath, nameof(relativeOrGitPath));
             Guard.ArgumentNotEmptyString(sha, nameof(sha));
 
-            FileName = Path.GetFileName(relativePath);
-            RelativePath = relativePath.Replace("/", "\\");
+            FileName = Path.GetFileName(relativeOrGitPath);
+            RelativePath = Paths.ToWindowsPath(relativeOrGitPath);
             Sha = sha;
             Status = status;
             OldPath = oldPath;
@@ -51,7 +55,7 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 if (oldPath != null)
                 {
-                    StatusDisplay = Path.GetDirectoryName(oldPath) == Path.GetDirectoryName(relativePath) ?
+                    StatusDisplay = Path.GetDirectoryName(oldPath) == Path.GetDirectoryName(relativeOrGitPath) ?
                             Path.GetFileName(oldPath) : oldPath;
                 }
                 else
@@ -98,6 +102,33 @@ namespace GitHub.ViewModels.GitHubPane
         {
             get { return commentCount; }
             set { this.RaiseAndSetIfChanged(ref commentCount, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of annotation notices on the file.
+        /// </summary>
+        public int AnnotationNoticeCount
+        {
+            get { return annotationNoticeCount; }
+            set { this.RaiseAndSetIfChanged(ref annotationNoticeCount, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of annotation errors on the file.
+        /// </summary>
+        public int AnnotationWarningCount
+        {
+            get { return annotationWarningCount; }
+            set { this.RaiseAndSetIfChanged(ref annotationWarningCount, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of annotation failures on the file.
+        /// </summary>
+        public int AnnotationFailureCount
+        {
+            get { return _annotationFailureCount; }
+            set { this.RaiseAndSetIfChanged(ref _annotationFailureCount, value); }
         }
     }
 }

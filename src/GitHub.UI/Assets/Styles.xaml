@@ -124,15 +124,6 @@
     <SolidColorBrush x:Key="GitHubDarkTextBoxMouseOverBorderBrush" Color="#FF545454" 
                      PresentationOptions:Freeze="true" />
 
-    <!-- horizontal divider brushes -->
-    <SolidColorBrush x:Key="HorizontalDividerBorderBrush" Color="#19000000"
-                     PresentationOptions:Freeze="true" />
-    <RadialGradientBrush x:Key="HorizontalDividerShadowBrush"
-                         PresentationOptions:Freeze="true">
-        <GradientStop Color="Black"/>
-        <GradientStop Offset="1" Color="#00000000"/>
-    </RadialGradientBrush>
-
     <!-- Primary fonts -->
     <FontFamily x:Key="GitHubFontFamilyNormal">Segoe UI</FontFamily>
     <FontFamily x:Key="GitHubFontFamilyLight">Segoe UI Light, Segoe UI, Global User Interface</FontFamily>

@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ghfvs="https://github.com/github/VisualStudio"
              xmlns:local="clr-namespace:GitHub.InlineReviews.Views"
              xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
              xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI"
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog" 
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="500">
     <UserControl.Resources>
@@ -101,12 +103,42 @@
             </StackPanel>
         </Border>
 
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource VsBrush.InfoBackground}"
+                BorderThickness="1 0 0 1"
+                Padding="4">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Thread.IsResolved}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <DockPanel>
+                <imaging:CrispImage Margin="4 0" Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.StatusInformation}" Visibility="{Binding Model.AnnotationLevel, Converter={ghfvs:EqualsToVisibilityConverter Notice}}"/>
+                <TextBlock Foreground="{DynamicResource VsBrush.InfoText}"  TextWrapping="Wrap" Text="{x:Static ghfvs:Resources.ThisConversationWasMarkedAsResolved}"/>
+            </DockPanel>
+        </Border>
+
         <ScrollViewer Name="threadScroller"
                       VerticalScrollBarVisibility="Auto"
                       Background="{DynamicResource GitHubPeekViewBackground}">
-            <Grid>
-                <ghfvs:CommentThreadView x:Name="threadView" DataContext="{Binding Thread}"/>
-            </Grid>
+            <StackPanel Orientation="Vertical">
+                <ItemsControl x:Name="annotationsView" ItemsSource="{Binding Annotations}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ghfvs:InlineAnnotationView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ghfvs:CommentThreadView x:Name="threadView"
+                                         Visibility="{Binding DataContext.AvailableForComment, Converter={ghfvs:BooleanToVisibilityConverter}, ElementName=annotationsView}"
+                                         DataContext="{Binding Thread}"/>
+            </StackPanel>
         </ScrollViewer>
     </DockPanel>
 </UserControl>

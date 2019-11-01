@@ -298,7 +298,7 @@ public class UriStringTests
         [TestCase("https://github.com/foo/bar", null, false)]
         public void ReturnsTrueForCaseSensitiveEquality(string source, string compare, bool expected)
         {
-            Assert.That(expected, Is.EqualTo(source.Equals(compare)));
+            Assert.That(expected, Is.EqualTo(source.Equals(compare, StringComparison.Ordinal)));
             Assert.That(expected, Is.EqualTo(EqualityComparer<UriString>.Default.Equals(source, compare)));
         }
 

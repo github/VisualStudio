@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using GitHub;
 using GitHub.Collections;
 using GitHub.Models;
 using GitHub.Primitives;
@@ -92,15 +97,15 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             Assert.That(target.Message, Is.EqualTo(IssueListMessage.NoItemsMatchCriteria));
         }
 
-        protected static ILocalRepositoryModel CreateLocalRepository(
+        protected static LocalRepositoryModel CreateLocalRepository(
             string owner = "owner",
             string name = "name")
         {
-            var result = Substitute.For<ILocalRepositoryModel>();
-            result.CloneUrl.Returns(new UriString($"https://giuthub.com/{owner}/{name}"));
-            result.Owner.Returns(owner);
-            result.Name.Returns(name);
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString($"https://giuthub.com/{owner}/{name}"),
+                Name = name
+            };
         }
 
         protected static IPullRequestSessionManager CreateSessionManager(PullRequestDetailModel pullRequest = null)
@@ -146,7 +151,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         static async Task<Target> CreateTargetAndInitialize(
             IRepositoryService repositoryService = null,
-            ILocalRepositoryModel repository = null,
+            LocalRepositoryModel repository = null,
             IConnection connection = null,
             int itemCount = 1000)
         {
@@ -172,7 +177,8 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
             public override IReadOnlyList<string> States { get; } = new[] { "Open", "Closed" };
 
-            protected override IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource() => ItemSource;
+            protected override Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh)
+                => Task.FromResult(ItemSource);
 
             protected override Task DoOpenItem(IIssueListItemViewModelBase item)
             {

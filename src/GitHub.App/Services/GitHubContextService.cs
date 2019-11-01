@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Windows;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -25,6 +26,7 @@ namespace GitHub.Services
     {
         readonly IGitHubServiceProvider serviceProvider;
         readonly IGitService gitService;
+        readonly IVSServices vsServices;
         readonly Lazy<IVsTextManager2> textManager;
 
         // USERID_REGEX = /[a-z0-9][a-z0-9\-\_]*/i
@@ -61,11 +63,36 @@ namespace GitHub.Services
         static readonly Regex tempFileObjectishRegex = new Regex(@"\\TFSTemp\\[^\\]*[.](?<objectish>[a-z0-9]{8})[.][^.\\]*$", RegexOptions.Compiled);
 
         [ImportingConstructor]
-        public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService)
+        public GitHubContextService(IGitHubServiceProvider serviceProvider, IGitService gitService, IVSServices vsServices)
         {
             this.serviceProvider = serviceProvider;
             this.gitService = gitService;
+            this.vsServices = vsServices;
             textManager = new Lazy<IVsTextManager2>(() => serviceProvider.GetService<SVsTextManager, IVsTextManager2>());
+        }
+
+        /// <inheritdoc/>
+        public void TryNavigateToContext(string repositoryDir, GitHubContext context)
+        {
+            if (context?.LinkType == LinkType.Blob)
+            {
+                var (commitish, path, commitSha) = ResolveBlob(repositoryDir, context);
+                if (commitish == null && path == null)
+                {
+                    var message = string.Format(CultureInfo.CurrentCulture, Resources.CouldntFindCorrespondingFile, context.Url);
+                    vsServices.ShowMessageBoxInfo(message);
+                    return;
+                }
+
+                var hasChanges = HasChangesInWorkingDirectory(repositoryDir, commitish, path);
+                if (hasChanges)
+                {
+                    var message = string.Format(CultureInfo.CurrentCulture, Resources.ChangesInWorkingDirectoryMessage, commitish);
+                    vsServices.ShowMessageBoxInfo(message);
+                }
+
+                TryOpenFile(repositoryDir, context);
+            }
         }
 
         /// <inheritdoc/>
@@ -97,7 +124,27 @@ namespace GitHub.Services
                 Url = uri
             };
 
-            var repositoryPrefix = uri.ToRepositoryUrl().ToString() + "/";
+            if (uri.Owner == null)
+            {
+                context.LinkType = LinkType.Unknown;
+                return context;
+            }
+
+            if (uri.RepositoryName == null)
+            {
+                context.LinkType = LinkType.Unknown;
+                return context;
+            }
+
+            var repositoryUrl = uri.ToRepositoryUrl().ToString();
+            if (string.Equals(url, repositoryUrl, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(url, repositoryUrl + ".git", StringComparison.OrdinalIgnoreCase))
+            {
+                context.LinkType = LinkType.Repository;
+                return context;
+            }
+
+            var repositoryPrefix = repositoryUrl + "/";
             if (!url.StartsWith(repositoryPrefix, StringComparison.OrdinalIgnoreCase))
             {
                 return context;
@@ -235,7 +282,8 @@ namespace GitHub.Services
                 return false;
             }
 
-            var fullPath = Path.Combine(repositoryDir, path.Replace('/', '\\'));
+            var relativePath = Paths.ToWindowsPath(path);
+            var fullPath = Path.Combine(repositoryDir, relativePath);
             var textView = OpenDocument(fullPath);
             SetSelection(textView, context);
             return true;
@@ -357,12 +405,17 @@ namespace GitHub.Services
         }
 
         /// <inheritdoc/>
-        public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string path)
+        public bool HasChangesInWorkingDirectory(string repositoryDir, string commitish, string relativePath)
         {
+            Guard.ArgumentNotNull(repositoryDir, nameof(repositoryDir));
+            Guard.ArgumentNotNull(commitish, nameof(commitish));
+            Guard.ArgumentIsRelativePath(relativePath, nameof(relativePath));
+
+            var gitPath = Paths.ToGitPath(relativePath);
             using (var repo = gitService.GetRepository(repositoryDir))
             {
                 var commit = repo.Lookup<Commit>(commitish);
-                var paths = new[] { path };
+                var paths = new[] { gitPath };
 
                 return repo.Diff.Compare<Patch>(commit.Tree, DiffTargets.WorkingDirectory, paths).Count() > 0;
             }

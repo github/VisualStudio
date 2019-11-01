@@ -1,7 +1,8 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <ExtrasEnableDefaultResourceItems>false</ExtrasEnableDefaultResourceItems>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -12,6 +13,8 @@
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
 
@@ -29,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
     <ProjectReference Include="..\GitHub.Exports\GitHub.Exports.csproj" />
     <ProjectReference Include="..\GitHub.Resources\GitHub.Resources.csproj" />
   </ItemGroup>

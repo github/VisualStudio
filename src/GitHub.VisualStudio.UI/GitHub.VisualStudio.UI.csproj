@@ -1,6 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -9,10 +9,15 @@
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Shell.ViewManager">
+      <HintPath>..\..\lib\14.0\Microsoft.VisualStudio.Shell.ViewManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
 
@@ -22,11 +27,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EnvDTE" Version="8.0.1" />
     <PackageReference Include="Markdig.Signed" version="0.13.0" />
     <PackageReference Include="Markdig.Wpf.Signed" version="0.2.1" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.17" />
-    <PackageReference Include="Microsoft.VisualStudio.ImageCatalog" version="14.3.25407" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime" version="14.3.25407" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" Version="15.0.27" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Page Update="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
+  </ItemGroup>  
+
 </Project>

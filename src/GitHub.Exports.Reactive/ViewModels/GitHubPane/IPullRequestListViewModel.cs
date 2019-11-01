@@ -15,7 +15,7 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> CreatePullRequest { get; }
 
         /// <summary>
-        /// Gets a command that opens pull request item on GitHub.
+        /// Gets a command that opens the pull request item on GitHub.
         /// </summary>
         ReactiveCommand<IPullRequestListItemViewModel, IPullRequestListItemViewModel> OpenItemInBrowser { get; }
     }

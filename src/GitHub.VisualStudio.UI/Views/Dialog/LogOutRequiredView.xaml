@@ -4,19 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ghfvs="https://github.com/github/VisualStudio"
-             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI;assembly=GitHub.VisualStudio.UI"
+             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
-  
-  <Control.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
-        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </Control.Resources>
 
-  <DockPanel Margin="10">
+    <Control.Resources>
+        <ResourceDictionary Source="DialogStyles.xaml" />
+    </Control.Resources>
+
+    <DockPanel Margin="10">
     <ghfvs:OcticonImage DockPanel.Dock="Top"
                         Icon="mark_github"
                         Foreground="{DynamicResource GitHubVsWindowText}"
@@ -30,13 +27,12 @@
            FontSize="16"
            Content="You need to sign out and back in." />
       
-    <ghfvs:OcticonCircleButton DockPanel.Dock="Bottom"
-                               Command="{Binding LogOut}"
-                               Content="Sign out"
-                               Icon="check"
-                               IsDefault="True"
-                               Margin="0 16"
-                               HorizontalAlignment="Center"/>
+    <Button DockPanel.Dock="Bottom"
+            Command="{Binding LogOut}"
+            Content="Sign out"
+            IsDefault="True"
+            Margin="0 16"
+            HorizontalAlignment="Center"/>
 
     <TextBlock TextWrapping="Wrap"
                 TextAlignment="Center"

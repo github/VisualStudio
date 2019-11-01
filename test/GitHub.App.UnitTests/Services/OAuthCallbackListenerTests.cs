@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Services;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Rothko;
 using NUnit.Framework;
 
@@ -31,6 +32,8 @@ namespace UnitTests.GitHub.App.Services
             var target = new OAuthCallbackListener(httpListener);
 
             await target.Listen("id1", CancellationToken.None);
+
+            target.RedirectLastContext(new Uri("http://github.com"));
 
             httpListener.Received(1).Stop();
         }
@@ -70,10 +73,40 @@ namespace UnitTests.GitHub.App.Services
 
             await target.Listen("id1", CancellationToken.None);
 
+            target.RedirectLastContext(new Uri("http://github.com"));
+
             context.Response.Received(1).Close();
         }
 
-        IHttpListener CreateHttpListener(string id)
+        [Test]
+        public async Task ContextFailureStopsListener()
+        {
+            var httpListener = Substitute.For<IHttpListener>();
+            httpListener
+                .When(x => x.Start())
+                .Do(_ => httpListener.IsListening.Returns(true));
+
+            var context = Substitute.For<IHttpListenerContext>();
+            context.Request.Url.Returns(new Uri($"https://localhost:42549?code=1234&state={"id1"}"));
+            httpListener.GetContext().Returns(context);
+            httpListener.GetContextAsync().Returns(context);
+
+            httpListener.GetContextAsync().Throws(new Exception());
+            var target = new OAuthCallbackListener(httpListener);
+
+            try
+            {
+                await target.Listen("id1", CancellationToken.None);
+            }
+            catch (Exception e)
+            {
+                
+            }
+
+            httpListener.Received(1).Stop();
+        }
+
+        static IHttpListener CreateHttpListener(string id)
         {
             var result = Substitute.For<IHttpListener>();
             result.When(x => x.Start()).Do(_ => result.IsListening.Returns(true));

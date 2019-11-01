@@ -26,19 +26,11 @@ namespace GitHub.Services
         Task Push(IRepository repository, string branchName, string remoteName);
 
         /// <summary>
-        /// Fetches the remote.
-        /// </summary>
-        /// <param name="repository">The repository to pull</param>
-        /// <param name="remoteName">The name of the remote</param>
-        /// <returns></returns>
-        Task Fetch(IRepository repository, string remoteName);
-
-        /// <summary>
         /// Fetches from the remote, using custom refspecs.
         /// </summary>
         /// <param name="repository">The repository to pull</param>
         /// <param name="remoteName">The name of the remote</param>
-        /// <param name="refspecs">The custom refspecs</param>
+        /// <param name="refspecs">The custom refspecs or none to use the default</param>
         /// <returns></returns>
         Task Fetch(IRepository repository, string remoteName, params string[] refspecs);
 
@@ -65,50 +57,20 @@ namespace GitHub.Services
         Task Checkout(IRepository repository, string branchName);
 
         /// <summary>
+        /// Checks if a commit exists a the repository.
+        /// </summary>
+        /// <param name="repository">The repository.</param>
+        /// <param name="sha">The SHA of the commit.</param>
+        /// <returns></returns>
+        Task<bool> CommitExists(IRepository repository, string sha);
+
+        /// <summary>
         /// Creates a new branch.
         /// </summary>
         /// <param name="repository">The repository to carry out the checkout on</param>
         /// <param name="branchName">The name of the branch</param>
         /// <returns></returns>
         Task CreateBranch(IRepository repository, string branchName);
-
-        /// <summary>
-        /// Compares two commits.
-        /// </summary>
-        /// <param name="repository">The repository</param>
-        /// <param name="sha1">The SHA of the first commit.</param>
-        /// <param name="sha2">The SHA of the second commit.</param>
-        /// <param name="detectRenames">Whether to detect renames</param>
-        /// <returns>
-        /// A <see cref="TreeChanges"/> object or null if one of the commits could not be found in the repository,
-        /// (e.g. it is from a fork).
-        /// </returns>
-        Task<TreeChanges> Compare(IRepository repository, string sha1, string sha2, bool detectRenames = false);
-
-        /// <summary>
-        /// Compares a file in two commits.
-        /// </summary>
-        /// <param name="repository">The repository</param>
-        /// <param name="sha1">The SHA of the first commit.</param>
-        /// <param name="sha2">The SHA of the second commit.</param>
-        /// <param name="path">The relative path to the file.</param>
-        /// <returns>
-        /// A <see cref="Patch"/> object or null if one of the commits could not be found in the repository.
-        /// </returns>
-        Task<Patch> Compare(IRepository repository, string sha1, string sha2, string path);
-
-        /// <summary>
-        /// Compares a file in a commit to a string.
-        /// </summary>
-        /// <param name="repository">The repository</param>
-        /// <param name="sha1">The SHA of the first commit.</param>
-        /// <param name="sha2">The SHA of the second commit.</param>
-        /// <param name="path">The relative path to the file.</param>
-        /// <param name="contents">The contents to compare with the file.</param>
-        /// <returns>
-        /// A <see cref="Patch"/> object or null if the commit could not be found in the repository.
-        /// </returns>
-        Task<ContentChanges> CompareWith(IRepository repository, string sha1, string sha2, string path, byte[] contents);
 
         /// <summary>
         /// Gets the value of a configuration key.

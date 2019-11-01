@@ -50,7 +50,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public string RemoteRepositoryOwner { get; private set; }
@@ -84,7 +84,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "login")]
         public async Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,
@@ -144,7 +144,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();

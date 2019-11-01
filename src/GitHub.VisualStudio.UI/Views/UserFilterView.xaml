@@ -9,6 +9,14 @@
     <d:DesignData.DataContext>
         <ghfvs:UserFilterViewModelDesigner/>
     </d:DesignData.DataContext>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <StaticResource ResourceKey="ThemedDialogDefaultStylesKey"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     
     <DockPanel>
         <ghfvs:PromptTextBox Name="searchBox"

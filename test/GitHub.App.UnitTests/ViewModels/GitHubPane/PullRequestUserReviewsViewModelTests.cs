@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Factories;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using GitHub.ViewModels.GitHubPane;
 using NSubstitute;
@@ -161,7 +162,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
 
         async Task InitializeAsync(
             PullRequestUserReviewsViewModel target,
-            ILocalRepositoryModel localRepository = null,
+            LocalRepositoryModel localRepository = null,
             IConnection connection = null,
             int pullRequestNumber = 5,
             string login = AuthorLogin)
@@ -182,7 +183,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
         {
             pullRequest = pullRequest ?? new PullRequestDetailModel
             {
-                Reviews = new PullRequestReviewModel[0],
+                Reviews = Array.Empty<PullRequestReviewModel>(),
             };
 
             var session = Substitute.For<IPullRequestSession>();
@@ -207,19 +208,13 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
                 sessionManager);
         }
 
-        IModelServiceFactory CreateFactory(IModelService modelService)
+        LocalRepositoryModel CreateRepository(string owner = "owner", string name = "repo")
         {
-            var result = Substitute.For<IModelServiceFactory>();
-            result.CreateAsync(null).ReturnsForAnyArgs(modelService);
-            return result;
-        }
-
-        ILocalRepositoryModel CreateRepository(string owner = "owner", string name = "repo")
-        {
-            var result = Substitute.For<ILocalRepositoryModel>();
-            result.Owner.Returns(owner);
-            result.Name.Returns(name);
-            return result;
+            return new LocalRepositoryModel
+            {
+                CloneUrl = new UriString($"https://github.com/{owner}/{name}"),
+                Name = name
+            };
         }
     }
 }

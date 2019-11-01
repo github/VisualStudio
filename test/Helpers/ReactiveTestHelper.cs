@@ -29,7 +29,7 @@ public static class ReactiveTestHelper
     }
 }
 
-public class UserErrorResult : IDisposable
+public sealed class UserErrorResult : IDisposable
 {
     readonly IDisposable handlerOverride;
 

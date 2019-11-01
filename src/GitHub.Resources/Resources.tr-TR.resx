@@ -1,0 +1,894 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>Yeni deponuzu içerecek klasörü seçin.</value>
+  </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>GitHub'dan Aç</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>github.com ile bağlantı kurulamadı</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>GitHub Gist oluştur</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>{0} Deposu Oluştur</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>Lütfen bir Enterprise URL'si girin</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>Lütfen geçerli bir Enterprise URL'si girin</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>Bu bir Enterprise sunucusu değil. Lütfen bir Enterprise URL'si girin</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(parolanızı mı unuttunuz?)</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>Oturum açmak için Kişisel Erişim belirteci yerine parolanızı kullandığınızdan emin olun.</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Kullanıcı adınızı ve parolanızı kontrol edin, sonra tekrar deneyin</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Oturum açılamadı.</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>GitHub'a Bağlan</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>Lütfen parolanızı girin</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>**{0}** dalı için Çekme İsteği [{1}] ({2}) konumunda başarıyla oluşturuldu</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>Lütfen Çekme İsteği için bir başlık girin</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>Kaynak ve hedef dal aynı olamaz</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>Kaynak dal uzak depoda yok, kaynak dalı gönderdiniz mi?</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>Lütfen bir depo yolu girin</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>Lütfen geçerli bir yol girin</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>Yol geçersiz karakterler içeriyor</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>Yol çok uzun</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>'{0}/{1}' deposu zaten var.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>Depo adını değiştirin veya farklı bir hesap seçip yeniden deneyin.</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>Özel depolar kotası aşıldı.</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>Bu konumda aynı ada sahip bir depo zaten var</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>Lütfen bir depo adı girin</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>Depo adı 100 karakterden kısa olmalıdır</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>{0} olarak oluşturulacak</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>Kimlik doğrulama kodunuzu görüntülemek için cihazınızda iki öğeli kimlik doğrulama uygulamasını açın.</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>Size SMS üzerinden kimlik doğrulama kodunuzun bulunduğu bir mesaj gönderdik.</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>İki öğeli kimlik doğrulama gerekiyor</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>Buraya bir oturum açma kimlik doğrulama kodu girin</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>Lütfen kullanıcı adınızı veya e-posta adresinizi girin</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>Kullanıcı adı veya e-posta adresi boşluk içeremez</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Çekme İstekleri</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Çekme İsteği</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>ekleyin</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>çatal oluştur</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[geçersiz]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>Gönderebilmeniz için önce çekmeniz gerekir</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>Çekilecek commit yok</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>Gönderilecek commit yok</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*Açıklama sağlanmadı.*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>Şunu kullanıma al: {0}</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>Kullanıma alma hedefi: {0}</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>{0} {1} dalından çekin</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>{0} {1} dalına gönder</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>uzak depo</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>yeniden adlandır</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>Kaynak depo artık kullanılamıyor.</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>Çalışma dizininizde kaydedilmemiş değişiklikler olduğundan kullanıma alınamıyor.</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>{0} alt modüllerini eşitle</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>PATH konumunda Git.exe dosyası bulunamadı.
+
+Lütfen şuradan Windows için Git yükleyin:
+https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Onaylandı</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>İstenen Değişiklikler</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Açıklamalı</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>İlerliyor</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Düzenleyiciye gitmek için Enter tuşuna basın</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Düzenleyiciye gitmeden önce PR dalını kullanıma alın</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>Düzenleyiciye gitmek için Enter tuşuna basın (PR dalının kullanıma alınması gerekir)</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Depo Çatalı Oluştur</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Origin'i Değiştir</value>
+  </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Bu incelemeyi iptal etmek istediğinizden emin misiniz? Tüm bekleyen açıklamalarınızı kaybedersiniz.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>İncelemeyi İptal Et</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>Hedef yolunda bir dosya var.</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Oturumun Kapatılması Gerekiyor</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>{0:N0} gün önce</value>
+  </data>
+  <data name="days" xml:space="preserve">
+    <value>{0:N0} gün önce</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>{0:N0} saat önce</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>{0:N0} saat önce</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>az önce</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>{0:N0} dakika önce</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>{0:N0} dakika önce</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>{0:N0} ay önce</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>{0:N0} ay önce</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>{0:N0} saniye önce</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>{0:N0} saniye önce</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>{0:N0} yıl önce</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>{0:N0} yıl önce</value>
+  </data>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>Geçersiz kimlik doğrulama kodu</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>Yeni bir kimlik doğrulama kodu almak için kodu yeniden girmeyi veya yeniden gönder düğmesine tıklamayı deneyin.</value>
+  </data>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>Kimlik doğrulama kodu gönderildi!</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>Kimlik doğrulama kodunu almadıysanız support@github.com adresine başvurun.</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>Gözat</value>
+  </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>github.com ile bağlantı kurulamadı</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>Sunucuya bağlanılamadı.</value>
+  </data>
+  <data name="CreateLink" xml:space="preserve">
+    <value>Oluştur</value>
+  </data>
+  <data name="DescriptionOptional" xml:space="preserve">
+    <value>Açıklama (İsteğe Bağlı)</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>Tarayıcıda Aç</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>Gist oluşturuldu</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Gist oluşturulamadı</value>
+  </data>
+  <data name="prUpdatedByText" xml:space="preserve">
+    <value>Sağlayan:</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Gizlilik</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Anonim kullanım verileri göndererek geliştirmemize yardımcı olun</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Panoya kopyalanamadı. Lütfen yeniden deneyin.</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Bağlantı panoya kopyalandı</value>
+  </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Depo başarıyla oluşturuldu.</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Özel Gist</value>
+  </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>Dosya Adı</value>
+  </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>{0} oturumunuz açılmadığından belirli git işlemleri başarısız olabilir. [Şimdi oturum açın]({1})</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>Pulse</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>Yol</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Konular</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>Grafikler</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>GitHub'da Yayımla</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>Açık kaynak ve özel projeler için güçlü işbirliği, kod incelemesi ve kod yönetimi.</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>Bağlan...</value>
+  </data>
+  <data name="CloneLink" xml:space="preserve">
+    <value>Kopya</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>Doğrula</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>İki öğeli kimlik doğrulama</value>
+  </data>
+  <data name="SignUpLink" xml:space="preserve">
+    <value>Kaydol</value>
+  </data>
+  <data name="SignOutLink" xml:space="preserve">
+    <value>Oturumu kapat</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>Kodu kayıtlı SMS Cihazınıza yeniden gönderin</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>Yeniden Gönder</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>Depo Adı</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>Bu deponun uzak deposu yok. GitHub'da yayımlamak için formu doldurun.</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>Yayımla</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>veya</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>Kimlik doğrulama kodunuzu görüntülemek için cihazınızda iki öğeli kimlik doğrulama uygulamasını açın.</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>Depo yok</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>Özel Depo</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>Yerel yol:</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>Lisans</value>
+  </data>
+  <data name="learnMoreLink" xml:space="preserve">
+    <value>Daha fazla bilgi</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Git ignore</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>Depolarda ara</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>Depoların bir kısmı veya tümü yüklenmemiş olabilir. İletişim kutusunu kapatın ve yeniden deneyin.</value>
+  </data>
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
+    <value>Depolar yüklenirken bir hata oluştu</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>GitHub Enterprise sunucusu adresi</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>Ana bilgisayar kullanılamıyor veya bir GitHub Enterprise sunucusu değil. Adresi denetleyin ve yeniden deneyin.</value>
+  </data>
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
+    <value>Kullanıcı adı veya e-posta</value>
+  </data>
+  <data name="PasswordPrompt" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Oturum aç</value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>Lütfen internet bağlantınızı kontrol edin ve yeniden deneyin.</value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>GitHub Enterprise kullanmıyor musunuz? </value>
+  </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>Hesabınız yok mu?</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Başlık (gerekli)</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>Bu depoyu GitHub'da yayımlayarak açık kaynak ve özel projeler için güçlü işbirliği, kod incelemesi ve kod yönetiminden yararlanın.</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>Bu depo GitHub'da değil</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>Depo yok</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>Burada bir git deposu bulunamadı. Çalışmaya başlamak için bir git projesi açın veya bir projede "Dosya -&gt; Kaynak Denetimine Ekle" seçeneğine tıklayın.</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Hesap oluştur</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>Dalları filtrele</value>
+  </data>
+  <data name="PublishToGitHubButton" xml:space="preserve">
+    <value>GitHub'da Yayımla</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>Kullanmaya Başlayın</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>Oturum aç</value>
+  </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>Oturum aç...</value>
+  </data>
+  <data name="LocalBranchUpToDate" xml:space="preserve">
+    <value>Yerel dal güncel</value>
+  </data>
+  <data name="ChangesCountFormat" xml:space="preserve">
+    <value>Değişiklikler ({0})</value>
+  </data>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>Değişiklikleri Görüntüle</value>
+  </data>
+  <data name="CompareFileAsDefaultAction" xml:space="preserve">
+    <value>Varsayılan Eylem Olarak Dosyayı Karşılaştır</value>
+  </data>
+  <data name="ViewFile" xml:space="preserve">
+    <value>Dosyayı Görüntüle</value>
+  </data>
+  <data name="OpenFileAsDefaultAction" xml:space="preserve">
+    <value>Varsayılan Eylem Olarak Dosyayı Aç</value>
+  </data>
+  <data name="SwitchToListView" xml:space="preserve">
+    <value>Liste Görünümüne Geç</value>
+  </data>
+  <data name="SwitchToTreeView" xml:space="preserve">
+    <value>Ağaç Görünümüne Geç</value>
+  </data>
+  <data name="UpdatedFormat" xml:space="preserve">
+    <value>{0} güncelleştirildi</value>
+  </data>
+  <data name="OpenPROnGitHubToolTip" xml:space="preserve">
+    <value>Çekme İsteğini GitHub'da Görüntüle</value>
+  </data>
+  <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
+    <value>Visual Studio için GitHub'a hoş geldiniz! [Eğitimimize](show-training) veya [belgelerimize](show-docs) göz atmaya ne dersiniz?
+
+[Bunu bir daha gösterme](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>Güncelleştirildi</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>Düzenleyici kenar boşluğunda PR açıklamalarını göster</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Deneysel özellikler</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>Bu özellikler gelecekteki bir sürümde değişebilir</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>Çözümdeki Değişiklikleri Görüntüle</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Dosyayı Çözümde Aç</value>
+  </data>
+  <data name="TokenPrompt" xml:space="preserve">
+    <value>Belirteç</value>
+  </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>İncelemenize devam edin</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>İncelemenizi ekleyin</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>Gözden Geçirenler</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>İnceleme açıklaması ekle</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>Tek bir açıklama ekleyin</value>
+  </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>Çatal Oluştur</value>
+  </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>Hata Ayıklama</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>İzleme Günlüğünü Etkinleştir</value>
+  </data>
+  <data name="BlendDialogText" xml:space="preserve">
+    <value>GitHub uzantısı Blend içinde kullanılamıyor</value>
+  </data>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>Açıklamayı güncelleştir</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Bekliyor</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>İnceleme başlat</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>Buraya bir açıklama eklemek için değişikliklerinizi commit işlemi yapıp göndermelisiniz.</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>Önceki Açıklama</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>Sonraki Açıklama</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>Çekme İsteğini Görüntüle, Oluştur veya Kullanıma Al</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Geri</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>Depo Çatalı Oluştur</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>Depo çatalı oluştur</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> Yerel deponuzun şu öğesini güncelleştirin:</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>işaret edecek şekilde</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>Çekme isteği oluştur</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>GitHub'da oturum açın</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>Çek</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Anında İlet</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>Eşitle</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>yazdı</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>Şuna yönelik incelemenizi gönderin:</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>İnceleme özetiniz</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>Yalnızca açıklama</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Onayla</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>İstek değişiklikleri</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Açıklamalar</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>Süresi geçen açıklamalar</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Yeni Oluştur</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>Atanan</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Yazar</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>Tarayıcınızla oturum açın</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Aç</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>Yazara Göre Filtrele</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>Çatal Seçin</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>Bu açıklamayı silmek istediğinizden emin misiniz?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>Açıklamayı Sil</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Yeniden dene</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>Açık çekme isteği yok</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>Çekme istekleri GitHub'da bir depoya gönderdiğiniz değişiklikleri başkalarına duyurmanıza olanak tanır</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>Aramanızla eşleşen sonuç yok.</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>Başlamak için şunları yapabilirsiniz:</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>çekme isteği oluştur</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>'{0}' konumundaki depo açılsın mı?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>Hedef URL'nin geçerli depodan farklı bir sahibi var.</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>Gidilecek etkin bir depo yok</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>Çalışma dosyası '{0}' konumundaki dosyadan farklı. Lütfen karşılık gelen dalı, çekme isteğini veya commit'i kullanıma alın.</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>Lütfen '{0}' deposunu açın ve yeniden deneyin</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>'{0}' kaynağından açılamadı. Şu anda yalnızca depo dosyalarına bağlantı kuran URL'ler destekleniyor.</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>Panoda GitHub URL'si bulunamadı</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>Hedef URL geçerli depoda bulunamadı. Getirme işlemi gerçekleştirdikten sonra yeniden deneyin.</value>
+  </data>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Hedef yoldaki dizin boş değil.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>Bu konumda bir depo zaten var ancak bu deponun "origin" adlı bir uzak deposu yok.</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>Bu konumda bir depo zaten var ancak bu depo {0} adlı bir uzak depoya sahip.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>Zaten bu konuma kopyaladınız. Yerel depoyu açmak için 'Aç' seçeneğine tıklayın.</value>
+  </data>
+  <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
+    <value>Depo için GitHub URL'si bulunamıyor</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
+    <value>GitHub URL'lerinin bulunması için depoların tanımlı bir "origin" adlı uzak depoya sahip olması gerekir.</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
+    <value>Lütfen mevcut uzak depolarınızdan birini 'origin' olarak adlandırın veya 'origin' adlı yeni bir uzak depo ekleyip getirin. Bu işlemi komut satırından veya aşağıdaki düğmeye tıklayarak gerçekleştirebilirsiniz.</value>
+  </data>
+  <data name="CouldntFindCorrespondingFile" xml:space="preserve">
+    <value>Depoda '{0}' öğesine karşılık gelen dosya bulunamadı. Lütfen bir 'git fetch' işlemi gerçekleştirin ya da hedef çekme isteğini kullanıma alın.</value>
+  </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>En son gönderilen {0}</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Çekme isteğini kapat</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Sorunu kapat</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Kapat ve açıklama ekle</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Yeniden aç ve açıklama ekle</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Sorunu yeniden aç</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Çekme isteğini yeniden aç</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} işleme</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>birkaç işleme ekledi</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>ve diğer kişiler</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Bu konuşma çözümlendi olarak işaretlendi</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Depolarınız</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Ortak çalışan depoları</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Katkıda bulunulan depolar</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Bir URL arayın veya girin</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Gözat...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Kopyalama</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Hesap Ekle/Değiştir</value>
+  </data>
+</root>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
     <Compile Include="..\Helpers\LazySubstitute.cs" />
     <Compile Include="..\Helpers\ReactiveTestHelper.cs" />

@@ -27,7 +27,7 @@ namespace GitHub.SampleData
                 {
                     IsExpanded = true,
                     HasDetails = true,
-                    FileComments = new IPullRequestReviewFileCommentViewModel[0],
+                    FileComments = Array.Empty<IPullRequestReviewFileCommentViewModel>(),
                     StateDisplay = "approved",
                     Model = new PullRequestReviewModel
                     {
@@ -63,7 +63,7 @@ namespace GitHub.SampleData
             };
         }
 
-        public ILocalRepositoryModel LocalRepository { get; set; }
+        public LocalRepositoryModel LocalRepository { get; set; }
         public string RemoteRepositoryOwner { get; set; }
         public int PullRequestNumber { get; set; }
         public IActorViewModel User { get; set; }
@@ -71,7 +71,7 @@ namespace GitHub.SampleData
         public string PullRequestTitle { get; set; }
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
+        public Task InitializeAsync(LocalRepositoryModel localRepository, IConnection connection, string owner, string repo, int pullRequestNumber, string login)
         {
             return Task.CompletedTask;
         }

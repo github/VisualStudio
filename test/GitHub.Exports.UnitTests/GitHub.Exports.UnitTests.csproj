@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Helpers\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj" />
     <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj" />
   </ItemGroup>
 

@@ -64,7 +64,7 @@ However, if you're two-way binding these properties to a UI, then ignore the rea
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> FileComments { get; set; }
         public bool IsExpanded { get; set; }
         public bool HasDetails { get; set; }
-        public ILocalRepositoryModel LocalRepository { get; set; }
+        public LocalRepositoryModel LocalRepository { get; set; }
         public PullRequestReviewModel Model { get; set; }
         public ReactiveCommand<Unit, Unit> NavigateToPullRequest { get; }
         public IReadOnlyList<IPullRequestReviewFileCommentViewModel> OutdatedFileComments { get; set; }

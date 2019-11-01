@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Globalization;
 using System.Linq;
 
@@ -8,6 +7,16 @@ namespace GitHub.Extensions
 {
     public static class Guard
     {
+        public static void ArgumentIsRelativePath(string value, string name)
+        {
+            ArgumentNotNull(value, name);
+
+            if (Path.IsPathRooted(value))
+            {
+                throw new ArgumentException($"The value '{value}' must not be rooted", name);
+            }
+        }
+
         public static void ArgumentNotNull(object value, string name)
         {
             if (value != null) return;

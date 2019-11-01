@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using ReactiveUI;
 
 namespace GitHub.ViewModels.GitHubPane
@@ -16,7 +17,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <summary>
         /// Gets the local repository.
         /// </summary>
-        ILocalRepositoryModel LocalRepository { get; }
+        LocalRepositoryModel LocalRepository { get; }
 
         /// <summary>
         /// Gets the owner of the remote repository that contains the pull request.
@@ -88,6 +89,11 @@ namespace GitHub.ViewModels.GitHubPane
         ReactiveCommand<Unit, Unit> Cancel { get; }
 
         /// <summary>
+        /// Provides an AutoCompleteAdvisor.
+        /// </summary>
+        IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
+
+        /// <summary>
         /// Initializes the view model for creating a new review.
         /// </summary>
         /// <param name="localRepository">The local repository.</param>
@@ -96,7 +102,7 @@ namespace GitHub.ViewModels.GitHubPane
         /// <param name="repo">The pull request's repository name.</param>
         /// <param name="pullRequestNumber">The pull request number.</param>
         Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,

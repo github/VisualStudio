@@ -11,6 +11,8 @@ using ReactiveUI;
 using GitHub.Services;
 using GitHub.Extensions;
 
+#pragma warning disable CA1018 // Mark attributes with AttributeUsageAttribute
+
 namespace GitHub.Validation
 {
     public class ReactiveValidatableObject : ReactiveObject, IDataErrorInfo

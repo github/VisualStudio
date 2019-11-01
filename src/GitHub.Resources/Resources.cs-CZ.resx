@@ -1,0 +1,894 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>Vyberte nadřazenou složku pro nové úložiště.</value>
+  </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>Otevřít z GitHubu</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>Nepodařilo se připojit ke github.com.</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>Vytvořit gist GitHubu</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>Vytvořit úložiště {0}</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>Zadejte prosím adresu URL severu Enterprise.</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>Zadejte prosím platnou adresu URL severu Enterprise.</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>Nejedná se o server Enterprise. Zadejte prosím adresu URL serveru Enterprise.</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(zapomněli jste heslo?)</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>K přihlášení použijte heslo, ne token PAT.</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>Zkontrolujte svoje uživatelské jméno a heslo a zkuste to znovu.</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>Přihlášení se nepovedlo.</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>Připojit ke GitHubu</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>Zadejte prosím heslo.</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>Žádost o přijetí změn pro větev **{0}** se úspěšně vytvořila v [{1}]({2})</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>Zadejte prosím název žádosti o přijetí změn.</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>Zdrojová a cílová větev nemůžou být stejné.</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>Zdrojová větev neexistuje vzdáleně, nasdíleli jste ji?</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>Zadejte prosím cestu k úložišti.</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>Zadejte prosím platnou cestu.</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>Cesta obsahuje neplatné znaky.</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>Cesta je moc dlouhá.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>Úložiště {0}/{1} už existuje.</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>Změňte název úložiště nebo vyberte jiný účet a zkuste to znovu.</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>Překročila se kvóta pro privátní úložiště.</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>Úložiště se stejným názvem už v tomto umístění existuje.</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>Zadejte prosím název úložiště.</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>Název úložiště musí mít méně než 100 znaků.</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>Vytvoří se jako {0}.</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>Otevřete aplikaci pro dvoufaktorové ověřování na vašem zařízení a zobrazte svůj ověřovací kód.</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>Poslali jsme vám SMS s vaším ověřovacím kódem.</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>Vyžaduje se dvoufaktorové ověřování.</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>Sem zadejte ověřovací kód pro přihlášení.</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>Zadejte prosím svoje uživatelské jméno nebo e-mailovou adresu.</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>Uživatelské jméno nebo e-mailová adresa nesmí obsahovat mezery.</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Žádosti o přijetí změn</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Žádost o přijetí změn</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>přidat</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>fork</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[neplatný]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>Před nasdílením změn musíte napřed přijmout změny.</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>Žádné zápisy k přijetí</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>Žádné zápisy k nasdílení</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*Není zadaný žádný popis.*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>Rezervovat {0}</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>Rezervovat pro {0}</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>Přijmout změny z větve {0} {1}</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>Nasdílet změny do větve {0} {1}</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>vzdálené úložiště</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>přejmenovat</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>Úložiště zdrojového kódu už není k dispozici.</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>Nelze rezervovat, protože pracovní adresář obsahuje nezapsané změny.</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>Synchronizovat dílčí moduly {0}</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>Git.exe se na zadané cestě nepodařilo najít.
+
+Nainstalujte si prosím Git pro Windows z tohoto umístění:
+https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>Schválené</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>Požadované změny</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>Okomentované</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>Probíhá zpracování.</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>Pokud chcete přejít do editoru, stiskněte Enter.</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>Před přechodem do editoru napřed rezervujte větev PR.</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>Pokud chcete přejít do editoru, stiskněte Enter (větev PR musí být rezervovaná).</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>Fork úložiště</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Přepnout úložiště Origin</value>
+  </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>Opravdu chcete tuto revizi zrušit? Všechny vaše čekající komentáře se ztratí.</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>Zrušit revizi</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>Soubor na cílové cestě existuje.</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>Vyžaduje se odhlášení.</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>před {0:N0} dnem</value>
+  </data>
+  <data name="days" xml:space="preserve">
+    <value>před {0:N0} dny</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>před {0:N0} hodinou</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>před {0:N0} hodinami</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>právě teď</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>před {0:N0} minutou</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>před {0:N0} minutami</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>před {0:N0} měsícem</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>před {0:N0} měsíci</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>před {0:N0} sekundou</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>před {0:N0} sekundami</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>před {0:N0} rokem</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>před {0:N0} roky</value>
+  </data>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>Neplatný ověřovací kód</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>Zkuste zadat kód znovu nebo kliknutím na tlačítko pro opětovné odeslání získejte nový ověřovací kód.</value>
+  </data>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>Ověřovací kód se odeslal.</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>Pokud ověřovací kód nedostanete, obraťte se na support@github.com.</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>Procházet</value>
+  </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>Nepodařilo se připojit ke github.com.</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>Nepodařilo se připojit k serveru.</value>
+  </data>
+  <data name="CreateLink" xml:space="preserve">
+    <value>Vytvořit</value>
+  </data>
+  <data name="DescriptionOptional" xml:space="preserve">
+    <value>Popis (nepovinné)</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>Otevřít v prohlížeči</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>Gist se vytvořil.</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>Gist se nepodařilo vytvořit.</value>
+  </data>
+  <data name="prUpdatedByText" xml:space="preserve">
+    <value>podle</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>Ochrana osobních údajů</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>Pomozte nám s vylepšováním posíláním anonymních dat o používání</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>Zkopírování do schránky se nepodařilo. Zkuste to prosím znovu.</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>Odkaz se zkopíroval do schránky.</value>
+  </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>Úložiště se úspěšně vytvořilo.</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>Privátní gist</value>
+  </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>Název souboru</value>
+  </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>Nejste přihlášeni k {0}, takže některé operace git se asi nezdaří. [Přihlásit]({1})</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>Impulz</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>Cesta</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>Problémy</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>Grafy</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>Publikovat na GitHub</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>Výkonná spolupráce, revize kódu a správa kódu pro open source a privátní projekty.</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>Připojit…</value>
+  </data>
+  <data name="CloneLink" xml:space="preserve">
+    <value>Klonovat</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>Ověřit</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>Dvoufaktorové ověřování</value>
+  </data>
+  <data name="SignUpLink" xml:space="preserve">
+    <value>Zaregistrovat se</value>
+  </data>
+  <data name="SignOutLink" xml:space="preserve">
+    <value>Odhlásit se</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>Znovu odeslat kód na vaše registrované zařízení SMS</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>Poslat znovu</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>Název úložiště</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>Toto úložiště nemá vzdálené úložiště. Vyplňte formulář pro jeho publikování na GitHubu.</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>Publikovat</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>nebo</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>Otevřete aplikaci pro dvoufaktorové ověřování na vašem zařízení a zobrazte svůj ověřovací kód.</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>Žádná úložiště</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>Název</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>Privátní úložiště</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>Místní cesta:</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="learnMoreLink" xml:space="preserve">
+    <value>Další informace</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Ignorování Gitu</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>Hledat úložiště</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>Některá nebo všechna úložiště se možná nenačetla. Zavřete dialogové okno a zkuste to znovu.</value>
+  </data>
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
+    <value>Při načítání úložišť došlo k chybě.</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>Adresa serveru GitHub Enterprise</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>Hostitel není dostupný nebo se nejedná o server GitHub Enterprise. Zkontrolujte adresu a zkuste to znovu.</value>
+  </data>
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
+    <value>Uživatelské jméno nebo e-mail</value>
+  </data>
+  <data name="PasswordPrompt" xml:space="preserve">
+    <value>Heslo</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>Přihlásit se</value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>Zkontrolujte prosím připojení k internetu a zkuste to znovu.</value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>Nemáte GitHub Enterprise?</value>
+  </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>Nemáte účet?</value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>Název (povinné)</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Popis</value>
+  </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>Publikujte toto úložiště na GitHub a získáte výkonnou spolupráci, revizi kódu a správu kódu pro open source a privátní projekty.</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>Toto úložiště není na GitHubu.</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>Žádné úložiště</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>Žádné úložiště git jsme tady nenašli. Pokud chcete začít, otevřete projekt git nebo klikněte v projektu na Soubor -&gt; Přidat do správy zdrojového kódu.</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>Vytvořit účet</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>Filtrovat větve</value>
+  </data>
+  <data name="PublishToGitHubButton" xml:space="preserve">
+    <value>Publikovat na GitHub</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>Začínáme</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>Přihlásit se</value>
+  </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>Přihlásit se...</value>
+  </data>
+  <data name="LocalBranchUpToDate" xml:space="preserve">
+    <value>Místní větev je aktuální.</value>
+  </data>
+  <data name="ChangesCountFormat" xml:space="preserve">
+    <value>Změny ({0})</value>
+  </data>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>Zobrazit změny</value>
+  </data>
+  <data name="CompareFileAsDefaultAction" xml:space="preserve">
+    <value>Porovnat soubor jako výchozí akce</value>
+  </data>
+  <data name="ViewFile" xml:space="preserve">
+    <value>Zobrazit soubor</value>
+  </data>
+  <data name="OpenFileAsDefaultAction" xml:space="preserve">
+    <value>Otevřít soubor jako výchozí akce</value>
+  </data>
+  <data name="SwitchToListView" xml:space="preserve">
+    <value>Přepnout na zobrazení seznamu</value>
+  </data>
+  <data name="SwitchToTreeView" xml:space="preserve">
+    <value>Přepnout na stromové zobrazení</value>
+  </data>
+  <data name="UpdatedFormat" xml:space="preserve">
+    <value>aktualizoval(a) {0}</value>
+  </data>
+  <data name="OpenPROnGitHubToolTip" xml:space="preserve">
+    <value>Zobrazit žádost o přijetí změn na GitHubu</value>
+  </data>
+  <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
+    <value>Vítá vás GitHub pro Visual Studio. Podívejte se na naše [školení](show-training) a [dokumentaci](show-docs).
+
+[Příště už nezobrazovat](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>Aktualizováno</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>Zobrazit komentáře PR na okraji editoru</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>Experimentální funkce</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>Tyto funkce se můžou v budoucí verzi změnit.</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>Zobrazit změny v řešení</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>Otevřít soubor v řešení</value>
+  </data>
+  <data name="TokenPrompt" xml:space="preserve">
+    <value>Token</value>
+  </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>Pokračovat v revizi</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>Přidat revizi</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>Revidující</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>Přidat komentář revize</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>Přidat jeden komentář</value>
+  </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>Fork</value>
+  </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>Ladění</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>Povolit protokolování trasování</value>
+  </data>
+  <data name="BlendDialogText" xml:space="preserve">
+    <value>Rozšíření GitHub není k dispozici v Blendu.</value>
+  </data>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>Aktualizovat komentář</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Čekající</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>Zahájit revizi</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>Pokud sem chcete přidat komentář, musíte zapsat a nasdílet změny.</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>Předchozí komentář</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>Další komentář</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>Zobrazit, rezervovat nebo vytvořit žádost o přijetí změn</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Zpět</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>Fork úložiště</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>Fork úložiště</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> Aktualizovat pro místní úložiště</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>přejít na</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>Vytvořit žádost o přijetí změn</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>Přihlásit se ke GitHubu</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>Přijmout změny</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Vložit</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>Synchronizovat</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>zapsal(a)</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>Odeslat revizi pro</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>Souhrn vaší revize</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>Jenom komentář</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Schválit</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>Požádat o změny</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Komentáře</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>Zastaralé komentáře</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>Vytvořit nový</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>Pověřená osoba</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>Přihlásit se pomocí prohlížeče</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Otevřít</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>Filtrovat podle autora</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>Vybrat fork</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>Opravdu chcete odstranit tento komentář?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>Odstranit komentář</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Opakovat</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>Nejsou k dispozici žádné otevřené žádosti o přijetí změn.</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>Žádosti o přijetí změn vám umožňují informovat ostatní o změnách, které jste nasdíleli do úložiště na GitHubu.</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>Vašemu hledání neodpovídají žádné výsledky.</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>Pokud chcete začít, můžete</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>vytvořit žádost o přijetí změn</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>Otevřít úložiště v {0}?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>Cílová adresa URL má jiného vlastníka než aktuální úložiště.</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>Není k dispozici žádné aktivní úložiště, do kterého by bylo možné přejít.</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>Pracovní soubor je jiný než soubor v {0}. Rezervujte si prosím odpovídající větev, žádost o přijetí změn nebo zápis.</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>Otevřete prosím úložiště {0} a zkuste to znovu.</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>Nelze otevřít z {0}. Momentálně jsou podporované jenom adresy URL, které odkazují na soubory v úložišti.</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>Ve schránce se nepodařilo najít adresu URL na GitHubu.</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>V aktuálním úložišti se nepodařilo najít cílovou adresu URL. Zkuste to znovu po načtení změn.</value>
+  </data>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Adresář v cílové cestě není prázdný.</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>Úložiště už v tomto umístění existuje, ale nemá vzdálené úložiště s názvem origin.</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>Úložiště už v tomto umístění existuje, ale má vzdálené úložiště {0}.</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>Do tohoto umístění jste už klonovali. Kliknutím na Otevřít otevřete místní úložiště.</value>
+  </data>
+  <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
+    <value>Pro úložiště nelze najít adresu URL na GitHubu.</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
+    <value>Úložiště musí mít definované vzdálené úložiště s názvem origin, aby bylo možné vyhledat jejich adresu URL na GitHubu.</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
+    <value>Přejmenujte prosím jedno z vašich existujících vzdálených úložišť na origin nebo přidejte nové vzdálené úložiště s názvem origin a načtěte je. Můžete to provést z příkazového řádku nebo kliknutím na tlačítko níže.</value>
+  </data>
+  <data name="CouldntFindCorrespondingFile" xml:space="preserve">
+    <value>V úložišti se nepodařilo najít soubor odpovídající {0}. Proveďte prosím příkaz git fetch nebo rezervujte žádost o přijetí změn v cíli.</value>
+  </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>{0} – naposledy nasdíleno</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Komentář</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Zavřít žádost o přijetí změn</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Zavřít problém</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Zavřít a okomentovat</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Znovu otevřít a okomentovat</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Znovu otevřít problém</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Znovu otevřít žádost o přijetí změn</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>Počet zápisů: {0}</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>přidal(a) nějaké zápisy</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>a další</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Tato konverzace byla označena jako vyřešená.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Vaše úložiště</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Úložiště spolupracovníka</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Přidáno do úložišť</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Vyhledejte nebo zadejte adresu URL.</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Procházet...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Klon</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Přidat nebo změnit účty</value>
+  </data>
+</root>

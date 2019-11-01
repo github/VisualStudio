@@ -60,7 +60,7 @@ namespace UnitTests.GitHub.App.ViewModels.GitHubPane
             var review = pr.Reviews[0];
 
             review.Body = string.Empty;
-            review.Comments = new PullRequestReviewCommentModel[0];
+            review.Comments = Array.Empty<PullRequestReviewCommentModel>();
 
             var target = CreateTarget(pullRequest: pr);
 

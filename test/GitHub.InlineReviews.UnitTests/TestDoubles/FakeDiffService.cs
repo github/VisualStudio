@@ -22,13 +22,13 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         public FakeDiffService()
         {
             this.repository = CreateRepository();
-            this.inner = new DiffService(Substitute.For<IGitClient>());
+            this.inner = new DiffService(Substitute.For<IGitService>());
         }
 
         public FakeDiffService(string path, string contents)
         {
             this.repository = CreateRepository();
-            this.inner = new DiffService(Substitute.For<IGitClient>());
+            this.inner = new DiffService(Substitute.For<IGitService>());
             AddFile(path, contents);
         }
 
@@ -39,9 +39,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var directory = Path.GetDirectoryName(fullPath);
             Directory.CreateDirectory(directory);
             File.WriteAllText(fullPath, contents);
-#pragma warning disable 618 // Type or member is obsolete
-            repository.Stage(path);
-#pragma warning restore 618 // Type or member is obsolete
+            LibGit2Sharp.Commands.Stage(repository, path);
             repository.Commit("Added " + path, signature, signature);
             return repository.Head.Tip.Sha;
         }
@@ -66,21 +64,21 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
         {
             var blob1 = GetBlob(path, baseSha);
             var blob2 = GetBlob(path, headSha);
-            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            var patch = repository.Diff.Compare(blob1, blob2, new CompareOptions { IndentHeuristic = true }).Patch;
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
+        Task<IReadOnlyList<DiffChunk>> Diff(string path, string baseSha, byte[] contents)
         {
             var tip = repository.Head.Tip.Sha;
             var stream = contents != null ? new MemoryStream(contents) : new MemoryStream();
             var blob1 = GetBlob(path, baseSha);
             var blob2 = repository.ObjectDatabase.CreateBlob(stream, path);
-            var patch = repository.Diff.Compare(blob1, blob2).Patch;
+            var patch = repository.Diff.Compare(blob1, blob2, new CompareOptions { IndentHeuristic = true }).Patch;
             return Task.FromResult<IReadOnlyList<DiffChunk>>(DiffUtilities.ParseFragment(patch).ToList());
         }
 
-        public Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
+        internal Task<IReadOnlyList<DiffChunk>> Diff(string path, string contents)
         {
             return Diff(path, repository.Head.Tip.Sha, Encoding.UTF8.GetBytes(contents));
         }
@@ -108,9 +106,7 @@ namespace GitHub.InlineReviews.UnitTests.TestDoubles
             var signature = new Signature("user", "user@user", DateTimeOffset.Now);
 
             File.WriteAllText(Path.Combine(tempPath, ".gitattributes"), "* text=auto");
-#pragma warning disable 618 // Type or member is obsolete
-            result.Stage("*");
-#pragma warning restore 618 // Type or member is obsolete
+            LibGit2Sharp.Commands.Stage(result, "*");
             result.Commit("Initial commit", signature, signature);
 
             return result;

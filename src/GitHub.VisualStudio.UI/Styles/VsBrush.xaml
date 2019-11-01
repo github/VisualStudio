@@ -1,6 +1,7 @@
 <ResourceDictionary 
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0" 
   xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
   xmlns:vsui="clr-namespace:GitHub.VisualStudio.UI">
 
@@ -16,6 +17,13 @@
   <SolidColorBrush x:Key="GitHubVsComboBoxPopupBorder" Color="{DynamicResource VsColor.ComboBoxPopupBorder}" />
 
   <SolidColorBrush x:Key="GitHubGlyphMarginCommentableBackground" Color="{DynamicResource VsColor.SearchBoxBackground}" />
+
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerInfoFill" Color="#23a1d0" />
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerWarningFill" Color="#ffc806" />
+  <SolidColorBrush x:Key="GitHubAnnotationMarkerFailureFill" Color="#d53243" />
+
+    <!-- Button border is blue rather than yellow (like text box border) when using blue theme -->
+  <SolidColorBrush x:Key="GitHubAccentBrush" Color="{DynamicResource {x:Static vs:CommonControlsColors.ButtonBorderFocusedColorKey}}" />
 
   <!-- Team Foundation Colors -->
   <SolidColorBrush x:Key="TFRequiredTextBoxBorderBrushKey" Color="{Binding Source={x:Static vsui:TeamFoundationColors.Instance}, Path=RequiredTextBoxBorderColor, Mode=OneWay}" />

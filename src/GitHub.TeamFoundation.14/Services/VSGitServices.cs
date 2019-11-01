@@ -1,10 +1,4 @@
-﻿#if !TEAMEXPLORER14
-// Microsoft.VisualStudio.Shell.Framework has an alias to avoid conflict with IAsyncServiceProvider
-extern alias SF15;
-using ServiceProgressData = SF15::Microsoft.VisualStudio.Shell.ServiceProgressData;
-#endif
-
-using System;
+﻿using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -37,7 +31,7 @@ namespace GitHub.Services
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2017")]
         readonly Lazy<IStatusBarNotificationService> statusBar;
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Justification = "Used in VS2015")]
-        readonly Lazy<IVSServices> vsServices;
+        readonly Lazy<ITeamExplorerServices> teamExplorerServices;
 
         /// <summary>
         /// This MEF export requires specific versions of TeamFoundation. IGitExt is declared here so
@@ -50,11 +44,11 @@ namespace GitHub.Services
         [ImportingConstructor]
         public VSGitServices(IGitHubServiceProvider serviceProvider,
             Lazy<IStatusBarNotificationService> statusBar,
-            Lazy<IVSServices> vsServices)
+            Lazy<ITeamExplorerServices> teamExplorerServices)
         {
             this.serviceProvider = serviceProvider;
             this.statusBar = statusBar;
-            this.vsServices = vsServices;
+            this.teamExplorerServices = teamExplorerServices;
         }
 
         // The Default Repository Path that VS uses is hidden in an internal
@@ -81,7 +75,8 @@ namespace GitHub.Services
             string cloneUrl,
             string clonePath,
             bool recurseSubmodules,
-            object progress = null)
+            object progress = null,
+            CancellationToken? cancellationToken = null)
         {
             var teamExplorer = serviceProvider.TryGetService<ITeamExplorer>();
             Assumes.Present(teamExplorer);
@@ -90,16 +85,29 @@ namespace GitHub.Services
             await StartClonenOnConnectPageAsync(teamExplorer, cloneUrl, clonePath, recurseSubmodules);
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await WaitForCloneOnHomePageAsync(teamExplorer);
-            vsServices.Value.TryOpenRepository(clonePath); // Show the repository on Team Explorer - Home
-#else
-            var gitExt = serviceProvider.GetService<IGitActionsExt>();
-            var typedProgress = ((Progress<ServiceProgressData>)progress) ?? new Progress<ServiceProgressData>();
-            typedProgress.ProgressChanged += (s, e) => statusBar.Value.ShowMessage(e.ProgressText);
-            var cloneTask = gitExt.CloneAsync(cloneUrl, clonePath, recurseSubmodules, default(CancellationToken), typedProgress);
+#elif TEAMEXPLORER15 || TEAMEXPLORER16
+            // IGitActionsExt is proffered by SccProviderPackage, but isn't advertised.
+            // To ensure that getting IGitActionsExt doesn't return null, we first request the
+            // IGitExt service which is advertised. This forces SccProviderPackage to load
+            // and proffer IGitActionsExt.
+            var gitExt = serviceProvider.GetService(typeof(IGitExt));
+            Assumes.NotNull(gitExt);
+            var gitActionsExt = serviceProvider.GetService<IGitActionsExt>();
+            Assumes.NotNull(gitActionsExt);
+
+            // The progress parameter uses the ServiceProgressData type which is defined in
+            // Microsoft.VisualStudio.Shell.Framework. Referencing this assembly directly
+            // would cause type conflicts, so we're using reflection to call CloneAsync.
+            var cloneAsyncMethod = typeof(IGitActionsExt).GetMethod(nameof(IGitActionsExt.CloneAsync));
+            Assumes.NotNull(cloneAsyncMethod);
+            var cloneParameters = new object[] { cloneUrl, clonePath, recurseSubmodules, cancellationToken, progress };
+            var cloneTask = (Task)cloneAsyncMethod.Invoke(gitActionsExt, cloneParameters);
 
             NavigateToHomePage(teamExplorer); // Show progress on Team Explorer - Home
             await cloneTask;
 #endif
+            // Change Team Explorer context to the newly cloned repository
+            teamExplorerServices.Value.OpenRepository(clonePath);
         }
 
         static async Task StartClonenOnConnectPageAsync(
@@ -175,7 +183,7 @@ namespace GitHub.Services
             return ret ?? String.Empty;
         }
 
-        public IEnumerable<ILocalRepositoryModel> GetKnownRepositories()
+        public IEnumerable<LocalRepositoryModel> GetKnownRepositories()
         {
             try
             {
@@ -184,7 +192,7 @@ namespace GitHub.Services
             catch (Exception ex)
             {
                 log.Error(ex, "Error loading the repository list from the registry");
-                return Enumerable.Empty<ILocalRepositoryModel>();
+                return Enumerable.Empty<LocalRepositoryModel>();
             }
         }
 

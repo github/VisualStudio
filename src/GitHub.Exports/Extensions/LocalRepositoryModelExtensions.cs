@@ -8,7 +8,7 @@ namespace GitHub.Extensions
 {
     public static class LocalRepositoryModelExtensions
     {
-        public static bool HasCommits(this ILocalRepositoryModel repository)
+        public static bool HasCommits(this LocalRepositoryModel repository)
         {
             using (var repo = GitService.GitServiceHelper.GetRepository(repository.LocalPath))
             {
@@ -16,7 +16,7 @@ namespace GitHub.Extensions
             }
         }
 
-        public static bool MightContainSolution(this ILocalRepositoryModel repository)
+        public static bool MightContainSolution(this LocalRepositoryModel repository)
         {
             var dir = new DirectoryInfo(repository.LocalPath);
             return dir.EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)

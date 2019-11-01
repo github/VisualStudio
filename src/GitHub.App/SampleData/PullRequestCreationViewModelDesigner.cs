@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.Validation;
 using GitHub.ViewModels.GitHubPane;
 using ReactiveUI;
@@ -15,15 +16,21 @@ namespace GitHub.SampleData
     {
         public PullRequestCreationViewModelDesigner()
         {
-            Branches = new List<IBranch>
+            var repositoryModel = new LocalRepositoryModel
             {
-                new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("don/stub-ui", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("feature/pr/views", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
-                new BranchModel("release-1.0.17.0", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner())),
+                Name = "repo",
+                CloneUrl = "http://github.com/user/repo"
+            };
+
+            Branches = new List<BranchModel>
+            {
+                new BranchModel("master", repositoryModel),
+                new BranchModel("don/stub-ui", repositoryModel),
+                new BranchModel("feature/pr/views", repositoryModel),
+                new BranchModel("release-1.0.17.0", repositoryModel),
             }.AsReadOnly();
 
-            TargetBranch = new BranchModel("master", new LocalRepositoryModel("http://github.com/user/repo", new GitServiceDesigner()));
+            TargetBranch = new BranchModel("master", repositoryModel);
             SourceBranch = Branches[2];
 
             SelectedAssignee = "Haacked (Phil Haack)";
@@ -34,9 +41,9 @@ namespace GitHub.SampleData
             };
         }
 
-        public IBranch SourceBranch { get; set; }
-        public IBranch TargetBranch { get; set; }
-        public IReadOnlyList<IBranch> Branches { get; set; }
+        public BranchModel SourceBranch { get; set; }
+        public BranchModel TargetBranch { get; set; }
+        public IReadOnlyList<BranchModel> Branches { get; set; }
 
         public string SelectedAssignee { get; set; }
         public List<string> Users { get; set; }
@@ -47,9 +54,10 @@ namespace GitHub.SampleData
         public string PRTitle { get; set; }
 
         public ReactivePropertyValidator TitleValidator { get; }
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         public ReactivePropertyValidator BranchValidator { get; }
 
-        public Task InitializeAsync(ILocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
+        public Task InitializeAsync(LocalRepositoryModel repository, IConnection connection) => Task.CompletedTask;
     }
 }

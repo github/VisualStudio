@@ -6,6 +6,7 @@ using GitHub.App.Services;
 using GitHub.Models;
 using GitHub.Primitives;
 using GitHub.Services;
+using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -17,7 +18,7 @@ public class LocalRepositoriesTests : TestBaseClass
     public void RepositoriesShouldInitiallyBeEmpty()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         Assert.That(target.Repositories, Is.Empty);
     }
@@ -26,20 +27,20 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task RefreshShouldLoadRepositories()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
         Assert.That(
             new[] { "repo1", "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
     public async Task RefreshShouldAddNewRepository()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -53,14 +54,14 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo1", "repo2", "new" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
     public async Task RefreshShouldRemoveRepository()
     {
         var service = CreateVSGitServices("repo1", "repo2");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -73,7 +74,7 @@ public class LocalRepositoriesTests : TestBaseClass
 
         Assert.That(
             new[] { "repo2" },
-			Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
+            Is.EqualTo(target.Repositories.Select(x => x.Name).ToList()));
     }
 
     [Test]
@@ -83,7 +84,7 @@ public class LocalRepositoriesTests : TestBaseClass
             Tuple.Create("repo1", GitHubAddress),
             Tuple.Create("repo2", GitHubAddress),
             Tuple.Create("repo2", "https://another.com"));
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
 
@@ -98,14 +99,14 @@ public class LocalRepositoriesTests : TestBaseClass
     public async Task GetRepositoriesForAddressShouldSortRepositories()
     {
         var service = CreateVSGitServices("c", "a", "b");
-        var target = new LocalRepositories(service);
+        var target = new LocalRepositories(service, new JoinableTaskContext());
 
         await target.Refresh();
         var result = target.GetRepositoriesForAddress(HostAddress.Create(GitHubAddress));
 
         Assert.That(
             new[] { "a", "b", "c" },
-			Is.EqualTo(result.Select(x => x.Name).ToList()));
+            Is.EqualTo(result.Select(x => x.Name).ToList()));
     }
 
     static IVSGitServices CreateVSGitServices(params string[] names)
@@ -116,21 +117,22 @@ public class LocalRepositoriesTests : TestBaseClass
     static IVSGitServices CreateVSGitServices(params Tuple<string, string>[] namesAndAddresses)
     {
         var result = Substitute.For<IVSGitServices>();
-        var repositories = new List<ILocalRepositoryModel>(namesAndAddresses.Select(CreateRepository));
+        var repositories = new List<LocalRepositoryModel>(namesAndAddresses.Select(CreateRepository));
         result.GetKnownRepositories().Returns(repositories);
         return result;
     }
 
-    static ILocalRepositoryModel CreateRepository(string name)
+    static LocalRepositoryModel CreateRepository(string name)
     {
         return CreateRepository(Tuple.Create(name, "https://github.com"));
     }
 
-    static ILocalRepositoryModel CreateRepository(Tuple<string, string> nameAndAddress)
+    static LocalRepositoryModel CreateRepository(Tuple<string, string> nameAndAddress)
     {
-        var result = Substitute.For<ILocalRepositoryModel>();
-        result.Name.Returns(nameAndAddress.Item1);
-        result.CloneUrl.Returns(new UriString(nameAndAddress.Item2));
-        return result;
+        return new LocalRepositoryModel
+        {
+            Name = nameAndAddress.Item1,
+            CloneUrl = new UriString(nameAndAddress.Item2)
+        };
     }
 }

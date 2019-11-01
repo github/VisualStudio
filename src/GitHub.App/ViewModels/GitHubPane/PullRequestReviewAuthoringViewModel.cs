@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Factories;
 using GitHub.Logging;
 using GitHub.Models;
+using GitHub.Models.Drafts;
+using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 using Serilog;
@@ -24,7 +27,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         readonly IPullRequestEditorService editorService;
         readonly IPullRequestSessionManager sessionManager;
+        readonly IMessageDraftStore draftStore;
         readonly IPullRequestService pullRequestService;
+        readonly IScheduler timerScheduler;
         IPullRequestSession session;
         IDisposable sessionSubscription;
         PullRequestReviewModel model;
@@ -39,15 +44,34 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService pullRequestService,
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
-            IPullRequestFilesViewModel files)
+            IMessageDraftStore draftStore,
+            IPullRequestFilesViewModel files,
+            IAutoCompleteAdvisor autoCompleteAdvisor)
+            : this(pullRequestService, editorService, sessionManager,draftStore, files, autoCompleteAdvisor, DefaultScheduler.Instance)
+        {
+        }
+
+        public PullRequestReviewAuthoringViewModel(
+            IPullRequestService pullRequestService,
+            IPullRequestEditorService editorService,
+            IPullRequestSessionManager sessionManager,
+            IMessageDraftStore draftStore,
+            IPullRequestFilesViewModel files,
+            IAutoCompleteAdvisor autoCompleteAdvisor,
+            IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
+            Guard.ArgumentNotNull(draftStore, nameof(draftStore));
             Guard.ArgumentNotNull(files, nameof(files));
+            Guard.ArgumentNotNull(autoCompleteAdvisor, nameof(autoCompleteAdvisor));
+            Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.pullRequestService = pullRequestService;
             this.editorService = editorService;
             this.sessionManager = sessionManager;
+            this.draftStore = draftStore;
+            this.timerScheduler = timerScheduler;
 
             canApproveRequestChanges = this.WhenAnyValue(
                 x => x.Model,
@@ -56,6 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
+            AutoCompleteAdvisor = autoCompleteAdvisor;
 
             var hasBodyOrComments = this.WhenAnyValue(
                 x => x.Body,
@@ -75,7 +100,7 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
-        public ILocalRepositoryModel LocalRepository { get; private set; }
+        public LocalRepositoryModel LocalRepository { get; private set; }
 
         /// <inheritdoc/>
         public string RemoteRepositoryOwner { get; private set; }
@@ -96,6 +121,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IPullRequestFilesViewModel Files { get; }
+
+        /// <inheritdoc/>
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         /// <inheritdoc/>
         public string Body
@@ -131,7 +159,7 @@ namespace GitHub.ViewModels.GitHubPane
         public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public async Task InitializeAsync(
-            ILocalRepositoryModel localRepository,
+            LocalRepositoryModel localRepository,
             IConnection connection,
             string owner,
             string repo,
@@ -148,8 +176,25 @@ namespace GitHub.ViewModels.GitHubPane
             {
                 LocalRepository = localRepository;
                 RemoteRepositoryOwner = owner;
-                session = await sessionManager.GetSession(owner, repo, pullRequestNumber);
-                await Load(session.PullRequest);
+                session = await sessionManager.GetSession(owner, repo, pullRequestNumber).ConfigureAwait(true);
+                await Load(session.PullRequest).ConfigureAwait(true);
+
+                if (LocalRepository?.CloneUrl != null)
+                {
+                    var key = GetDraftKey();
+
+                    if (string.IsNullOrEmpty(Body))
+                    {
+                        var draft = await draftStore.GetDraft<PullRequestReviewDraft>(key, string.Empty)
+                            .ConfigureAwait(true);
+                        Body = draft?.Body;
+                    }
+
+                    this.WhenAnyValue(x => x.Body)
+                        .Throttle(TimeSpan.FromSeconds(1), timerScheduler)
+                        .Select(x => new PullRequestReviewDraft { Body = x })
+                        .Subscribe(x => draftStore.UpdateDraft(key, string.Empty, x));
+                }
             }
             finally
             {
@@ -180,6 +225,20 @@ namespace GitHub.ViewModels.GitHubPane
                 Error = ex;
                 IsBusy = false;
             }
+        }
+
+        public static string GetDraftKey(
+            UriString cloneUri,
+            int pullRequestNumber)
+        {
+            return Invariant($"pr-review|{cloneUri}|{pullRequestNumber}");
+        }
+
+        protected string GetDraftKey()
+        {
+            return GetDraftKey(
+                LocalRepository.CloneUrl.WithOwner(RemoteRepositoryOwner),
+                PullRequestModel.Number);
         }
 
         async Task Load(PullRequestDetailModel pullRequest)
@@ -252,8 +311,9 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                await session.PostReview(Body, e);
+                await session.PostReview(Body, e).ConfigureAwait(true);
                 Close();
+                await draftStore.DeleteDraft(GetDraftKey(), string.Empty).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -285,6 +345,7 @@ namespace GitHub.ViewModels.GitHubPane
                     Close();
                 }
 
+                await draftStore.DeleteDraft(GetDraftKey(), string.Empty).ConfigureAwait(true);
             }
             catch (Exception ex)
             {

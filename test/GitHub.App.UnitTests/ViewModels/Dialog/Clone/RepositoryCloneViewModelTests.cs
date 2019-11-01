@@ -2,8 +2,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Linq.Expressions;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using GitHub.Extensions;
 using GitHub.Models;
@@ -19,9 +17,47 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 {
     public class RepositoryCloneViewModelTests
     {
+        const string directoryEmpty = "d:\\empty\\directory";
         const string directoryExists = "d:\\exists\\directory";
         const string fileExists = "d:\\exists\\file";
         const string defaultPath = "d:\\default\\path";
+
+        public class TheUrlProperty
+        {
+            [TestCase("https://github.com;https://enterprise.com", null, 0)]
+            [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", 0)]
+            [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", 1)]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://ENTERPRISE.COM/FOO/BAR", 1)]
+            [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", 0)]
+            public async Task Select_Tab_For_Url(string addresses, string url, int expectTabIndex)
+            {
+                var cm = CreateConnectionManager(addresses.Split(';'));
+                var target = CreateTarget(connectionManager: cm);
+                target.Url = url;
+
+                await target.InitializeAsync(null);
+
+                Assert.That(target.SelectedTabIndex, Is.EqualTo(expectTabIndex));
+            }
+
+            [TestCase("https://github.com;https://enterprise.com", null, "", "")]
+            [TestCase("https://github.com;https://enterprise.com", "https://github.com/foo/bar", "https://github.com/foo/bar", "")]
+            [TestCase("https://github.com;https://enterprise.com", "https://enterprise.com/foo/bar", "", "https://enterprise.com/foo/bar")]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://GITHUB.COM/FOO/BAR", "HTTPS://GITHUB.COM/FOO/BAR", "")]
+            [TestCase("https://github.com;https://enterprise.com", "HTTPS://ENTERPRISE.COM/FOO/BAR", "", "HTTPS://ENTERPRISE.COM/FOO/BAR")]
+            [TestCase("https://github.com;https://enterprise.com", "https://unknown.com/foo/bar", "", "")]
+            public async Task Set_Filter_For_Url(string addresses, string url, string expectGitHubFilter, string expectEnterpriseFilter)
+            {
+                var cm = CreateConnectionManager(addresses.Split(';'));
+                var target = CreateTarget(connectionManager: cm);
+                target.Url = url;
+
+                await target.InitializeAsync(null);
+
+                Assert.That(target.GitHubTab.Filter, Is.EqualTo(expectGitHubFilter));
+                Assert.That(target.EnterpriseTab.Filter, Is.EqualTo(expectEnterpriseFilter));
+            }
+        }
 
         [Test]
         public async Task GitHubPage_Is_Initialized()
@@ -33,42 +69,6 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
 
             target.GitHubTab.Received(1).Initialize(cm.Connections[0]);
             target.EnterpriseTab.DidNotReceiveWithAnyArgs().Initialize(null);
-        }
-
-        [TestCase("https://github.com", false, 0)]
-        [TestCase("https://enterprise.com", false, 1)]
-        [TestCase("https://github.com", true, 2, Description = "Show URL tab for GitHub connections")]
-        [TestCase("https://enterprise.com", true, 2, Description = "Show URL tab for Enterprise connections")]
-        public async Task Default_SelectedTabIndex_For_Group(string address, bool isGroupA, int expectTabIndex)
-        {
-            var cm = CreateConnectionManager(address);
-            var connection = cm.Connections[0];
-            var usageService = CreateUsageService(isGroupA);
-            var target = CreateTarget(connectionManager: cm, usageService: usageService);
-
-            await target.InitializeAsync(connection);
-
-            Assert.That(target.SelectedTabIndex, Is.EqualTo(expectTabIndex));
-        }
-
-        [TestCase("https://github.com", false, 1, nameof(UsageModel.MeasuresModel.NumberOfCloneViewGitHubTab))]
-        [TestCase("https://enterprise.com", false, 1, nameof(UsageModel.MeasuresModel.NumberOfCloneViewEnterpriseTab))]
-        [TestCase("https://github.com", true, 1, nameof(UsageModel.MeasuresModel.NumberOfCloneViewUrlTab))]
-        [TestCase("https://enterprise.com", true, 1, nameof(UsageModel.MeasuresModel.NumberOfCloneViewUrlTab))]
-        public async Task IncrementCounter_Showing_Default_Tab(string address, bool isGroupA, int numberOfCalls, string counterName)
-        {
-            var cm = CreateConnectionManager(address);
-            var connection = cm.Connections[0];
-            var usageService = CreateUsageService(isGroupA);
-            var usageTracker = Substitute.For<IUsageTracker>();
-            var target = CreateTarget(connectionManager: cm, usageService: usageService, usageTracker: usageTracker);
-            usageTracker.IncrementCounter(null).ReturnsForAnyArgs(Task.CompletedTask);
-
-            await target.InitializeAsync(connection).ConfigureAwait(false);
-
-            await usageTracker.Received(numberOfCalls).IncrementCounter(
-                Arg.Is<Expression<Func<UsageModel.MeasuresModel, int>>>(x =>
-                    ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Path_Is_Initialized()
+        public void Path_Is_Initialized()
         {
             var target = CreateTarget();
 
@@ -156,7 +156,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Owner_And_Repository_Name_Is_Appended_To_Base_Path()
+        public void Owner_And_Repository_Name_Is_Appended_To_Base_Path()
         {
             var owner = "owner";
             var repo = "repo";
@@ -169,7 +169,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Not_Set_When_No_Repository_Selected()
+        public void PathWarning_Is_Not_Set_When_No_Repository_Selected()
         {
             var target = CreateTarget();
 
@@ -179,7 +179,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_File_At_Destination()
+        public void PathWarning_Is_Set_For_Existing_File_At_Destination()
         {
             var target = CreateTarget();
             SetRepository(target.GitHubTab, CreateRepositoryModel("owner", "repo"));
@@ -189,7 +189,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_Clone_At_Destination()
+        public void PathWarning_Is_Set_For_Existing_Clone_At_Destination()
         {
             var owner = "owner";
             var repo = "repo";
@@ -203,7 +203,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Repository_With_No_Origin()
+        public void PathWarning_Is_Set_For_Repository_With_No_Origin()
         {
             var owner = "owner";
             var repo = "repo";
@@ -216,7 +216,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Directory_With_No_Repository()
+        public void PathWarning_Is_Set_For_Directory_With_No_Repository()
         {
             var owner = "owner";
             var repo = "repo";
@@ -225,11 +225,11 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             SetRepository(target.GitHubTab, CreateRepositoryModel(owner, repo));
             target.Path = directoryExists;
 
-            Assert.That(target.PathWarning, Is.EqualTo(Resources.CantFindARepositoryAtLocalPath));
+            Assert.That(target.PathWarning, Is.EqualTo(Resources.DirectoryAtDestinationNotEmpty));
         }
 
         [Test]
-        public async Task PathWarning_Is_Set_For_Existing_Repository_At_Destination_With_Different_Remote()
+        public void PathWarning_Is_Set_For_Existing_Repository_At_Destination_With_Different_Remote()
         {
             var originalOwner = "original_Owner";
             var forkedOwner = "forked_owner";
@@ -246,7 +246,17 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         }
 
         [Test]
-        public async Task Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
+        public void PathWarning_Is_Not_Set_When_EmptyDirectoryExists_Selected()
+        {
+            var target = CreateTarget();
+
+            target.Path = directoryEmpty;
+
+            Assert.That(target.PathWarning, Is.Null);
+        }
+
+        [Test]
+        public void Repository_Name_Replaces_Last_Part_Of_Non_Base_Path()
         {
             var target = CreateTarget();
 
@@ -281,7 +291,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Description = "Owner deleted")]
         [TestCase("c:\\base", "same/same", "c:\\base\\same\\same", "owner2/repo2", "c:\\base\\owner2\\repo2",
             Description = "Owner and repo have same name")]
-        public async Task User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
+        public void User_Edits_Path(string defaultClonePath, string repo1, string userPath, string repo2, string expectPath)
         {
             var target = CreateTarget(defaultClonePath: defaultClonePath);
             SetRepository(target.GitHubTab, CreateRepositoryModel(repo1));
@@ -343,7 +353,22 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             Assert.That(target.Open.CanExecute(null), Is.True);
         }
 
-        static void SetRepository(IRepositoryCloneTabViewModel vm, IRepositoryModel repository)
+        [Test]
+        public async Task Clone_Is_Enabled_When_Path_EmptyDirectoryExists()
+        {
+            var target = CreateTarget();
+
+            await target.InitializeAsync(null);
+
+            SetRepository(target.GitHubTab, CreateRepositoryModel());
+            Assert.That(target.Clone.CanExecute(null), Is.True);
+
+            target.Path = directoryEmpty;
+
+            Assert.That(target.Clone.CanExecute(null), Is.True);
+        }
+
+        static void SetRepository(IRepositoryCloneTabViewModel vm, RepositoryModel repository)
         {
             vm.Repository.Returns(repository);
             vm.PropertyChanged += Raise.Event<PropertyChangedEventHandler>(
@@ -376,7 +401,7 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
         static IRepositorySelectViewModel CreateSelectViewModel()
         {
             var result = Substitute.For<IRepositorySelectViewModel>();
-            result.Repository.Returns((IRepositoryModel)null);
+            result.Repository.Returns((RepositoryModel)null);
             result.WhenForAnyArgs(x => x.Initialize(null)).Do(_ => result.IsEnabled.Returns(true));
             return result;
         }
@@ -386,6 +411,8 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             var result = Substitute.For<IRepositoryCloneService>();
             result.DefaultClonePath.Returns(defaultClonePath);
             result.DestinationDirectoryExists(directoryExists).Returns(true);
+            result.DestinationDirectoryExists(directoryEmpty).Returns(true);
+            result.DestinationDirectoryEmpty(directoryEmpty).Returns(true);
             result.DestinationFileExists(directoryExists).Returns(false);
             result.DestinationDirectoryExists(fileExists).Returns(false);
             result.DestinationFileExists(fileExists).Returns(true);
@@ -396,34 +423,31 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             IOperatingSystem os = null,
             IConnectionManager connectionManager = null,
             IRepositoryCloneService service = null,
-            IUsageService usageService = null,
             IUsageTracker usageTracker = null,
+            IDialogService dialogService = null,
             IRepositorySelectViewModel gitHubTab = null,
             IRepositorySelectViewModel enterpriseTab = null,
             IGitService gitService = null,
-            IRepositoryUrlViewModel urlTab = null,
             string defaultClonePath = defaultPath)
         {
             os = os ?? Substitute.For<IOperatingSystem>();
             connectionManager = connectionManager ?? CreateConnectionManager("https://github.com");
             service = service ?? CreateRepositoryCloneService(defaultClonePath);
-            usageService = usageService ?? CreateUsageService();
             usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
+            dialogService = dialogService ?? Substitute.For<IDialogService>();
             gitHubTab = gitHubTab ?? CreateSelectViewModel();
             enterpriseTab = enterpriseTab ?? CreateSelectViewModel();
             gitService = gitService ?? CreateGitService(true, "https://github.com/owner/repo");
-            urlTab = urlTab ?? CreateRepositoryUrlViewModel();
 
             return new RepositoryCloneViewModel(
                 os,
                 connectionManager,
                 service,
                 gitService,
-                usageService,
                 usageTracker,
+                dialogService,
                 gitHubTab,
-                enterpriseTab,
-                urlTab);
+                enterpriseTab);
         }
 
         private static IGitService CreateGitService(bool repositoryExists, UriString remoteUrl)
@@ -441,43 +465,22 @@ namespace GitHub.App.UnitTests.ViewModels.Dialog.Clone
             return gitService;
         }
 
-        static IUsageService CreateUsageService(bool isGroupA = false)
-        {
-            var usageService = Substitute.For<IUsageService>();
-            var guidBytes = new byte[16];
-            guidBytes[guidBytes.Length - 1] = (byte)(isGroupA ? 0 : 1);
-            var userGuid = new Guid(guidBytes);
-            usageService.GetUserGuid().Returns(userGuid);
-            return usageService;
-        }
-
-        static IRepositoryModel CreateRepositoryModel(string repo = "owner/repo")
+        static RepositoryModel CreateRepositoryModel(string repo = "owner/repo")
         {
             var split = repo.Split('/');
             var (owner, name) = (split[0], split[1]);
             return CreateRepositoryModel(owner, name);
         }
 
-        static IRepositoryModel CreateRepositoryModel(string owner, string name)
+        static RepositoryModel CreateRepositoryModel(string owner, string name)
         {
-            var repository = Substitute.For<IRepositoryModel>();
-            repository.Owner.Returns(owner);
-            repository.Name.Returns(name);
-            repository.CloneUrl.Returns(CreateGitHubUrl(owner, name));
-            return repository;
+            var cloneUrl = CreateGitHubUrl(owner, name);
+            return new RepositoryModel(name, cloneUrl);
         }
 
         static UriString CreateGitHubUrl(string owner, string repo)
         {
             return new UriString($"https://github.com/{owner}/{repo}");
-        }
-
-        static IRepositoryUrlViewModel CreateRepositoryUrlViewModel()
-        {
-            var repositoryUrlViewModel = Substitute.For<IRepositoryUrlViewModel>();
-            repositoryUrlViewModel.Repository.Returns(null as IRepositoryModel);
-            repositoryUrlViewModel.Url.Returns(string.Empty);
-            return repositoryUrlViewModel;
         }
     }
 }

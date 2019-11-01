@@ -4,6 +4,8 @@ using System.Windows.Input;
 using GitHub.Commands;
 using Microsoft.VisualStudio.Shell;
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types
+
 namespace GitHub.Services.Vssdk.Commands
 {
     /// <summary>
