@@ -257,16 +257,6 @@ namespace GitHub.Services
 
         public void SetDefaultClonePath(string repositoryPath, UriString cloneUrl)
         {
-            if (!Splat.ModeDetector.InUnitTestRunner())
-            {
-                // Use same capitalization as underlying file system
-                if (DestinationDirectoryExists(repositoryPath))
-                {
-                    var dirInfo = operatingSystem.Directory.GetDirectory(repositoryPath);
-                    repositoryPath = GetProperDirectoryCapitalization(operatingSystem, dirInfo);
-                }
-            }
-
             var (defaultPath, repositoryLayout) = RepositoryLayoutUtilities.GetDefaultPathAndLayout(repositoryPath, cloneUrl);
 
             log.Information("Setting DefaultRepositoryLocation to {Location}", defaultPath);
@@ -295,19 +285,6 @@ namespace GitHub.Services
 
                 return GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
             }
-        }
-
-        static string GetProperDirectoryCapitalization(IOperatingSystem operatingSystem, IDirectoryInfo dirInfo)
-        {
-            var parentDirInfo = dirInfo.Parent;
-            if (parentDirInfo is null)
-            {
-                return dirInfo.Name;
-            }
-
-            var parentDir = GetProperDirectoryCapitalization(operatingSystem, parentDirInfo);
-            var dirName = parentDirInfo.EnumerateDirectories(dirInfo.Name).First().Name;
-            return Path.Combine(parentDir, dirName);
         }
 
         JoinableTaskContext JoinableTaskContext { get; }
