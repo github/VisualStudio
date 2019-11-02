@@ -161,7 +161,7 @@ public class RepositoryCloneServiceTests
     {
         [TestCase(@"c:\source\owner\repositoryName", "https://github.com/owner/repositoryName", @"c:\source")]
         [TestCase(@"c:\source\owner\newRepositoryName", "https://github.com/owner/repositoryName", @"c:\source")]
-        [TestCase(@"c:\source\owner\repositoryName", "https://github.com/OWNER/repositoryName", @"c:\source\owner")]
+        [TestCase(@"c:\source\owner\repositoryName", "https://github.com/OWNER/repositoryName", @"c:\source")]
         [TestCase(@"c:\owner\repositoryName", "https://github.com/owner/repositoryName", @"c:\")]
 
         [TestCase(@"c:\source\repositoryName", "https://github.com/owner/repositoryName", @"c:\source")]

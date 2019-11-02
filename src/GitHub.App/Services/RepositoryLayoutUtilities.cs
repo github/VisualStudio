@@ -6,6 +6,10 @@ namespace GitHub.Services
 {
     public static class RepositoryLayoutUtilities
     {
+        // Exclude directories with a case sensitive name of "GitHub" from being a possible owner.
+        // GitHub Desktop uses "GitHub" as its default directory and this isn't a user or organization name.
+        const string GitHubDirectoryName = "GitHub";
+
         public static string GetDefaultRepositoryPath(UriString cloneUrl, string defaultPath, RepositoryLayout repositoryLayout)
         {
             switch (repositoryLayout)
@@ -31,7 +35,8 @@ namespace GitHub.Services
         {
             var possibleOwnerPath = Path.GetDirectoryName(repositoryPath);
             var possibleOwner = Path.GetFileName(possibleOwnerPath);
-            if (string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.Ordinal))
+            if (string.Equals(possibleOwner, cloneUrl.Owner, StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(possibleOwner, GitHubDirectoryName, StringComparison.Ordinal))
             {
                 return (Path.GetDirectoryName(possibleOwnerPath), RepositoryLayout.OwnerName);
             }
