@@ -86,20 +86,17 @@ jobs:
         /p:DeployExtension=False
         
   - task: DownloadSecureFile@1
-    condition: $(certificate_password)
     name: vsixsigntool_exe
     inputs:
       secureFile: vsixsigntool.exe
 
   - task: DownloadSecureFile@1
     name: certificate_pfx
-    condition: $(certificate_password)
     inputs:
       secureFile: certificate.pfx
 
   - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 c4fdf13659f49e57ac14774fdf45053f499f185f /fd sha256 /tr http://timestamp.digicert.com /td sha256 GitHub.VisualStudio.vsix
     displayName: Sign the VSIX
-    condition: $(certificate_password)
 
   - task: PublishBuildArtifacts@1
     inputs:
