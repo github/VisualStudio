@@ -22,51 +22,17 @@ Visit the [documentation](https://github.com/github/VisualStudio/tree/master/doc
 
 ## Build
 
-Clone the repository and its submodules in a git GUI client or via the command line:
+Clone the repository and its submodules.
 
-```txt
-git clone https://github.com/github/VisualStudio
-cd VisualStudio
-git submodule init
-git submodule deinit script
-git submodule update
-```
-
-Open the `GitHubVS.sln` solution with Visual Studio 2017+.
+Open the `GitHubVS.sln` solution with Visual Studio 2019.
 To be able to use the GitHub API, you'll need to:
 
-- [Register a new developer application](https://github.com/settings/developers) in your profile.
-- Open [src/GitHub.Api/ApiClientConfiguration_User.cs](src/GitHub.Api/ApiClientConfiguration_User.cs) and fill out the clientId/clientSecret fields for your application. **Note this has recently changed location, so you may need to re-do this**
+- [Register a new developer application](https://github.com/settings/developers) in your profile
+- Create an environment variable `GitHubVS_ClientID` with your `Client ID`
+- Create an environment variable `GitHubVS_ClientSecret` with your `Client Secret`
 
-Build using Visual Studio 2017 or:
+Build using Visual Studio 2019.
 
-```txt
-build.cmd
-```
-
-Install in live (non-Experimental) instances of Visual Studio 2015 and 2017:
-
-```txt
-install.cmd
-```
-
-Note, the script will only install in one instance of Visual Studio 2017 (Enterprise, Professional or Community).
-
-## Build Flavors
-
-The following can be executed via `cmd.exe`.
-
-To build and install a `Debug` configuration VSIX:
-```txt
-build.cmd Debug
-install.cmd Debug
-```
-
-To build and install a `Release` configuration VSIX:
-```txt
-build.cmd Release
-install.cmd Release
-```
 ## Logs
 Logs can be viewed at the following location:
 
