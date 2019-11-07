@@ -7,10 +7,15 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  githubvsSolution: 'GitHubVS.sln'
-  essentialsSolution: 'src\GitHub.VisualStudio.16.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: GitHubVS
+- name: githubvsSolution
+  value: 'GitHubVS.sln'
+- name: essentialsSolution
+  value: 'src\GitHub.VisualStudio.16.sln'
+- name: buildPlatform
+  value: 'Any CPU'
+- name: buildConfiguration
+  value: 'Release'
 
 jobs:
 - job: build_and_test
