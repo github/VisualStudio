@@ -17,9 +17,7 @@ Most of the extension UI lives in the Team Explorer pane, which is available fro
 
 Official builds of this extension are available at [the official website](https://visualstudio.github.com).
 
-[![Build status](https://ci.appveyor.com/api/projects/status/dl8is5iqwt9qf3t7/branch/master?svg=true)](https://ci.appveyor.com/project/github-windows/visualstudio/branch/master)
-[![Build Status](https://github-editor-tools.visualstudio.com/VisualStudio/_apis/build/status/github.VisualStudio?branchName=master)](https://github-editor-tools.visualstudio.com/VisualStudio/_build/latest?definitionId=4&branchName=master)
-[![codecov](https://codecov.io/gh/GitHub/VisualStudio/branch/master/graph/badge.svg)](https://codecov.io/gh/GitHub/VisualStudio)
+[![Build Status](https://github-editor-tools.visualstudio.com/VisualStudio/_apis/build/status/github.VisualStudio?branchName=master)](https://github-editor-tools.visualstudio.com/VisualStudio/_build/latest?definitionId=10&branchName=master)
 
 [![Follow GitHub for Visual Studio](https://img.shields.io/twitter/follow/GitHubVS.svg?style=social "Follow GitHubVS")](https://twitter.com/githubvs?ref_src=twsrc%5Etfw) [![Join the chat at https://gitter.im/github/VisualStudio](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/github/VisualStudio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
