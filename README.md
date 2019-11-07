@@ -1,15 +1,5 @@
 # GitHub Extension for Visual Studio
 
-## Notices
-
-### If you are having issues with the installer, please read
-
-If you need to upgrade, downgrade, or uninstall the extension, and are having problems doing so, refer to this issue: https://github.com/github/VisualStudio/issues/1394 which details common problems and solutions when using the installer.
-
-### The location of the submodules has changed as of 31-01-2017
-
-If you have an existing clone, make sure to run `git submodule sync` to update your local clone with the new locations for the submodules.
-
 ## About
 
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015 and newer.
