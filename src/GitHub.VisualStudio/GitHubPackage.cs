@@ -35,7 +35,7 @@ using static System.FormattableString;
 namespace GitHub.VisualStudio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version)]
+    [InstalledProductRegistration("#110", "#112", ExtensionInformation.Version)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
@@ -393,7 +393,13 @@ namespace GitHub.VisualStudio
                 Assumes.Present(serviceProvider);
                 Assumes.Present(settings);
 
-                return new UsageTracker(serviceProvider, usageService, settings, ThreadHelper.JoinableTaskContext);
+                // Only use Visual Studio Telemetry on VS 2017 and above
+                await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+                var dte = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                Assumes.Present(dte);
+                var vsTelemetry = new Version(dte.Version) >= new Version(15, 0);
+
+                return new UsageTracker(serviceProvider, usageService, settings, ThreadHelper.JoinableTaskContext, vsTelemetry);
             }
             else if (serviceType == typeof(IVSGitExt))
             {

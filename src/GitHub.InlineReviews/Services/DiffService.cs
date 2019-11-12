@@ -29,9 +29,9 @@ namespace GitHub.InlineReviews.Services
             IRepository repo,
             string baseSha,
             string headSha,
-            string path)
+            string relativePath)
         {
-            var patch = await gitService.Compare(repo, baseSha, headSha, path);
+            var patch = await gitService.Compare(repo, baseSha, headSha, relativePath);
 
             if (patch != null)
             {

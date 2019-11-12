@@ -776,7 +776,7 @@ namespace GitHub.Services
             Encoding encoding)
         {
             var tempFilePath = CalculateTempFileName(relativePath, commitSha, encoding);
-            var gitPath = relativePath.TrimStart('/').Replace('\\', '/');
+            var gitPath = Paths.ToGitPath(relativePath);
 
             if (!File.Exists(tempFilePath))
             {
@@ -919,24 +919,22 @@ namespace GitHub.Services
             IRepository repo,
             int pullRequestNumber,
             string commitSha,
-            string path,
+            string relativePath,
             Encoding encoding,
             string tempFilePath)
         {
-            Guard.ArgumentIsGitPath(path, nameof(path));
-
             string contents;
 
             try
             {
-                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
             }
             catch (FileNotFoundException)
             {
                 var pullHeadRef = $"refs/pull/{pullRequestNumber}/head";
                 var remote = await gitClient.GetHttpRemote(repo, "origin");
                 await gitClient.Fetch(repo, remote.Name, commitSha, pullHeadRef);
-                contents = await gitClient.ExtractFile(repo, commitSha, path) ?? string.Empty;
+                contents = await gitClient.ExtractFile(repo, commitSha, relativePath) ?? string.Empty;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(tempFilePath));

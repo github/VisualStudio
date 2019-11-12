@@ -12,16 +12,20 @@ namespace GitHub.StartPage
     [ProvideBindingPath(SubPath = "UI")]
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.StartPagePackageId)]
-    [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Images.ImageMonikerGuid, Images.Logo, "#110", "#111", typeof(InBoxGitHubContainerProvider))]
+    [ProvideCodeContainerProvider("GitHub Container", Guids.StartPagePackageId, Images.ImageMonikerGuid, Images.LogoId, "#110", "#111", typeof(InBoxGitHubContainerProvider))]
     public sealed class StartPagePackage : ExtensionPointPackage
     {
         protected override ICodeContainerProvider CreateCodeContainerProvider(Guid provider)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var factory = new ExtensionServicesFactory(this);
-            var services = factory.Create();
-            return services.GetGitHubContainerProvider();
+            var codeContainerProvider = FullExtensionUtilities.FindGitHubContainerProvider(this);
+            if (codeContainerProvider != null)
+            {
+                return codeContainerProvider;
+            }
+
+            return new InBoxGitHubContainerProvider();
         }
     }
 }

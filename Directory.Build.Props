@@ -1,8 +1,14 @@
 <Project>
   <PropertyGroup>
     <Product>GitHub Extension for Visual Studio</Product>
-    <Version>2.10.2.0</Version>
+    <Version>2.10.8.0</Version>
     <Copyright>Copyright © GitHub, Inc. 2014-2018</Copyright>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning">
+      <Version>3.0.26</Version>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>
