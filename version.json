@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/AArnott/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
+  "version": "2.11",
+  "publicReleaseRefSpec": [
+    "^refs/heads/master$",
+    "^refs/heads/v\\d+(?:\\.\\d+)?$"
+  ],
+  "assemblyVersion": {
+    "precision": "revision"
+  }
+}

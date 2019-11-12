@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
@@ -9,8 +8,6 @@ using System.Linq;
 using System.Reflection;
 using GitHub.Api;
 using GitHub.Services;
-using GitHub.Settings;
-using GitHub.VisualStudio.Settings;
 using GitHub.VisualStudio.Views.Dialog.Clone;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
@@ -55,10 +52,7 @@ namespace GitHub.VisualStudio
         static CompositionContainer CreateVisualStudioCompositionContainer(ExportProvider defaultExportProvider)
         {
             var compositionContainer = CreateCompositionContainer(defaultExportProvider);
-
-            var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
-            var packageSettings = new PackageSettings(gitHubServiceProvider);
-            var usageTracker = UsageTrackerFactory.CreateUsageTracker(compositionContainer, packageSettings);
+            var usageTracker = CreateUsageTracker(compositionContainer);
             compositionContainer.ComposeExportedValue(usageTracker);
 
             return compositionContainer;
@@ -67,23 +61,16 @@ namespace GitHub.VisualStudio
         static CompositionContainer CreateOutOfProcCompositionContainer()
         {
             var compositionContainer = CreateCompositionContainer(CreateOutOfProcExports());
-
-            var packageSettings = new OutOfProcPackageSettings();
-            var usageTracker = UsageTrackerFactory.CreateUsageTracker(compositionContainer, packageSettings);
+            var usageTracker = CreateUsageTracker(compositionContainer);
             compositionContainer.ComposeExportedValue(usageTracker);
 
             return compositionContainer;
         }
 
-        class UsageTrackerFactory
+        static IUsageTracker CreateUsageTracker(CompositionContainer compositionContainer)
         {
-            internal static IUsageTracker CreateUsageTracker(CompositionContainer compositionContainer, IPackageSettings packageSettings)
-            {
-                var gitHubServiceProvider = compositionContainer.GetExportedValue<IGitHubServiceProvider>();
-                var usageService = compositionContainer.GetExportedValue<IUsageService>();
-                var joinableTaskContext = compositionContainer.GetExportedValue<JoinableTaskContext>();
-                return new UsageTracker(gitHubServiceProvider, usageService, packageSettings, joinableTaskContext);
-            }
+            var connectionManager = compositionContainer.GetExport<IConnectionManager>();
+            return new VisualStudioUsageTracker(connectionManager);
         }
 
         static CompositionContainer CreateOutOfProcExports()
@@ -268,22 +255,6 @@ namespace GitHub.VisualStudio
         #endregion
 
         public ExportProvider ExportProvider { get; }
-    }
-
-    public class OutOfProcPackageSettings : IPackageSettings
-    {
-        public bool CollectMetrics { get; set; } = true;
-        public bool EnableTraceLogging { get; set; } = true;
-        public bool EditorComments { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public UIState UIState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool HideTeamExplorerWelcomeMessage { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void Save()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     class OutOfProcSVsServiceProvider : SVsServiceProvider

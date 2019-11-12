@@ -4,60 +4,118 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 pool:
-  vmImage: 'VS2017-Win2016'
+  vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: GitHubVS
+- name: githubvsSolution
+  value: 'GitHubVS.sln'
+- name: essentialsSolution
+  value: 'src\GitHub.VisualStudio.16.sln'
+- name: buildPlatform
+  value: 'Any CPU'
+- name: buildConfiguration
+  value: 'Release'
 
-steps:
-- task: InstallSSHKey@0
-  inputs:
-    hostName: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
-    sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCx/AxLjr4mhH7XFlbISb65GBxQnVnKh1owmAT1bK/Qt1b4/Z0SL68IvV88DpgLyKbica2giEVfKo/Z4dkO+P8M2bGXrNgazzfO910DlR+e1vt8BSU/Dbvscz0i1lsfKb3PnfSouCkQev6Th0v+hBdgkuackWgaBw22DDLkp9Uf/cAo+QYLz56p5KVctEESRRgGgIIlZyUc8OYDMSU2wQhG9x31mSyJ4ODuOZsi1RgBBHrgUb2QRhLJ9nZWfQgGBRDxGYTKLWiWIQwgSVQ9x1Az/Rei+CbPRvLcVGg+5vHt8lcu+HxEgrY4IsjXdMqosPqxQ+TT6f+G4GQDn8+IQ4wOpTVi84PkOQX3JPE2QSJwWA0AHNe5NTSns6WWYQyzxFJYBN2pLPuMnj9/+ozV3GaeQqn47WHfUH3s5IawNQPTFDxcl4qsmU66Ybfqa4eFIPEvCCp1leQcuXyDHxKLq80x1szN4kn0oyL2W0zbkwTaZG4I5l4Rto0hErUf3qx7FlZjMGEFMdJVskgnRMkKdqngF0FmSYQICpmqqYD8TydUc6jxZVOCvFF5gbqwxV/F2lk10D7FnetUNeWvpcZKbFUX4e5Ff15vibJZp4/5FUbksv+glfbPwk6tGuNj3xPFODP7KG8Y5wtcbknX11XI0vi+iL8TxL0Vk30TpZUMXWYYvQ==
-    sshKeySecureFile: id_rsa
+jobs:
+- job: build_and_test
+  displayName: 'Build/test GitHub for VS and Essentials'
 
-- script: git submodule init && git submodule deinit script && git submodule update
-  displayName: Submodule init
+  strategy:
+    maxParallel: 2
+    matrix:
+      VSMarketplace:
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)'
+        IsProductComponent: false
+      VSInstaller:
+        ArtifactDirectory: '$(Build.ArtifactStagingDirectory)\VSInstaller'
+        IsProductComponent: true
 
-# Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
-#- task: NuGetToolInstaller@0
-#- task: NuGetCommand@2
-#  inputs:
-#    restoreSolution: '$(solution)'
-#    feedsToUse: 'config'
-#    nugetConfigPath: nuget.config
+  steps:
+  - checkout: self
+    submodules: true
 
-# Instead run nuget manually.
-- script: tools\nuget\nuget.exe restore
-  displayName: NuGet restore
+  # Can't use the NuGet tasks because of https://github.com/Microsoft/azure-pipelines-tasks/issues/6790
+  #- task: NuGetToolInstaller@0
+  #- task: NuGetCommand@2
+  #  inputs:
+  #    restoreSolution: '$(solution)'
+  #    feedsToUse: 'config'
+  #    nugetConfigPath: nuget.config
 
-# Ideally we'd run NerdBank.GitVersioning but that will come later. For now bump the
-# version with the azure BuildId
-- task: PowerShell@2
-  inputs:
-    targetType: filePath
-    filePath: '$(Build.SourcesDirectory)\scripts\Bump-Version.ps1'
-    arguments: -BumpBuild -BuildNumber:$(Build.BuildId)
-    displayName: Bump version
+  # Instead run nuget manually.
 
-- task: VSBuild@1
-  inputs:
-    solution: GitHubVS.sln
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+  - task: DotNetCoreCLI@2  
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . nbgv
+    displayName: Install NBGV tool
 
-- task: VSTest@2
-  inputs:
-    searchFolder: '$(Build.SourcesDirectory)\test'
-    testAssemblyVer2: '**\bin\**\*Tests.dll'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    diagnosticsEnabled: true
-    runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
+  - script: nbgv cloud
+    displayName: Set the cloud build number
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)\build\Release\GitHub.VisualStudio.vsix' 
-    artifactName: 'vsix' 
+  - script: tools\nuget\nuget.exe restore $(githubvsSolution)
+    displayName: NuGet restore $(githubvsSolution)
+
+  - script: tools\nuget\nuget.exe restore $(essentialsSolution)
+    displayName: NuGet restore $(essentialsSolution)
+
+  - pwsh: mkdir $(ArtifactDirectory) -Force
+    displayName: Create VSIX staging directory
+
+  - task: MSBuild@1
+    displayName: GitHub for Visual Studio
+    inputs:
+      solution: $(githubvsSolution)
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildVersion: '16.0'
+      msbuildArguments: >
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
+        /p:GitHubVS_ClientId=$(GitHubVS_ClientId)
+        /p:GitHubVS_ClientSecret=$(GitHubVS_ClientSecret)
+
+  - task: MSBuild@1
+    displayName: GitHub Essentials
+    inputs:
+      solution: $(essentialsSolution)
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildVersion: '16.0'
+      msbuildArguments: >
+        /p:TargetVsixContainer=$(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+        /p:IsProductComponent=$(IsProductComponent)
+        /p:DeployExtension=False
+        
+  - task: DownloadSecureFile@1
+    name: vsixsigntool_exe
+    inputs:
+      secureFile: vsixsigntool.exe
+
+  - task: DownloadSecureFile@1
+    name: certificate_pfx
+    inputs:
+      secureFile: certificate.pfx
+
+  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 c4fdf13659f49e57ac14774fdf45053f499f185f /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.vsix
+    displayName: Sign the GitHub for Visual Studio VSIX
+
+  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 c4fdf13659f49e57ac14774fdf45053f499f185f /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+    displayName: Sign the GitHub Essentials VSIX
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'vsix'
+
+  - task: VSTest@2
+    inputs:
+      searchFolder: '$(Build.SourcesDirectory)\test'
+      testAssemblyVer2: '**\bin\**\*Tests.dll'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      diagnosticsEnabled: true
+      runSettingsFile: '$(Build.SourcesDirectory)\test\test.runsettings'
