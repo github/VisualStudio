@@ -17,8 +17,11 @@ Visit the [documentation](https://github.com/github/VisualStudio/tree/master/doc
 ## Build requirements
 
 * Visual Studio 2019
-* Visual Studio SDK
-* The built VSIX will work with Visual Studio 2015 or newer
+  * `.NET desktop development` workload
+  * `.NET Core cross platform development` workload
+  * `Visual Studio extension development` workload
+
+The built VSIX will work with Visual Studio 2015 or newer
 
 ## Build
 
