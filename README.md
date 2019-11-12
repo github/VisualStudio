@@ -24,14 +24,17 @@ Visit the [documentation](https://github.com/github/VisualStudio/tree/master/doc
 
 Clone the repository and its submodules.
 
-Open the `GitHubVS.sln` solution with Visual Studio 2019.
 To be able to use the GitHub API, you'll need to:
 
 - [Register a new developer application](https://github.com/settings/developers) in your profile
 - Create an environment variable `GitHubVS_ClientID` with your `Client ID`
 - Create an environment variable `GitHubVS_ClientSecret` with your `Client Secret`
 
-Build using Visual Studio 2019.
+Execute `build.cmd`
+
+## Visual Studio Build
+
+Build `GitHubVS.sln` using Visual Studio 2019.
 
 ## Logs
 Logs can be viewed at the following location:
