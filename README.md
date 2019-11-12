@@ -69,6 +69,6 @@ Visit the [Contributor Guidelines](CONTRIBUTING.md) for details on how to contri
 
 ## Copyright
 
-Copyright 2015 - 2018 GitHub, Inc.
+Copyright 2015 - 2019 GitHub, Inc.
 
 Licensed under the [MIT License](LICENSE.md)
