@@ -100,10 +100,10 @@ jobs:
     inputs:
       secureFile: certificate.pfx
 
-  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 c4fdf13659f49e57ac14774fdf45053f499f185f /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.vsix
+  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 bf69e0c45ae7b0749c451dbfa4909fef9f507674 /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.vsix
     displayName: Sign the GitHub for Visual Studio VSIX
 
-  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 c4fdf13659f49e57ac14774fdf45053f499f185f /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+  - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 bf69e0c45ae7b0749c451dbfa4909fef9f507674 /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
     displayName: Sign the GitHub Essentials VSIX
 
   - task: PublishBuildArtifacts@1
