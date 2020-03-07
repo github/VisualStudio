@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="GitHub.UI.AutoCompleteSuggestionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="34"
+             d:DesignWidth="100">
+    <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+        <Image
+            x:Name="image"
+            RenderOptions.BitmapScalingMode="HighQuality" 
+            Stretch="UniformToFill"
+            HorizontalAlignment="Left"
+            Width="24"
+            Height="24"
+            Visibility="Hidden"
+            Source="/Images/default_org_avatar.png">
+            <Image.Clip>
+                <RectangleGeometry Rect="0,0,24,24" RadiusX="2" RadiusY="2" />
+            </Image.Clip>
+        </Image>
+        <TextBlock x:Name="suggestionText" VerticalAlignment="Center">
+            <Run x:Name="name" Text="Name" /> <Run x:Name="description" Text="Description" />
+        </TextBlock>
+    </StackPanel>
+</UserControl>

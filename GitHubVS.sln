@@ -1,8 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2035
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28603.18
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio.Vsix", "src\GitHub.VisualStudio.Vsix\GitHub.VisualStudio.Vsix.csproj", "{D26B4B40-0C94-48AD-8019-0B9BE46E0071}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.VisualStudio", "src\GitHub.VisualStudio\GitHub.VisualStudio.csproj", "{11569514-5AE5-4B5B-92A2-F10B0967DE5F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F5ED78B-74A3-4406-A299-70CFB5885B8B} = {7F5ED78B-74A3-4406-A299-70CFB5885B8B}
@@ -12,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		README.md = README.md
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
@@ -27,32 +30,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submodules", "Submodules", "{1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}"
 	ProjectSection(SolutionItems) = preProject
 		test\UnitTests\Args.cs = test\UnitTests\Args.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\Modules\BuildUtils.psm1 = scripts\Modules\BuildUtils.psm1
-		scripts\Modules\Debugging.psm1 = scripts\Modules\Debugging.psm1
-		scripts\Modules\Vsix.psm1 = scripts\Modules\Vsix.psm1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C5F8D-14B3-443D-B044-0E209AE12BDF}"
-	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
-		scripts\build.ps1 = scripts\build.ps1
-		scripts\Bump-Version.ps1 = scripts\Bump-Version.ps1
-		scripts\common.ps1 = scripts\common.ps1
-		scripts\Get-CheckedOutBranch.ps1 = scripts\Get-CheckedOutBranch.ps1
-		scripts\Get-HeadSha1.ps1 = scripts\Get-HeadSha1.ps1
-		scripts\modules.ps1 = scripts\modules.ps1
-		nuget.config = nuget.config
-		scripts\Require-CleanWorkTree.ps1 = scripts\Require-CleanWorkTree.ps1
-		scripts\Run-CodeCoverage.ps1 = scripts\Run-CodeCoverage.ps1
-		scripts\Run-NUnit.ps1 = scripts\Run-NUnit.ps1
-		scripts\Run-Tests.ps1 = scripts\Run-Tests.ps1
-		scripts\Run-XUnit.ps1 = scripts\Run-XUnit.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A7DA2E7-262B-4581-807A-1C45CE79CDFD}"
@@ -141,6 +118,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL.Core", "sub
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octokit.GraphQL", "submodules\octokit.graphql.net\Octokit.GraphQL\Octokit.GraphQL.csproj", "{791B408C-0ABC-465B-9EB1-A2422D67F418}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.StartPage.UnitTests", "test\GitHub.StartPage.UnitTests\GitHub.StartPage.UnitTests.csproj", "{B467682B-9F0E-42D8-8A20-1DE78F798793}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +128,14 @@ Global
 		ReleaseWithoutVsix|Any CPU = ReleaseWithoutVsix|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.DebugWithoutVsix|Any CPU.Build.0 = DebugWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.ActiveCfg = ReleaseWithoutVsix|Any CPU
+		{D26B4B40-0C94-48AD-8019-0B9BE46E0071}.ReleaseWithoutVsix|Any CPU.Build.0 = ReleaseWithoutVsix|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11569514-5AE5-4B5B-92A2-F10B0967DE5F}.DebugWithoutVsix|Any CPU.ActiveCfg = DebugWithoutVsix|Any CPU
@@ -493,12 +480,19 @@ Global
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.Release|Any CPU.Build.0 = Release|Any CPU
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
 		{791B408C-0ABC-465B-9EB1-A2422D67F418}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.DebugWithoutVsix|Any CPU.ActiveCfg = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.DebugWithoutVsix|Any CPU.Build.0 = Debug|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.ActiveCfg = Release|Any CPU
+		{B467682B-9F0E-42D8-8A20-1DE78F798793}.ReleaseWithoutVsix|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1} = {7B6C5F8D-14B3-443D-B044-0E209AE12BDF}
 		{1E7F7253-A6AF-43C4-A955-37BEDDA01AC0} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 		{08DD4305-7787-4823-A53F-4D0F725A07F3} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
 		{674B69B8-0780-4D54-AE2B-C15821FA51CB} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
@@ -527,6 +521,7 @@ Global
 		{65542DEE-D3BE-4810-B85A-08E970413A21} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 		{3321CE72-26ED-4D1E-A8F5-6901FB783007} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
 		{791B408C-0ABC-465B-9EB1-A2422D67F418} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
+		{B467682B-9F0E-42D8-8A20-1DE78F798793} = {8A7DA2E7-262B-4581-807A-1C45CE79CDFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {556014CF-5B35-4CE5-B3EF-6AB0007001AC}

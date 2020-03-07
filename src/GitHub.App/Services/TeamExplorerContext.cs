@@ -49,15 +49,16 @@ namespace GitHub.Services
         TeamExplorerContext(
             IVSGitExt gitExt,
             [Import(typeof(SVsServiceProvider))] IServiceProvider sp,
-            IPullRequestService pullRequestService) : this(
+            IPullRequestService pullRequestService,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext) : this(
                 gitExt,
                 new AsyncLazy<DTE>(async () =>
                 {
-                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    await (joinableTaskContext ?? ThreadHelper.JoinableTaskContext).Factory.SwitchToMainThreadAsync();
                     return (DTE)sp.GetService(typeof(DTE));
                 }),
                 pullRequestService,
-                ThreadHelper.JoinableTaskContext)
+                joinableTaskContext ?? ThreadHelper.JoinableTaskContext)
         {
         }
 

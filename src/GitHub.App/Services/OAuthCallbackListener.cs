@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,6 +41,7 @@ namespace GitHub.Services
         }
 
         public readonly static string CallbackUrl = Invariant($"http://localhost:{CallbackPort}/");
+        private IHttpListenerContext lastContext;
 
         public async Task<string> Listen(string id, CancellationToken cancel)
         {
@@ -51,22 +54,29 @@ namespace GitHub.Services
                 {
                     while (true)
                     {
-                        var context = await httpListener.GetContextAsync().ConfigureAwait(false);
-                        var foo = context.Request;
-                        var queryParts = HttpUtility.ParseQueryString(context.Request.Url.Query);
+                        lastContext = await httpListener.GetContextAsync().ConfigureAwait(false);
+                        var queryParts = HttpUtility.ParseQueryString(lastContext.Request.Url.Query);
 
                         if (queryParts["state"] == id)
                         {
-                            context.Response.Close();
                             return queryParts["code"];
                         }
                     }
                 }
             }
-            finally
+            catch(Exception)
             {
                 httpListener.Stop();
+                throw;
             }
+        }
+
+        public void RedirectLastContext(Uri url)
+        {
+            lastContext.Response.Redirect(url);
+            lastContext.Response.Close();
+
+            httpListener.Stop();
         }
     }
 }

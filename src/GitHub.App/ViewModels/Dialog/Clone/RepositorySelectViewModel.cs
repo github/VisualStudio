@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using GitHub.Exports;
 using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
@@ -23,27 +25,37 @@ namespace GitHub.ViewModels.Dialog.Clone
     {
         static readonly ILogger log = LogManager.ForContext<RepositorySelectViewModel>();
         readonly IRepositoryCloneService service;
+        readonly IGitHubContextService gitHubContextService;
         IConnection connection;
         Exception error;
         string filter;
         bool isEnabled;
         bool isLoading;
-        bool loadingStarted;
         IReadOnlyList<IRepositoryItemViewModel> items;
         ICollectionView itemsView;
         ObservableAsPropertyHelper<RepositoryModel> repository;
         IRepositoryItemViewModel selectedItem;
 
         [ImportingConstructor]
-        public RepositorySelectViewModel(IRepositoryCloneService service)
+        public RepositorySelectViewModel(IRepositoryCloneService service, IGitHubContextService gitHubContextService)
         {
             Guard.ArgumentNotNull(service, nameof(service));
+            Guard.ArgumentNotNull(service, nameof(gitHubContextService));
 
             this.service = service;
+            this.gitHubContextService = gitHubContextService;
 
-            repository = this.WhenAnyValue(x => x.SelectedItem)
-                .Select(CreateRepository)
+            var selectedRepository = this.WhenAnyValue(x => x.SelectedItem)
+                .Select(CreateRepository);
+
+            var filterRepository = this.WhenAnyValue(x => x.Filter)
+                .Select(f => gitHubContextService.FindContextFromUrl(f))
+                .Select(CreateRepository);
+
+            repository = selectedRepository
+                .Merge(filterRepository)
                 .ToProperty(this, x => x.Repository);
+
             this.WhenAnyValue(x => x.Filter).Subscribe(_ => ItemsView?.Refresh());
         }
 
@@ -101,26 +113,47 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public async Task Activate()
         {
-            if (connection == null || loadingStarted) return;
+            await this.LoadItems(true);
+        }
+
+        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
+        {
+            var name = group.Key;
+            if (group.Value.Count == max)
+            {
+                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
+            }
+
+            return name;
+        }
+
+        async Task LoadItems(bool refresh)
+        {
+            if (connection == null || IsLoading) return;
 
             Error = null;
             IsLoading = true;
-            loadingStarted = true;
 
             try
             {
+                if (refresh)
+                {
+                    Items = new List<IRepositoryItemViewModel>();
+                    ItemsView = CollectionViewSource.GetDefaultView(Items);
+                }
+
                 var results = await log.TimeAsync(nameof(service.ReadViewerRepositories),
-                    () => service.ReadViewerRepositories(connection.HostAddress));
+                    () => service.ReadViewerRepositories(connection.HostAddress, refresh));
 
                 var yourRepositories = results.Repositories
                     .Where(r => r.Owner == results.Owner)
-                    .Select(x => new RepositoryItemViewModel(x, "Your repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectYourRepositories));
                 var collaboratorRepositories = results.Repositories
                     .Where(r => r.Owner != results.Owner)
                     .OrderBy(r => r.Owner)
-                    .Select(x => new RepositoryItemViewModel(x, "Collaborator repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectCollaboratorRepositories));
                 var repositoriesContributedTo = results.ContributedToRepositories
-                    .Select(x => new RepositoryItemViewModel(x, "Contributed to repositories"));
+                    .Select(x => new RepositoryItemViewModel(x, Resources.RepositorySelectContributedRepositories));
                 var orgRepositories = results.Organizations
                     .OrderBy(x => x.Key)
                     .SelectMany(x => x.Value.Select(y => new RepositoryItemViewModel(y, GroupName(x, 100))));
@@ -151,22 +184,26 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
         }
 
-        static string GroupName(KeyValuePair<string, IReadOnlyList<RepositoryListItemModel>> group, int max)
-        {
-            var name = group.Key;
-            if (group.Value.Count == max)
-            {
-                name += $" ({string.Format(CultureInfo.InvariantCulture, Resources.MostRecentlyPushed, max)})";
-            }
-
-            return name;
-        }
-
         bool FilterItem(object obj)
         {
-            if (obj is IRepositoryItemViewModel item && !string.IsNullOrWhiteSpace(Filter))
+            var trimedFilter = Filter?.Trim();
+            if (obj is IRepositoryItemViewModel item && !string.IsNullOrEmpty(trimedFilter))
             {
-                return item.Caption.Contains(Filter, StringComparison.CurrentCultureIgnoreCase);
+                if (new UriString(trimedFilter).IsHypertextTransferProtocol)
+                {
+                    var urlString = item.Url.ToString();
+                    var urlStringWithGit = urlString + ".git";
+                    var urlStringWithSlash = urlString + "/";
+                    return
+                        urlString.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithGit.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase) ||
+                        urlStringWithSlash.Contains(trimedFilter, StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return
+                        item.Caption.Contains(trimedFilter, StringComparison.CurrentCultureIgnoreCase);
+                }
             }
 
             return true;
@@ -177,6 +214,18 @@ namespace GitHub.ViewModels.Dialog.Clone
             return item != null ?
                 new RepositoryModel(item.Name, UriString.ToUriString(item.Url)) :
                 null;
+        }
+
+        RepositoryModel CreateRepository(GitHubContext context)
+        {
+            switch (context?.LinkType)
+            {
+                case LinkType.Repository:
+                case LinkType.Blob:
+                    return new RepositoryModel(context.RepositoryName, context.Url);
+            }
+
+            return null;
         }
     }
 }

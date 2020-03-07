@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using GitHub.Extensions;
 using GitHub.Models;
+using GitHub.Primitives;
 using GitHub.Services;
 using LibGit2Sharp;
 using ReactiveUI;
@@ -224,8 +225,8 @@ namespace GitHub.ViewModels.GitHubPane
         {
             if (file.Status == PullRequestFileStatus.Renamed)
             {
-                var fileName = file.FileName.Replace("/", "\\");
-                return changes?.Renamed.FirstOrDefault(x => x.Path == fileName)?.OldPath;
+                var gitPath = Paths.ToGitPath(file.FileName);
+                return changes?.Renamed.FirstOrDefault(x => x.Path == gitPath)?.OldPath;
             }
 
             return null;

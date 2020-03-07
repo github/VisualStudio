@@ -36,9 +36,20 @@ namespace GitHub.StartPage
     {
         static readonly ILogger log = LogManager.ForContext<GitHubContainerProvider>();
 
+        readonly Lazy<IGitHubServiceProvider> gitHubServiceProvider;
+
+        public GitHubContainerProvider() : this(
+            new Lazy<IGitHubServiceProvider>(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider))
+        {
+        }
+
+        public GitHubContainerProvider(Lazy<IGitHubServiceProvider> gitHubServiceProvider)
+        {
+            this.gitHubServiceProvider = gitHubServiceProvider;
+        }
+
         public async Task<CodeContainer> AcquireCodeContainerAsync(IProgress<ServiceProgressData> downloadProgress, CancellationToken cancellationToken)
         {
-
             return await RunAcquisition(downloadProgress, null, cancellationToken);
         }
 
@@ -55,7 +66,7 @@ namespace GitHub.StartPage
 
             try
             {
-                var uiProvider = await Task.Run(() => Package.GetGlobalService(typeof(IGitHubServiceProvider)) as IGitHubServiceProvider);
+                var uiProvider = await Task.Run(() => gitHubServiceProvider.Value);
                 request = await ShowCloneDialog(uiProvider, downloadProgress, cancellationToken, repository);
             }
             catch (Exception e)
@@ -68,6 +79,10 @@ namespace GitHub.StartPage
 
             var uri = request.Url.ToRepositoryUrl();
             var repositoryName = request.Url.RepositoryName;
+
+            // Report all steps complete before returning a CodeContainer
+            downloadProgress.Report(new ServiceProgressData(string.Empty, string.Empty, 1, 1));
+
             return new CodeContainer(
                 localProperties: new CodeContainerLocalProperties(request.Path, CodeContainerType.Folder,
                                 new CodeContainerSourceControlProperties(repositoryName, request.Path, new Guid(Guids.GitSccProviderId))),

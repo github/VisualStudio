@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:local="clr-namespace:GitHub.VisualStudio.Views.GitHubPane"
              xmlns:uic="clr-namespace:GitHub.VisualStudio.UI.Controls"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
              Foreground="{DynamicResource GitHubVsWindowText}"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -69,7 +70,6 @@
     <Grid>
       <DockPanel Visibility="{Binding ContentOverride, Converter={ghfvs:EqualsToVisibilityConverter None}}">
         <ghfvs:GitHubProgressBar DockPanel.Dock="Top"
-                             Foreground="{DynamicResource GitHubAccentBrush}"
                              IsIndeterminate="True"
                              Style="{DynamicResource GitHubProgressBar}"
                              Visibility="{Binding Content.Content.IsBusy, Converter={ghfvs:BooleanToHiddenVisibilityConverter}, FallbackValue=Hidden}"/>

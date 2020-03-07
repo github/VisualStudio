@@ -1,14 +1,13 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Settings;
+using Microsoft.VisualStudio.Threading;
 using Serilog;
 using Task = System.Threading.Tasks.Task;
 
@@ -21,21 +20,28 @@ namespace GitHub.Services
 
         bool initialized;
         IMetricsService client;
-        IUsageService service;
-        IConnectionManager connectionManager;
-        IPackageSettings userSettings;
+        readonly IUsageService service;
+        Lazy<IConnectionManager> connectionManager;
+        readonly IPackageSettings userSettings;
+        readonly bool vsTelemetry;
         IVSServices vsservices;
+        IUsageTracker visualStudioUsageTracker;
         IDisposable timer;
         bool firstTick = true;
 
         public UsageTracker(
             IGitHubServiceProvider gitHubServiceProvider,
             IUsageService service,
-            IPackageSettings settings)
+            IPackageSettings settings,
+            JoinableTaskContext joinableTaskContext,
+            bool vsTelemetry)
         {
             this.gitHubServiceProvider = gitHubServiceProvider;
             this.service = service;
             this.userSettings = settings;
+            JoinableTaskContext = joinableTaskContext;
+            this.vsTelemetry = vsTelemetry;
+
             timer = StartTimer();
         }
 
@@ -47,13 +53,37 @@ namespace GitHub.Services
         public async Task IncrementCounter(Expression<Func<UsageModel.MeasuresModel, int>> counter)
         {
             await Initialize();
-            var data = await service.ReadLocalData();
-            var usage = await GetCurrentReport(data);
+
             var property = (MemberExpression)counter.Body;
             var propertyInfo = (PropertyInfo)property.Member;
-            log.Verbose("Increment counter {Name}", propertyInfo.Name);
+            var counterName = propertyInfo.Name;
+            log.Verbose("Increment counter {Name}", counterName);
+
+            var updateTask = UpdateUsageMetrics(propertyInfo);
+
+            if (visualStudioUsageTracker != null)
+            {
+                // Not available on Visual Studio 2015
+                await visualStudioUsageTracker.IncrementCounter(counter);
+            }
+
+            await updateTask;
+        }
+
+        bool IsEnterpriseUser =>
+            connectionManager.Value?.Connections.Any(x => !x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        bool IsGitHubUser =>
+            connectionManager.Value?.Connections.Any(x => x.HostAddress.IsGitHubDotCom()) ?? false;
+
+        async Task UpdateUsageMetrics(PropertyInfo propertyInfo)
+        {
+            var data = await service.ReadLocalData();
+            var usage = await GetCurrentReport(data);
+
             var value = (int)propertyInfo.GetValue(usage.Measures);
             propertyInfo.SetValue(usage.Measures, value + 1);
+
             await service.WriteLocalData(data);
         }
 
@@ -69,11 +99,18 @@ namespace GitHub.Services
 
             // The services needed by the usage tracker are loaded when they are first needed to
             // improve the startup time of the extension.
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
 
             client = gitHubServiceProvider.TryGetService<IMetricsService>();
-            connectionManager = gitHubServiceProvider.GetService<IConnectionManager>();
+            connectionManager = new Lazy<IConnectionManager>(() => gitHubServiceProvider.GetService<IConnectionManager>());
             vsservices = gitHubServiceProvider.GetService<IVSServices>();
+
+            if (vsTelemetry)
+            {
+                log.Verbose("Creating VisualStudioUsageTracker");
+                visualStudioUsageTracker = new VisualStudioUsageTracker(connectionManager);
+            }
+
             initialized = true;
         }
 
@@ -134,12 +171,14 @@ namespace GitHub.Services
             current.Dimensions.Lang = CultureInfo.InstalledUICulture.IetfLanguageTag;
             current.Dimensions.CurrentLang = CultureInfo.CurrentCulture.IetfLanguageTag;
             current.Dimensions.CurrentUILang = CultureInfo.CurrentUICulture.IetfLanguageTag;
-            current.Dimensions.AppVersion = AssemblyVersionInformation.Version;
+            current.Dimensions.AppVersion = ExtensionInformation.Version;
             current.Dimensions.VSVersion = vsservices.VSVersion;
 
-            current.Dimensions.IsGitHubUser = connectionManager.Connections.Any(x => x.HostAddress.IsGitHubDotCom());
-            current.Dimensions.IsEnterpriseUser = connectionManager.Connections.Any(x => !x.HostAddress.IsGitHubDotCom());
+            current.Dimensions.IsGitHubUser = IsGitHubUser;
+            current.Dimensions.IsEnterpriseUser = IsEnterpriseUser;
             return current;
         }
+
+        JoinableTaskContext JoinableTaskContext { get; }
     }
 }

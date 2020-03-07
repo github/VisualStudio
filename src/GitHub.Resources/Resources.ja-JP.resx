@@ -1,0 +1,894 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BrowseForDirectory" xml:space="preserve">
+    <value>新しいリポジトリを含んでいるフォルダーを選択します。</value>
+  </data>
+  <data name="OpenFromGitHubTitle" xml:space="preserve">
+    <value>GitHub から開く</value>
+  </data>
+  <data name="CouldNotConnectToGitHub" xml:space="preserve">
+    <value>Github.com に接続できませんでした</value>
+  </data>
+  <data name="CreateGistTitle" xml:space="preserve">
+    <value>GitHub Gist の作成</value>
+  </data>
+  <data name="CreateTitle" xml:space="preserve">
+    <value>{0} リポジトリの作成</value>
+  </data>
+  <data name="DefaultGistFileName" xml:space="preserve">
+    <value>GistFromVisualStudio.cs</value>
+  </data>
+  <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
+    <value>Enterprise URL を入力してください</value>
+  </data>
+  <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
+    <value>有効な Enterprise URL を入力してください</value>
+  </data>
+  <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
+    <value>Enterprise サーバーではありません。Enterprise URL を入力してください</value>
+  </data>
+  <data name="ForgotPasswordLink" xml:space="preserve">
+    <value>(パスワードを忘れた場合)</value>
+  </data>
+  <data name="LoginFailedForbiddenMessage" xml:space="preserve">
+    <value>サインインするには、個人用アクセス トークンではなく、パスワードを使用してください。</value>
+  </data>
+  <data name="LoginFailedMessage" xml:space="preserve">
+    <value>ユーザー名とパスワードを確認してから、もう一度お試しください</value>
+  </data>
+  <data name="LoginFailedText" xml:space="preserve">
+    <value>サインインできませんでした。</value>
+  </data>
+  <data name="LoginTitle" xml:space="preserve">
+    <value>GitHub に接続</value>
+  </data>
+  <data name="PasswordValidatorEmpty" xml:space="preserve">
+    <value>パスワードを入力してください</value>
+  </data>
+  <data name="PRCreatedUpstream" xml:space="preserve">
+    <value>ブランチの Pull Request **{0}** が [{1}]({2}) に正常に作成されました</value>
+  </data>
+  <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
+    <value>Pull Request のタイトルを入力してください</value>
+  </data>
+  <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
+    <value>ソース ブランチとターゲット ブランチを同じにすることはできません</value>
+  </data>
+  <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
+    <value>ソース ブランチがリモートに存在しません。ブランチをプッシュしましたか?</value>
+  </data>
+  <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
+    <value>リポジトリのパスを入力してください</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
+    <value>有効なパスを入力してください</value>
+  </data>
+  <data name="RepositoryCreationClonePathInvalidCharacters" xml:space="preserve">
+    <value>パスに無効な文字が含まれています</value>
+  </data>
+  <data name="RepositoryCreationClonePathTooLong" xml:space="preserve">
+    <value>パスが長すぎます</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExists" xml:space="preserve">
+    <value>リポジトリ '{0}/{1}' は既に存在します。</value>
+  </data>
+  <data name="RepositoryCreationFailedAlreadyExistsMessage" xml:space="preserve">
+    <value>リポジトリ名を変更するか、別のアカウントを選択してから、もう一度お試しください。</value>
+  </data>
+  <data name="RepositoryCreationFailedQuota" xml:space="preserve">
+    <value>プライベート リポジトリのクォータを超えました。</value>
+  </data>
+  <data name="RepositoryNameValidatorAlreadyExists" xml:space="preserve">
+    <value>同じ名前のリポジトリがこの場所に既に存在します</value>
+  </data>
+  <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
+    <value>リポジトリ名を入力してください</value>
+  </data>
+  <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
+    <value>リポジトリ名は 100 文字未満でなければなりません</value>
+  </data>
+  <data name="SafeRepositoryNameWarning" xml:space="preserve">
+    <value>{0} として作成されます</value>
+  </data>
+  <data name="TwoFactorApp" xml:space="preserve">
+    <value>デバイスで 2 要素認証アプリを開き、認証コードを確認してださい。</value>
+  </data>
+  <data name="TwoFactorSms" xml:space="preserve">
+    <value>SMS メッセージで認証コードを送信しました。</value>
+  </data>
+  <data name="TwoFactorTitle" xml:space="preserve">
+    <value>2 要素認証が必要です</value>
+  </data>
+  <data name="TwoFactorUnknown" xml:space="preserve">
+    <value>サインインの認証コードをここに入力</value>
+  </data>
+  <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
+    <value>ユーザー名または電子メール アドレスを入力してください</value>
+  </data>
+  <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
+    <value>ユーザー名または電子メール アドレスにスペースを含めることはできません</value>
+  </data>
+  <data name="PullRequestsNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
+  </data>
+  <data name="PullRequestNavigationItemText" xml:space="preserve">
+    <value>Pull Request</value>
+  </data>
+  <data name="AddedFileStatus" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="Fork" xml:space="preserve">
+    <value>フォーク</value>
+  </data>
+  <data name="InvalidBranchName" xml:space="preserve">
+    <value>[無効]</value>
+  </data>
+  <data name="MustPullBeforePush" xml:space="preserve">
+    <value>プッシュする前にプルする必要があります</value>
+  </data>
+  <data name="NoCommitsToPull" xml:space="preserve">
+    <value>プルするコミットがありません</value>
+  </data>
+  <data name="NoCommitsToPush" xml:space="preserve">
+    <value>プッシュするコミットがありません</value>
+  </data>
+  <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
+    <value>*説明が指定されていません。*</value>
+  </data>
+  <data name="PullRequestDetailsCheckout" xml:space="preserve">
+    <value>{0} のチェックアウト</value>
+  </data>
+  <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
+    <value>{0} へのチェックアウト</value>
+  </data>
+  <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
+    <value>{0} ブランチ {1} からプルします</value>
+  </data>
+  <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
+    <value>{0} ブランチ {1} にプッシュします</value>
+  </data>
+  <data name="Remote" xml:space="preserve">
+    <value>リモート</value>
+  </data>
+  <data name="RenamedFileStatus" xml:space="preserve">
+    <value>名前の変更</value>
+  </data>
+  <data name="SourceRepositoryNoLongerAvailable" xml:space="preserve">
+    <value>ソース リポジトリは使用できなくなりました。</value>
+  </data>
+  <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
+    <value>作業ディレクトリにコミットされていない変更があるため、チェックアウトできません。</value>
+  </data>
+  <data name="SyncSubmodules" xml:space="preserve">
+    <value>{0} サブモジュールの同期</value>
+  </data>
+  <data name="CouldntFindGitOnPath" xml:space="preserve">
+    <value>PATH 上に Git.exe が見つかりませんでした。
+
+Git for Windows を次の場所からインストールしてください。
+https://git-scm.com/download/win</value>
+  </data>
+  <data name="Approved" xml:space="preserve">
+    <value>承認済み</value>
+  </data>
+  <data name="ChangesRequested" xml:space="preserve">
+    <value>変更が要求されました</value>
+  </data>
+  <data name="Commented" xml:space="preserve">
+    <value>コメントされました</value>
+  </data>
+  <data name="InProgress" xml:space="preserve">
+    <value>処理中</value>
+  </data>
+  <data name="NavigateToEditorStatusMessage" xml:space="preserve">
+    <value>エディターに移動するには Enter キーを押します</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
+    <value>エディターに移動する前に PR ブランチをチェックアウトしてください</value>
+  </data>
+  <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
+    <value>エディターに移動するには Enter キーを押します (PR ブランチをチェックアウトする必要があります)</value>
+  </data>
+  <data name="ForkRepositoryTitle" xml:space="preserve">
+    <value>リポジトリのフォーク</value>
+  </data>
+  <data name="SwitchOriginTitle" xml:space="preserve">
+    <value>Origin の切り替え</value>
+  </data>
+  <data name="CancelPendingReviewConfirmation" xml:space="preserve">
+    <value>このレビューをキャンセルしますか? 保留中のすべてのコメントが失われます。</value>
+  </data>
+  <data name="CancelPendingReviewConfirmationCaption" xml:space="preserve">
+    <value>レビューのキャンセル</value>
+  </data>
+  <data name="DestinationAlreadyExists" xml:space="preserve">
+    <value>宛先パスにファイルが存在します。</value>
+  </data>
+  <data name="LogoutRequired" xml:space="preserve">
+    <value>ログアウトが必要です</value>
+  </data>
+  <data name="day" xml:space="preserve">
+    <value>{0:N0} 日前</value>
+  </data>
+  <data name="days" xml:space="preserve">
+    <value>{0:N0} 日前</value>
+  </data>
+  <data name="hour" xml:space="preserve">
+    <value>{0:N0} 時間前</value>
+  </data>
+  <data name="hours" xml:space="preserve">
+    <value>{0:N0} 時間前</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>今すぐ</value>
+  </data>
+  <data name="minute" xml:space="preserve">
+    <value>{0:N0} 分前</value>
+  </data>
+  <data name="minutes" xml:space="preserve">
+    <value>{0:N0} 分前</value>
+  </data>
+  <data name="month" xml:space="preserve">
+    <value>{0:N0} か月前</value>
+  </data>
+  <data name="months" xml:space="preserve">
+    <value>{0:N0} か月前</value>
+  </data>
+  <data name="second" xml:space="preserve">
+    <value>{0:N0} 秒前</value>
+  </data>
+  <data name="seconds" xml:space="preserve">
+    <value>{0:N0} 秒前</value>
+  </data>
+  <data name="year" xml:space="preserve">
+    <value>{0:N0} 年前</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>{0:N0} 年前</value>
+  </data>
+  <data name="authenticationFailedLabelContent" xml:space="preserve">
+    <value>認証コードが無効です</value>
+  </data>
+  <data name="authenticationFailedLabelMessage" xml:space="preserve">
+    <value>コードをもう一度入力してみてください。または、再送信ボタンをクリックして新しい認証コードを取得します。</value>
+  </data>
+  <data name="authenticationSentLabelContent" xml:space="preserve">
+    <value>認証コードを送信しました。</value>
+  </data>
+  <data name="authenticationSentLabelMessage" xml:space="preserve">
+    <value>認証コードを受け取れない場合は、support@github.com にお問い合わせください。</value>
+  </data>
+  <data name="browsePathButtonContent" xml:space="preserve">
+    <value>参照</value>
+  </data>
+  <data name="couldNotConnectToGitHubText" xml:space="preserve">
+    <value>Github.com に接続できませんでした</value>
+  </data>
+  <data name="couldNotConnectToTheServerText" xml:space="preserve">
+    <value>サーバーに接続できませんでした。</value>
+  </data>
+  <data name="CreateLink" xml:space="preserve">
+    <value>作成</value>
+  </data>
+  <data name="DescriptionOptional" xml:space="preserve">
+    <value>説明 (オプション)</value>
+  </data>
+  <data name="openInBrowser" xml:space="preserve">
+    <value>ブラウザーで開く</value>
+  </data>
+  <data name="CancelLink" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="gistCreatedMessage" xml:space="preserve">
+    <value>gist が作成されました</value>
+  </data>
+  <data name="gistCreationFailedMessage" xml:space="preserve">
+    <value>gist を作成できませんでした</value>
+  </data>
+  <data name="prUpdatedByText" xml:space="preserve">
+    <value>作成者</value>
+  </data>
+  <data name="Options_PrivacyTitle" xml:space="preserve">
+    <value>プライバシー</value>
+  </data>
+  <data name="Options_MetricsLabel" xml:space="preserve">
+    <value>機能向上のために匿名の利用状況データを送信する</value>
+  </data>
+  <data name="Error_FailedToCopyToClipboard" xml:space="preserve">
+    <value>クリップボードにコピーできませんでした。もう一度お試しください。</value>
+  </data>
+  <data name="LinkCopiedToClipboardMessage" xml:space="preserve">
+    <value>リンクがクリップボードにコピーされました</value>
+  </data>
+  <data name="RepositoryPublishedMessage" xml:space="preserve">
+    <value>リポジトリが正常に作成されました。</value>
+  </data>
+  <data name="makePrivateGist" xml:space="preserve">
+    <value>プライベート gist</value>
+  </data>
+  <data name="fileNameText" xml:space="preserve">
+    <value>ファイル名</value>
+  </data>
+  <data name="NotLoggedInMessage" xml:space="preserve">
+    <value>{0} にサインインしていないため、特定の Git 操作を実行できない可能性があります。[今すぐサインインする]({1})</value>
+  </data>
+  <data name="WikiNavigationItemText" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="PulseNavigationItemText" xml:space="preserve">
+    <value>パルス</value>
+  </data>
+  <data name="pathText" xml:space="preserve">
+    <value>パス</value>
+  </data>
+  <data name="IssuesNavigationItemText" xml:space="preserve">
+    <value>懸案事項</value>
+  </data>
+  <data name="GraphsNavigationItemText" xml:space="preserve">
+    <value>グラフ</value>
+  </data>
+  <data name="GitHubPublishSectionTitle" xml:space="preserve">
+    <value>GitHub に発行</value>
+  </data>
+  <data name="BlurbText" xml:space="preserve">
+    <value>オープン ソースとプライベート プロジェクトの強力なコラボレーション、コード レビュー、コード管理が提供されます。</value>
+  </data>
+  <data name="GitHubInvitationSectionConnectLabel" xml:space="preserve">
+    <value>接続…</value>
+  </data>
+  <data name="CloneLink" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="verifyText" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="twoFactorAuthText" xml:space="preserve">
+    <value>2 要素認証</value>
+  </data>
+  <data name="SignUpLink" xml:space="preserve">
+    <value>サインアップ</value>
+  </data>
+  <data name="SignOutLink" xml:space="preserve">
+    <value>サインアウト</value>
+  </data>
+  <data name="resendCodeButtonToolTip" xml:space="preserve">
+    <value>登録された SMS デバイスにコードを再送信します</value>
+  </data>
+  <data name="resendCodeButtonContent" xml:space="preserve">
+    <value>再送信</value>
+  </data>
+  <data name="RepoNameText" xml:space="preserve">
+    <value>リポジトリ名</value>
+  </data>
+  <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
+    <value>このリポジトリにはリモートがありません。このリポジトリを GitHub に発行するには、フォームに入力します。</value>
+  </data>
+  <data name="publishText" xml:space="preserve">
+    <value>公開</value>
+  </data>
+  <data name="orText" xml:space="preserve">
+    <value>または</value>
+  </data>
+  <data name="openTwoFactorAuthAppText" xml:space="preserve">
+    <value>デバイスで 2 要素認証アプリを開き、認証コードを確認してださい。</value>
+  </data>
+  <data name="noRepositoriesMessageText" xml:space="preserve">
+    <value>リポジトリがありません</value>
+  </data>
+  <data name="nameText" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="makePrivateContent" xml:space="preserve">
+    <value>プライベート リポジトリ</value>
+  </data>
+  <data name="localPathText" xml:space="preserve">
+    <value>ローカル パス:</value>
+  </data>
+  <data name="licenseListText" xml:space="preserve">
+    <value>ライセンス</value>
+  </data>
+  <data name="learnMoreLink" xml:space="preserve">
+    <value>詳細情報</value>
+  </data>
+  <data name="ignoreTemplateListText" xml:space="preserve">
+    <value>Git 無視</value>
+  </data>
+  <data name="filterTextPromptText" xml:space="preserve">
+    <value>リポジトリの検索</value>
+  </data>
+  <data name="loadingFailedMessageContent" xml:space="preserve">
+    <value>一部またはすべてのリポジトリが読み込まれていない可能性があります。ダイアログを閉じて、もう一度お試しください。</value>
+  </data>
+  <data name="loadingFailedMessageMessage" xml:space="preserve">
+    <value>リポジトリの読み込み中にエラーが発生しました</value>
+  </data>
+  <data name="enterpriseUrlPromptText" xml:space="preserve">
+    <value>GitHub Enterprise サーバーのアドレス</value>
+  </data>
+  <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
+    <value>ホストが使用できないか、GitHub Enterprise サーバーではありません。アドレスを確認して、もう一度お試しください。</value>
+  </data>
+  <data name="UserNameOrEmailPromptText" xml:space="preserve">
+    <value>ユーザー名または電子メール</value>
+  </data>
+  <data name="PasswordPrompt" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="LoginLink" xml:space="preserve">
+    <value>サインイン</value>
+  </data>
+  <data name="dotComConnectionFailedMessageMessage" xml:space="preserve">
+    <value>インターネット接続を確認して、もう一度お試しください。</value>
+  </data>
+  <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
+    <value>GitHub Enterprise をお持ちでない場合 </value>
+  </data>
+  <data name="dontHaveAnAccountText" xml:space="preserve">
+    <value>アカウントをお持ちでない場合 </value>
+  </data>
+  <data name="TitleRequired" xml:space="preserve">
+    <value>タイトル (必須)</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>説明</value>
+  </data>
+  <data name="NotAGitHubRepositoryMessage" xml:space="preserve">
+    <value>このリポジトリを GitHub に発行すると、オープン ソースとプライベート プロジェクトの強力なコラボレーション、コード レビュー、コード管理が提供されます。</value>
+  </data>
+  <data name="NotAGitHubRepository" xml:space="preserve">
+    <value>このリポジトリは GitHub 上にありません</value>
+  </data>
+  <data name="NotAGitRepository" xml:space="preserve">
+    <value>リポジトリが見つかりません</value>
+  </data>
+  <data name="NotAGitRepositoryMessage" xml:space="preserve">
+    <value>この場所に Git リポジトリが見つかりませんでした。Git プロジェクトを開くか、プロジェクトで [ファイル] -&gt; [ソース管理に追加] をクリックして作業を開始してください。</value>
+  </data>
+  <data name="CreateAccountLink" xml:space="preserve">
+    <value>アカウントを作成する</value>
+  </data>
+  <data name="filterBranchesText" xml:space="preserve">
+    <value>ブランチのフィルター処理</value>
+  </data>
+  <data name="PublishToGitHubButton" xml:space="preserve">
+    <value>GitHub に発行</value>
+  </data>
+  <data name="GetStartedText" xml:space="preserve">
+    <value>はじめに</value>
+  </data>
+  <data name="SignInLink" xml:space="preserve">
+    <value>サインイン</value>
+  </data>
+  <data name="SignInCallToAction" xml:space="preserve">
+    <value>サインイン...</value>
+  </data>
+  <data name="LocalBranchUpToDate" xml:space="preserve">
+    <value>最新のローカル ブランチ</value>
+  </data>
+  <data name="ChangesCountFormat" xml:space="preserve">
+    <value>変更 ({0})</value>
+  </data>
+  <data name="ViewChanges" xml:space="preserve">
+    <value>変更の表示</value>
+  </data>
+  <data name="CompareFileAsDefaultAction" xml:space="preserve">
+    <value>既定のアクションとしてファイルを比較する</value>
+  </data>
+  <data name="ViewFile" xml:space="preserve">
+    <value>ファイルの表示</value>
+  </data>
+  <data name="OpenFileAsDefaultAction" xml:space="preserve">
+    <value>既定のアクションとしてファイルを開く</value>
+  </data>
+  <data name="SwitchToListView" xml:space="preserve">
+    <value>リスト ビューに切り替え</value>
+  </data>
+  <data name="SwitchToTreeView" xml:space="preserve">
+    <value>ツリー ビューに切り替え</value>
+  </data>
+  <data name="UpdatedFormat" xml:space="preserve">
+    <value>{0} が更新されました</value>
+  </data>
+  <data name="OpenPROnGitHubToolTip" xml:space="preserve">
+    <value>GitHub 上で Pull Request を表示</value>
+  </data>
+  <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
+    <value>GitHub for Visual Studio へようこそ! [トレーニング](show-training) または [ドキュメント](show-docs) をご覧ください。
+
+[今後このメッセージを表示しない](dont-show-again)</value>
+  </data>
+  <data name="prUpdatedText" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="Options_EditorCommentsLabel" xml:space="preserve">
+    <value>エディターの余白に PR コメントを表示する</value>
+  </data>
+  <data name="Options_ExperimentalTitle" xml:space="preserve">
+    <value>試験的な機能</value>
+  </data>
+  <data name="Options_ExperimentalNote" xml:space="preserve">
+    <value>これらの機能は今後のバージョンで変更される可能性があります</value>
+  </data>
+  <data name="ViewChangesInSolution" xml:space="preserve">
+    <value>ソリューション内の変更の表示</value>
+  </data>
+  <data name="OpenFileInSolution" xml:space="preserve">
+    <value>ソリューション内のファイルを開く</value>
+  </data>
+  <data name="TokenPrompt" xml:space="preserve">
+    <value>トークン</value>
+  </data>
+  <data name="ContinueYourReview" xml:space="preserve">
+    <value>レビューを続行</value>
+  </data>
+  <data name="AddYourReview" xml:space="preserve">
+    <value>レビューの追加</value>
+  </data>
+  <data name="Reviewers" xml:space="preserve">
+    <value>レビュー担当者</value>
+  </data>
+  <data name="AddReviewComment" xml:space="preserve">
+    <value>レビュー コメントの追加</value>
+  </data>
+  <data name="AddSingleComment" xml:space="preserve">
+    <value>単一コメントの追加</value>
+  </data>
+  <data name="ForkNavigationItemText" xml:space="preserve">
+    <value>フォーク</value>
+  </data>
+  <data name="Options_DebuggingTitle" xml:space="preserve">
+    <value>デバッグ</value>
+  </data>
+  <data name="Options_EnableTraceLoggingText" xml:space="preserve">
+    <value>トレース ログを有効にする</value>
+  </data>
+  <data name="BlendDialogText" xml:space="preserve">
+    <value>Blend 内では GitHub 拡張機能を使用できません</value>
+  </data>
+  <data name="UpdateComment" xml:space="preserve">
+    <value>コメントの更新</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>保留中</value>
+  </data>
+  <data name="StartAReview" xml:space="preserve">
+    <value>レビューの開始</value>
+  </data>
+  <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
+    <value>ここにコメントを追加するには、変更をコミットしてプッシュする必要があります。</value>
+  </data>
+  <data name="PreviousComment" xml:space="preserve">
+    <value>前のコメント</value>
+  </data>
+  <data name="NextComment" xml:space="preserve">
+    <value>次のコメント</value>
+  </data>
+  <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
+    <value>Pull Request の表示、チェックアウト、または作成</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>戻る</value>
+  </data>
+  <data name="ForkRepository" xml:space="preserve">
+    <value>リポジトリのフォーク</value>
+  </data>
+  <data name="ForkTheRepository" xml:space="preserve">
+    <value>リポジトリをフォークします</value>
+  </data>
+  <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
+    <value> ローカル リポジトリの次のものを更新します</value>
+  </data>
+  <data name="ToPointTo" xml:space="preserve">
+    <value>ポイントする</value>
+  </data>
+  <data name="CreatePullRequest" xml:space="preserve">
+    <value>pull request の作成</value>
+  </data>
+  <data name="SignInToGitHub" xml:space="preserve">
+    <value>GitHub にサインイン</value>
+  </data>
+  <data name="Pull" xml:space="preserve">
+    <value>プル</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>プッシュ</value>
+  </data>
+  <data name="Sync" xml:space="preserve">
+    <value>同期</value>
+  </data>
+  <data name="Wrote" xml:space="preserve">
+    <value>書き込みました</value>
+  </data>
+  <data name="SubmitYourReviewFor" xml:space="preserve">
+    <value>次に対するレビュー送信をします:</value>
+  </data>
+  <data name="YourReviewSummary" xml:space="preserve">
+    <value>レビューの概要</value>
+  </data>
+  <data name="CommentOnly" xml:space="preserve">
+    <value>コメントのみ</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>承認</value>
+  </data>
+  <data name="RequestChanges" xml:space="preserve">
+    <value>変更の要求</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>コメント</value>
+  </data>
+  <data name="OutdatedComments" xml:space="preserve">
+    <value>期限切れのコメント</value>
+  </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>新規作成</value>
+  </data>
+  <data name="Assignee" xml:space="preserve">
+    <value>担当者</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作成者</value>
+  </data>
+  <data name="SignInWithYourBrowser" xml:space="preserve">
+    <value>ブラウザーでサインインします</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>開く</value>
+  </data>
+  <data name="FilterByAuthor" xml:space="preserve">
+    <value>作成者でフィルター処理</value>
+  </data>
+  <data name="SelectFork" xml:space="preserve">
+    <value>フォークの選択</value>
+  </data>
+  <data name="DeleteCommentConfirmation" xml:space="preserve">
+    <value>このコメントを削除してもよろしいですか?</value>
+  </data>
+  <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
+    <value>コメントの削除</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>再試行</value>
+  </data>
+  <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
+    <value>開いている pull request はありません</value>
+  </data>
+  <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
+    <value>pull request を使用すると、GitHub 上のリポジトリにプッシュした変更が他のユーザーに知らされます</value>
+  </data>
+  <data name="NoResultsMatchedYourSearch" xml:space="preserve">
+    <value>検索に一致する結果がありませんでした。</value>
+  </data>
+  <data name="ToGetStartedYouCan" xml:space="preserve">
+    <value>作業を開始するには、次のようにします。</value>
+  </data>
+  <data name="CreateAPullRequest" xml:space="preserve">
+    <value>pull request を作成します</value>
+  </data>
+  <data name="OpenRepositoryAtDir" xml:space="preserve">
+    <value>'{0}' にあるリポジトリを開きますか?</value>
+  </data>
+  <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
+    <value>ターゲット URL には現在のリポジトリに対する別の所有者がいます。</value>
+  </data>
+  <data name="NoActiveRepositoryMessage" xml:space="preserve">
+    <value>移動するアクティブなリポジトリがありません</value>
+  </data>
+  <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
+    <value>作業ファイルは、'{0}' にあるファイルとは別のファイルです。対応するブランチ、pull request、またはコミットをチェックアウトしてください。</value>
+  </data>
+  <data name="DifferentRepositoryMessage" xml:space="preserve">
+    <value>リポジトリ '{0}' を開き、もう一度お試しください</value>
+  </data>
+  <data name="UnknownLinkTypeMessage" xml:space="preserve">
+    <value>'{0}' から開くことができませんでした。現在、リポジトリ ファイルにリンクする URL のみがサポートされています。</value>
+  </data>
+  <data name="NoGitHubUrlMessage" xml:space="preserve">
+    <value>クリップボード内に GitHub URL が見つかりませんでした</value>
+  </data>
+  <data name="NoResolveSameOwnerMessage" xml:space="preserve">
+    <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
+  </data>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>ターゲット パスのディレクトリが空ではありません。</value>
+  </data>
+  <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
+    <value>この場所にリポジトリが既に存在しますが、そのリポジトリには "origin" という名前のリモートがありません。</value>
+  </data>
+  <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
+    <value>この場所にリポジトリが既に存在しますが、そのリポジトリには {0} のリモートがあります。</value>
+  </data>
+  <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
+    <value>この場所に対する複製は既に実行済みです。[開く] をクリックして、ローカル リポジトリを開いてください。</value>
+  </data>
+  <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
+    <value>リポジトリの GitHub URL が見つかりません</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
+    <value>リポジトリの GitHub URL を検索するには、"origin" という名前のリモートがそのリポジトリで定義されている必要があります。</value>
+  </data>
+  <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
+    <value>既存のリモートのいずれかの名前を 'origin' に変更するか、'origin' という名前の新しいリモートを追加してください。これを行うには、コマンド ラインを使用するか、下のボタンをクリックします。</value>
+  </data>
+  <data name="CouldntFindCorrespondingFile" xml:space="preserve">
+    <value>'{0}' に対応するファイルがリポジトリ内に見つかりませんでした。'git fetch' を実行するか、ターゲット pull request をチェックアウトしてください。</value>
+  </data>
+  <data name="MostRecentlyPushed" xml:space="preserve">
+    <value>{0} が最近プッシュされました</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>コメント</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>pull request を閉じる</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>問題を閉じる</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>閉じてコメントする</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>再度開いてコメントする</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>問題を再度開く</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>pull request を再度開く</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} 個のコミット</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>コミットがいくつか追加されました</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>この会話は解決済みとしてマークされました</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>ご使用のリポジトリ</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>コラボレーターのリポジトリ</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>参加先のリポジトリ</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>URL を検索または入力します</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>参照...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>アカウントの追加または変更</value>
+  </data>
+</root>

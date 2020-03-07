@@ -13,7 +13,7 @@
     <ItemsControl ItemsSource="{Binding Comments}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <local:CommentView />
+                <local:PullRequestReviewCommentView />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

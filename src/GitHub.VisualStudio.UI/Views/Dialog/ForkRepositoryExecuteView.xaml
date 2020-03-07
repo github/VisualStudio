@@ -9,24 +9,23 @@
              xmlns:ui="https://github.com/github/VisualStudio"
              VerticalAlignment="Top"
              Margin="8"
-             xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
+             xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+             Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+             Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
              mc:Ignorable="d" d:DesignWidth="300" Height="315.179">
 
-  <Control.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-      
-      <!-- Disable links until we make them work-->
-      <Style TargetType="Hyperlink">
-        <Setter Property="IsEnabled" Value="False"/>
-        <Setter Property="Foreground" Value="Black"/>
-      </Style>
-      
-    </ResourceDictionary>
-  </Control.Resources>
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DialogStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Disable links until we make them work-->
+            <Style TargetType="Hyperlink">
+                <Setter Property="IsEnabled" Value="False"/>
+            </Style>
+        </ResourceDictionary>
+    </Control.Resources>
 
   <d:DesignProperties.DataContext>
     <sampleData:ForkRepositoryExecuteViewModelDesigner/>
@@ -47,7 +46,7 @@
     <TextBlock Margin="0 16 0 0" FontSize="14">This operation will:</TextBlock>
 
     <StackPanel Orientation="Vertical">
-        <Border Margin="0 8 0 4" CornerRadius="2" Background="#ffeff1f5" Padding="8 16">
+        <Border Margin="0 8 0 4" CornerRadius="2" Padding="8 16">
                 <StackPanel>
                     <Grid Margin="0 0 0 0">
                         <Grid.ColumnDefinitions>
@@ -95,8 +94,8 @@
                    Visibility="{Binding Error, Converter={ui:NullToVisibilityConverter}}" 
                    HorizontalAlignment="Left" />
         <StackPanel Margin="0 8" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Margin="0 0 4 0" Command="{Binding BackCommand}" Content="{x:Static ghfvs:Resources.Back}"/>
-          <Button HorizontalAlignment="Right" Padding="16 4" BorderThickness="0" Command="{Binding CreateFork}" Content="{x:Static ghfvs:Resources.ForkRepository}"/>
+          <Button HorizontalAlignment="Right" Padding="16 4" Margin="0 0 4 0" Command="{Binding BackCommand}" Content="{x:Static ghfvs:Resources.Back}"/>
+          <Button HorizontalAlignment="Right" Padding="16 4" Command="{Binding CreateFork}" Content="{x:Static ghfvs:Resources.ForkRepository}"/>
         </StackPanel>
     </StackPanel>
   </StackPanel>

@@ -272,8 +272,9 @@ namespace GitHub.InlineReviews.UnitTests.ViewModels
             var draftStore = Substitute.For<IMessageDraftStore>();
             var commentService = Substitute.For<ICommentService>();
             var result = Substitute.For<IViewViewModelFactory>();
+            var autoCompleteAdvisor = Substitute.For<IAutoCompleteAdvisor>();
             result.CreateViewModel<IPullRequestReviewCommentViewModel>().Returns(_ =>
-                new PullRequestReviewCommentViewModel(commentService));
+                new PullRequestReviewCommentViewModel(commentService, autoCompleteAdvisor));
             result.CreateViewModel<IPullRequestReviewCommentThreadViewModel>().Returns(_ =>
                 new PullRequestReviewCommentThreadViewModel(draftStore, result));
             return result;

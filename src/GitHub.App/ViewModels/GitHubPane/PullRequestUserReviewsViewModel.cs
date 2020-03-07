@@ -144,7 +144,6 @@ namespace GitHub.ViewModels.GitHubPane
 
             try
             {
-                await Task.Delay(0);
                 PullRequestTitle = pullRequest.Title;
 
                 var reviews = new List<IPullRequestReviewViewModel>();

@@ -51,7 +51,7 @@ namespace GitHub.Services
             var viewModel = factory.CreateViewModel<IRepositoryCloneViewModel>();
             if (url != null)
             {
-                viewModel.UrlTab.Url = url;
+                viewModel.Url = url;
             }
 
             if (connection != null)

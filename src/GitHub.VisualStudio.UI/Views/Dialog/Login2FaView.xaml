@@ -5,19 +5,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ghfvs="https://github.com/github/VisualStudio"
     xmlns:local="clr-namespace:GitHub.VisualStudio.Views.Dialog"
+    xmlns:controls="clr-namespace:GitHub.VisualStudio.UI.Controls"
     mc:Ignorable="d"
     d:DesignWidth="414"
     d:DesignHeight="440"
     Style="{DynamicResource DialogUserControl}"
+    xmlns:vs="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.14.0"
+    Background="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelBrushKey}}"
+    Foreground="{DynamicResource {x:Static vs:ThemedDialogColors.WindowPanelTextBrushKey}}"
     AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationCustom}" >
 
     <Control.Resources>
-        <ResourceDictionary>
-          <ResourceDictionary.MergedDictionaries>
-            <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
-            <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-          </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ResourceDictionary Source="DialogStyles.xaml" />
     </Control.Resources>
 
     <StackPanel
@@ -29,11 +28,10 @@
                 Text="{x:Static ghfvs:Resources.twoFactorAuthText}" 
                 Padding="0" 
                 Margin="0,0,12,0"
-                Style="{DynamicResource GitHubH1TextBlock}"
-                Foreground="{DynamicResource GHTextBrush}" />
+                Style="{DynamicResource GitHubH1TextBlock}" />
         </WrapPanel>
 
-        <ghfvs:HorizontalShadowDivider />
+        <controls:HorizontalShadowDivider />
 
         <TextBlock
             Margin="30,0,30,16"
@@ -44,7 +42,8 @@
             <Run x:Name="description" Text="{x:Static ghfvs:Resources.openTwoFactorAuthAppText}"/>
             <Hyperlink x:Name="twoFactorReadMoreLink" ToolTip="https://help.github.com/articles/about-two-factor-authentication" 
                        AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticationLearnMoreHyperlink}">
-                <TextBlock Text="{x:Static ghfvs:Resources.learnMoreLink}"/></Hyperlink>
+                <Run Text="{x:Static ghfvs:Resources.learnMoreLink}"/>
+            </Hyperlink>
         </TextBlock>
         <ghfvs:TwoFactorInput
             x:Name="authenticationCode"
@@ -66,19 +65,17 @@
             Orientation="Horizontal"
             HorizontalAlignment="Center"
             Margin="0,18,0,60">
-            <ghfvs:OcticonCircleButton
-                x:Name="okButton" 
-                TabIndex="2" 
-                Icon="check"
+            <Button
+                x:Name="okButton"
+                TabIndex="2"
                 IsDefault="True"
                 Content="{x:Static ghfvs:Resources.verifyText}"
                 AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TwoFactorAuthenticatonVerifyButton}" />
-            <ghfvs:OcticonLinkButton 
+            <Button 
                 x:Name="resendCodeButton"
                 TabIndex="3"
                 ToolTip="{x:Static ghfvs:Resources.resendCodeButtonToolTip}"
                 FontSize="12"
-                Icon="sync"
                 Margin="18,0,0,0"
                 Content="{x:Static ghfvs:Resources.resendCodeButtonContent}" />
         </StackPanel>

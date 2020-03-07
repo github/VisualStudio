@@ -26,7 +26,7 @@
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
                 <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI.Reactive;component/SharedDictionary.xaml" />
-                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Markdown.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Control.Resources>
@@ -41,17 +41,30 @@
             </TextBlock>
             <TextBlock Foreground="{DynamicResource GitHubVsGrayText}" Text="{Binding PullRequestModel.Title}" TextWrapping="Wrap"/>
             <TextBlock Margin="0 12 0 4" Text="{x:Static ghfvs:Resources.YourReviewSummary}"/>
-            <TextBox AcceptsReturn="True"
-                     Background="{DynamicResource VsBrush.BrandedUIBackground}"
-                     Foreground="{DynamicResource VsBrush.BrandedUIText}"
-                     BorderBrush="{DynamicResource VsBrush.ActiveBorder}"
-                     Margin="0 4"
-                     MinHeight="120"
-                     Padding="0 4"
-                     TextWrapping="Wrap"
-                     Text="{Binding Body}"
-                     SpellCheck.IsEnabled="True"/>
             
+            <ui:AutoCompleteBox
+                    Padding="0 4"
+                    Margin="0 4"
+                    Advisor="{Binding AutoCompleteAdvisor}">
+                <ui:AutoCompleteBox.ItemTemplate>
+                    <DataTemplate>
+                        <ui:AutoCompleteSuggestionView ViewModel="{Binding}" />
+                    </DataTemplate>
+                </ui:AutoCompleteBox.ItemTemplate>
+                <ui:AutoCompleteBox.InputElement>
+                    <ui:TextBoxAutoCompleteTextInput>
+                        <TextBox AcceptsReturn="True"
+                                 Background="{DynamicResource VsBrush.BrandedUIBackground}"
+                                 Foreground="{DynamicResource VsBrush.BrandedUIText}"
+                                 BorderBrush="{DynamicResource VsBrush.ActiveBorder}"
+                                 MinHeight="120"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding Body}"
+                                 SpellCheck.IsEnabled="True"/>
+                    </ui:TextBoxAutoCompleteTextInput>
+                </ui:AutoCompleteBox.InputElement>
+            </ui:AutoCompleteBox>
+
             <StackPanel Margin="0 4" Orientation="Horizontal">
                 <ui:DropDownButton AutoCloseOnClick="True" Foreground="{DynamicResource GHBlueLinkButtonTextBrush}">
                     <ui:GitHubActionLink>Submit review</ui:GitHubActionLink>
