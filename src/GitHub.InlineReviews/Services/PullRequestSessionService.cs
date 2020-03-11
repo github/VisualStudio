@@ -347,7 +347,7 @@ namespace GitHub.InlineReviews.Services
                         }).ToList(),
                         Threads = pr.ReviewThreads(null, null, null, null).AllPages().Select(thread => new PullRequestReviewThreadModel
                         {
-                            Comments = thread.Comments(null, null, null, null).AllPages().Select(comment => new CommentAdapter
+                            Comments = thread.Comments(null, null, null, null, null).AllPages().Select(comment => new CommentAdapter
                             {
                                 Id = comment.Id.Value,
                                 PullRequestId = comment.PullRequest.Number,
