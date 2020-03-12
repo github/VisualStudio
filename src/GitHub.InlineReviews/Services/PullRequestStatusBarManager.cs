@@ -157,13 +157,13 @@ namespace GitHub.InlineReviews.Services
 
         PullRequestStatusViewModel CreatePullRequestStatusViewModel(LocalRepositoryModel repository, IPullRequestSession session)
         {
-            var pullRequestStatusViewModel = new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand);
-            var pullRequest = session?.PullRequest;
-            pullRequestStatusViewModel.Number = pullRequest?.Number;
-            pullRequestStatusViewModel.Title = pullRequest?.Title;
-            pullRequestStatusViewModel.RepositoryName = repository?.Name;
-            pullRequestStatusViewModel.RepositoryOwner = repository?.Owner;
-            return pullRequestStatusViewModel;
+            return new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand)
+            {
+                Number = session?.PullRequest?.Number,
+                Title = session?.PullRequest?.Title,
+                RepositoryName = repository?.Name,
+                RepositoryOwner = repository?.Owner,
+            };
         }
 
         PullRequestStatusView ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
