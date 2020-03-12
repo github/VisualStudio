@@ -49,7 +49,7 @@ namespace GitHub.Services
             var operation = new TelemetryEvent(Event.UsageTracker);
             operation.Properties[Property.TelemetryVersion] = TelemetryVersion;
             operation.Properties[Property.CounterName] = counterName;
-            operation.Properties[Property.ExtensionVersion] = AssemblyVersionInformation.Version;
+            operation.Properties[Property.ExtensionVersion] = ExtensionInformation.Version;
             operation.Properties[Property.IsGitHubUser] = IsGitHubUser;
             operation.Properties[Property.IsEnterpriseUser] = IsEnterpriseUser;
 

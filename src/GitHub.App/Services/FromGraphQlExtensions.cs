@@ -29,6 +29,10 @@ namespace GitHub.Services
                     return CheckConclusionState.Success;
                 case Octokit.GraphQL.Model.CheckConclusionState.Neutral:
                     return CheckConclusionState.Neutral;
+                case Octokit.GraphQL.Model.CheckConclusionState.Skipped:
+                    return CheckConclusionState.Skipped;
+                case Octokit.GraphQL.Model.CheckConclusionState.Stale:
+                    return CheckConclusionState.Stale;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
