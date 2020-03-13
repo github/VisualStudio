@@ -54,7 +54,7 @@ namespace GitHub.Services
             {
                 query = new Query().Repository(owner: Var(nameof(owner)), name: Var(nameof(name)))
                 .Select(repository =>
-                    repository.MentionableUsers(null, null, null, null)
+                    repository.MentionableUsers(null, null, null, null, null)
                         .AllPages()
                         .Select(sourceItem => 
                             new SuggestionItem(sourceItem.Login, 
