@@ -49,5 +49,5 @@ jobs:
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v1
       with:
-        name: GitHub.VisualStudio.${{ steps.nbgv.outputs.SemVer2 }}
+        name: GitHubVS-${{ steps.nbgv.outputs.SemVer2 }}
         path: ${{ env.vsixContainer }}
