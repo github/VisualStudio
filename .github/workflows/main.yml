@@ -24,13 +24,13 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: aarnott/nbgv@v0.3
-      id: nbgv
-
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v1
       with:
         submodules: true
+
+    - uses: aarnott/nbgv@v0.3
+      id: nbgv
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
