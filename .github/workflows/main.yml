@@ -5,6 +5,7 @@ name: CI
 env:
   config: Release
   githubvsSolution: GitHubVS.sln
+  vsixContainer: GitHub.VisualStudio.vsix
   
 # Controls when the action will run. Triggers the workflow on push or pull request 
 # events but only for the master branch
@@ -40,4 +41,10 @@ jobs:
 
     - name: MSBuild ${{ env.githubvsSolution }}
       run: |
-        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:DeployExtension=False /p:GitHubVS_ClientId=${{ secrets.GitHubVS_ClientId }} /p:GitHubVS_ClientSecret=${{ secrets.GitHubVS_ClientSecret }}
+        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False /p:GitHubVS_ClientId=${{ secrets.GitHubVS_ClientId }} /p:GitHubVS_ClientSecret=${{ secrets.GitHubVS_ClientSecret }}
+
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: vsix
+        path: ${{ env.vsixContainer }}
