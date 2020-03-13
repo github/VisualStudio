@@ -32,12 +32,15 @@ jobs:
     - uses: aarnott/nbgv@v0.3
       id: nbgv
 
-    - name: Add msbuild to PATH
+    - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
 
     - uses: nuget/setup-nuget@v1
       with:
         nuget-version: '5.x'
+
+    - name: Add VSTest to PATH
+      uses: darenm/Setup-VSTest@v1
 
     - name: NuGet restore ${{ env.githubvsSolution }}
       run: nuget restore ${{ env.githubvsSolution }}
@@ -51,3 +54,7 @@ jobs:
       with:
         name: GitHubVS-${{ steps.nbgv.outputs.SemVer2 }}
         path: ${{ env.vsixContainer }}
+
+    # We need to run '**\bin\**\*Tests.dll'
+    - name: Run unit tests
+      run: vstest.console test\GitHub.InlineReviews.UnitTests\obj\Release\net46\GitHub.InlineReviews.UnitTests.dll /Settings:${{ github.workspace }}\test\test.runsettings
