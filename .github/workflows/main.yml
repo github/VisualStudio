@@ -57,4 +57,4 @@ jobs:
 
     # We need to run '**\bin\**\*Tests.dll'
     - name: Run unit tests
-      run: vstest.console test\GitHub.InlineReviews.UnitTests\obj\Release\net46\GitHub.InlineReviews.UnitTests.dll /Settings:${{ github.workspace }}\test\test.runsettings
+      run: vstest.console test\GitHub.InlineReviews.UnitTests\bin\Release\net46\GitHub.InlineReviews.UnitTests.dll /Settings:${{ github.workspace }}\test\test.runsettings
