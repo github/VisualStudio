@@ -5,7 +5,7 @@ name: CI
 env:
   config: Release
   githubvsSolution: GitHubVS.sln
-  vsixContainer: GitHub.VisualStudio.vsix
+  vsixContainer: ${{ github.workspace }}\GitHub.VisualStudio.vsix
   
 # Controls when the action will run. Triggers the workflow on push or pull request 
 # events but only for the master branch
