@@ -56,14 +56,14 @@ jobs:
         path: ${{ env.vsixContainer }}
 
     # We need to run '**\bin\**\*Tests.dll'
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.App.UnitTests\bin\Release\net46\GitHub.App.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.Exports.Reactive.UnitTests\bin\Release\net46\GitHub.Exports.Reactive.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.Exports.UnitTests\bin\Release\net46\GitHub.Exports.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.Extensions.UnitTests\bin\Release\net46\GitHub.Extensions.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.InlineReviews.UnitTests\bin\Release\net46\GitHub.InlineReviews.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.Services.Vssdk.UnitTests\bin\Release\net461\GitHub.Services.Vssdk.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.StartPage.UnitTests\bin\Release\net46\GitHub.StartPage.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.TeamFoundation.UnitTests\bin\Release\net46\GitHub.TeamFoundation.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.UI.UnitTests\bin\Release\net46\GitHub.UI.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\GitHub.VisualStudio.UnitTests\bin\Release\net46\GitHub.VisualStudio.UnitTests.dll
-    - run: vstest.console /Settings:test\test.runsettings test\MetricsTests\MetricsTests\bin\Release\MetricsTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.App.UnitTests\bin\Release\net46\GitHub.App.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.Exports.Reactive.UnitTests\bin\Release\net46\GitHub.Exports.Reactive.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.Exports.UnitTests\bin\Release\net46\GitHub.Exports.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.Extensions.UnitTests\bin\Release\net46\GitHub.Extensions.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.InlineReviews.UnitTests\bin\Release\net46\GitHub.InlineReviews.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.Services.Vssdk.UnitTests\bin\Release\net461\GitHub.Services.Vssdk.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.StartPage.UnitTests\bin\Release\net46\GitHub.StartPage.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.TeamFoundation.UnitTests\bin\Release\net46\GitHub.TeamFoundation.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.UI.UnitTests\bin\Release\net46\GitHub.UI.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\GitHub.VisualStudio.UnitTests\bin\Release\net46\GitHub.VisualStudio.UnitTests.dll
+    - run: vstest.console /TestAdapterPath:test /Settings:test\test.runsettings test\MetricsTests\MetricsTests\bin\Release\MetricsTests.dll
