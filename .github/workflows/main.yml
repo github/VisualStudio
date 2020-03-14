@@ -48,7 +48,7 @@ jobs:
 
     - name: MSBuild ${{ env.githubvsSolution }}
       run: |
-        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False /p:GitHubVS_ClientId=${{ secrets.GitHubVS_ClientId }} /p:GitHubVS_ClientSecret=${{ secrets.GitHubVS_ClientSecret }}
+        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False /p:GitHubVS_ClientId="${{ secrets.GitHubVS_ClientId }}" /p:GitHubVS_ClientSecret="${{ secrets.GitHubVS_ClientSecret }}"
 
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v1
