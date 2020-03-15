@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.IO;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
+using GitHub.Info;
 using GitHub.Models;
 using GitHub.Primitives;
 using Octokit.GraphQL;
@@ -17,6 +20,7 @@ namespace GitHub.Api
     {
         readonly IKeychain keychain;
         readonly IProgram program;
+        readonly FileCache cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GraphQLClientFactory"/> class.
@@ -28,14 +32,21 @@ namespace GitHub.Api
         {
             this.keychain = keychain;
             this.program = program;
+
+            var cachePath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                ApplicationInfo.ApplicationName,
+                "GraphQLCache");
+            cache = new FileCache(cachePath);
         }
 
         /// <inheirtdoc/>
-        public Task<Octokit.GraphQL.IConnection> CreateConnection(HostAddress address)
+        public Task<IGraphQLClient> CreateConnection(HostAddress address)
         {
             var credentials = new GraphQLKeychainCredentialStore(keychain, address);
             var header = new ProductHeaderValue(program.ProductHeader.Name, program.ProductHeader.Version);
-            return Task.FromResult<Octokit.GraphQL.IConnection>(new Connection(header, address.GraphQLUri, credentials));
+            var connection = new Connection(header, address.GraphQLUri, credentials);
+            return Task.FromResult<IGraphQLClient>(new GraphQLClient(connection, cache));
         }
     }
 }

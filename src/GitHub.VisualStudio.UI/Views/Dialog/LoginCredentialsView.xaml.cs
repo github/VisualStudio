@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using GitHub.Controls;
@@ -32,7 +34,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             {
                 SetupDotComBindings(d);
                 SetupEnterpriseBindings(d);
-                SetupSelectedAndVisibleTabBindings(d);
+                SetupSelectedTabBindings(d);
                 d(Disposable.Create(Deactivate));
             });
 
@@ -46,7 +48,7 @@ namespace GitHub.VisualStudio.Views.Dialog
             this.WhenAnyObservable(
                 x => x.ViewModel.GitHubLogin.LoginViaOAuth,
                 x => x.ViewModel.EnterpriseLogin.LoginViaOAuth)
-                .Subscribe(_ => Application.Current.MainWindow?.Activate());
+                .Subscribe(_ => SetForegroundWindow());
 
             hostTabControl.SelectionChanged += (s, e) =>
             {
@@ -82,7 +84,6 @@ namespace GitHub.VisualStudio.Views.Dialog
 
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Login, v => v.dotComLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.LoginViaOAuth, v => v.dotComSsaLogInButton.Command));
-            d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.IsLoggingIn, v => v.dotComLogInButton.ShowSpinner));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.NavigatePricing, v => v.pricingLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.GitHubLogin.Error, v => v.dotComErrorMessage.UserError));
         }
@@ -107,21 +108,12 @@ namespace GitHub.VisualStudio.Views.Dialog
 
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Login, v => v.enterpriseLogInButton.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.LoginViaOAuth, v => v.enterpriseSsaLogInButton.Command));
-            d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.IsLoggingIn, v => v.enterpriseLogInButton.ShowSpinner));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.NavigateLearnMore, v => v.learnMoreLink.Command));
             d(this.OneWayBind(ViewModel, vm => vm.EnterpriseLogin.Error, v => v.enterpriseErrorMessage.UserError));
         }
 
-        void SetupSelectedAndVisibleTabBindings(Action<IDisposable> d)
+        void SetupSelectedTabBindings(Action<IDisposable> d)
         {
-            d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
-                .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.DotComOnly)
-                .BindTo(this, v => v.dotComTab.IsEnabled));
-
-            d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
-                .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.EnterpriseOnly)
-                .BindTo(this, v => v.enterpriseTab.IsEnabled));
-
             d(this.WhenAny(x => x.ViewModel.LoginMode, x => x.Value)
                 .Select(x => x == LoginMode.DotComOrEnterprise || x == LoginMode.DotComOnly)
                 .Where(x => x == true)
@@ -131,6 +123,24 @@ namespace GitHub.VisualStudio.Views.Dialog
                 .Select(x => x == LoginMode.EnterpriseOnly)
                 .Where(x => x == true)
                 .BindTo(this, v => v.enterpriseTab.IsSelected));
+        }
+
+        static bool SetForegroundWindow()
+        {
+            var hWnd = Process.GetCurrentProcess().MainWindowHandle;
+            if (hWnd != IntPtr.Zero)
+            {
+                return NativeMethods.SetForegroundWindow(hWnd);
+            }
+
+            return false;
+        }
+
+        class NativeMethods
+        {
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
         }
     }
 }

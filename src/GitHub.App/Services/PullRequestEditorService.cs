@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using EnvDTE;
 using GitHub.Commands;
+using GitHub.Primitives;
 using GitHub.Extensions;
 using GitHub.Models;
 using GitHub.Models.Drafts;
@@ -89,13 +90,12 @@ namespace GitHub.Services
 
             try
             {
-                var fullPath = GetAbsolutePath(session.LocalRepository, relativePath);
                 string fileName;
                 string commitSha;
 
                 if (workingDirectory)
                 {
-                    fileName = fullPath;
+                    fileName = Path.Combine(session.LocalRepository.LocalPath, relativePath);
                     commitSha = null;
                 }
                 else
@@ -119,7 +119,7 @@ namespace GitHub.Services
 
                     if (!workingDirectory)
                     {
-                        AddBufferTag(wpfTextView.TextBuffer, session, fullPath, commitSha, null);
+                        AddBufferTag(wpfTextView.TextBuffer, session, relativePath, commitSha, null);
                         EnableNavigateToEditor(textView, session);
                     }
                 }
@@ -478,13 +478,6 @@ namespace GitHub.Services
             return matchingLine;
         }
 
-        static string GetAbsolutePath(LocalRepositoryModel localRepository, string relativePath)
-        {
-            var localPath = localRepository.LocalPath;
-            relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
-            return Path.Combine(localPath, relativePath);
-        }
-
         string GetText(IVsTextView textView)
         {
             IVsTextLines buffer;
@@ -561,13 +554,13 @@ namespace GitHub.Services
         void AddBufferTag(
             ITextBuffer buffer,
             IPullRequestSession session,
-            string path,
+            string relativePath,
             string commitSha,
             DiffSide? side)
         {
             buffer.Properties.GetOrCreateSingletonProperty(
                 typeof(PullRequestTextBufferInfo),
-                () => new PullRequestTextBufferInfo(session, path, commitSha, side));
+                () => new PullRequestTextBufferInfo(session, relativePath, commitSha, side));
 
             var projection = buffer as IProjectionBuffer;
 
@@ -575,7 +568,7 @@ namespace GitHub.Services
             {
                 foreach (var source in projection.SourceBuffers)
                 {
-                    AddBufferTag(source, session, path, commitSha, side);
+                    AddBufferTag(source, session, relativePath, commitSha, side);
                 }
             }
         }
@@ -642,9 +635,10 @@ namespace GitHub.Services
                 session.LocalRepository,
                 session.PullRequest))
             {
-                var fileChange = changes.FirstOrDefault(x => x.Path == file.RelativePath);
+                var gitPath = Paths.ToGitPath(file.RelativePath);
+                var fileChange = changes.FirstOrDefault(x => x.Path == gitPath);
                 return fileChange?.Status == LibGit2Sharp.ChangeKind.Renamed ?
-                    fileChange.OldPath : file.RelativePath;
+                    Paths.ToWindowsPath(fileChange.OldPath) : file.RelativePath;
             }
         }
 

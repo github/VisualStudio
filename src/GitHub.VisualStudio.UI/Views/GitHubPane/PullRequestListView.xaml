@@ -8,6 +8,8 @@
              xmlns:v="clr-namespace:GitHub.VisualStudio.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
+             Background="{DynamicResource GitHubVsToolWindowBackground}"
+             Foreground="{DynamicResource GitHubVsWindowText}"
              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.PullRequestListViewCustom}">
     <d:DesignProperties.DataContext>
         <ghfvs:PullRequestListViewModelDesigner Message="None" StateCaption="3 Open"/>

@@ -4,19 +4,48 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  
+   
+  <PropertyGroup>
+    <!-- Use a default client ID/secret for testing -->
+    <!-- https://github.com/organizations/editor-tools/settings/applications/620133 -->
+    <GitHubVS_ClientId Condition="'$(GitHubVS_ClientId)' == ''">2454a3e6102fd41cc212</GitHubVS_ClientId>
+    <GitHubVS_ClientSecret Condition="'$(GitHubVS_ClientSecret)' == ''">2157c138e970165d955d09562230afcfbcda23f2</GitHubVS_ClientSecret>
+  </PropertyGroup>
+   
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
-  <ItemGroup Condition="$(Buildtype) == 'Internal'">
-    <Compile Remove="ApiClientConfiguration_User.cs" />
-    <Compile Include="..\..\script\src\ApiClientConfiguration_User.cs">
-      <Link>ApiClientConfiguration_User.cs</Link>
-    </Compile>
-  </ItemGroup>
-
+  <Target Name="AddClientSecret" BeforeTargets="BeforeCompile"
+          Inputs="$(MSBuildThisFileFullPath)" Outputs="$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs">
+    <Error Condition="'$(GitHubVS_ClientId)' == '' OR '$(GitHubVS_ClientSecret)' == ''"
+          Text="Please define 'GitHubVS_ClientId' and 'GitHubVS_ClientSecret' environment variables (restart Visual Studio if necessary)" />
+    <PropertyGroup>
+      <GeneratedFilePath>$(IntermediateOutputPath)ApiClientConfiguration.$(GitHubVS_ClientId).cs</GeneratedFilePath>
+      <GeneratedText>
+        <![CDATA[
+namespace GitHub.Api
+{
+  static partial class ApiClientConfiguration
+  {
+    static partial void Configure()
+    {
+      ClientId = "$(GitHubVS_ClientId)"%3b
+      ClientSecret = "$(GitHubVS_ClientSecret)"%3b
+    }
+  }
+}
+]]>
+      </GeneratedText>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilePath)" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(GeneratedFilePath)" Lines="$(GeneratedText)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+  </Target>
+  
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
   
   <ItemGroup>

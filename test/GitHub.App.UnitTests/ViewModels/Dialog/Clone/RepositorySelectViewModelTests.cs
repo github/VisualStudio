@@ -18,6 +18,9 @@ public class RepositorySelectViewModelTests
         [TestCase("", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("owner", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("name", "owner", "name", "https://github.com/owner/name", 1)]
+        [TestCase(" name", "owner", "name", "https://github.com/owner/name", 1, Description = "Ignore whitespace before filter")]
+        [TestCase("name ", "owner", "name", "https://github.com/owner/name", 1, Description = "Ignore whitespace after filter")]
+        [TestCase("https://github.com/owner/name ", "owner", "name", "https://github.com/owner/name", 1, Description = "Ignore whitespace in URL filter")]
         [TestCase("owner/name", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("OWNER/NAME", "owner", "name", "https://github.com/owner/name", 1)]
         [TestCase("https://github.com/owner/name", "owner", "name", "https://github.com/owner/name", 1)]
@@ -113,7 +116,7 @@ public class RepositorySelectViewModelTests
 
         var viewRepositoriesModel = CreateViewerRepositoriesModel(contributedToRepositories: contributedToRepositories);
         var repositoryCloneService = Substitute.For<IRepositoryCloneService>();
-        repositoryCloneService.ReadViewerRepositories(hostAddress).Returns(viewRepositoriesModel);
+        repositoryCloneService.ReadViewerRepositories(hostAddress, Arg.Any<bool>()).Returns(viewRepositoriesModel);
         return repositoryCloneService;
     }
 

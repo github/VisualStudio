@@ -8,11 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Extensions;
-using GitHub.Helpers;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
 using Octokit.GraphQL.Model;
 using Rothko;
@@ -50,7 +50,8 @@ namespace GitHub.Services
             IGraphQLClientFactory graphqlFactory,
             IGitHubContextService gitHubContextService,
             IUsageTracker usageTracker,
-            IGitHubServiceProvider sp)
+            IGitHubServiceProvider sp,
+            [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.operatingSystem = operatingSystem;
             this.vsGitServices = vsGitServices;
@@ -59,12 +60,13 @@ namespace GitHub.Services
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
             dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
+            JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
         /// <inheritdoc/>
-        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address)
+        public async Task<ViewerRepositoriesModel> ReadViewerRepositories(HostAddress address, bool refresh = false)
         {
             if (readViewerRepositories == null)
             {
@@ -107,7 +109,7 @@ namespace GitHub.Services
             }
 
             var graphql = await graphqlFactory.CreateConnection(address).ConfigureAwait(false);
-            var result = await graphql.Run(readViewerRepositories).ConfigureAwait(false);
+            var result = await graphql.Run(readViewerRepositories, cacheDuration: TimeSpan.FromHours(1), refresh: refresh).ConfigureAwait(false);
             return result;
         }
 
@@ -129,7 +131,7 @@ namespace GitHub.Services
 
             var repositoryUrl = url.ToRepositoryUrl();
             var isDotCom = HostAddress.IsGitHubDotComUri(repositoryUrl);
-            if (DestinationDirectoryExists(repositoryPath))
+            if (DestinationDirectoryExists(repositoryPath) && !DestinationDirectoryEmpty(repositoryPath))
             {
                 if (!IsSolutionInRepository(repositoryPath))
                 {
@@ -206,9 +208,12 @@ namespace GitHub.Services
 
             // Switch to a thread pool thread for IO then back to the main thread to call
             // vsGitServices.Clone() as this must be called on the main thread.
-            await ThreadingHelper.SwitchToPoolThreadAsync();
-            operatingSystem.Directory.CreateDirectory(repositoryPath);
-            await ThreadingHelper.SwitchToMainThreadAsync();
+            if (!DestinationDirectoryExists(repositoryPath))
+            {
+                await TaskScheduler.Default;
+                operatingSystem.Directory.CreateDirectory(repositoryPath);
+                await JoinableTaskContext.Factory.SwitchToMainThreadAsync();
+            }
 
             try
             {
@@ -233,6 +238,9 @@ namespace GitHub.Services
         public bool DestinationDirectoryExists(string path) => operatingSystem.Directory.DirectoryExists(path);
 
         /// <inheritdoc/>
+        public bool DestinationDirectoryEmpty(string path) => operatingSystem.Directory.GetDirectory(path).IsEmpty;
+
+        /// <inheritdoc/>
         public bool DestinationFileExists(string path) => operatingSystem.File.Exists(path);
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
@@ -244,6 +252,8 @@ namespace GitHub.Services
         }
 
         public string DefaultClonePath { get { return defaultClonePath; } }
+
+        JoinableTaskContext JoinableTaskContext { get; }
 
         class OrganizationAdapter
         {

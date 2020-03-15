@@ -113,7 +113,7 @@ namespace GitHub.App.UnitTests.ViewModels
         class TestComment : CommentViewModel
         {
             public TestComment()
-                : base(Substitute.For<ICommentService>())
+                : base(Substitute.For<ICommentService>(), Substitute.For<IAutoCompleteAdvisor>())
             {
             }
 

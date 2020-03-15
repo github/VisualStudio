@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Yeni deponuzu içerecek klasörü seçin.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Depo Kopyala</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub'dan Aç</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>**{0}** dalı için Çekme İsteği [{1}] ({2}) konumunda başarıyla oluşturuldu</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Depoyu yayımla</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Depoyu {0} konumunda yayımla</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Lütfen Çekme İsteği için bir başlık girin</value>
   </data>
@@ -181,10 +172,7 @@
     <value>Kaynak ve hedef dal aynı olamaz</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>Kaynak dal uzak konumda değil, kaynak dalı gönderdiniz mi?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Seçili depo yok.</value>
+    <value>Kaynak dal uzak depoda yok, kaynak dalı gönderdiniz mi?</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Lütfen bir depo yolu girin</value>
@@ -256,10 +244,10 @@
     <value>Gönderebilmeniz için önce çekmeniz gerekir</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>Çekilecek işleme yok</value>
+    <value>Çekilecek commit yok</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>Gönderilecek işleme yok</value>
+    <value>Gönderilecek commit yok</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*Açıklama sağlanmadı.*</value>
@@ -277,7 +265,7 @@
     <value>{0} {1} dalına gönder</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>uzak</value>
+    <value>uzak depo</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>yeniden adlandır</value>
@@ -490,7 +478,7 @@ https://git-scm.com/download/win</value>
     <value>Depo Adı</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>Bu deponun uzak konumu yok. GitHub'da yayımlamak için formu doldurun.</value>
+    <value>Bu deponun uzak deposu yok. GitHub'da yayımlamak için formu doldurun.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Yayımla</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Özel Depo</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Yerel yol</value>
+    <value>Yerel yol:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Lisans</value>
@@ -687,7 +675,7 @@ https://git-scm.com/download/win</value>
     <value>İnceleme başlat</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Buraya bir açıklama eklemek için değişikliklerinizi işleyip göndermelisiniz.</value>
+    <value>Buraya bir açıklama eklemek için değişikliklerinizi commit işlemi yapıp göndermelisiniz.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Önceki Açıklama</value>
@@ -807,7 +795,7 @@ https://git-scm.com/download/win</value>
     <value>Gidilecek etkin bir depo yok</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>Çalışma dosyası '{0}' konumundaki dosyadan farklı. Lütfen karşılık gelen dalı, çekme isteğini veya işlemeyi kullanıma alın.</value>
+    <value>Çalışma dosyası '{0}' konumundaki dosyadan farklı. Lütfen karşılık gelen dalı, çekme isteğini veya commit'i kullanıma alın.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Lütfen '{0}' deposunu açın ve yeniden deneyin</value>
@@ -821,14 +809,14 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Hedef URL geçerli depoda bulunamadı. Getirme işlemi gerçekleştirdikten sonra yeniden deneyin.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>Bu konumda zaten bir dizin var ancak bir depo içermiyor.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Hedef yoldaki dizin boş değil.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Bu konumda bir depo zaten var ancak bu deponun "origin" adlı bir uzak konumu yok.</value>
+    <value>Bu konumda bir depo zaten var ancak bu deponun "origin" adlı bir uzak deposu yok.</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Bu konumda bir depo zaten var ancak bu depo {0} adlı bir uzak konumuna sahip.</value>
+    <value>Bu konumda bir depo zaten var ancak bu depo {0} adlı bir uzak depoya sahip.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Zaten bu konuma kopyaladınız. Yerel depoyu açmak için 'Aç' seçeneğine tıklayın.</value>
@@ -837,15 +825,70 @@ https://git-scm.com/download/win</value>
     <value>Depo için GitHub URL'si bulunamıyor</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>GitHub URL'lerinin bulunması için depoların tanımlı bir "origin" adlı uzak konumuna sahip olması gerekir.</value>
+    <value>GitHub URL'lerinin bulunması için depoların tanımlı bir "origin" adlı uzak depoya sahip olması gerekir.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Lütfen mevcut uzak konumlarınızdan birini 'origin' olarak adlandırın veya 'origin' adlı yeni bir uzak konum ekleyip getirin. Bu işlemi komut satırından veya aşağıdaki düğmeye tıklayarak gerçekleştirebilirsiniz.</value>
+    <value>Lütfen mevcut uzak depolarınızdan birini 'origin' olarak adlandırın veya 'origin' adlı yeni bir uzak depo ekleyip getirin. Bu işlemi komut satırından veya aşağıdaki düğmeye tıklayarak gerçekleştirebilirsiniz.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Depoda '{0}' öğesine karşılık gelen dosya bulunamadı. Lütfen bir 'git fetch' işlemi gerçekleştirin ya da hedef çekme isteğini kullanıma alın.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>En son gönderilen {0}</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Çekme isteğini kapat</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Sorunu kapat</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Kapat ve açıklama ekle</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Yeniden aç ve açıklama ekle</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Sorunu yeniden aç</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Çekme isteğini yeniden aç</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} işleme</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>birkaç işleme ekledi</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>ve diğer kişiler</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Bu konuşma çözümlendi olarak işaretlendi</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Depolarınız</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Ortak çalışan depoları</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Katkıda bulunulan depolar</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Bir URL arayın veya girin</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Gözat...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Kopyalama</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Hesap Ekle/Değiştir</value>
   </data>
 </root>

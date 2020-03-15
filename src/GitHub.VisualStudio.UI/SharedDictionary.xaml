@@ -2,21 +2,24 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:theme="clr-namespace:GitHub.VisualStudio.UI.Helpers"
-                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI"
-                    xmlns:ui="clr-namespace:GitHub.UI;assembly=GitHub.UI">
+                    xmlns:cache="clr-namespace:GitHub.UI.Helpers;assembly=GitHub.UI">
 
     <ResourceDictionary.MergedDictionaries>
         <theme:ThemeDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ThemeDesignTime.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ActionLinkButton.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/OcticonButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubComboBox.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Buttons.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubLinkButton.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubTabControl.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/TextBlocks.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/FilterTextBox.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/LinkDropDown.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/GitHubActionLink.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/ItemsControls.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/SectionControl.xaml"/>
         <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/UI/Controls/InfoPanel.xaml"/>
+        <cache:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/UI/Controls/LightModalViewTabControl.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <DrawingBrush x:Key="ConnectArrowBrush">

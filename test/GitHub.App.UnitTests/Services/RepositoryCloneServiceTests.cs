@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
+using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using Rothko;
@@ -121,9 +122,11 @@ public class RepositoryCloneServiceTests
                     ((MemberExpression)x.Body).Member.Name == counterName));
         }
 
-        [TestCase("https://github.com/failing/url", @"c:\dev\bar")]
-        public async Task CleansDirectoryOnCloneFailed(string cloneUrl, string clonePath)
+        [Test]
+        public async Task CleansDirectoryOnCloneFailed()
         {
+            var cloneUrl = "https://github.com/failing/url";
+            var clonePath = @"c:\dev\bar";
             var operatingSystem = Substitute.For<IOperatingSystem>();
             var vsGitServices = Substitute.For<IVSGitServices>();
             vsGitServices.Clone(cloneUrl, clonePath, true).Returns(x => { throw new Exception(); });
@@ -133,6 +136,22 @@ public class RepositoryCloneServiceTests
 
             operatingSystem.Directory.Received().CreateDirectory(clonePath);
             operatingSystem.Directory.Received().DeleteDirectory(clonePath);
+            await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
+        }
+
+        [Test]
+        public async Task CloneIntoEmptyDirectory()
+        {
+            var cloneUrl = "https://github.com/foo/bar";
+            var clonePath = @"c:\empty\directory";
+            var operatingSystem = Substitute.For<IOperatingSystem>();
+            operatingSystem.Directory.DirectoryExists(clonePath).Returns(true);
+            operatingSystem.Directory.IsEmpty(clonePath).Returns(true);
+            var vsGitServices = Substitute.For<IVSGitServices>();
+            var cloneService = CreateRepositoryCloneService(operatingSystem: operatingSystem, vsGitServices: vsGitServices);
+            await cloneService.CloneRepository(cloneUrl, clonePath);
+
+            operatingSystem.Directory.DidNotReceive().CreateDirectory(clonePath);
             await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
         }
 
@@ -150,7 +169,7 @@ public class RepositoryCloneServiceTests
 
             return new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                usageTracker, serviceProvider);
+                usageTracker, serviceProvider, new JoinableTaskContext());
         }
     }
 }

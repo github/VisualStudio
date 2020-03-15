@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Wybierz folder zawierający dla nowego repozytorium.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Klonuj repozytorium</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Otwórz z witryny GitHub</value>
   </data>
@@ -139,13 +136,13 @@
     <value>GistFromVisualStudio.cs</value>
   </data>
   <data name="EnterpriseUrlValidatorEmpty" xml:space="preserve">
-    <value>Wprowadź adres URL przedsiębiorstwa</value>
+    <value>Wprowadź adres URL usługi Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Wprowadź prawidłowy adres URL przedsiębiorstwa</value>
+    <value>Wprowadź prawidłowy adres URL usługi Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
-    <value>To nie jest serwer przedsiębiorstwa. Wprowadź adres URL przedsiębiorstwa</value>
+    <value>To nie jest serwer usługi Enterprise. Wprowadź adres URL usługi Enterprise</value>
   </data>
   <data name="ForgotPasswordLink" xml:space="preserve">
     <value>(Nie pamiętasz hasła?)</value>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pomyślnie utworzono żądanie ściągnięcia dla gałęzi **{0}**: [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publikowanie repozytorium w: {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Wprowadź tytuł żądania ściągnięcia</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Gałąź źródłowa nie istnieje zdalnie. Czy została wypchnięta?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Nie wybrano żadnego repozytorium.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Wprowadź ścieżkę repozytorium</value>
@@ -277,7 +265,7 @@
     <value>Wypchnij do {0} gałęzi {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>zdalny</value>
+    <value>repozytorium zdalne</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>zmień nazwę</value>
@@ -319,7 +307,7 @@ https://git-scm.com/download/win</value>
     <value>Naciśnij klawisz Enter, aby przejść do edytora (gałąź żądania ściągnięcia musi zostać wyewidencjonowana)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Repozytorium rozwidlenia</value>
+    <value>Utwórz rozwidlenie repozytorium</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>Przełącz źródło</value>
@@ -490,7 +478,7 @@ https://git-scm.com/download/win</value>
     <value>Nazwa repozytorium</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>To repozytorium nie ma elementu zdalnego. Wypełnij formularz, aby opublikować je w witrynie GitHub.</value>
+    <value>To repozytorium nie ma repozytorium zdalnego. Wypełnij formularz, aby opublikować je w witrynie GitHub.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Publikuj</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Repozytorium prywatne</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Ścieżka lokalna</value>
+    <value>Ścieżka lokalna:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licencja</value>
@@ -532,10 +520,10 @@ https://git-scm.com/download/win</value>
     <value>Wystąpił błąd podczas ładowania repozytoriów</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>Adres serwera systemu GitHub Enterprise</value>
+    <value>Adres serwera usługi GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
-    <value>Host jest niedostępna lub nie jest serwerem systemu GitHub Enterprise. Sprawdź adres i spróbuj ponownie.</value>
+    <value>Host jest niedostępny lub nie jest serwerem usługi GitHub Enterprise. Sprawdź adres i spróbuj ponownie.</value>
   </data>
   <data name="UserNameOrEmailPromptText" xml:space="preserve">
     <value>Nazwa użytkownika lub adres e-mail</value>
@@ -550,7 +538,7 @@ https://git-scm.com/download/win</value>
     <value>Sprawdź połączenie internetowe i spróbuj ponownie.</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Nie masz systemu GitHub Enterprise? </value>
+    <value>Nie masz usługi GitHub Enterprise? </value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
     <value>Nie masz konta? </value>
@@ -622,9 +610,9 @@ https://git-scm.com/download/win</value>
     <value>Wyświetl żądanie ściągnięcia w witrynie GitHub</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>Witamy w usłudze GitHub dla programu Visual! Zapoznaj się naszym [szkoleniem](pokaż szkolenie) lub [dokumentacją](pokaż dokumenty).
+    <value>Witamy w usłudze GitHub for Visual Studio! Zapoznaj się naszym [szkoleniem](show-training) lub [dokumentacją](show-docs).
 
-[Nie pokazuj ponownie](nie pokazuj ponownie)</value>
+[Nie pokazuj ponownie](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
     <value>Zaktualizowane</value>
@@ -702,7 +690,7 @@ https://git-scm.com/download/win</value>
     <value>Wstecz</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Repozytorium rozwidlenia</value>
+    <value>Utwórz rozwidlenie repozytorium</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
     <value>Utwórz rozwidlenie repozytorium</value>
@@ -821,14 +809,14 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Nie można odnaleźć docelowego adresu URL w bieżącym repozytorium. Spróbuj ponownie po zakończeniu pobierania.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>W tej lokalizacji istnieje już katalog, ale nie zawiera on repozytorium.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Katalog w ścieżce docelowej nie jest pusty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma w niej elementu zdalnego o nazwie „origin”.</value>
+    <value>Repozytorium już istnieje w tej lokalizacji, ale nie ma zdalnego repozytorium o nazwie „origin”.</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Repozytorium już istnieje w tej lokalizacji, ale zawiera element zdalny {0}.</value>
+    <value>Repozytorium już istnieje w tej lokalizacji, ale ma repozytorium zdalne {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Sklonowano już zawartość do tej lokalizacji. Kliknij pozycję „Otwórz”, aby otworzyć repozytorium lokalne.</value>
@@ -837,15 +825,70 @@ https://git-scm.com/download/win</value>
     <value>Nie można odnaleźć adresu URL repozytorium w usłudze GitHub</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Repozytoria muszą mieć zdefiniowany element zdalny o nazwie „origin” w celu zlokalizowania ich adresu URL usługi GitHub.</value>
+    <value>Repozytoria muszą mieć zdefiniowane repozytorium zdalne o nazwie „origin” w celu zlokalizowania ich adresu URL usługi GitHub.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Zmień nazwę jednego z istniejących elementów zdalnych na „origin” lub dodaj nowy element zdalny o nazwie „origin” i pobierz. Można to zrobić z poziomu wiersza polecenia lub przez kliknięcie przycisku poniżej.</value>
+    <value>Zmień nazwę jednego z istniejących repozytoriów zdalnych na „origin” lub dodaj nowe repozytorium zdalne o nazwie „origin” i pobierz. Można to zrobić z poziomu wiersza polecenia lub przez kliknięcie przycisku poniżej.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>Nie można odnaleźć pliku odpowiadającego elementowi „{0}” w repozytorium. Wykonaj polecenie pobierania danych Git lub wyewidencjonuj docelowe żądanie ściągnięcia.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>Ostatnio wypchnięte ({0})</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Komentarz</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Zamknij żądanie ściągnięcia</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Zamknij problem</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Zamknij i skomentuj</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Otwórz ponownie i skomentuj</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Otwórz ponownie problem</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Otwórz ponownie żądanie ściągnięcia</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>Zatwierdzenia w {0}</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>— użytkownik dodał zatwierdzenia</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>i inni</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Ta konwersacja została oznaczona jako rozwiązana</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Twoje repozytoria</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Repozytoria współpracowników</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Współtworzone repozytoria</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Wyszukaj lub wprowadź adres URL</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Przeglądaj...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Klonuj</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Dodaj/Zmień konta</value>
   </data>
 </root>

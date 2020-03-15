@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Input;
 using GitHub.ViewModels.Dialog;
 using Microsoft.VisualStudio.PlatformUI;
 
@@ -14,6 +16,19 @@ namespace GitHub.VisualStudio.Views.Dialog
             DataContext = viewModel;
             viewModel.Done.Subscribe(_ => Close());
             InitializeComponent();
+        }
+
+        void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
+            }
         }
     }
 }

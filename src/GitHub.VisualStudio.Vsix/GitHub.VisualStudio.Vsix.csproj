@@ -49,6 +49,8 @@
     <OutputPath>..\..\build\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <CopyVsixExtensionLocation>..\..\build\Content</CopyVsixExtensionLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugWithoutVsix|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -59,6 +61,8 @@
     <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Debug\</OutputPath>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <CopyVsixExtensionLocation>..\..\build\Content</CopyVsixExtensionLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -69,6 +73,8 @@
     <CreateVsixContainer>True</CreateVsixContainer>
     <DeployExtension>True</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <CopyVsixExtensionLocation>..\..\build\Content</CopyVsixExtensionLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseWithoutVsix|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -80,6 +86,8 @@
     <CreateVsixContainer>False</CreateVsixContainer>
     <DeployExtension>False</DeployExtension>
     <OutputPath>..\..\build\Release\</OutputPath>
+    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
+    <CopyVsixExtensionLocation>..\..\build\Content</CopyVsixExtensionLocation>
   </PropertyGroup>
   <PropertyGroup>
     <TargetVsixContainer>$(OutputPath)GitHub.VisualStudio.vsix</TargetVsixContainer>
@@ -349,7 +357,6 @@
   <Import Project="packaging.targets" />
   <!-- For regenerating templates on build -->
   <Import Project="..\common\t4.targets" />
-  <Import Project="versioning.targets" />
   <!--
     This is a workaround for allowing neutral CTO resource produced from *.vsct to go in the main assembly.
     We move the neutral *.cto file to be categorized as WithCulture=true,Culture=en to prevent the tools from falsely reporting:

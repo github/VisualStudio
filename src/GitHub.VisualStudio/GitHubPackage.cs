@@ -36,7 +36,7 @@ using GitHub.ViewModels.Documents;
 namespace GitHub.VisualStudio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version)]
+    [InstalledProductRegistration("#110", "#112", ExtensionInformation.Version)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
@@ -358,9 +358,9 @@ namespace GitHub.VisualStudio
                 // needs to be refactored. See #1398.
 #pragma warning disable VSTHRD011 // Use AsyncLazy<T>
                 var lazy2Fa = new Lazy<ITwoFactorChallengeHandler>(() =>
-                    ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    JoinableTaskFactory.Run(async () =>
                     {
-                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        await JoinableTaskFactory.SwitchToMainThreadAsync();
                         return serviceProvider.GetService<ITwoFactorChallengeHandler>();
                     }));
 #pragma warning restore VSTHRD011 // Use AsyncLazy<T>
@@ -382,7 +382,7 @@ namespace GitHub.VisualStudio
                 Assumes.Present(sp);
 
                 var environment = new Rothko.Environment();
-                return new UsageService(sp, environment);
+                return new UsageService(sp, environment, ThreadHelper.JoinableTaskContext);
             }
             else if (serviceType == typeof(IUsageTracker))
             {
@@ -394,12 +394,18 @@ namespace GitHub.VisualStudio
                 Assumes.Present(serviceProvider);
                 Assumes.Present(settings);
 
-                return new UsageTracker(serviceProvider, usageService, settings);
+                // Only use Visual Studio Telemetry on VS 2017 and above
+                await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+                var dte = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                Assumes.Present(dte);
+                var vsTelemetry = new Version(dte.Version) >= new Version(15, 0);
+
+                return new UsageTracker(serviceProvider, usageService, settings, ThreadHelper.JoinableTaskContext, vsTelemetry);
             }
             else if (serviceType == typeof(IVSGitExt))
             {
                 var vsVersion = ApplicationInfo.GetHostVersionInfo().FileMajorPart;
-                return new VSGitExtFactory(vsVersion, this, GitService.GitServiceHelper).Create();
+                return new VSGitExtFactory(vsVersion, this, GitService.GitServiceHelper, ThreadHelper.JoinableTaskContext).Create();
             }
             else if (serviceType == typeof(IGitHubToolWindowManager))
             {
@@ -407,7 +413,7 @@ namespace GitHub.VisualStudio
             }
             else if (serviceType == typeof(IPackageSettings))
             {
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
                 var sp = new ServiceProvider(Services.Dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 return new PackageSettings(sp);
             }

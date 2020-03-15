@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Threading.Tasks;
 using GitHub.Models;
+using GitHub.Services;
 using GitHub.ViewModels;
 using ReactiveUI;
 
@@ -37,6 +38,7 @@ namespace GitHub.SampleData
         public ReactiveCommand<Unit, Unit> CommitEdit { get; }
         public ReactiveCommand<Unit, Unit> OpenOnGitHub { get; } = ReactiveCommand.Create(() => { });
         public ReactiveCommand<Unit, Unit> Delete { get; }
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         public Task InitializeAsync(ICommentThreadViewModel thread, ActorModel currentUser, CommentModel comment, CommentEditState state)
         {

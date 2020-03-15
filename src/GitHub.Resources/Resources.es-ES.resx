@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Seleccione una carpeta contenedora para el nuevo repositorio.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Clonar un repositorio</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Abrir desde GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>La solicitud de incorporación de cambios para la rama **{0}** se creó correctamente a las [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publicar repositorio</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publicar el repositorio en {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Escriba un título para la solicitud de incorporación de cambios</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>La rama de origen no existe en la ubicación remota. ¿La ha insertado?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No hay ningún repositorio seleccionado.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Escriba una ruta de acceso de repositorio.</value>
@@ -256,10 +244,10 @@
     <value>Debe incorporar los cambios antes de enviarlos</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>No hay confirmaciones para incorporar cambios.</value>
+    <value>No hay commits para incorporar cambios</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>No hay confirmaciones para enviar cambios.</value>
+    <value>No hay commits para enviar cambios</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*No se ha proporcionado ninguna descripción.*</value>
@@ -277,7 +265,7 @@
     <value>Enviar cambios a {0}, rama {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
-    <value>remoto</value>
+    <value>repositorio remoto</value>
   </data>
   <data name="RenamedFileStatus" xml:space="preserve">
     <value>cambiar nombre</value>
@@ -286,7 +274,7 @@
     <value>El repositorio de origen ya no está disponible.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>No se puede extraer del repositorio porque el directorio de trabajo tiene cambios pendientes de confirmación.</value>
+    <value>No se puede extraer del repositorio porque el directorio de trabajo tiene cambios pendientes de hacer commit.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Sincronizar {0} submódulos</value>
@@ -490,7 +478,7 @@ https://git-scm.com/download/win</value>
     <value>Nombre del repositorio</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>Este repositorio no tiene un elemento remoto. Rellene el formulario para publicarlo en GitHub.</value>
+    <value>Este repositorio no tiene un repositorio remoto. Rellene el formulario para publicarlo en GitHub.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Publicar</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Repositorio privado</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Ruta de acceso local</value>
+    <value>Ruta de acceso local:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Licencia</value>
@@ -568,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Este repositorio no está en GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>No hay ningún repositorio</value>
+    <value>No se encontró ningún repositorio.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>No se encontró ningún repositorio GIT aquí. Abra un proyecto GIT o haga clic en "Archivo -&gt; Agregar al control de código fuente" en un proyecto para empezar.</value>
@@ -687,7 +675,7 @@ https://git-scm.com/download/win</value>
     <value>Iniciar una revisión</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Debe confirmar y enviar los cambios para agregar un comentario aquí.</value>
+    <value>Debe hacer commit y enviar los cambios para agregar un comentario aquí.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Comentario anterior</value>
@@ -807,7 +795,7 @@ https://git-scm.com/download/win</value>
     <value>No hay ningún repositorio activo para navegar.</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>El archivo de trabajo es distinto al archivo en "{0}". Extraiga del repositorio la rama, solicitud de incorporación de cambios o confirmación correspondiente.</value>
+    <value>El archivo de trabajo es distinto al archivo que hay en "{0}". Extraiga del repositorio la rama, la solicitud de incorporación de cambios o el commit correspondiente.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Abra el repositorio "{0}" y vuelva a intentarlo</value>
@@ -821,14 +809,14 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>No se encontró la dirección URL de destino en el repositorio actual. Vuelva a intentarlo tras una recuperación de cambios.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>Ya hay un directorio en esta ubicación, pero no contiene un repositorio.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>El directorio en la ruta de acceso de destino no está vacío.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Ya existe un repositorio en esta ubicación, pero no tiene un elemento remoto con el nombre "origen".</value>
+    <value>Ya existe un repositorio en esta ubicación, pero no tiene un repositorio remoto con el nombre "origen".</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Ya existe un repositorio en esta ubicación, pero tiene un elemento remoto de {0}.</value>
+    <value>Ya existe un repositorio en esta ubicación, pero tiene un repositorio remoto de {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Ya se ha realizado una clonación en esta ubicación. Haga clic en "Abrir" para abrir el repositorio local.</value>
@@ -837,15 +825,70 @@ https://git-scm.com/download/win</value>
     <value>No se encuentra la dirección URL de GitHub para el repositorio</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Los repositorios deben tener definido un elemento remoto llamado "origen" para encontrar su dirección URL de GitHub.</value>
+    <value>Los repositorios deben tener definido un repositorio remoto llamado "origen" para encontrar su dirección URL de GitHub.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Cambie el nombre de uno de los elementos remotos existentes a "origen" o bien agregue uno nuevo llamado "origen" y recupere los cambios. Esta operación puede realizarse desde la línea de comandos o al hacer clic en el botón siguiente.</value>
+    <value>Cambie el nombre de uno de los repositorios remotos actuales a "origen", o bien agregue uno nuevo llamado "origen" y recupere los cambios. Esta operación puede realizarse desde la línea de comandos o al hacer clic en el botón siguiente.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
     <value>No se encontró el archivo correspondiente a "{0}" en el repositorio. Realice la operación "Búsqueda de GIT" o extraiga del repositorio la solicitud de incorporación de cambios de destino.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} con cambios enviados más recientemente</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comentario</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Cerrar la solicitud de incorporación de cambios</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Cerrar el problema</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Cerrar y comentar</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Volver a abrir y comentar</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Volver a abrir el problema</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Volver a abrir la solicitud de incorporación de cambios</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} confirmaciones</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>se han agregado algunas confirmaciones</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>y otros</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Esta conversación se ha marcado como resuelta</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Los repositorios</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Repositorios de colaborador</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contribución a los repositorios</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Buscar o escribir una dirección URL</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Examinar...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clonar</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Agregar o cambiar cuentas</value>
   </data>
 </root>

@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>新しいリポジトリを含んでいるフォルダーを選択します。</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>リポジトリを複製</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>GitHub から開く</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>ブランチの Pull Request **{0}** が [{1}]({2}) に正常に作成されました</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>リポジトリの発行</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>リポジトリを {0} に発行</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Pull Request のタイトルを入力してください</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>ソース ブランチがリモートに存在しません。ブランチをプッシュしましたか?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>リポジトリが選択されていません。</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>リポジトリのパスを入力してください</value>
@@ -286,7 +274,7 @@
     <value>ソース リポジトリは使用できなくなりました。</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>作業ディレクトリに確定されていない変更があるため、チェックアウトできません。</value>
+    <value>作業ディレクトリにコミットされていない変更があるため、チェックアウトできません。</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>{0} サブモジュールの同期</value>
@@ -322,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>リポジトリのフォーク</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>原点の切り替え</value>
+    <value>Origin の切り替え</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>このレビューをキャンセルしますか? 保留中のすべてのコメントが失われます。</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>プライベート リポジトリ</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>ローカル パス</value>
+    <value>ローカル パス:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>ライセンス</value>
@@ -568,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>このリポジトリは GitHub 上にありません</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>リポジトリではありません</value>
+    <value>リポジトリが見つかりません</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>この場所に Git リポジトリが見つかりませんでした。Git プロジェクトを開くか、プロジェクトで [ファイル] -&gt; [ソース管理に追加] をクリックして作業を開始してください。</value>
@@ -622,7 +610,7 @@ https://git-scm.com/download/win</value>
     <value>GitHub 上で Pull Request を表示</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
-    <value>Visual Studio 向け GitHub へようこそ! [トレーニング](show-training) または [ドキュメント](show-docs) をご覧ください。
+    <value>GitHub for Visual Studio へようこそ! [トレーニング](show-training) または [ドキュメント](show-docs) をご覧ください。
 
 [今後このメッセージを表示しない](dont-show-again)</value>
   </data>
@@ -821,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>現在のリポジトリにターゲット URL が見つかりませんでした。フェッチを実行した後、もう一度お試しください。</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>この場所に既にディレクトリがありますが、リポジトリが含まれていません。</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>ターゲット パスのディレクトリが空ではありません。</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>この場所にリポジトリが既に存在しますが、そのリポジトリには "origin" という名前のリモートがありません。</value>
@@ -847,5 +835,60 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} が最近プッシュされました</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>コメント</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>pull request を閉じる</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>問題を閉じる</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>閉じてコメントする</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>再度開いてコメントする</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>問題を再度開く</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>pull request を再度開く</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>{0} 個のコミット</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>コミットがいくつか追加されました</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>この会話は解決済みとしてマークされました</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>ご使用のリポジトリ</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>コラボレーターのリポジトリ</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>参加先のリポジトリ</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>URL を検索または入力します</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>参照...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>アカウントの追加または変更</value>
   </data>
 </root>

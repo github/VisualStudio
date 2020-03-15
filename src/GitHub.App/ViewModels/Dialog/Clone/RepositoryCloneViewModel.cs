@@ -26,6 +26,7 @@ namespace GitHub.ViewModels.Dialog.Clone
         readonly IRepositoryCloneService service;
         readonly IGitService gitService;
         readonly IUsageTracker usageTracker;
+        readonly IDialogService dialogService;
         readonly IReadOnlyList<IRepositoryCloneTabViewModel> tabs;
         string path;
         UriString url;
@@ -40,6 +41,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             IRepositoryCloneService service,
             IGitService gitService,
             IUsageTracker usageTracker,
+            IDialogService dialogService,
             IRepositorySelectViewModel gitHubTab,
             IRepositorySelectViewModel enterpriseTab)
         {
@@ -48,6 +50,7 @@ namespace GitHub.ViewModels.Dialog.Clone
             this.service = service;
             this.gitService = gitService;
             this.usageTracker = usageTracker;
+            this.dialogService = dialogService;
 
             GitHubTab = gitHubTab;
             EnterpriseTab = enterpriseTab;
@@ -67,11 +70,13 @@ namespace GitHub.ViewModels.Dialog.Clone
 
             var canClone = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && !service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) &&
+                (!service.DestinationDirectoryExists(path) || service.DestinationDirectoryEmpty(path)));
 
             var canOpen = Observable.CombineLatest(
                 repository, this.WhenAnyValue(x => x.Path),
-                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path));
+                (repo, path) => repo != null && !service.DestinationFileExists(path) && service.DestinationDirectoryExists(path)
+                && !service.DestinationDirectoryEmpty(path));
 
             Browse = ReactiveCommand.Create(() => BrowseForDirectory());
             Clone = ReactiveCommand.CreateFromObservable(
@@ -80,6 +85,8 @@ namespace GitHub.ViewModels.Dialog.Clone
             Open = ReactiveCommand.CreateFromObservable(
                 () => repository.Select(x => new CloneDialogResult(Path, x?.CloneUrl)),
                 canOpen);
+
+            LoginAsDifferentUser = ReactiveCommand.CreateFromTask(LoginAsDifferentUserAsync);
         }
 
         public IRepositorySelectViewModel GitHubTab { get; }
@@ -109,6 +116,8 @@ namespace GitHub.ViewModels.Dialog.Clone
 
         public IObservable<object> Done => Observable.Merge(Clone, Open);
 
+        public ReactiveCommand<Unit, Unit> LoginAsDifferentUser { get; }
+
         public ReactiveCommand<Unit, Unit> Browse { get; }
 
         public ReactiveCommand<Unit, CloneDialogResult> Clone { get; }
@@ -131,7 +140,11 @@ namespace GitHub.ViewModels.Dialog.Clone
                 EnterpriseTab.Initialize(enterpriseConnection);
             }
 
-            if (connection == enterpriseConnection)
+            if (connection == gitHubConnection)
+            {
+                SelectedTabIndex = 0;
+            }
+            else if (connection == enterpriseConnection)
             {
                 SelectedTabIndex = 1;
             }
@@ -151,6 +164,28 @@ namespace GitHub.ViewModels.Dialog.Clone
             }
 
             this.WhenAnyValue(x => x.SelectedTabIndex).Subscribe(x => tabs[x].Activate().Forget());
+        }
+
+        async Task LoginAsDifferentUserAsync()
+        {
+            if (await dialogService.ShowLoginDialog() is IConnection connection)
+            {
+                var connections = await connectionManager.GetLoadedConnections();
+                var gitHubConnection = connections.FirstOrDefault(x => x.HostAddress.IsGitHubDotCom());
+
+                if (connection == gitHubConnection)
+                {
+                    SelectedTabIndex = 0;
+                    GitHubTab.Initialize(connection);
+                    GitHubTab.Activate().Forget();
+                }
+                else
+                {
+                    SelectedTabIndex = 1;
+                    EnterpriseTab.Initialize(connection);
+                    EnterpriseTab.Activate().Forget();
+                }
+            }
         }
 
         void BrowseForDirectory()
@@ -236,13 +271,13 @@ namespace GitHub.ViewModels.Dialog.Clone
                     return Resources.DestinationAlreadyExists;
                 }
 
-                if (service.DestinationDirectoryExists(path))
+                if (service.DestinationDirectoryExists(path) && !service.DestinationDirectoryEmpty(path))
                 {
                     using (var repository = gitService.GetRepository(path))
                     {
                         if (repository == null)
                         {
-                            return Resources.CantFindARepositoryAtLocalPath;
+                            return Resources.DirectoryAtDestinationNotEmpty;
                         }
 
                         var localUrl = gitService.GetRemoteUri(repository)?.ToRepositoryUrl();
@@ -254,7 +289,8 @@ namespace GitHub.ViewModels.Dialog.Clone
                         var targetUrl = repositoryModel.CloneUrl?.ToRepositoryUrl();
                         if (localUrl != targetUrl)
                         {
-                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf, localUrl);
+                            return string.Format(CultureInfo.CurrentCulture, Resources.LocalRepositoryHasARemoteOf,
+                                localUrl);
                         }
 
                         return Resources.YouHaveAlreadyClonedToThisLocation;

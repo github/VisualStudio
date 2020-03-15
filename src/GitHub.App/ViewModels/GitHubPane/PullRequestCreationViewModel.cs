@@ -18,6 +18,7 @@ using GitHub.Models;
 using GitHub.Models.Drafts;
 using GitHub.Primitives;
 using GitHub.Services;
+using GitHub.UI;
 using GitHub.Validation;
 using Octokit;
 using ReactiveUI;
@@ -51,8 +52,9 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestService service,
             INotificationService notifications,
             IMessageDraftStore draftStore,
-            IGitService gitService)
-            : this(modelServiceFactory, service, notifications, draftStore, gitService, DefaultScheduler.Instance)
+            IGitService gitService,
+            IAutoCompleteAdvisor autoCompleteAdvisor)
+            : this(modelServiceFactory, service, notifications, draftStore, gitService, autoCompleteAdvisor, DefaultScheduler.Instance)
         {
         }
 
@@ -62,6 +64,7 @@ namespace GitHub.ViewModels.GitHubPane
             INotificationService notifications,
             IMessageDraftStore draftStore,
             IGitService gitService,
+            IAutoCompleteAdvisor autoCompleteAdvisor,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(modelServiceFactory, nameof(modelServiceFactory));
@@ -69,12 +72,14 @@ namespace GitHub.ViewModels.GitHubPane
             Guard.ArgumentNotNull(notifications, nameof(notifications));
             Guard.ArgumentNotNull(draftStore, nameof(draftStore));
             Guard.ArgumentNotNull(gitService, nameof(gitService));
+            Guard.ArgumentNotNull(autoCompleteAdvisor, nameof(autoCompleteAdvisor));
             Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.service = service;
             this.modelServiceFactory = modelServiceFactory;
             this.draftStore = draftStore;
             this.gitService = gitService;
+            this.AutoCompleteAdvisor = autoCompleteAdvisor;
             this.timerScheduler = timerScheduler;
 
             this.WhenAnyValue(x => x.Branches)
@@ -336,6 +341,7 @@ namespace GitHub.ViewModels.GitHubPane
 
         public RemoteRepositoryModel GitHubRepository { get { return githubRepository?.Value; } }
         bool IsExecuting { get { return isExecuting.Value; } }
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         bool initialized;
         bool Initialized

@@ -6,12 +6,8 @@
                     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Controls/RoundedCheckBox.xaml" />
-        <ResourceDictionary Source="Controls/FilterTextBox.xaml" />
-        <ResourceDictionary Source="Controls/GitHubLinkButton.xaml" />
-        <ResourceDictionary Source="Controls/LightModalViewTabControl.xaml" />
+        <ResourceDictionary Source="Controls/AutoCompleteBox.xaml" />
         <ResourceDictionary Source="Controls/ScrollViewerWithShadow.xaml" />
-        <ResourceDictionary Source="Controls/LightListBox.xaml" />
         <ResourceDictionary Source="../Controls/Octicons/OcticonImage.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -21,8 +17,8 @@
 
     <!-- ProgressBar -->
     <Style x:Key="GitHubProgressBar" TargetType="{x:Type ui:GitHubProgressBar}">
-        <Setter Property="Foreground" Value="#999999" />
-        <Setter Property="Background" Value="#DDDDDD" />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubAccentBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Height" Value="4" />
         <Setter Property="IsHitTestVisible" Value="False" />
         <Setter Property="Focusable" Value="False" />

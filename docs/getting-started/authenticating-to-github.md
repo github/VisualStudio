@@ -4,7 +4,7 @@
 
 1. In Visual Studio, select **Team Explorer** from the **View** menu.
     <a href="images/view_team_explorer.png?raw=true" target="_blank"><div><img src="images/view_team_explorer.png" alt="Team Explorer in the view menu" width="500px"/></div></a>
-1. In the Team Explorer pane, click the **Manage Connectios** toolbar icon.
+1. In the Team Explorer pane, click the **Manage Connections** toolbar icon.
     <a href="images/manage_connections.png?raw=true" target="_blank"><div><img src="images/manage_connections.png" alt="Manage connections toolbar icon in the Team Explorer pane" width="500px"/></div></a>
 1. Click the **Connect** link in the GitHub section.
         <a href="images/sign-in-to-github-provider.png?raw=true" target="_blank"><div><img src="images/sign-in-to-github-provider.png" alt="Connect to GitHub" height="300px"/></div></a>   

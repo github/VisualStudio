@@ -5,6 +5,7 @@
                     xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf">
     <Style TargetType="local:InfoPanel">
         <Setter Property="Background" Value="{DynamicResource VsBrush.InfoBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource VsBrush.InfoText}"/>
         <Setter Property="Padding" Value="8"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -17,7 +18,7 @@
                                 <ResourceDictionary>
                                     <ResourceDictionary.MergedDictionaries>
                                         <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml"/>
-                                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/Assets/Markdown.xaml" />
+                                        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/Styles/Markdown.xaml" />
                                     </ResourceDictionary.MergedDictionaries>
                                     <Style x:Key="DocumentStyle" TargetType="FlowDocument">
                                         <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -45,17 +46,22 @@
                                              VerticalAlignment="Top"
                                              Background="Transparent"
                                              DockPanel.Dock="Right"
-                                             Foreground="Black"
                                              Icon="x"
                                              Visibility="{TemplateBinding ShowCloseButton, Converter={ghfvs:BooleanToVisibilityConverter}}"/>
                             <markdig:MarkdownViewer Margin="8,0"
                                                 VerticalAlignment="Top"
                                                 DockPanel.Dock="Top"
-                                                Foreground="Black"
                                                 Markdown="{TemplateBinding Message}"
                                                 ScrollViewer.CanContentScroll="False"
                                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"/>
+                                                ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                <markdig:MarkdownViewer.Resources>
+                                    <!-- Don't highlight selected text-->
+                                    <Style TargetType="{x:Type FlowDocumentScrollViewer}">
+                                        <Setter Property="SelectionOpacity" Value="0" />
+                                    </Style>
+                                </markdig:MarkdownViewer.Resources>
+                            </markdig:MarkdownViewer>
                         </DockPanel>
                     </Border>
                 </ControlTemplate>

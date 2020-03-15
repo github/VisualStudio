@@ -129,6 +129,7 @@
     <Compile Include="Services\ShowDialogService.cs" />
     <Compile Include="Services\UsageService.cs" />
     <Compile Include="Services\UsageTracker.cs" />
+    <Compile Include="Services\VisualStudioUsageTracker.cs" />
     <Compile Include="Services\VSGitExtFactory.cs" />
     <Compile Include="Settings\Constants.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
@@ -169,7 +170,6 @@
     <None Include="..\common\settings.json">
       <Link>Properties\settings.json</Link>
     </None>
-    <None Include="..\..\build\version" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="GitHub.VisualStudio.vsct">
@@ -300,6 +300,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Madskristensen.VisualStudio.SDK" Version="14.3.75-pre" />
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>15.0.691-master31907920</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.8.3252</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -308,6 +311,7 @@
     <PackageReference Include="Microsoft.VSSDK.VsixSignTool">
       <Version>14.1.24720</Version>
     </PackageReference>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0" />
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
@@ -317,7 +321,6 @@
   <Import Project="packaging.targets" />
   <!-- For regenerating templates on build -->
   <Import Project="..\common\t4.targets" />
-  <Import Project="versioning.targets" />
   <!--
     This is a workaround for allowing neutral CTO resource produced from *.vsct to go in the main assembly.
     We move the neutral *.cto file to be categorized as WithCulture=true,Culture=en to prevent the tools from falsely reporting:

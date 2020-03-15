@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Выберите папку для нового репозитория.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Клонировать репозиторий</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Открыть из GitHub</value>
   </data>
@@ -142,7 +139,7 @@
     <value>Введите URL-адрес предприятия</value>
   </data>
   <data name="EnterpriseUrlValidatorInvalid" xml:space="preserve">
-    <value>Введите допустимый URL-адрес предприятия</value>
+    <value>Введите допустимый URL-адрес Enterprise</value>
   </data>
   <data name="EnterpriseUrlValidatorNotAGitHubHost" xml:space="preserve">
     <value>Это не сервер предприятия. Введите URL-адрес предприятия</value>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Запрос на вытягивание для ветви **{0}** успешно создан в [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Опубликовать репозиторий</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Опубликовать репозиторий в {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Введите заголовок для запроса на вытягивание</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Исходная ветвь не существует удаленно, вы отправили ее?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>Нет выбранного репозитория.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Введите путь к репозиторию</value>
@@ -322,7 +310,7 @@ https://git-scm.com/download/win</value>
     <value>Создать вилку репозитория</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
-    <value>Переключить источник</value>
+    <value>Переключить origin</value>
   </data>
   <data name="CancelPendingReviewConfirmation" xml:space="preserve">
     <value>Вы действительно хотите отменить эту проверку? Все ожидающие комментарии будут потеряны.</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Частный репозиторий</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Локальный путь</value>
+    <value>Локальный путь:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>Лицензия</value>
@@ -568,7 +556,7 @@ https://git-scm.com/download/win</value>
     <value>Этот репозиторий находится не в GitHub</value>
   </data>
   <data name="NotAGitRepository" xml:space="preserve">
-    <value>Репозиторий отсутствует</value>
+    <value>Репозиторий отсутствует.</value>
   </data>
   <data name="NotAGitRepositoryMessage" xml:space="preserve">
     <value>Не удалось найти здесь репозиторий Git. Откройте проект Git или выберите "Файл" -&gt; "Добавить в систему управления версиями" в проекте, чтобы приступить к работе.</value>
@@ -732,7 +720,7 @@ https://git-scm.com/download/win</value>
     <value>записал</value>
   </data>
   <data name="SubmitYourReviewFor" xml:space="preserve">
-    <value>Отправьте проверку для</value>
+    <value>Отправьте результаты проверки для</value>
   </data>
   <data name="YourReviewSummary" xml:space="preserve">
     <value>Сводка по вашей проверке</value>
@@ -821,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Не удалось найти целевой URL-адрес в текущем репозитории. Выполните принесение и повторите попытку.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>В этом расположении уже существует каталог, но он не содержит репозиторий.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>Каталог в пути назначения не пуст.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>В этом расположении уже существует репозиторий, но у него отсутствует удаленный репозиторий с именем "origin".</value>
@@ -831,7 +819,7 @@ https://git-scm.com/download/win</value>
     <value>В этом расположении уже существует репозиторий, но у него имеется удаленный репозиторий {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
-    <value>Вы уже клонировали в это расположение. Нажмите кнопку "Открыть", чтобы открыть локальный репозиторий.</value>
+    <value>Вы уже клонировали элементы в это расположение. Нажмите кнопку "Открыть", чтобы открыть локальный репозиторий.</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
     <value>Не удается найти URL-адрес GitHub для репозитория</value>
@@ -847,5 +835,60 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>Отправлено последний раз: {0}</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
+  <data name="ClosePullRequest" xml:space="preserve">
+    <value>Закрыть запрос на вытягивание</value>
+  </data>
+  <data name="CloseIssue" xml:space="preserve">
+    <value>Закрыть обращение</value>
+  </data>
+  <data name="CloseAndComment" xml:space="preserve">
+    <value>Закрыть и прокомментировать</value>
+  </data>
+  <data name="ReopenAndComment" xml:space="preserve">
+    <value>Повторно открыть и прокомментировать</value>
+  </data>
+  <data name="ReopenIssue" xml:space="preserve">
+    <value>Повторно открыть обращение</value>
+  </data>
+  <data name="ReopenPullRequest" xml:space="preserve">
+    <value>Повторно открыть запрос на включение внесенных изменений</value>
+  </data>
+  <data name="CommitCountFormat" xml:space="preserve">
+    <value>Фиксаций: {0}</value>
+  </data>
+  <data name="AddedSomeCommits" xml:space="preserve">
+    <value>добавляет некоторые фиксации</value>
+  </data>
+  <data name="AndOthers" xml:space="preserve">
+    <value>и др.</value>
+  </data>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>Эта беседа была помечена как разрешенная.</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Ваши хранилища</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Репозитории участника совместной работы</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Добавлял данные в репозитории</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Поиск или ввод URL-адреса</value>
+    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Обзор...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Клонировать</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Добавить или изменить учетные записи</value>
   </data>
 </root>

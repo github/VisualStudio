@@ -120,9 +120,6 @@
   <data name="BrowseForDirectory" xml:space="preserve">
     <value>Select a containing folder for your new repository.</value>
   </data>
-  <data name="CloneTitle" xml:space="preserve">
-    <value>Clone a Repository</value>
-  </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Open from GitHub</value>
   </data>
@@ -168,12 +165,6 @@
   <data name="PRCreatedUpstream" xml:space="preserve">
     <value>Pull Request for branch **{0}** created successfully at [{1}]({2})</value>
   </data>
-  <data name="PublishTitle" xml:space="preserve">
-    <value>Publish repository</value>
-  </data>
-  <data name="PublishToTitle" xml:space="preserve">
-    <value>Publish repository to {0}</value>
-  </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
     <value>Please enter a title for the Pull Request</value>
   </data>
@@ -182,9 +173,6 @@
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
     <value>Source branch doesn't exist remotely, have you pushed it?</value>
-  </data>
-  <data name="RepositoryCloneFailedNoSelectedRepo" xml:space="preserve">
-    <value>No selected repository.</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
     <value>Please enter a repository path</value>
@@ -511,7 +499,7 @@ https://git-scm.com/download/win</value>
     <value>Private Repository</value>
   </data>
   <data name="localPathText" xml:space="preserve">
-    <value>Local path</value>
+    <value>Local path:</value>
   </data>
   <data name="licenseListText" xml:space="preserve">
     <value>License</value>
@@ -821,8 +809,8 @@ https://git-scm.com/download/win</value>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
     <value>Couldn't find target URL in current repository. Try again after doing a fetch.</value>
   </data>
-  <data name="CantFindARepositoryAtLocalPath" xml:space="preserve">
-    <value>There is already a directory at this location, but it doesn't contain a repository.</value>
+  <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
+    <value>The directory at the destination path is not empty.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
     <value>A repository already exists at this location, but it doesn't have a remote named "origin".</value>
@@ -847,9 +835,6 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
     <value>{0} most recently pushed</value>
-  </data>
-  <data name="OpenConversation" xml:space="preserve">
-    <value>Open Conversation</value>
   </data>
   <data name="Comment" xml:space="preserve">
     <value>Comment</value>
@@ -883,5 +868,28 @@ https://git-scm.com/download/win</value>
   </data>
   <data name="ThereArentAnyOpenIssues" xml:space="preserve">
     <value>There aren't any open issues.</value>
+  <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
+    <value>This conversation was marked as resolved</value>
+  </data>
+  <data name="RepositorySelectYourRepositories" xml:space="preserve">
+    <value>Your repositories</value>
+  </data>
+  <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
+    <value>Collaborator repositories</value>
+  </data>
+  <data name="RepositorySelectContributedRepositories" xml:space="preserve">
+    <value>Contributed to repositories</value>
+  </data>
+  <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
+    <value>Search or enter a URL</value>    
+  </data>
+  <data name="OpenFromGitHubBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="OpenFromGitHubClone" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="AddChangeAccounts" xml:space="preserve">
+    <value>Add/Change Accounts</value>
   </data>
 </root>

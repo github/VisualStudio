@@ -10,6 +10,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using GitHub.Factories;
 using GitHub.Api;
+using Microsoft.VisualStudio.Threading;
 
 namespace UnitTests
 {
@@ -88,7 +89,7 @@ namespace UnitTests
             var clone = cloneService ?? new RepositoryCloneService(Substitute.For<IOperatingSystem>(),
                 Substitute.For<IVSGitServices>(), Substitute.For<ITeamExplorerServices>(),
                 Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                Substitute.For<IUsageTracker>(), ret);
+                Substitute.For<IUsageTracker>(), ret, new JoinableTaskContext());
             var create = creationService ?? new RepositoryCreationService(clone);
             avatarProvider = avatarProvider ?? Substitute.For<IAvatarProvider>();
             ret.GetService(typeof(IGitService)).Returns(gitservice);

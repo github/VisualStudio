@@ -14,7 +14,7 @@ namespace GitHub.ViewModels.Documents
         public CommitSummaryViewModel(CommitModel commit)
         {
             AbbreviatedOid = commit.AbbreviatedOid;
-            Author = new ActorViewModel(commit.Author);
+            Author = new CommitActorViewModel(commit.Author);
             Header = commit.MessageHeadline;
             Oid = commit.Oid;
         }
@@ -23,7 +23,7 @@ namespace GitHub.ViewModels.Documents
         public string AbbreviatedOid { get; private set; }
 
         /// <inheritdoc/>
-        public IActorViewModel Author { get; private set; }
+        public ICommitActorViewModel Author { get; private set; }
 
         /// <inheritdoc/>
         public string Header { get; private set; }

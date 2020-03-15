@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using GitHub.Collections;
 using GitHub.Extensions;
 using GitHub.Extensions.Reactive;
@@ -154,21 +152,21 @@ namespace GitHub.ViewModels.GitHubPane
 
                     Forks = new RepositoryModel[]
                     {
-                    RemoteRepository,
-                    repository,
+                        RemoteRepository,
+                        repository,
                     };
                 }
 
                 this.WhenAnyValue(x => x.SelectedState, x => x.RemoteRepository)
                     .Skip(1)
-                    .Subscribe(_ => Refresh().Forget());
+                    .Subscribe(_ => InitializeItemSource(false).Forget());
 
                 Observable.Merge(
                     this.WhenAnyValue(x => x.SearchQuery).Skip(1).SelectUnit(),
                     AuthorFilter.WhenAnyValue(x => x.Selected).Skip(1).SelectUnit())
                     .Subscribe(_ => FilterChanged());
 
-                await Refresh();
+                await InitializeItemSource(true);
             }
             catch (Exception ex)
             {
@@ -182,18 +180,43 @@ namespace GitHub.ViewModels.GitHubPane
         /// Refreshes the view model.
         /// </summary>
         /// <returns>A task tracking the operation.</returns>
-        public override Task Refresh()
+        public override Task Refresh() => InitializeItemSource(true);
+
+        /// <summary>
+        /// When overridden in a derived class, creates the <see cref="IVirtualizingListSource{T}"/>
+        /// that will act as the source for <see cref="Items"/>.
+        /// </summary>
+        /// <param name="refresh">
+        /// Whether the item source is being created due to <see cref="Refresh"/> being called.
+        /// </param>
+        protected abstract Task<IVirtualizingListSource<IIssueListItemViewModelBase>> CreateItemSource(bool refresh);
+
+        /// <summary>
+        /// When overridden in a derived class, navigates to the specified item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>A task tracking the operation.</returns>
+        protected abstract Task DoOpenItem(IIssueListItemViewModelBase item);
+
+        /// <summary>
+        /// Loads a page of authors for the <see cref="AuthorFilter"/>.
+        /// </summary>
+        /// <param name="after">The GraphQL "after" cursor.</param>
+        /// <returns>A task that returns a page of authors.</returns>
+        protected abstract Task<Page<ActorModel>> LoadAuthors(string after);
+
+        async Task InitializeItemSource(bool refresh)
         {
             if (RemoteRepository == null)
             {
                 // If an exception occurred reading the parent repository, do nothing.
-                return Task.CompletedTask;
+                return;
             }
 
             subscription?.Dispose();
 
             var dispose = new CompositeDisposable();
-            var itemSource = CreateItemSource();
+            var itemSource = await CreateItemSource(refresh);
             var items = new VirtualizingList<IIssueListItemViewModelBase>(itemSource, null);
             var view = new VirtualizingListCollectionView<IIssueListItemViewModelBase>(items);
 
@@ -219,29 +242,7 @@ namespace GitHub.ViewModels.GitHubPane
                     x => items.InitializationError -= x)
                 .Subscribe(x => Error = x.EventArgs.GetException()));
             subscription = dispose;
-
-            return Task.CompletedTask;
         }
-
-        /// <summary>
-        /// When overridden in a derived class, creates the <see cref="IVirtualizingListSource{T}"/>
-        /// that will act as the source for <see cref="Items"/>.
-        /// </summary>
-        protected abstract IVirtualizingListSource<IIssueListItemViewModelBase> CreateItemSource();
-
-        /// <summary>
-        /// When overridden in a derived class, navigates to the specified item.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns>A task tracking the operation.</returns>
-        protected abstract Task DoOpenItem(IIssueListItemViewModelBase item);
-
-        /// <summary>
-        /// Loads a page of authors for the <see cref="AuthorFilter"/>.
-        /// </summary>
-        /// <param name="after">The GraphQL "after" cursor.</param>
-        /// <returns>A task that returns a page of authors.</returns>
-        protected abstract Task<Page<ActorModel>> LoadAuthors(string after);
 
         void FilterChanged()
         {

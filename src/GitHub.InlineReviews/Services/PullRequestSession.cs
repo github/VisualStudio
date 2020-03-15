@@ -81,12 +81,12 @@ namespace GitHub.InlineReviews.Services
             try
             {
                 PullRequestSessionFile file;
-                var normalizedPath = relativePath.Replace("\\", "/");
-                var key = normalizedPath + '@' + commitSha;
+                var gitPath = Paths.ToGitPath(relativePath);
+                var key = gitPath + '@' + commitSha;
 
                 if (!fileIndex.TryGetValue(key, out file))
                 {
-                    file = new PullRequestSessionFile(normalizedPath, commitSha);
+                    file = new PullRequestSessionFile(relativePath, commitSha);
                     await UpdateFile(file);
                     fileIndex.Add(key, file);
                 }
@@ -108,22 +108,6 @@ namespace GitHub.InlineReviews.Services
             }
 
             return mergeBase;
-        }
-
-        /// <inheritdoc/>
-        public string GetRelativePath(string path)
-        {
-            if (Path.IsPathRooted(path))
-            {
-                var basePath = LocalRepository.LocalPath;
-
-                if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) && path.Length > basePath.Length + 1)
-                {
-                    return path.Substring(basePath.Length + 1);
-                }
-            }
-
-            return null;
         }
 
         /// <inheritdoc/>
@@ -268,7 +252,8 @@ namespace GitHub.InlineReviews.Services
                 address,
                 RepositoryOwner,
                 LocalRepository.Name,
-                PullRequest.Number);
+                PullRequest.Number,
+                true);
             await Update(model);
         }
 

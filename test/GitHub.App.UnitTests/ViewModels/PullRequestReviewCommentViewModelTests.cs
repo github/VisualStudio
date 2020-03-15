@@ -54,7 +54,8 @@ namespace GitHub.App.UnitTests.ViewModels
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IActorViewModel>();
                 var commentService = Substitute.For<ICommentService>();
-                var target = new PullRequestReviewCommentViewModel(commentService);
+                var autoCompleteAdvisor = Substitute.For<IAutoCompleteAdvisor>();
+                var target = new PullRequestReviewCommentViewModel(commentService, autoCompleteAdvisor);
 
                 await target.InitializeAsPlaceholderAsync(session, thread, false, false);
 
@@ -98,7 +99,8 @@ namespace GitHub.App.UnitTests.ViewModels
                 var thread = CreateThread();
                 var currentUser = Substitute.For<IActorViewModel>();
                 var commentService = Substitute.For<ICommentService>();
-                var target = new PullRequestReviewCommentViewModel(commentService);
+                var autoCompleteAdvisor = Substitute.For<IAutoCompleteAdvisor>();
+                var target = new PullRequestReviewCommentViewModel(commentService, autoCompleteAdvisor);
 
                 await target.InitializeAsPlaceholderAsync(session, thread, false, false);
 
@@ -218,16 +220,18 @@ namespace GitHub.App.UnitTests.ViewModels
             ICommentThreadViewModel thread = null,
             ActorModel currentUser = null,
             PullRequestReviewModel review = null,
-            PullRequestReviewCommentModel comment = null)
+            PullRequestReviewCommentModel comment = null,
+            IAutoCompleteAdvisor autoCompleteAdvisor = null)
         {
             session = session ?? CreateSession();
             commentService = commentService ?? Substitute.For<ICommentService>();
+            autoCompleteAdvisor = autoCompleteAdvisor ?? Substitute.For<IAutoCompleteAdvisor>();
             thread = thread ?? CreateThread();
             currentUser = currentUser ?? new ActorModel { Login = "CurrentUser" };
             comment = comment ?? new PullRequestReviewCommentModel();
             review = review ?? CreateReview(PullRequestReviewState.Approved, comment);
 
-            var result = new PullRequestReviewCommentViewModel(commentService);
+            var result = new PullRequestReviewCommentViewModel(commentService, autoCompleteAdvisor);
             await result.InitializeAsync(session, thread, review, comment, CommentEditState.None);
             return result;
         }

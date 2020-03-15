@@ -45,8 +45,9 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestEditorService editorService,
             IPullRequestSessionManager sessionManager,
             IMessageDraftStore draftStore,
-            IPullRequestFilesViewModel files)
-            : this(pullRequestService, editorService, sessionManager,draftStore, files, DefaultScheduler.Instance)
+            IPullRequestFilesViewModel files,
+            IAutoCompleteAdvisor autoCompleteAdvisor)
+            : this(pullRequestService, editorService, sessionManager,draftStore, files, autoCompleteAdvisor, DefaultScheduler.Instance)
         {
         }
 
@@ -56,12 +57,14 @@ namespace GitHub.ViewModels.GitHubPane
             IPullRequestSessionManager sessionManager,
             IMessageDraftStore draftStore,
             IPullRequestFilesViewModel files,
+            IAutoCompleteAdvisor autoCompleteAdvisor,
             IScheduler timerScheduler)
         {
             Guard.ArgumentNotNull(editorService, nameof(editorService));
             Guard.ArgumentNotNull(sessionManager, nameof(sessionManager));
             Guard.ArgumentNotNull(draftStore, nameof(draftStore));
             Guard.ArgumentNotNull(files, nameof(files));
+            Guard.ArgumentNotNull(autoCompleteAdvisor, nameof(autoCompleteAdvisor));
             Guard.ArgumentNotNull(timerScheduler, nameof(timerScheduler));
 
             this.pullRequestService = pullRequestService;
@@ -77,6 +80,7 @@ namespace GitHub.ViewModels.GitHubPane
                 .ToProperty(this, x => x.CanApproveRequestChanges);
 
             Files = files;
+            AutoCompleteAdvisor = autoCompleteAdvisor;
 
             var hasBodyOrComments = this.WhenAnyValue(
                 x => x.Body,
@@ -117,6 +121,9 @@ namespace GitHub.ViewModels.GitHubPane
 
         /// <inheritdoc/>
         public IPullRequestFilesViewModel Files { get; }
+
+        /// <inheritdoc/>
+        public IAutoCompleteAdvisor AutoCompleteAdvisor { get; }
 
         /// <inheritdoc/>
         public string Body

@@ -87,9 +87,9 @@ namespace GitHub.VisualStudio.Base
 
         void UpdateRepoOnMainThread(LocalRepositoryModel repo)
         {
-            holder.JoinableTaskFactory.RunAsync(async () =>
+            holder.JoinableTaskContext.Factory.RunAsync(async () =>
             {
-                await holder.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await holder.JoinableTaskContext.Factory.SwitchToMainThreadAsync();
                 UpdateRepo(repo);
             }).Task.Forget();
         }
