@@ -48,7 +48,7 @@ jobs:
 
     - name: MSBuild ${{ env.githubvsSolution }}
       run: |
-        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False
+        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False /verbosity:minimal
       env:
         GitHubVS_ClientId: ${{ secrets.GitHubVS_ClientId }}
         GitHubVS_ClientSecret: ${{ secrets.GitHubVS_ClientSecret }}
