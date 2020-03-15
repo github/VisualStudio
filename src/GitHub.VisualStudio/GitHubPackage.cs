@@ -35,7 +35,7 @@ using static System.FormattableString;
 namespace GitHub.VisualStudio
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("#110", "#112", AssemblyVersionInformation.Version)]
+    [InstalledProductRegistration("#110", "#112", ExtensionInformation.Version)]
     [Guid(Guids.guidGitHubPkgString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(Guids.GitContextPkgString, PackageAutoLoadFlags.BackgroundLoad)]
