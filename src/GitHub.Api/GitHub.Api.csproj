@@ -4,7 +4,14 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  
+   
+  <PropertyGroup>
+    <!-- Use a default client ID/secret for testing -->
+    <!-- https://github.com/organizations/editor-tools/settings/applications/620133 -->
+    <GitHubVS_ClientId Condition="'$(GitHubVS_ClientId)' == ''">2454a3e6102fd41cc212</GitHubVS_ClientId>
+    <GitHubVS_ClientSecret Condition="'$(GitHubVS_ClientSecret)' == ''">2157c138e970165d955d09562230afcfbcda23f2</GitHubVS_ClientSecret>
+  </PropertyGroup>
+   
   <Import Project="$(SolutionDir)\src\common\signing.props" />
 
   <Target Name="AddClientSecret" BeforeTargets="BeforeCompile"
