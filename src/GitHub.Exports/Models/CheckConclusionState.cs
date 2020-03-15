@@ -8,5 +8,7 @@
         Failure,
         Success,
         Neutral,
+        Skipped,
+        Stale
     }
 }
