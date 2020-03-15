@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Reactive.Linq;
-using GitHub.App;
-using GitHub.Primitives;
 using GitHub.Services;
 using ReactiveUI;
 
@@ -28,8 +26,7 @@ namespace GitHub.ViewModels.Dialog
                 (x, y) => x.Value || y.Value
             ).ToProperty(this, vm => vm.IsLoginInProgress);
 
-            UpdateLoginMode();
-            connectionManager.Connections.CollectionChanged += (_, __) => UpdateLoginMode();
+            LoginMode = LoginMode.DotComOrEnterprise;
 
             Done = Observable.Merge(
                 loginToGitHubViewModel.Login,
@@ -55,21 +52,5 @@ namespace GitHub.ViewModels.Dialog
         public bool IsLoginInProgress { get { return isLoginInProgress.Value; } }
 
         public IObservable<object> Done { get; }
-
-        void UpdateLoginMode()
-        {
-            var result = LoginMode.DotComOrEnterprise;
-
-            foreach (var connection in ConnectionManager.Connections)
-            {
-                if (connection.IsLoggedIn)
-                {
-                    result &= ~((connection.HostAddress == HostAddress.GitHubDotComHostAddress) ?
-                        LoginMode.DotComOnly : LoginMode.EnterpriseOnly);
-                }
-            }
-
-            LoginMode = result;
-        }
     }
 }
