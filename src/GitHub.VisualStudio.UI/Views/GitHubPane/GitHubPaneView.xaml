@@ -57,11 +57,8 @@
       <Separator Margin="5,-2,5,0"
                  Foreground="{DynamicResource GitHubPaneTitleBrush}"
                  Style="{StaticResource TitleVerticalSeparator}" />
-      <TextBlock Margin="0,-5,0,0"
-                 VerticalAlignment="Center"
-                 Foreground="{DynamicResource GitHubVsGrayText}"
-                 Text="{Binding LocalRepository.Name}" />
-    </StackPanel>
+            <ghfvs:GitHubActionLink Margin="0,-2.5,0,0" Command="{Binding BrowseRepository}" Content="{Binding LocalRepository.Name}" />
+        </StackPanel>
 
     <Separator Margin="0,0,0,2"
                DockPanel.Dock="Top"
