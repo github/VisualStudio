@@ -57,7 +57,7 @@
       <Separator Margin="5,-2,5,0"
                  Foreground="{DynamicResource GitHubPaneTitleBrush}"
                  Style="{StaticResource TitleVerticalSeparator}" />
-            <ghfvs:GitHubActionLink Margin="0,-2,0,0" Command="{Binding BrowseRepository}" Content="{Binding LocalRepository.Name}" />
+            <ghfvs:GitHubActionLink Margin="0,-2.5,0,0" Command="{Binding BrowseRepository}" Content="{Binding LocalRepository.Name}" />
         </StackPanel>
 
     <Separator Margin="0,0,0,2"
