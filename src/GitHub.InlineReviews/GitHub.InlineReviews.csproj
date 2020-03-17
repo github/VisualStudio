@@ -61,8 +61,6 @@
     <Compile Include="Commands\NextInlineCommentCommand.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Margins\InlineCommentTextViewOptions.cs" />
-    <Compile Include="Margins\PullRequestFileMargin.cs" />
-    <Compile Include="Margins\PullRequestFileMarginProvider.cs" />
     <Compile Include="Glyph\GlyphData.cs" />
     <Compile Include="Glyph\GlyphMargin.cs" />
     <Compile Include="Glyph\GlyphMarginVisualManager.cs" />
@@ -97,12 +95,8 @@
     <Compile Include="Tags\ShowInlineCommentAnnotationGlyph.xaml.cs">
       <DependentUpon>ShowInlineCommentAnnotationGlyph.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\PullRequestFileMarginViewModel.cs" />
     <Compile Include="ViewModels\InlineCommentPeekViewModel.cs" />
     <Compile Include="ViewModels\PullRequestStatusViewModel.cs" />
-    <Compile Include="Views\PullRequestFileMarginView.xaml.cs">
-      <DependentUpon>PullRequestFileMarginView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\GlyphMarginGrid.xaml.cs">
       <DependentUpon>GlyphMarginGrid.xaml</DependentUpon>
     </Compile>
@@ -250,10 +244,6 @@
     <Page Include="Tags\ShowInlineCommentAnnotationGlyph.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\PullRequestFileMarginView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GlyphMarginGrid.xaml">
       <SubType>Designer</SubType>
