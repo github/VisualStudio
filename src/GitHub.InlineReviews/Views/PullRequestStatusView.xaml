@@ -49,7 +49,10 @@
                         Fill="White"
                         VerticalAlignment="Bottom"
                         Margin="0 0 4 0 "
-                        Icon="git_pull_request" />
+                        Icon="mark_github" />
+                    <TextBlock VerticalAlignment="Center">
+                        <Run Text="{Binding RepositoryOwner}" /> / <Run Text="{Binding RepositoryName}" />
+                    </TextBlock>
                 </StackPanel>
             </Button>
             <Grid.ToolTip>

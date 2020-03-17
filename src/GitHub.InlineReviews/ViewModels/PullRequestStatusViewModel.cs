@@ -8,6 +8,8 @@ namespace GitHub.InlineReviews.ViewModels
     {
         int? number;
         string title;
+        string repositoryName;
+        string repositoryOwner;
 
         public PullRequestStatusViewModel(ICommand openPullRequestsCommand, ICommand showCurrentPullRequestCommand)
         {
@@ -37,6 +39,32 @@ namespace GitHub.InlineReviews.ViewModels
                 {
                     title = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+                }
+            }
+        }
+
+        public string RepositoryOwner
+        {
+            get { return repositoryOwner; }
+            set
+            {
+                if (repositoryOwner != value)
+                {
+                    repositoryOwner = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RepositoryOwner)));
+                }
+            }
+        }
+
+        public string RepositoryName
+        {
+            get { return repositoryName; }
+            set
+            {
+                if (repositoryName != value)
+                {
+                    repositoryName = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RepositoryName)));
                 }
             }
         }
