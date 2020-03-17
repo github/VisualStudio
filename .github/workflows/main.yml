@@ -63,7 +63,7 @@ jobs:
     - name: Run unit tests
       shell: bash
       run: |
-        vstest.console /TestAdapterPath:test /Settings:trest/test.runsettings \
+        vstest.console /TestAdapterPath:test /Settings:test/test.runsettings \
           trest/GitHub.App.UnitTests/bin/${{ env.config }}/net46/GitHub.App.UnitTests.dll \
           trest/GitHub.Exports.Reactive.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.Reactive.UnitTests.dll \
           trest/GitHub.Exports.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.UnitTests.dll \
