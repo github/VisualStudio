@@ -64,14 +64,14 @@ jobs:
       shell: bash
       run: |
         vstest.console /TestAdapterPath:test /Settings:test/test.runsettings \
-          trest/GitHub.App.UnitTests/bin/${{ env.config }}/net46/GitHub.App.UnitTests.dll \
-          trest/GitHub.Exports.Reactive.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.Reactive.UnitTests.dll \
-          trest/GitHub.Exports.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.UnitTests.dll \
-          trest/GitHub.Extensions.UnitTests/bin/${{ env.config }}/net46/GitHub.Extensions.UnitTests.dll \
-          trest/GitHub.InlineReviews.UnitTests/bin/${{ env.config }}/net46/GitHub.InlineReviews.UnitTests.dll \
-          trest/GitHub.Services.Vssdk.UnitTests/bin/${{ env.config }}/net461/GitHub.Services.Vssdk.UnitTests.dll \
-          trest/GitHub.StartPage.UnitTests/bin/${{ env.config }}/net46/GitHub.StartPage.UnitTests.dll \
-          trest/GitHub.TeamFoundation.UnitTests/bin/${{ env.config }}/net46/GitHub.TeamFoundation.UnitTests.dll \
-          trest/GitHub.UI.UnitTests/bin/${{ env.config }}/net46/GitHub.UI.UnitTests.dll \
-          trest/GitHub.VisualStudio.UnitTests/bin/${{ env.config }}/net46/GitHub.VisualStudio.UnitTests.dll \
-          trest/MetricsTests/MetricsTests/bin/${{ env.config }}/MetricsTests.dll
+          test/GitHub.App.UnitTests/bin/${{ env.config }}/net46/GitHub.App.UnitTests.dll \
+          test/GitHub.Exports.Reactive.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.Reactive.UnitTests.dll \
+          test/GitHub.Exports.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.UnitTests.dll \
+          test/GitHub.Extensions.UnitTests/bin/${{ env.config }}/net46/GitHub.Extensions.UnitTests.dll \
+          test/GitHub.InlineReviews.UnitTests/bin/${{ env.config }}/net46/GitHub.InlineReviews.UnitTests.dll \
+          test/GitHub.Services.Vssdk.UnitTests/bin/${{ env.config }}/net461/GitHub.Services.Vssdk.UnitTests.dll \
+          test/GitHub.StartPage.UnitTests/bin/${{ env.config }}/net46/GitHub.StartPage.UnitTests.dll \
+          test/GitHub.TeamFoundation.UnitTests/bin/${{ env.config }}/net46/GitHub.TeamFoundation.UnitTests.dll \
+          test/GitHub.UI.UnitTests/bin/${{ env.config }}/net46/GitHub.UI.UnitTests.dll \
+          test/GitHub.VisualStudio.UnitTests/bin/${{ env.config }}/net46/GitHub.VisualStudio.UnitTests.dll \
+          test/MetricsTests/MetricsTests/bin/${{ env.config }}/MetricsTests.dll
