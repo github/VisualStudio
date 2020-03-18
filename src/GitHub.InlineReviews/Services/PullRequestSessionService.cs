@@ -306,7 +306,6 @@ namespace GitHub.InlineReviews.Services
         async Task<PullRequestDetailModel> ReadPullRequestDetailWithResolved(HostAddress address, string owner,
             string name, int number, bool refresh)
         {
-
             if (readPullRequestWithResolved == null)
             {
                 readPullRequestWithResolved = new Query()
@@ -384,22 +383,22 @@ namespace GitHub.InlineReviews.Services
                                 AvatarUrl = review.Author.AvatarUrl(null)
                             }
                         }).ToList(),
-                        Timeline = pr.Timeline(null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
-                            when.Commit(commit => new CommitModel
+                        Timeline = pr.TimelineItems(null, null, null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                            when.PullRequestCommit(commit => new CommitModel
                             {
-                                AbbreviatedOid = commit.AbbreviatedOid,
+                                AbbreviatedOid = commit.Commit.AbbreviatedOid,
                                 Author = new CommitActorModel
                                 {
-                                    Name = commit.Author.Name,
-                                    Email = commit.Author.Email,
-                                    User = commit.Author.User != null ? new ActorModel
+                                    Name = commit.Commit.Author.Name,
+                                    Email = commit.Commit.Author.Email,
+                                    User = commit.Commit.Author.User != null ? new ActorModel
                                     {
-                                        Login = commit.Author.User.Login,
-                                        AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                        Login = commit.Commit.Author.User.Login,
+                                        AvatarUrl = commit.Commit.Author.User.AvatarUrl(null),
                                     } : null
                                 },
-                                MessageHeadline = commit.MessageHeadline,
-                                Oid = commit.Oid,
+                                MessageHeadline = commit.Commit.MessageHeadline,
+                                Oid = commit.Commit.Oid,
                             }).IssueComment(comment => new CommentModel
                             {
                                 Author = new ActorModel
@@ -563,21 +562,21 @@ namespace GitHub.InlineReviews.Services
                                 Url = comment.Url,
                             }).ToList(),
                         }).ToList(),
-                        Timeline = pr.Timeline(null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
-                            when.Commit(commit => new CommitModel
+                        Timeline = pr.TimelineItems(null, null, null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                            when.PullRequestCommit(commit => new CommitModel
                             {
-                                AbbreviatedOid = commit.AbbreviatedOid,
+                                AbbreviatedOid = commit.Commit.AbbreviatedOid,
                                 Author = new CommitActorModel {
-                                    Name = commit.Author.Name,
-                                    Email = commit.Author.Email,
-                                    User = commit.Author.User != null ? new ActorModel
+                                    Name = commit.Commit.Author.Name,
+                                    Email = commit.Commit.Author.Email,
+                                    User = commit.Commit.Author.User != null ? new ActorModel
                                     {
-                                        Login = commit.Author.User.Login,
-                                        AvatarUrl = commit.Author.User.AvatarUrl(null),
+                                        Login = commit.Commit.Author.User.Login,
+                                        AvatarUrl = commit.Commit.Author.User.AvatarUrl(null),
                                     } : null
                                 },
-                                MessageHeadline = commit.MessageHeadline,
-                                Oid = commit.Oid,
+                                MessageHeadline = commit.Commit.MessageHeadline,
+                                Oid = commit.Commit.Oid,
                             }).IssueComment(comment => new CommentModel
                             {
                                 Author = new ActorModel
