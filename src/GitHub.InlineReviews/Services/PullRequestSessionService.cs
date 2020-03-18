@@ -306,6 +306,8 @@ namespace GitHub.InlineReviews.Services
         async Task<PullRequestDetailModel> ReadPullRequestDetailWithResolved(HostAddress address, string owner,
             string name, int number, bool refresh)
         {
+            var itemTypes = new[] { PullRequestTimelineItemsItemType.IssueComment, PullRequestTimelineItemsItemType.PullRequestCommit };
+
             if (readPullRequestWithResolved == null)
             {
                 readPullRequestWithResolved = new Query()
@@ -383,7 +385,7 @@ namespace GitHub.InlineReviews.Services
                                 AvatarUrl = review.Author.AvatarUrl(null)
                             }
                         }).ToList(),
-                        Timeline = pr.TimelineItems(null, null, null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                        Timeline = pr.TimelineItems(null, null, null, null, itemTypes, null, null).AllPages().Select(item => item.Switch<object>(when =>
                             when.PullRequestCommit(commit => new CommitModel
                             {
                                 AbbreviatedOid = commit.Commit.AbbreviatedOid,
@@ -490,6 +492,8 @@ namespace GitHub.InlineReviews.Services
         async Task<PullRequestDetailModel> ReadPullRequestDetailWithoutResolved(HostAddress address, string owner,
             string name, int number, bool refresh)
         {
+            var itemTypes = new[] { PullRequestTimelineItemsItemType.IssueComment, PullRequestTimelineItemsItemType.PullRequestCommit };
+
             if (readPullRequestWithoutResolved == null)
             {
                 readPullRequestWithoutResolved = new Query()
@@ -562,7 +566,7 @@ namespace GitHub.InlineReviews.Services
                                 Url = comment.Url,
                             }).ToList(),
                         }).ToList(),
-                        Timeline = pr.TimelineItems(null, null, null, null, null, null, null).AllPages().Select(item => item.Switch<object>(when =>
+                        Timeline = pr.TimelineItems(null, null, null, null, itemTypes, null, null).AllPages().Select(item => item.Switch<object>(when =>
                             when.PullRequestCommit(commit => new CommitModel
                             {
                                 AbbreviatedOid = commit.Commit.AbbreviatedOid,
