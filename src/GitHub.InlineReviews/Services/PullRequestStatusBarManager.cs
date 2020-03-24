@@ -98,7 +98,7 @@ namespace GitHub.InlineReviews.Services
                 return;
             }
 
-            var viewModel = CreatePullRequestStatusViewModel(session);
+            var viewModel = CreatePullRequestStatusViewModel(repository, session);
             ShowStatus(viewModel);
         }
 
@@ -155,13 +155,15 @@ namespace GitHub.InlineReviews.Services
             return false;
         }
 
-        PullRequestStatusViewModel CreatePullRequestStatusViewModel(IPullRequestSession session)
+        PullRequestStatusViewModel CreatePullRequestStatusViewModel(LocalRepositoryModel repository, IPullRequestSession session)
         {
-            var pullRequestStatusViewModel = new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand);
-            var pullRequest = session?.PullRequest;
-            pullRequestStatusViewModel.Number = pullRequest?.Number;
-            pullRequestStatusViewModel.Title = pullRequest?.Title;
-            return pullRequestStatusViewModel;
+            return new PullRequestStatusViewModel(openPullRequestsCommand, showCurrentPullRequestCommand)
+            {
+                Number = session?.PullRequest?.Number,
+                Title = session?.PullRequest?.Title,
+                RepositoryName = repository?.Name,
+                RepositoryOwner = repository?.Owner,
+            };
         }
 
         PullRequestStatusView ShowStatus(PullRequestStatusViewModel pullRequestStatusViewModel = null)
