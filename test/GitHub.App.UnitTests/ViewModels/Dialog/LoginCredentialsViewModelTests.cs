@@ -76,8 +76,10 @@ public class LoginCredentialsViewModelTests
     public class TheLoginModeProperty : TestBaseClass
     {
         [Test]
-        public void LoginModeTracksAvailableConnections()
+        public void LoginModeIgnoresAvailableConnections()
         {
+            // We always want to option to log-in to GitHub or GitHub Enterprise
+
             var connectionManager = Substitute.For<IConnectionManager>();
             var connections = new ObservableCollectionEx<IConnection>();
             var gitHubLogin = Substitute.For<ILoginToGitHubViewModel>();
@@ -96,13 +98,13 @@ public class LoginCredentialsViewModelTests
             Assert.That(LoginMode.DotComOrEnterprise, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.Add(enterpriseConnection);
-            Assert.That(LoginMode.DotComOnly, Is.EqualTo(loginViewModel.LoginMode));
+            Assert.That(LoginMode.DotComOrEnterprise, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.Add(gitHubConnection);
-            Assert.That(LoginMode.None, Is.EqualTo(loginViewModel.LoginMode));
+            Assert.That(LoginMode.DotComOrEnterprise, Is.EqualTo(loginViewModel.LoginMode));
 
             connections.RemoveAt(0);
-            Assert.That(LoginMode.EnterpriseOnly, Is.EqualTo(loginViewModel.LoginMode));
+            Assert.That(LoginMode.DotComOrEnterprise, Is.EqualTo(loginViewModel.LoginMode));
         }
     }
 
