@@ -53,6 +53,9 @@ jobs:
         GitHubVS_ClientId: ${{ secrets.GitHubVS_ClientId }}
         GitHubVS_ClientSecret: ${{ secrets.GitHubVS_ClientSecret }}
 
+    - name: Sign the VSIX
+      run: tools/vsixsigntool/vsixsigntool.exe sign /f certificate.pfx /p '${{ secrets.CERTIFICATE_PASSWORD }}' /sha1 9c5a6d389e1454f2ed9ee9419cdf743689709f9c /fd sha256 /tr http://timestamp.digicert.com /td sha256 ${{ env.vsixContainer }}
+      
     - name: Upload VSIX artifact
       uses: actions/upload-artifact@v1
       with:
