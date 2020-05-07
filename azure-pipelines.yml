@@ -101,9 +101,11 @@ jobs:
       secureFile: certificate.pfx
 
   - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 9c5a6d389e1454f2ed9ee9419cdf743689709f9c /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.vsix
+    condition: not(eq(variables['Build.Reason'], 'PullRequest'))
     displayName: Sign the GitHub for Visual Studio VSIX
 
   - script: $(vsixsigntool_exe.secureFilePath) sign /f $(certificate_pfx.secureFilePath) /p "$(certificate_password)" /sha1 9c5a6d389e1454f2ed9ee9419cdf743689709f9c /fd sha256 /tr http://timestamp.digicert.com /td sha256 $(ArtifactDirectory)\GitHub.VisualStudio.16.vsix
+    condition: not(eq(variables['Build.Reason'], 'PullRequest'))
     displayName: Sign the GitHub Essentials VSIX
 
   - task: PublishBuildArtifacts@1
