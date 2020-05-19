@@ -9,6 +9,7 @@ using System.Windows.Input;
 using EnvDTE;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
 
 namespace GitHub.Services
@@ -66,10 +67,8 @@ namespace GitHub.Services
 
         public void ShowPublishSection()
         {
-            var te = serviceProvider.TryGetService<ITeamExplorer>();
-            var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
-            var publish = page?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
-            publish?.Connect();
+            IGitActionsExt2 gitActionsExt = serviceProvider.TryGetService<IGitActionsExt2>();
+            gitActionsExt?.InitializeOrPushRepositoryToGitService();
         }
 
         public async Task ShowRepositorySettingsRemotesAsync()
