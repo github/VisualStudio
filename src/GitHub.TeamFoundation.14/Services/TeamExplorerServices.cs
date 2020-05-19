@@ -67,8 +67,15 @@ namespace GitHub.Services
 
         public void ShowPublishSection()
         {
+#if TEAMEXPLORER14 || TEAMEXPLORER15
+            var te = serviceProvider.TryGetService<ITeamExplorer>();
+            var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
+            var publish = page?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
+            publish?.Connect();
+#else
             IGitActionsExt2 gitActionsExt = serviceProvider.TryGetService<IGitActionsExt2>();
             gitActionsExt?.InitializeOrPushRepositoryToGitService();
+#endif
         }
 
         public async Task ShowRepositorySettingsRemotesAsync()
