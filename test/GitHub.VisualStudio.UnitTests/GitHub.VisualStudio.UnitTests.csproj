@@ -16,6 +16,61 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\GitHub.TeamFoundation.15\GitHub.TeamFoundation.15.csproj" />
     <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj" />
+    <ProjectReference Include="..\..\src\GitHub.Services.Vssdk\GitHub.Services.Vssdk.csproj">
+      <Project>{2D3D2834-33BE-45CA-B3CC-12F853557D7B}</Project>
+      <Name>GitHub.Services.Vssdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\akavache\Akavache\Akavache_Net45.csproj">
+      <Project>{B4E665E5-6CAF-4414-A6E2-8DE1C3BCF203}</Project>
+      <Name>Akavache_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\reactiveui\ReactiveUI\ReactiveUI_Net45.csproj">
+      <Project>{1ce2d235-8072-4649-ba5a-cfb1af8776e0}</Project>
+      <Name>ReactiveUI_Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Api\GitHub.Api.csproj">
+      <Project>{b389adaf-62cc-486e-85b4-2d8b078df763}</Project>
+      <Name>GitHub.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj">
+      <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>
+      <Name>GitHub.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Extensions\GitHub.Extensions.csproj">
+      <Project>{6afe2e2d-6db0-4430-a2ea-f5f5388d2f78}</Project>
+      <Name>GitHub.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.TeamFoundation.14\GitHub.TeamFoundation.14.csproj">
+      <Project>{161DBF01-1DBF-4B00-8551-C5C00F26720D}</Project>
+      <Name>GitHub.TeamFoundation.14</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio\GitHub.VisualStudio.csproj">
+      <Project>{11569514-5ae5-4b5b-92a2-f10b0967de5f}</Project>
+      <Name>GitHub.VisualStudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
+      <Name>GitHub.VisualStudio.UI</Name>
+    </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -15,5 +15,28 @@
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" version="3.9.0" />
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.App\GitHub.App.csproj">
+      <Project>{1A1DA411-8D1F-4578-80A6-04576BEA2DC5}</Project>
+      <Name>GitHub.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports.Reactive\GitHub.Exports.Reactive.csproj">
+      <Project>{e4ed0537-d1d9-44b6-9212-3096d7c3f7a1}</Project>
+      <Name>GitHub.Exports.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.Exports\GitHub.Exports.csproj">
+      <Project>{9AEA02DB-02B5-409C-B0CA-115D05331A6B}</Project>
+      <Name>GitHub.Exports</Name>
+    </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>
