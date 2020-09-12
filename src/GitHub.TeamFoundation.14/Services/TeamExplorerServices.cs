@@ -9,6 +9,7 @@ using System.Windows.Input;
 using EnvDTE;
 using GitHub.VisualStudio.TeamExplorer.Sync;
 using Microsoft.TeamFoundation.Controls;
+using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using ReactiveUI;
 
 namespace GitHub.Services
@@ -66,11 +67,35 @@ namespace GitHub.Services
 
         public void ShowPublishSection()
         {
+#if TEAMEXPLORER16
+            // Only call InitializeOrPushRepositoryToGitService when IGitActionsExt2 exists
+            if (FindIGitActionsExt2() is object)
+            {
+                InitializeOrPushRepositoryToGitService();
+                return;
+            }
+#endif
+
             var te = serviceProvider.TryGetService<ITeamExplorer>();
             var page = te.NavigateToPage(new Guid(TeamExplorerPageIds.GitCommits), null);
             var publish = page?.GetSection(new Guid(GitHubPublishSection.GitHubPublishSectionId)) as GitHubPublishSection;
             publish?.Connect();
         }
+
+#if TEAMEXPLORER16
+        private static Type FindIGitActionsExt2()
+        {
+            Type type = typeof(IGitActionsExt);
+            string name = $"{type.FullName}2";
+            return type.Assembly.GetType(name, false);
+        }
+
+        private void InitializeOrPushRepositoryToGitService()
+        {
+            IGitActionsExt2 gitActionsExt = serviceProvider.TryGetService<IGitActionsExt2>();
+            gitActionsExt?.InitializeOrPushRepositoryToGitService();
+        }
+#endif
 
         public async Task ShowRepositorySettingsRemotesAsync()
         {
