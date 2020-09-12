@@ -21,6 +21,43 @@
     <Compile Include="..\Helpers\SplatModeDetectorSetUp.cs" />
     <Compile Include="..\Helpers\TestBaseClass.cs" />
     <Compile Include="..\Helpers\Urls.cs" />
+    <Compile Include="Converters.cs" />
+    <Compile Include="SharedDictionaryManagerTests.cs" />
+    <Compile Include="SharedDictionaryManagerIntegrationTests.cs" />
+    <Compile Include="LoadingResourceDictionaryIntegrationTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestAutomation\ResourceValueTests.cs" />
+    <Compile Include="TwoFactorInputTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GitHub.VisualStudio.UI\GitHub.VisualStudio.UI.csproj">
+      <Project>{d1dfbb0c-b570-4302-8f1e-2e3a19c41961}</Project>
+      <Name>GitHub.VisualStudio.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\octokit.net\Octokit\Octokit.csproj">
+      <Project>{08dd4305-7787-4823-a53f-4d0f725a07f3}</Project>
+      <Name>Octokit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\submodules\splat\Splat\Splat-Net45.csproj">
+      <Project>{252ce1c2-027a-4445-a3c2-e4d6c80a935a}</Project>
+      <Name>Splat-Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.UI.Reactive\GitHub.UI.Reactive.csproj">
+      <Project>{158B05E8-FDBC-4D71-B871-C96E28D5ADF5}</Project>
+      <Name>GitHub.UI.Reactive</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\GitHub.UI\GitHub.UI.csproj">
+      <Project>{346384dd-2445-4a28-af22-b45f3957bd89}</Project>
+      <Name>GitHub.UI</Name>
+    </ProjectReference>
+    <PackageReference Include="OpenCover">
+      <Version>4.6.519</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
