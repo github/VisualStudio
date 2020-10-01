@@ -4,6 +4,7 @@
 
 The GitHub Extension for Visual Studio provides GitHub integration in Visual Studio 2015 and newer.
 Most of the extension UI lives in the Team Explorer pane, which is available from the View menu.
+It helps to easily understand functionalities of Visual Studio.
 
 Official builds of this extension are available at the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio).
 
