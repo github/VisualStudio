@@ -20,6 +20,16 @@ public class ApiExceptionExtensionsTests
 
             Assert.That(result, Is.EqualTo(expect));
         }
+        
+        [Test]
+        public void NoResponse()
+        {
+            var ex = new ApiException();
+
+            var result = ApiExceptionExtensions.IsGitHubApiException(ex);
+
+            Assert.That(result, Is.EqualTo(false));
+        }
 
         static ApiException CreateApiException(Dictionary<string, string> headers)
         {
