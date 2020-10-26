@@ -11,6 +11,7 @@ public class ApiExceptionExtensionsTests
     {
         [TestCase("Not-GitHub-Request-Id", false)]
         [TestCase("X-GitHub-Request-Id", true)]
+        [TestCase("x-github-request-id", true)]
         public void NoGitHubRequestId(string key, bool expect)
         {
             var ex = CreateApiException(new Dictionary<string, string> { { key, "ANYTHING" } });
