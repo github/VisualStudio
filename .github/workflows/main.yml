@@ -67,7 +67,8 @@ jobs:
     - name: Run unit tests
       shell: bash
       run: |
-        vstest.console /TestAdapterPath:test /Settings:test/test.runsettings \
+        vstest.console /TestAdapterPath:test /Settings:test/test.runsettings \        
+          test/GitHub.Api.UnitTests/bin/${{ env.config }}/net46/GitHub.Api.UnitTests.dll \
           test/GitHub.App.UnitTests/bin/${{ env.config }}/net46/GitHub.App.UnitTests.dll \
           test/GitHub.Exports.Reactive.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.Reactive.UnitTests.dll \
           test/GitHub.Exports.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.UnitTests.dll \
