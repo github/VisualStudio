@@ -346,9 +346,14 @@ namespace GitHub.Api
             var response = await client.Connection.Get<User>(
                 UserEndpoint, null, null).ConfigureAwait(false);
 
-            if (response.HttpResponse.Headers.ContainsKey(ScopesHeader))
+            var scopes = response.HttpResponse.Headers
+                .Where(h => string.Equals(h.Key, ScopesHeader, StringComparison.OrdinalIgnoreCase))
+                .Select(h => h.Value)
+                .FirstOrDefault();
+
+            if (scopes != null)
             {
-                var returnedScopes = new ScopesCollection(response.HttpResponse.Headers[ScopesHeader]
+                var returnedScopes = new ScopesCollection(scopes
                     .Split(',')
                     .Select(x => x.Trim())
                     .ToArray());
