@@ -118,19 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BrowseForDirectory" xml:space="preserve">
-    <value>Selecione uma pasta de contenção para o seu novo repositório.</value>
+    <value>Selecione uma pasta para armazenar o seu novo repositório.</value>
   </data>
   <data name="OpenFromGitHubTitle" xml:space="preserve">
     <value>Abrir do GitHub</value>
   </data>
   <data name="CouldNotConnectToGitHub" xml:space="preserve">
-    <value>Não foi possível conectar ao github.com</value>
+    <value>Não foi possível conectar-se a github.com</value>
   </data>
   <data name="CreateGistTitle" xml:space="preserve">
     <value>Criar um Gist do GitHub</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
-    <value>Criar um Repositório {0}</value>
+    <value>Criar Repositório {0}</value>
   </data>
   <data name="DefaultGistFileName" xml:space="preserve">
     <value>GistFromVisualStudio.cs</value>
@@ -151,31 +151,31 @@
     <value>Use sua senha e não um token de Acesso Pessoal para entrar.</value>
   </data>
   <data name="LoginFailedMessage" xml:space="preserve">
-    <value>Verifique suas informações de nome de usuário e senha e tente novamente</value>
+    <value>Verifique seu nome de usuário e senha e tente novamente</value>
   </data>
   <data name="LoginFailedText" xml:space="preserve">
     <value>Falha ao entrar.</value>
   </data>
   <data name="LoginTitle" xml:space="preserve">
-    <value>Conectar-se Ao GitHub</value>
+    <value>Conectar-se ao GitHub</value>
   </data>
   <data name="PasswordValidatorEmpty" xml:space="preserve">
-    <value>Insira sua senha</value>
+    <value>Por favor insira sua senha</value>
   </data>
   <data name="PRCreatedUpstream" xml:space="preserve">
-    <value>Solicitação de Pull para branch **{0}** criada com êxito em [{1}]({2})</value>
+    <value>Pull Request para a branch **{0}** criada com êxito em [{1}]({2})</value>
   </data>
   <data name="PullRequestCreationTitleValidatorEmpty" xml:space="preserve">
-    <value>Insira um título para a Solicitação de Pull</value>
+    <value>Insira um título para a Pull Request</value>
   </data>
   <data name="PullRequestSourceAndTargetBranchTheSame" xml:space="preserve">
-    <value>O branch de origem e de destino não podem ser o mesmo</value>
+    <value>A branch de origem e de destino não pode ser a mesma</value>
   </data>
   <data name="PullRequestSourceBranchDoesNotExist" xml:space="preserve">
-    <value>O branch de origem não existe remotamente. Você o enviou por push?</value>
+    <value>A branch de origem não existe remotamente, você fez push dela?</value>
   </data>
   <data name="RepositoryCreationClonePathEmpty" xml:space="preserve">
-    <value>Insira um caminho de repositório</value>
+    <value>Insira um caminho de um repositório</value>
   </data>
   <data name="RepositoryCreationClonePathInvalid" xml:space="preserve">
     <value>Insira um caminho válido</value>
@@ -199,7 +199,7 @@
     <value>Já existe um repositório com o mesmo nome neste local</value>
   </data>
   <data name="RepositoryNameValidatorEmpty" xml:space="preserve">
-    <value>Insira um nome de repositório</value>
+    <value>Por favor insira um nome para o repositório</value>
   </data>
   <data name="RepositoryNameValidatorTooLong" xml:space="preserve">
     <value>O nome do repositório deve ter menos de 100 caracteres</value>
@@ -208,61 +208,61 @@
     <value>Será criado como {0}</value>
   </data>
   <data name="TwoFactorApp" xml:space="preserve">
-    <value>Abra o aplicativo de autenticação de dois fatores em seu dispositivo para exibir o código de autenticação.</value>
+    <value>Abra o aplicativo de autenticação de dois fatores em seu dispositivo para visualizar o código de autenticação.</value>
   </data>
   <data name="TwoFactorSms" xml:space="preserve">
     <value>Enviamos uma mensagem para você por SMS com o código de autenticação.</value>
   </data>
   <data name="TwoFactorTitle" xml:space="preserve">
-    <value>É necessária a autenticação de Dois Fatores</value>
+    <value>É necessária autenticação de Dois Fatores</value>
   </data>
   <data name="TwoFactorUnknown" xml:space="preserve">
-    <value>Insira um sinal no código de autenticação aqui</value>
+    <value>Insira um código de autenticação de login aqui</value>
   </data>
   <data name="UsernameOrEmailValidatorEmpty" xml:space="preserve">
-    <value>Insira seu nome de usuário ou endereço de email</value>
+    <value>Por favor insira seu nome de usuário ou endereço de email</value>
   </data>
   <data name="UsernameOrEmailValidatorSpaces" xml:space="preserve">
     <value>O nome de usuário ou endereço de email não deve ter espaços</value>
   </data>
   <data name="PullRequestsNavigationItemText" xml:space="preserve">
-    <value>Solicitações Pull</value>
+    <value>Pull Requests</value>
   </data>
   <data name="PullRequestNavigationItemText" xml:space="preserve">
-    <value>Solicitação pull</value>
+    <value>Pull Request</value>
   </data>
   <data name="AddedFileStatus" xml:space="preserve">
     <value>adicionar</value>
   </data>
   <data name="Fork" xml:space="preserve">
-    <value>bifurcação</value>
+    <value>fork</value>
   </data>
   <data name="InvalidBranchName" xml:space="preserve">
     <value>[inválido]</value>
   </data>
   <data name="MustPullBeforePush" xml:space="preserve">
-    <value>Você deve efetuar pull antes de poder enviar por push</value>
+    <value>Você deve fazer pull antes de fazer push</value>
   </data>
   <data name="NoCommitsToPull" xml:space="preserve">
-    <value>Não há commits dos quais efetuar pull</value>
+    <value>Não há commits para fazer pull</value>
   </data>
   <data name="NoCommitsToPush" xml:space="preserve">
-    <value>Não há commits a serem enviados por push</value>
+    <value>Não há commits para fazer push</value>
   </data>
   <data name="NoDescriptionProvidedMarkdown" xml:space="preserve">
     <value>*Nenhuma descrição fornecida.*</value>
   </data>
   <data name="PullRequestDetailsCheckout" xml:space="preserve">
-    <value>Fazer check-out de {0}</value>
+    <value>Fazer checkout de {0}</value>
   </data>
   <data name="PullRequestDetailsCheckoutTo" xml:space="preserve">
-    <value>Fazer check-out para {0}</value>
+    <value>Fazer checkout para {0}</value>
   </data>
   <data name="PullRequestDetailsPullToolTip" xml:space="preserve">
-    <value>Efetuar pull de {0} branch {1}</value>
+    <value>Fazer pull de {0} branch {1}</value>
   </data>
   <data name="PullRequestDetailsPushToolTip" xml:space="preserve">
-    <value>Enviar por push para {0} branch {1}</value>
+    <value>Fazer push para {0} branch {1}</value>
   </data>
   <data name="Remote" xml:space="preserve">
     <value>repositório remoto</value>
@@ -274,15 +274,15 @@
     <value>O repositório de origem não está mais disponível.</value>
   </data>
   <data name="WorkingDirectoryHasUncommittedCHanges" xml:space="preserve">
-    <value>Não é possível fazer check-out, pois o seu diretório de trabalho tem alterações cujo commit não foi feito.</value>
+    <value>Não é possível fazer checkout, pois o seu diretório de trabalho possui alterações cujo commit não foi feito.</value>
   </data>
   <data name="SyncSubmodules" xml:space="preserve">
     <value>Sincronizar {0} submódulos</value>
   </data>
   <data name="CouldntFindGitOnPath" xml:space="preserve">
-    <value>Não foi possível encontrar Git.exe no CAMINHO.
+    <value>Não foi possível encontrar o Git.exe no PATH.
 
-Instale o Git para Windows:
+Por favor Instale o Git para Windows em:
 https://git-scm.com/download/win</value>
   </data>
   <data name="Approved" xml:space="preserve">
@@ -301,13 +301,13 @@ https://git-scm.com/download/win</value>
     <value>Pressione Enter para navegar para o Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutInfoMessage" xml:space="preserve">
-    <value>Fazer check-out do branch de PR antes de navegar para o Editor</value>
+    <value>Fazer checkout da branch da PR antes de navegar para o Editor</value>
   </data>
   <data name="NavigateToEditorNotCheckedOutStatusMessage" xml:space="preserve">
-    <value>Pressione Enter para navegar para o Editor (é necessário fazer o check-out do branch de PR)</value>
+    <value>Pressione Enter para navegar para o Editor (é necessário fazer checkout da branch da PR)</value>
   </data>
   <data name="ForkRepositoryTitle" xml:space="preserve">
-    <value>Repositório de Bifurcação</value>
+    <value>Criar Fork de Repositório</value>
   </data>
   <data name="SwitchOriginTitle" xml:space="preserve">
     <value>Alternar Origem</value>
@@ -319,7 +319,7 @@ https://git-scm.com/download/win</value>
     <value>Cancelar Revisão</value>
   </data>
   <data name="DestinationAlreadyExists" xml:space="preserve">
-    <value>Existe um arquivo no caminho de destino.</value>
+    <value>Existem arquivos no caminho de destino.</value>
   </data>
   <data name="LogoutRequired" xml:space="preserve">
     <value>Logoff Necessário</value>
@@ -367,10 +367,10 @@ https://git-scm.com/download/win</value>
     <value>Código de autenticação inválido</value>
   </data>
   <data name="authenticationFailedLabelMessage" xml:space="preserve">
-    <value>Tente inserir o código novamente ou clicar no botão de reenvio para obter um novo código de autenticação.</value>
+    <value>Tente inserir o código novamente ou clique no botão reenviar para obter um novo código de autenticação.</value>
   </data>
   <data name="authenticationSentLabelContent" xml:space="preserve">
-    <value>Código de autenticação enviado.</value>
+    <value>Código de autenticação enviado!</value>
   </data>
   <data name="authenticationSentLabelMessage" xml:space="preserve">
     <value>Se você não receber o código de autenticação, entre em contato com support@github.com.</value>
@@ -379,10 +379,10 @@ https://git-scm.com/download/win</value>
     <value>Procurar</value>
   </data>
   <data name="couldNotConnectToGitHubText" xml:space="preserve">
-    <value>Não foi possível conectar ao github.com</value>
+    <value>Não foi possível conectar-se a github.com</value>
   </data>
   <data name="couldNotConnectToTheServerText" xml:space="preserve">
-    <value>Não foi possível conectar ao servidor.</value>
+    <value>Não foi possível conectar-se ao servidor.</value>
   </data>
   <data name="CreateLink" xml:space="preserve">
     <value>Criar</value>
@@ -418,7 +418,7 @@ https://git-scm.com/download/win</value>
     <value>Link copiado para a área de transferência</value>
   </data>
   <data name="RepositoryPublishedMessage" xml:space="preserve">
-    <value>Repositório criado com êxito.</value>
+    <value>Repositório criado com sucesso.</value>
   </data>
   <data name="makePrivateGist" xml:space="preserve">
     <value>Gist Privado</value>
@@ -427,19 +427,19 @@ https://git-scm.com/download/win</value>
     <value>Nome do Arquivo</value>
   </data>
   <data name="NotLoggedInMessage" xml:space="preserve">
-    <value>Você não entrou em {0}; portanto, determinadas operações git poderão falhar. [Entre agora]({1})</value>
+    <value>Você não entrou em {0}, devido a isso determinadas operações git poderão falhar. [Entre agora]({1})</value>
   </data>
   <data name="WikiNavigationItemText" xml:space="preserve">
     <value>Wiki</value>
   </data>
   <data name="PulseNavigationItemText" xml:space="preserve">
-    <value>Pulso</value>
+    <value>Pulsação</value>
   </data>
   <data name="pathText" xml:space="preserve">
     <value>Caminho</value>
   </data>
   <data name="IssuesNavigationItemText" xml:space="preserve">
-    <value>Questões</value>
+    <value>Issues</value>
   </data>
   <data name="GraphsNavigationItemText" xml:space="preserve">
     <value>Grafos</value>
@@ -460,7 +460,7 @@ https://git-scm.com/download/win</value>
     <value>Verificar</value>
   </data>
   <data name="twoFactorAuthText" xml:space="preserve">
-    <value>Autenticação em dois fatores</value>
+    <value>Autenticação de dois fatores</value>
   </data>
   <data name="SignUpLink" xml:space="preserve">
     <value>Inscrever-se</value>
@@ -469,7 +469,7 @@ https://git-scm.com/download/win</value>
     <value>Sair</value>
   </data>
   <data name="resendCodeButtonToolTip" xml:space="preserve">
-    <value>Enviar o código novamente para o seu Dispositivo de SMS registrado</value>
+    <value>Enviar o código novamente para o seu Dispositivo SMS registrado</value>
   </data>
   <data name="resendCodeButtonContent" xml:space="preserve">
     <value>Reenviar</value>
@@ -478,7 +478,7 @@ https://git-scm.com/download/win</value>
     <value>Nome do Repositório</value>
   </data>
   <data name="RepoDoesNotHaveRemoteText" xml:space="preserve">
-    <value>Este repositório não tem um repositório remoto. Preencha o formulário para publicá-lo no GitHub.</value>
+    <value>Este repositório não possui um repositório remoto. Preencha o formulário para publicá-lo no GitHub.</value>
   </data>
   <data name="publishText" xml:space="preserve">
     <value>Publicar</value>
@@ -487,7 +487,7 @@ https://git-scm.com/download/win</value>
     <value>ou</value>
   </data>
   <data name="openTwoFactorAuthAppText" xml:space="preserve">
-    <value>Abra o aplicativo de autenticação de dois fatores em seu dispositivo para exibir o código de autenticação.</value>
+    <value>Abra o aplicativo de autenticação de dois fatores em seu dispositivo para ver o código de autenticação.</value>
   </data>
   <data name="noRepositoriesMessageText" xml:space="preserve">
     <value>Nenhum repositório</value>
@@ -508,19 +508,19 @@ https://git-scm.com/download/win</value>
     <value>Saiba mais</value>
   </data>
   <data name="ignoreTemplateListText" xml:space="preserve">
-    <value>Ignorar git</value>
+    <value>Git ignore</value>
   </data>
   <data name="filterTextPromptText" xml:space="preserve">
     <value>Pesquisar repositórios</value>
   </data>
   <data name="loadingFailedMessageContent" xml:space="preserve">
-    <value>Alguns ou todos os repositórios podem não ter carregado. Feche a caixa de diálogo e tente novamente.</value>
+    <value>Alguns ou todos os repositórios podem não ter sido carregados. Feche a caixa de diálogo e tente novamente.</value>
   </data>
   <data name="loadingFailedMessageMessage" xml:space="preserve">
     <value>Ocorreu um erro ao carregar os repositórios</value>
   </data>
   <data name="enterpriseUrlPromptText" xml:space="preserve">
-    <value>Endereço do servidor do GitHub Enterprise</value>
+    <value>Endereço do servidor GitHub Enterprise</value>
   </data>
   <data name="enterpriseConnectingFailedMessage" xml:space="preserve">
     <value>O host não está disponível ou não é um servidor do GitHub Enterprise. Verifique o endereço e tente novamente.</value>
@@ -538,10 +538,10 @@ https://git-scm.com/download/win</value>
     <value>Verifique sua conexão com a Internet e tente novamente.</value>
   </data>
   <data name="dontHaveGitHubEnterpriseText" xml:space="preserve">
-    <value>Não tem o GitHub Enterprise? </value>
+    <value>Não possui o GitHub Enterprise? </value>
   </data>
   <data name="dontHaveAnAccountText" xml:space="preserve">
-    <value>Não tem uma conta? </value>
+    <value>Não possui uma conta? </value>
   </data>
   <data name="TitleRequired" xml:space="preserve">
     <value>Título (obrigatório)</value>
@@ -580,7 +580,7 @@ https://git-scm.com/download/win</value>
     <value>Entrar...</value>
   </data>
   <data name="LocalBranchUpToDate" xml:space="preserve">
-    <value>Branch local atualizado</value>
+    <value>Branch local atualizada</value>
   </data>
   <data name="ChangesCountFormat" xml:space="preserve">
     <value>Alterações ({0})</value>
@@ -589,13 +589,13 @@ https://git-scm.com/download/win</value>
     <value>Exibir alterações</value>
   </data>
   <data name="CompareFileAsDefaultAction" xml:space="preserve">
-    <value>Comparar o Arquivo como Ação Padrão</value>
+    <value>Comparar Arquivo como Ação Padrão</value>
   </data>
   <data name="ViewFile" xml:space="preserve">
     <value>Exibir Arquivo</value>
   </data>
   <data name="OpenFileAsDefaultAction" xml:space="preserve">
-    <value>Abrir o Arquivo como Ação Padrão</value>
+    <value>Abrir Arquivo como Ação Padrão</value>
   </data>
   <data name="SwitchToListView" xml:space="preserve">
     <value>Alternar para o Modo de Exibição de Lista</value>
@@ -607,18 +607,18 @@ https://git-scm.com/download/win</value>
     <value>atualizou {0}</value>
   </data>
   <data name="OpenPROnGitHubToolTip" xml:space="preserve">
-    <value>Exibir Solicitação de Pull no GitHub</value>
+    <value>Ver Pull Request no GitHub</value>
   </data>
   <data name="TeamExplorerWelcomeMessage" xml:space="preserve">
     <value>Bem-vindo ao GitHub para Visual Studio! Por que não dá uma olhada em nosso [treinamento](show-training) ou [documentação](show-docs)?
 
-[Não mostrar esta mensagem novamente](dont-show-again)</value>
+[Não mostrar novamente](dont-show-again)</value>
   </data>
   <data name="prUpdatedText" xml:space="preserve">
     <value>Atualizado</value>
   </data>
   <data name="Options_EditorCommentsLabel" xml:space="preserve">
-    <value>Mostrar comentários de PR na margem do editor</value>
+    <value>Mostrar comentários da PR na margem do editor</value>
   </data>
   <data name="Options_ExperimentalTitle" xml:space="preserve">
     <value>Recursos experimentais</value>
@@ -630,7 +630,7 @@ https://git-scm.com/download/win</value>
     <value>Exibir Alterações na Solução</value>
   </data>
   <data name="OpenFileInSolution" xml:space="preserve">
-    <value>Abrir o Arquivo na Solução</value>
+    <value>Abrir Arquivo na Solução</value>
   </data>
   <data name="TokenPrompt" xml:space="preserve">
     <value>Token</value>
@@ -645,19 +645,19 @@ https://git-scm.com/download/win</value>
     <value>Revisores</value>
   </data>
   <data name="AddReviewComment" xml:space="preserve">
-    <value>Adicionar comentário de revisão</value>
+    <value>Adicionar comentário na revisão</value>
   </data>
   <data name="AddSingleComment" xml:space="preserve">
-    <value>Adicionar um único comentário</value>
+    <value>Adicionar somente um comentário</value>
   </data>
   <data name="ForkNavigationItemText" xml:space="preserve">
-    <value>Bifurcação</value>
+    <value>Criar Fork</value>
   </data>
   <data name="Options_DebuggingTitle" xml:space="preserve">
     <value>Depurando</value>
   </data>
   <data name="Options_EnableTraceLoggingText" xml:space="preserve">
-    <value>Habilitar o Registro de Rastreamento</value>
+    <value>Habilitar Logs de Trace</value>
   </data>
   <data name="BlendDialogText" xml:space="preserve">
     <value>A extensão do GitHub não está disponível dentro do Blend</value>
@@ -672,10 +672,10 @@ https://git-scm.com/download/win</value>
     <value>Pendente</value>
   </data>
   <data name="StartAReview" xml:space="preserve">
-    <value>Iniciar uma revisão</value>
+    <value>Iniciar revisão</value>
   </data>
   <data name="YouMustCommitAndPushYourChangesToAddACommentHere" xml:space="preserve">
-    <value>Você precisa fazer commit das alterações e enviá-las por push para adicionar um comentário aqui.</value>
+    <value>Você precisa fazer commit e push das suas alterações para adicionar um comentário aqui.</value>
   </data>
   <data name="PreviousComment" xml:space="preserve">
     <value>Comentário Anterior</value>
@@ -684,16 +684,16 @@ https://git-scm.com/download/win</value>
     <value>Próximo Comentário</value>
   </data>
   <data name="ViewCheckoutOrCreateAPullRequest" xml:space="preserve">
-    <value>Exibir, Fazer Check-out ou Criar uma solicitação de Pull</value>
+    <value>Exibir, Fazer Checkout ou Criar uma Pull request</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>Voltar</value>
   </data>
   <data name="ForkRepository" xml:space="preserve">
-    <value>Repositório de Bifurcação</value>
+    <value>Criar Fork de Repositório</value>
   </data>
   <data name="ForkTheRepository" xml:space="preserve">
-    <value>Bifurcar o repositório</value>
+    <value>Fazer Fork do repositório</value>
   </data>
   <data name="UpdateYourLocalRepositoryS" xml:space="preserve">
     <value>Atualizar seu repositório local</value>
@@ -702,16 +702,16 @@ https://git-scm.com/download/win</value>
     <value>para apontar para</value>
   </data>
   <data name="CreatePullRequest" xml:space="preserve">
-    <value>Criar solicitação de pull</value>
+    <value>Criar pull request</value>
   </data>
   <data name="SignInToGitHub" xml:space="preserve">
     <value>Entrar no GitHub</value>
   </data>
   <data name="Pull" xml:space="preserve">
-    <value>Efetuar pull</value>
+    <value>Fazer Pull</value>
   </data>
   <data name="Push" xml:space="preserve">
-    <value>Enviar por push</value>
+    <value>Fazer Push</value>
   </data>
   <data name="Sync" xml:space="preserve">
     <value>Sincronizar</value>
@@ -726,7 +726,7 @@ https://git-scm.com/download/win</value>
     <value>O resumo da sua revisão</value>
   </data>
   <data name="CommentOnly" xml:space="preserve">
-    <value>Comentário somente</value>
+    <value>Somente Comentário</value>
   </data>
   <data name="Approve" xml:space="preserve">
     <value>Aprovar</value>
@@ -744,7 +744,7 @@ https://git-scm.com/download/win</value>
     <value>Criar Novo</value>
   </data>
   <data name="Assignee" xml:space="preserve">
-    <value>Destinatário</value>
+    <value>Responsável</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>Autor</value>
@@ -759,10 +759,10 @@ https://git-scm.com/download/win</value>
     <value>Filtrar por Autor</value>
   </data>
   <data name="SelectFork" xml:space="preserve">
-    <value>Selecionar Bifurcação</value>
+    <value>Selecionar Fork</value>
   </data>
   <data name="DeleteCommentConfirmation" xml:space="preserve">
-    <value>Tem certeza de que deseja excluir este comentário?</value>
+    <value>Tem certeza de que deseja excluir esse comentário?</value>
   </data>
   <data name="DeleteCommentConfirmationCaption" xml:space="preserve">
     <value>Excluir Comentário</value>
@@ -771,79 +771,79 @@ https://git-scm.com/download/win</value>
     <value>Tentar Novamente</value>
   </data>
   <data name="ThereArenTAnyOpenPullRequests" xml:space="preserve">
-    <value>Não há nenhuma solicitação de pull aberta</value>
+    <value>Não há nenhuma pull request aberta</value>
   </data>
   <data name="PullRequestsLetYouTellOthersAboutChangesYouVePushedToARepositoryOnGitHub" xml:space="preserve">
-    <value>As solicitações de pull permitem que você informe outras pessoas sobre as alterações que você enviou por push a um repositório no GitHub</value>
+    <value>As pull requests permitem que você informe outras pessoas sobre as alterações que você enviou por push a um repositório no GitHub</value>
   </data>
   <data name="NoResultsMatchedYourSearch" xml:space="preserve">
-    <value>Nenhum resultado correspondeu à sua pesquisa.</value>
+    <value>Nenhum resultado correspondente à sua pesquisa.</value>
   </data>
   <data name="ToGetStartedYouCan" xml:space="preserve">
     <value>Para começar, você pode</value>
   </data>
   <data name="CreateAPullRequest" xml:space="preserve">
-    <value>criar uma solicitação de pull</value>
+    <value>criar uma pull request</value>
   </data>
   <data name="OpenRepositoryAtDir" xml:space="preserve">
     <value>Abrir repositório em '{0}'?</value>
   </data>
   <data name="NoResolveDifferentOwnerMessage" xml:space="preserve">
-    <value>A URL de destino tem um proprietário diferente para o repositório atual.</value>
+    <value>A URL de destino possui um proprietário diferente para o repositório atual.</value>
   </data>
   <data name="NoActiveRepositoryMessage" xml:space="preserve">
-    <value>Não há nenhum repositório ativo para navegar</value>
+    <value>Não há repositórios ativos para navegar</value>
   </data>
   <data name="ChangesInWorkingDirectoryMessage" xml:space="preserve">
-    <value>O arquivo de trabalho é diferente do arquivo em '{0}'. Faça o check-out do branch, da solicitação pull ou do commit correspondente.</value>
+    <value>O arquivo é diferente do arquivo em '{0}'. Faça checkout da branch, pull request ou do commit correspondente.</value>
   </data>
   <data name="DifferentRepositoryMessage" xml:space="preserve">
     <value>Abra o repositório '{0}' e tente novamente</value>
   </data>
   <data name="UnknownLinkTypeMessage" xml:space="preserve">
-    <value>Não foi possível abrir pelo '{0}'. No momento, há suporte para apenas as URLs vinculadas aos arquivos do repositório.</value>
+    <value>Não foi possível abrir de '{0}'. No momento há suporte somente para URLs vinculadas a arquivos do repositório.</value>
   </data>
   <data name="NoGitHubUrlMessage" xml:space="preserve">
-    <value>Não foi possível localizar uma URL do GitHub na área de transferência</value>
+    <value>Não foi possível encontrar uma URL do GitHub na área de transferência</value>
   </data>
   <data name="NoResolveSameOwnerMessage" xml:space="preserve">
-    <value>Não foi possível encontrar a URL de destino no repositório atual. Tente novamente depois de efetuar um fetch.</value>
+    <value>Não foi possível encontrar a URL de destino no repositório atual. Tente novamente após fazer um fetch.</value>
   </data>
   <data name="DirectoryAtDestinationNotEmpty" xml:space="preserve">
     <value>O diretório no caminho de destino não está vazio.</value>
   </data>
   <data name="LocalRepositoryDoesntHaveARemoteOrigin" xml:space="preserve">
-    <value>Já existe um repositório neste local, mas ele não tem um repositório remoto com o nome "origem".</value>
+    <value>Já existe um repositório neste local, mas ele não tem um repositório remoto com o nome "origin".</value>
   </data>
   <data name="LocalRepositoryHasARemoteOf" xml:space="preserve">
-    <value>Já existe um repositório neste local, mas ele tem um repositório remoto de {0}.</value>
+    <value>Já existe um repositório neste local, mas ele possui um repositório remoto de {0}.</value>
   </data>
   <data name="YouHaveAlreadyClonedToThisLocation" xml:space="preserve">
     <value>Você já clonou nesse local. Clique em 'Abrir' para abrir o repositório local.</value>
   </data>
   <data name="CantFindGitHubUrlForRepository" xml:space="preserve">
-    <value>Não é possível encontrar a URL do GitHub para repositório</value>
+    <value>Não é possível encontrar a URL do GitHub para o repositório</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOrigin" xml:space="preserve">
-    <value>Os repositórios precisam ter um repositório remoto chamado "origem" definido para localizar suas URLs do GitHub.</value>
+    <value>Os repositórios devem possuir um repositório remoto chamado "origin" definido para localizar suas URLs do GitHub.</value>
   </data>
   <data name="RepositoriesMustHaveRemoteOriginHowToFix" xml:space="preserve">
-    <value>Renomeie um dos seus repositórios remotos existentes para 'origem' ou adicione um novo repositório remoto chamado 'origem' e efetue um fetch. Isso pode ser feito da linha de comando ou clicando no botão abaixo.</value>
+    <value>Renomeie um dos seus repositórios remotos para 'origin' ou adicione um novo repositório remoto chamado 'origin' e faça um fetch. Isso pode ser feito na linha de comando ou clicando no botão abaixo.</value>
   </data>
   <data name="CouldntFindCorrespondingFile" xml:space="preserve">
-    <value>Não foi possível encontrar o arquivo correspondente a '{0}' no repositório. Faça um 'git fetch' ou o check-out da solicitação de pull de destino.</value>
+    <value>Não foi possível encontrar o arquivo correspondente a '{0}' no repositório. Faça um 'git fetch' ou checkout da pull request desejada.</value>
   </data>
   <data name="MostRecentlyPushed" xml:space="preserve">
-    <value>{0} mais recentemente pressionado</value>
+    <value>{0} mais recentemente enviados</value>
   </data>
   <data name="Comment" xml:space="preserve">
     <value>Comentário</value>
   </data>
   <data name="ClosePullRequest" xml:space="preserve">
-    <value>Fechar solicitação de pull</value>
+    <value>Fechar pull request</value>
   </data>
   <data name="CloseIssue" xml:space="preserve">
-    <value>Fechar problema</value>
+    <value>Fechar issue</value>
   </data>
   <data name="CloseAndComment" xml:space="preserve">
     <value>Fechar e comentar</value>
@@ -855,13 +855,13 @@ https://git-scm.com/download/win</value>
     <value>Reabrir problema</value>
   </data>
   <data name="ReopenPullRequest" xml:space="preserve">
-    <value>Reabrir solicitação de pull</value>
+    <value>Reabrir pull request</value>
   </data>
   <data name="CommitCountFormat" xml:space="preserve">
-    <value>{0} confirma</value>
+    <value>{0} commits</value>
   </data>
   <data name="AddedSomeCommits" xml:space="preserve">
-    <value>adicionou algumas confirmações</value>
+    <value>adicionou alguns commits</value>
   </data>
   <data name="AndOthers" xml:space="preserve">
     <value>e outros</value>
@@ -873,14 +873,13 @@ https://git-scm.com/download/win</value>
     <value>Seus repositórios</value>
   </data>
   <data name="RepositorySelectCollaboratorRepositories" xml:space="preserve">
-    <value>Repositórios de colaborador</value>
+    <value>Repositórios do colaborador</value>
   </data>
   <data name="RepositorySelectContributedRepositories" xml:space="preserve">
-    <value>Contribui para os repositórios</value>
+    <value>Contribui nos repositórios</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
     <value>Pesquise ou insira uma URL</value>
-    
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
     <value>Procurar...</value>
