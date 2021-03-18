@@ -30,7 +30,7 @@ jobs:
         submodules: true
 
     - name: Nerdbank.GitVersioning
-      uses: aarnott/nbgv@v0.3
+      uses: aarnott/nbgv@v3.3.37
       id: nbgv
 
     - name: Add MSBuild to PATH
