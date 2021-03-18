@@ -24,14 +24,14 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Nerdbank.GitVersioning
+      uses: aarnott/nbgv@v0.4
+      id: nbgv
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v1
       with:
         submodules: true
-
-    - name: Nerdbank.GitVersioning
-      uses: aarnott/nbgv@v0.4
-      id: nbgv
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
