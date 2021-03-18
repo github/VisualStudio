@@ -29,6 +29,11 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+
     - name: Nerdbank.GitVersioning
       uses: aarnott/nbgv@v0.4
       id: nbgv
