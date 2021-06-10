@@ -219,10 +219,10 @@ namespace GitHub.Services
                     frame = VisualStudio.Services.DifferenceService.OpenComparisonWindow2(
                         leftFile,
                         rightFile,
-                        caption,
-                        tooltip,
-                        leftLabel,
-                        rightLabel,
+                        SanitizeForDisplay(caption),
+                        SanitizeForDisplay(tooltip),
+                        SanitizeForDisplay(leftLabel),
+                        SanitizeForDisplay(rightLabel),
                         string.Empty,
                         string.Empty,
                         (uint)options);
@@ -282,6 +282,13 @@ namespace GitHub.Services
                 ShowErrorInStatusBar("Error opening file", e);
                 return null;
             }
+        }
+
+        private static string SanitizeForDisplay(string caption)
+        {
+            // The diff window passes captions and tooltips through string.Format, with {0} and {1} being the left and right file respectively, but we already
+            // nicely format the file names with extra info we know, so we have to escape braces to prevent unwanted formatting, or invalid format errors.
+            return caption.Replace("{", "{{").Replace("}", "}}");
         }
 
         /// <inheritdoc/>
