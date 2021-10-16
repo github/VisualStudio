@@ -10,7 +10,6 @@ namespace GitHub.UI
         {
             var text = value as string;
             if (String.IsNullOrEmpty(text)) return null;
-            Debug.Assert(text != null, "This should not be null. Possible error with IsNullOrEmpty extension method");
 
             var conversionType = GetConversionTypeFromParameter(parameter);
 

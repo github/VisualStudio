@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -69,7 +70,7 @@ namespace GitHub.Validation
         Valid = 2,
     }
 
-    public abstract class ReactivePropertyValidator : ReactiveObject
+    public abstract class ReactivePropertyValidator : ReactiveObject, IDisposable
     {
         public static ReactivePropertyValidator<TProp> For<TObj, TProp>(TObj This, Expression<Func<TObj, TProp>> property)
         {
@@ -92,9 +93,18 @@ namespace GitHub.Validation
         public abstract Task<ReactivePropertyValidationResult> ExecuteAsync();
 
         public abstract Task ResetAsync();
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class ReactivePropertyValidator<TProp> : ReactivePropertyValidator
     {
         readonly ReactiveCommand<ReactivePropertyValidationResult> validateCommand;
@@ -266,12 +276,21 @@ namespace GitHub.Validation
             return This.IfTrue(String.IsNullOrEmpty, errorMessage);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "System.UriBuilder",
+            Justification = "We're using UriBuilder to validate the URL because Uri.TryCreate fails if no scheme specified.")]
         public static ReactivePropertyValidator<string> IfNotUri(this ReactivePropertyValidator<string> This, string errorMessage)
         {
             return This.IfFalse(s =>
             {
-                Uri uri;
-                return Uri.TryCreate(s, UriKind.Absolute, out uri);
+                try
+                {
+                    new UriBuilder(s);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }, errorMessage);
         }
 

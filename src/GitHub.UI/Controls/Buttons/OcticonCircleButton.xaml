@@ -191,7 +191,7 @@
                                     Stretch="Uniform">
                                     <Path 
                                             x:Name="octicon"
-                                            Height="1024"
+                                            Height="16"
                                             Stretch="None"
                                             Fill="{Binding Path=IconForeground,
                                                 RelativeSource={RelativeSource TemplatedParent}}"
@@ -253,7 +253,7 @@
                                             RelativeSource={RelativeSource TemplatedParent}}"
                                         Stretch="Uniform">
                                             <Path 
-                                                Height="1024"
+                                                Height="16"
                                                 Stretch="None"
                                                 Fill="{Binding Path=ActiveForeground,
                                                     RelativeSource={RelativeSource TemplatedParent}}"

@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -46,14 +45,12 @@ namespace GitHub.UI
 
         public Thickness IconMargin
         {
-            [return: AllowNull]
             get { return (Thickness)GetValue(IconMarginProperty); }
             set { SetValue(IconMarginProperty, value); }
         }
 
         public Brush IconFill
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(IconFillProperty); }
             set { SetValue(IconFillProperty, value); }
         }

@@ -98,7 +98,7 @@
                                 </Style>
 
                                 <Style TargetType="{x:Type Path}">
-                                    <Setter Property="Height" Value="1024" />
+                                    <Setter Property="Height" Value="16" />
                                     <Setter Property="Fill" Value="#666" />
                                     <Setter Property="Opacity" Value="0" />
                                 </Style>

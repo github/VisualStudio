@@ -3,9 +3,13 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using Rothko;
 using GitHub.Extensions;
-using NLog;
+using GitHub.Logging;
+using Microsoft.VisualStudio.Shell;
+using Serilog;
+using Rothko;
+using GitHub.Helpers;
+using Task = System.Threading.Tasks.Task;
 
 namespace GitHub.Services
 {
@@ -18,51 +22,60 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class RepositoryCloneService : IRepositoryCloneService
     {
-        static readonly Logger log = LogManager.GetCurrentClassLogger();
+        static readonly ILogger log = LogManager.ForContext<RepositoryCloneService>();
 
         readonly IOperatingSystem operatingSystem;
         readonly string defaultClonePath;
-        readonly IVSServices vsservices;
+        readonly IVSGitServices vsGitServices;
+        readonly IUsageTracker usageTracker;
 
         [ImportingConstructor]
-        public RepositoryCloneService(IOperatingSystem operatingSystem, IVSServices vsservices)
+        public RepositoryCloneService(
+            IOperatingSystem operatingSystem,
+            IVSGitServices vsGitServices,
+            IUsageTracker usageTracker)
         {
             this.operatingSystem = operatingSystem;
-            this.vsservices = vsservices;
+            this.vsGitServices = vsGitServices;
+            this.usageTracker = usageTracker;
 
             defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
-        public IObservable<Unit> CloneRepository(string cloneUrl, string repositoryName, string repositoryPath)
+        /// <inheritdoc/>
+        public async Task CloneRepository(
+            string cloneUrl,
+            string repositoryName,
+            string repositoryPath,
+            object progress = null)
         {
             Guard.ArgumentNotEmptyString(cloneUrl, nameof(cloneUrl));
             Guard.ArgumentNotEmptyString(repositoryName, nameof(repositoryName));
             Guard.ArgumentNotEmptyString(repositoryPath, nameof(repositoryPath));
 
-            return Observable.Start(() =>
+            string path = Path.Combine(repositoryPath, repositoryName);
+
+            // Switch to a thread pool thread for IO then back to the main thread to call
+            // vsGitServices.Clone() as this must be called on the main thread.
+            await ThreadingHelper.SwitchToPoolThreadAsync();
+            operatingSystem.Directory.CreateDirectory(path);
+            await ThreadingHelper.SwitchToMainThreadAsync();
+
+            try
             {
-                string path = Path.Combine(repositoryPath, repositoryName);
-
-                operatingSystem.Directory.CreateDirectory(path);
-
-                try
-                {
-                    // this will throw if it can't find it
-                    vsservices.Clone(cloneUrl, path, true);
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Could not clone {0} to {1}. {2}", cloneUrl, path, ex);
-                    throw;
-                }
-                
-                return Unit.Default;
-            });
+                await vsGitServices.Clone(cloneUrl, path, true, progress);
+                await usageTracker.IncrementCounter(x => x.NumberOfClones);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Could not clone {CloneUrl} to {Path}", cloneUrl, path);
+                throw;
+            }
         }
 
         string GetLocalClonePathFromGitProvider(string fallbackPath)
         {
-            var ret = vsservices.GetLocalClonePathFromGitProvider();
+            var ret = vsGitServices.GetLocalClonePathFromGitProvider();
             return !string.IsNullOrEmpty(ret)
                 ? operatingSystem.Environment.ExpandEnvironmentVariables(ret)
                 : fallbackPath;

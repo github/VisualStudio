@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using NullGuard;
 
 namespace GitHub.UI
 {
@@ -28,16 +27,6 @@ namespace GitHub.UI
                 FrameworkPropertyMetadataOptions.AffectsMeasure | 
                 FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-            "Icon", typeof(Octicon), typeof(OcticonCircleButton),
-            new FrameworkPropertyMetadata(defaultValue: Octicon.mark_github, flags:
-                FrameworkPropertyMetadataOptions.AffectsArrange |
-                FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender,
-                propertyChangedCallback: OnIconChanged
-            )
-        );
-
         public bool ShowSpinner
         {
             get { return (bool)GetValue(ShowSpinnerProperty); }
@@ -46,28 +35,24 @@ namespace GitHub.UI
 
         public Brush IconForeground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(IconForegroundProperty); }
             set { SetValue(IconForegroundProperty, value); }
         }
 
         public Brush ActiveBackground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(ActiveBackgroundProperty); }
             set { SetValue(ActiveBackgroundProperty, value); }
         }
 
         public Brush ActiveForeground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(ActiveForegroundProperty); }
             set { SetValue(ActiveForegroundProperty, value); }
         }
 
         public Brush PressedBackground
         {
-            [return: AllowNull]
             get { return (Brush)GetValue(PressedBackgroundProperty); }
             set { SetValue(PressedBackgroundProperty, value); }
         }
@@ -76,20 +61,6 @@ namespace GitHub.UI
         {
             get { return (double)GetValue(IconSizeProperty); }
             set { SetValue(IconSizeProperty, value); }
-        }
-
-        public Octicon Icon
-        {
-            [return: AllowNull]
-            get { return (Octicon)GetValue(OcticonPath.IconProperty); }
-            set { SetValue(OcticonPath.IconProperty, value); }
-        }
-
-        public Geometry Data
-        {
-            [return: AllowNull]
-            get { return (Geometry)GetValue(Path.DataProperty); }
-            set { SetValue(Path.DataProperty, value); }
         }
 
         static OcticonCircleButton()

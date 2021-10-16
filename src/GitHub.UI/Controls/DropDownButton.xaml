@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:GitHub.UI">
+    <Style TargetType="local:DropDownButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DropDownButton">
+                    <StackPanel>
+                        <Button Name="PART_Button"
+                                Background="{TemplateBinding Background}"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Margin="{TemplateBinding Padding}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <DockPanel Background="{TemplateBinding Background}">
+                                        <Polygon DockPanel.Dock="Right"
+                                                 Margin="4,0"
+                                                 Fill="{TemplateBinding Foreground}"
+                                                 Points="0,0 8,0 4,4 0,0"
+                                                 VerticalAlignment="Center"/>
+                                        <ContentPresenter/>
+                                    </DockPanel>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Popup Name="PART_Popup"
+                               IsOpen="{TemplateBinding IsOpen}"
+                               Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=PART_Button}"
+                               StaysOpen="False"
+                               MinWidth="{Binding ActualWidth,ElementName=PART_Button}">
+                            <ContentControl Content="{TemplateBinding DropDownContent}"/>
+                        </Popup>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

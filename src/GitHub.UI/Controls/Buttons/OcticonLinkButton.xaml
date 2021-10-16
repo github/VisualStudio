@@ -60,7 +60,7 @@
                             Width="{Binding Path=IconWidth, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=16.0}">
                             <Path x:Name="octicon" 
                                   SnapsToDevicePixels="True" 
-                                  Height="1024"
+                                  Height="16"
                                   Data="{Binding Path=(Path.Data), RelativeSource={RelativeSource TemplatedParent}}">
                                 <Path.Fill>
                                     <SolidColorBrush Color="{DynamicResource GHBlueLinkButtonIconColor}" />

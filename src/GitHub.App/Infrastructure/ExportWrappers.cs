@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Net;
+using GitHub.Models;
+using Octokit;
 using Octokit.Internal;
-using System;
-using System.Net.Http;
+using Rothko;
 
 namespace GitHub.Infrastructure
 {
@@ -15,5 +18,24 @@ namespace GitHub.Infrastructure
         public ExportedHttpClient() :
             base(HttpMessageHandlerFactory.CreateDefault)
         {}
+    }
+
+    [Export(typeof(IHttpListener))]
+    public class ExportedHttpListener : HttpListenerWrapper
+    {
+        public ExportedHttpListener()
+            : base(new HttpListener())
+        {
+        }
+    }
+
+    [Export(typeof(IEnterpriseProbe))]
+    public class ExportedEnterpriseProbe : EnterpriseProbe
+    {
+        [ImportingConstructor]
+        public ExportedEnterpriseProbe(IProgram program, IHttpClient client)
+            : base(program.ProductHeader, client)
+        {
+        }
     }
 }

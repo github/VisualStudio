@@ -1,8 +1,11 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System;
+using System.Windows.Media.Imaging;
+using GitHub.Collections;
 
 namespace GitHub.Models
 {
-    public interface IAccount
+    public interface IAccount : ICopyable<IAccount>,
+        IEquatable<IAccount>, IComparable<IAccount>
     {
         bool IsEnterprise { get; }
         bool IsOnFreePlan { get; }
@@ -11,6 +14,7 @@ namespace GitHub.Models
         string Login { get; }
         int OwnedPrivateRepos { get; }
         long PrivateReposInPlan { get; }
-        BitmapSource Avatar { get; } 
+        string AvatarUrl { get; }
+        BitmapSource Avatar { get; }
     }
 }

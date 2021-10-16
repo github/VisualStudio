@@ -115,6 +115,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelLink {
+            get {
+                return ResourceManager.GetString("CancelLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clone.
         /// </summary>
         public static string CloneLink {
@@ -214,6 +223,15 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Name.
+        /// </summary>
+        public static string fileNameText {
+            get {
+                return ResourceManager.GetString("fileNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search repositories.
         /// </summary>
         public static string filterTextPromptText {
@@ -237,6 +255,15 @@ namespace GitHub.VisualStudio {
         public static string GetStartedLink {
             get {
                 return ResourceManager.GetString("GetStartedLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to create gist.
+        /// </summary>
+        public static string gistCreationFailedMessage {
+            get {
+                return ResourceManager.GetString("gistCreationFailedMessage", resourceCulture);
             }
         }
         
@@ -367,11 +394,29 @@ namespace GitHub.VisualStudio {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Private Gist.
+        /// </summary>
+        public static string makePrivateGist {
+            get {
+                return ResourceManager.GetString("makePrivateGist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string nameText {
             get {
                 return ResourceManager.GetString("nameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To use this feature you need to sign in again..
+        /// </summary>
+        public static string needLogout {
+            get {
+                return ResourceManager.GetString("needLogout", resourceCulture);
             }
         }
         
@@ -471,6 +516,15 @@ namespace GitHub.VisualStudio {
         public static string RepoNameText {
             get {
                 return ResourceManager.GetString("RepoNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repository created successfully..
+        /// </summary>
+        public static string RepositoryPublishedMessage {
+            get {
+                return ResourceManager.GetString("RepositoryPublishedMessage", resourceCulture);
             }
         }
         

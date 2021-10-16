@@ -1,5 +1,5 @@
 ﻿using System.Reactive;
-using GitHub.Authentication;
+using GitHub.Models;
 using GitHub.Validation;
 using ReactiveUI;
 
@@ -33,7 +33,12 @@ namespace GitHub.ViewModels
         /// Gets a command which, when invoked, performs the actual 
         /// login procedure.
         /// </summary>
-        IReactiveCommand<AuthenticationResult> Login { get; }
+        IReactiveCommand<IConnection> Login { get; }
+
+        /// <summary>
+        /// Gets a command which, when invoked, performs an OAuth login.
+        /// </summary>
+        IReactiveCommand<IConnection> LoginViaOAuth { get; }
 
         /// <summary>
         /// Gets a command which, when invoked, direct the user to a
@@ -54,17 +59,6 @@ namespace GitHub.ViewModels
         bool IsLoggingIn { get; }
 
         /// <summary>
-        /// Gets a value indicating whether to show log an error
-        /// message due to a failed log in.
-        /// </summary>
-        bool ShowLogInFailedError { get; }
-
-        /// <summary>
-        /// The message to show if login failed.
-        /// </summary>
-        string LoginFailedMessage { get; }
-
-        /// <summary>
         /// Gets a command which, when invoked, resets all properties 
         /// and validators.
         /// </summary>
@@ -74,12 +68,16 @@ namespace GitHub.ViewModels
         /// Gets a command which, when invoked, directs the user to
         /// a GitHub.com lost password flow.
         /// </summary>
-        IReactiveCommand<Unit> NavigateForgotPassword { get; }
+        IRecoveryCommand NavigateForgotPassword { get; }
 
         /// <summary>
-        /// Gets a value indicating whether to show an error message
-        /// due to being unable to connect to the host.
+        /// Gets an error to display to the user.
         /// </summary>
-        bool ShowConnectingToHostFailed { get; }
+        UserError Error { get; }
+
+        /// <summary>
+        /// Called when the login UI is hidden or dismissed.
+        /// </summary>
+        void Deactivated();
     }
 }

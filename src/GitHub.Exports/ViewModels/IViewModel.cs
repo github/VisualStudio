@@ -1,11 +1,14 @@
-using System.Windows.Input;
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GitHub.ViewModels
 {
-    public interface IViewModel
+    /// <summary>
+    /// Base interface for all view models.
+    /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
+    public interface IViewModel : INotifyPropertyChanged
     {
-        string Title { get; }
-        ICommand Cancel { get; }
-        bool IsShowing { get; }
-	}
+    }
 }

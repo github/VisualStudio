@@ -94,5 +94,10 @@ namespace GitHub.Info
                 : string.Format(CultureInfo.InvariantCulture,
                     GitHub + "/organizations/{0}/settings/billing", account.Login);
         }
+
+        /// <summary>
+        /// The URL for the GitHub for Visual Studio documentation.
+        /// </summary>
+        public const string Documentation = "https://github.com/github/VisualStudio/tree/master/docs";
     }
 }

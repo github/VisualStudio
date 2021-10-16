@@ -1,6 +1,5 @@
 ﻿using System;
 using GitHub.Primitives;
-using Microsoft.VisualStudio.TeamFoundation.Git.Extensibility;
 using GitHub.Models;
 
 namespace GitHub.Services
@@ -29,13 +28,13 @@ namespace GitHub.Services
         /// <summary>
         /// A IGitRepositoryInfo representing the currently active repository
         /// </summary>
-        ISimpleRepositoryModel ActiveRepo { get; }
+        ILocalRepositoryModel ActiveRepo { get; }
         /// <summary>
         /// Subscribe to be notified when the active repository is set and Notify is called.
         /// </summary>
         /// <param name="who">The instance that is interested in being called (or a unique key/object for that instance)</param>
         /// <param name="handler">The handler to call when ActiveRepo is set</param>
-        void Subscribe(object who, Action<ISimpleRepositoryModel> handler);
+        void Subscribe(object who, Action<ILocalRepositoryModel> handler);
         /// <summary>
         /// Unsubscribe from notifications
         /// </summary>
@@ -43,16 +42,11 @@ namespace GitHub.Services
         void Unsubscribe(object who);
 
         IGitAwareItem HomeSection { get; }
-
-        /// <summary>
-        /// Refresh the information on the active repo (in case of remote url changes or other such things)
-        /// </summary>
-        void Refresh();
     }
 
     public interface IGitAwareItem
     {
-        ISimpleRepositoryModel ActiveRepo { get; }
+        ILocalRepositoryModel ActiveRepo { get; }
 
         /// <summary>
         /// Represents the web URL of the repository on GitHub.com, even if the origin is an SSH address.

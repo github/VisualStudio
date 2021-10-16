@@ -1,28 +1,20 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Threading.Tasks;
+using GitHub.Factories;
 using GitHub.Models;
-using System;
-using ReactiveUI;
-using GitHub.Primitives;
+using GitHub.Services;
 
 namespace GitHub.Extensions
 {
     public static class ConnectionManagerExtensions
     {
-        public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts)
+        public static async Task<IModelService> GetModelService(
+            this IConnectionManager cm,
+            ILocalRepositoryModel repository,
+            IModelServiceFactory factory)
         {
-            return cm.Connections.ToObservable()
-                    .SelectMany(c => c.Login())
-                    .Select(c => hosts.LookupHost(c.HostAddress))
-                    .Any(h => h.IsLoggedIn);
-        }
-
-        public static IObservable<bool> IsLoggedIn(this IConnectionManager cm, IRepositoryHosts hosts, HostAddress address)
-        {
-            return cm.Connections.ToObservable()
-                    .Where(c => c.HostAddress.Equals(address))
-                    .SelectMany(c => c.Login())
-                    .Select(c => hosts.LookupHost(c.HostAddress))
-                    .Any(h => h.IsLoggedIn);
+            var connection = await cm.GetConnection(repository);
+            return connection?.IsLoggedIn == true ? await factory.CreateAsync(connection) : null;
         }
     }
 }

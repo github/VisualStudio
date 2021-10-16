@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitHub.Collections;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Linq;
 namespace GitHub.Models
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public sealed class GitIgnoreItem
+    public sealed class GitIgnoreItem : ICopyable<GitIgnoreItem>
     {
         static readonly string[] recommendedIgnoreFiles = { "None", "VisualStudio", "Node", "Eclipse", "C++", "Windows" };
 
@@ -22,6 +23,12 @@ namespace GitHub.Models
         {
             Name = name;
             Recommended = IsRecommended(name);
+        }
+
+        public void CopyFrom(GitIgnoreItem other)
+        {
+            Name = other.Name;
+            Recommended = other.Recommended;
         }
 
         public string Name { get; private set; }

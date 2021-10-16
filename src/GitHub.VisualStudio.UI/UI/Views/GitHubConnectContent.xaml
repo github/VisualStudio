@@ -1,0 +1,278 @@
+﻿<UserControl x:Class="GitHub.VisualStudio.UI.Views.GitHubConnectContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ghfvs="https://github.com/github/VisualStudio"
+             xmlns:local="clr-namespace:GitHub.VisualStudio.UI.Views"
+             xmlns:prop="clr-namespace:GitHub.VisualStudio.UI"
+             mc:Ignorable="d"
+             KeyboardNavigation.TabNavigation="Local"
+             DataContext="{Binding ViewModel}"
+             Background="{DynamicResource GitHubVsToolWindowBackground}" >
+    
+  <d:DesignProperties.DataContext>
+    <Binding>
+      <Binding.Source>
+        <ghfvs:GitHubConnectSectionDesigner ErrorMessage="Could not connect."
+                                            ShowLogin="True"
+                                            ShowLogout="True"
+                                            ShowRetry="True"/>
+      </Binding.Source>
+    </Binding>
+  </d:DesignProperties.DataContext>
+  
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.VisualStudio.UI;component/SharedDictionary.xaml" />
+        <ghfvs:SharedDictionaryManager Source="pack://application:,,,/GitHub.UI;component/SharedDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <ghfvs:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+      <ghfvs:HasItemsVisibilityConverter x:Key="HasItemsVisibilityConverter" />
+      <local:FormatRepositoryNameConverter x:Key="FormatRepositoryNameConverter" />
+      <local:IsCurrentRepositoryConverter x:Key="IsCurrentRepositoryConverter" />
+
+
+      <Style x:Key="RepoNameStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+        <Setter Property="Margin" Value="0,0,6,3" />
+        <Setter Property="Text">
+          <Setter.Value>
+            <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
+              <Binding/>
+              <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
+            </MultiBinding>
+          </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+          <DataTrigger Value="True">
+            <DataTrigger.Binding>
+              <MultiBinding Converter="{StaticResource IsCurrentRepositoryConverter}" ConverterParameter="IsCurrentRepository">
+                <Binding/>
+                <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
+              </MultiBinding>
+            </DataTrigger.Binding>
+            <Setter Property="TextBlock.FontWeight" Value="Bold" />
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+
+      <Style x:Key="RepoPathStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Margin" Value="0,0,3,3" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"  />
+        <Setter Property="TextWrapping" Value="NoWrap"  />
+        <Setter Property="Foreground" Value="{DynamicResource GitHubVsGrayText}" />
+        <Style.Triggers>
+          <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+              <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True"/>
+            </MultiDataTrigger.Conditions>
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+          </MultiDataTrigger>
+          <MultiDataTrigger>
+            <MultiDataTrigger.Conditions>
+              <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}, Path=IsMouseOver}" Value="true" />
+            </MultiDataTrigger.Conditions>
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+          </MultiDataTrigger>
+          <DataTrigger Value="True">
+            <DataTrigger.Binding>
+              <MultiBinding Converter="{StaticResource IsCurrentRepositoryConverter}" ConverterParameter="IsCurrentRepository">
+                <Binding/>
+                <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
+              </MultiBinding>
+            </DataTrigger.Binding>
+            <Setter Property="Foreground" Value="{DynamicResource GitHubVsToolWindowText}" />
+          </DataTrigger>
+        </Style.Triggers>
+
+      </Style>
+      
+      <Style x:Key="RepositoriesListItemContainerStyle" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="1"/>
+
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+              <Border x:Name="Bd"
+                      Padding="{TemplateBinding Padding}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      Background="{TemplateBinding Background}">
+                <ContentPresenter
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+              </Border>
+              <ControlTemplate.Triggers>
+                <MultiTrigger>
+                  <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True"/>
+                  </MultiTrigger.Conditions>
+                  <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarHover}" />
+                </MultiTrigger>
+                <MultiTrigger>
+                  <MultiTrigger.Conditions>
+                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                    <Condition Property="IsSelected" Value="True"/>
+                  </MultiTrigger.Conditions>
+                  <Setter Property="Background" Value="{DynamicResource GitHubVsCommandBarSelectedBorder}" />
+                </MultiTrigger>
+                <MultiTrigger>
+                  <MultiTrigger.Conditions>
+                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                  </MultiTrigger.Conditions>
+                </MultiTrigger>
+                <Trigger Property="IsEnabled" Value="False">
+                  <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+
+  </UserControl.Resources>
+  
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+      
+    <WrapPanel Orientation="Horizontal"
+               Margin="6,0,0,6"
+               Visibility="{Binding SectionConnection.IsLoggedIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="0" x:Name="cloneLink" Command="{Binding Clone}" Content="{x:Static prop:Resources.CloneLink}"              
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CloneHyperlink}"/>
+      <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="1" x:Name="createLink" Click="createLink_Click" Content="{x:Static prop:Resources.CreateLink}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.CreateHyperlink}"/>
+      <Separator Margin="3,0,3,0" Style="{StaticResource VerticalSeparator}" />
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="signOut" Click="signOut_Click" Content="{x:Static prop:Resources.SignOutLink}"
+              Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignOutHyperlink}"/>
+      <Button Style="{StaticResource ActionLinkButton}" KeyboardNavigation.TabIndex="2" x:Name="login" Click="login_Click" Content="{x:Static prop:Resources.LoginLink}"
+              Visibility="{Binding ShowLogin, Converter={StaticResource BooleanToVisibilityConverter}}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.SignInHyperlink}"/>
+    </WrapPanel>
+ 
+    <ListView x:Name="repositories"
+              Grid.Row="1"
+              ItemsSource="{Binding Repositories}"
+              SelectedItem="{Binding Path=SelectedRepository}"
+              Margin="5,0,6,0"
+              MouseDoubleClick="repositories_MouseDoubleClick"
+              ItemContainerStyle="{StaticResource RepositoriesListItemContainerStyle}"
+              Background="Transparent"
+              BorderBrush="Transparent"
+              TextSearch.TextPath="Name"
+              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+              VirtualizingPanel.IsVirtualizing="True"
+              VirtualizingPanel.ScrollUnit="Pixel"
+              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+              Visibility="{Binding Repositories, Converter={StaticResource HasItemsVisibilityConverter}}"
+              AutomationProperties.AutomationId="{x:Static ghfvs:AutomationIDs.TeamExplorerRepositoryListView}" >
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ghfvs:OcticonImage Grid.Column="0" Margin="11,1,6,1" Width="16" Height="16"
+                             Foreground="{DynamicResource GitHubVsToolWindowText}"
+                             Icon="{Binding Path=Icon}"/>
+            <TextBlock       Grid.Column="1" Style="{StaticResource RepoNameStyle}" />
+            <Separator       Grid.Column="2" Margin="0,0,6,3" Style="{StaticResource VerticalSeparator}" />
+            <TextBlock       Grid.Column="3" Text="{Binding Path=LocalPath}" Style="{StaticResource RepoPathStyle}" />
+            <Grid.ToolTip>
+              <ToolTip>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                  </Grid.RowDefinitions>
+                  <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.nameText}"/>:
+                  </TextBlock>
+                  <TextBlock Grid.Row="0" Grid.Column="1">
+                    <TextBlock.Text>
+                      <MultiBinding Converter="{StaticResource FormatRepositoryNameConverter}" ConverterParameter="FormatRepositoryName">
+                        <Binding/>
+                        <Binding Path="ViewModel" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type local:GitHubConnectContent}}" />
+                      </MultiBinding>
+                    </TextBlock.Text>
+                  </TextBlock>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,6,0">
+                    <Run Text="{x:Static prop:Resources.pathText}"/>:
+                  </TextBlock>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=LocalPath}" />
+                </Grid>
+              </ToolTip>
+            </Grid.ToolTip>
+          </Grid>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+    <TextBlock Grid.Row="1"
+               Visibility="{Binding IsLoggingIn, Converter={ghfvs:BooleanToVisibilityConverter}}">
+      Logging in...
+    </TextBlock>
+
+    <Grid Grid.Row="1"
+          Visibility="{Binding ErrorMessage, Converter={ghfvs:NotEqualsToVisibilityConverter {x:Null}}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <ghfvs:OcticonImage Grid.Column="0"
+                          Grid.RowSpan="3"
+                          Icon="alert"
+                          Margin="8"/>
+
+      <TextBlock Grid.Column="1"
+                 Grid.Row="0"
+                 Text="{Binding ErrorMessage}"
+                 TextWrapping="Wrap"/>
+
+      <StackPanel Grid.Column="1"
+                  Grid.Row="1"
+                  Margin="0,8,0,0"
+                  Orientation="Horizontal">
+        <Button Style="{StaticResource ActionLinkButton}"
+                Content="{x:Static prop:Resources.Retry}"
+                Click="retry_Click"
+                Margin="0,0,8,0"
+                Visibility="{Binding ShowRetry, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Button Style="{StaticResource ActionLinkButton}"
+                Click="signOut_Click"
+                Content="{x:Static prop:Resources.SignOutLink}"
+                Visibility="{Binding ShowLogout, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+      </StackPanel>
+    </Grid>
+    
+  </Grid>
+</UserControl>

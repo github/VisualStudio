@@ -1,12 +1,12 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Reactive.Linq;
-using System.Security;
-using Akavache;
-using GitHub.Caches;
+using GitHub.Api;
+using GitHub.Extensions;
+using GitHub.Logging;
 using GitHub.Primitives;
 using LibGit2Sharp;
-using NullGuard;
+using Microsoft.VisualStudio.Shell;
+using Serilog;
 
 namespace GitHub.Services
 {
@@ -14,37 +14,42 @@ namespace GitHub.Services
     [PartCreationPolicy(CreationPolicy.Shared)]
     class GitHubCredentialProvider : IGitHubCredentialProvider
     {
-        readonly ISecureBlobCache secureCache = null;
+        static readonly ILogger log = LogManager.ForContext<GitHubCredentialProvider>();
+        readonly IKeychain keychain;
 
         [ImportingConstructor]
-        public GitHubCredentialProvider(ISharedCache sharedCache)
+        public GitHubCredentialProvider(IKeychain keychain)
         {
-            secureCache = sharedCache.Secure;
+            Guard.ArgumentNotNull(keychain, nameof(keychain));
+
+            this.keychain = keychain;
         }
 
         /// <summary>
         /// This is a callback from libgit2
         /// </summary>
         /// <returns></returns>
-        public Credentials HandleCredentials([AllowNull]string url, [AllowNull]string username, SupportedCredentialTypes types)
+        public Credentials HandleCredentials(string url, string username, SupportedCredentialTypes types)
         {
             if (url == null)
                 return null; // wondering if we should return DefaultCredentials instead
 
             var host = HostAddress.Create(url);
-            return secureCache.GetObject<Tuple<string, SecureString>>("login:" + host.CredentialCacheKeyHost)
-                .Select(CreateCredentials)
-                .Catch(Observable.Return<Credentials>(null))
-                .Wait();
-        }
 
-        static Credentials CreateCredentials(Tuple<string, SecureString> data)
-        {
-            return new SecureUsernamePasswordCredentials
+            try
             {
-                Username = data.Item1,
-                Password = data.Item2
-            };
+                var credentials = ThreadHelper.JoinableTaskFactory.Run(async () => await keychain.Load(host));
+                return new UsernamePasswordCredentials
+                {
+                    Username = credentials.Item1,
+                    Password = credentials.Item2,
+                };
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error loading credentials in GitHubCredentialProvider");
+                return null;
+            }
         }
     }
 }

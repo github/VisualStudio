@@ -4,6 +4,7 @@ using System.Reactive;
 using GitHub.Models;
 using GitHub.Caches;
 using GitHub.Collections;
+using GitHub.Api;
 
 namespace GitHub.Services
 {
@@ -13,13 +14,24 @@ namespace GitHub.Services
     /// </summary>
     public interface IModelService : IDisposable
     {
-        IObservable<AccountCacheItem> GetUserFromCache();
+        IApiClient ApiClient { get; }
+
+        IObservable<IAccount> GetCurrentUser();
+        IObservable<IAccount> GetUser(string login);
         IObservable<Unit> InsertUser(AccountCacheItem user);
         IObservable<IReadOnlyList<IAccount>> GetAccounts();
-        IObservable<IReadOnlyList<IRepositoryModel>> GetRepositories();
-        IObservable<IReadOnlyList<LicenseItem>> GetLicenses();
-        IObservable<IReadOnlyList<GitIgnoreItem>> GetGitIgnoreTemplates();
-        ITrackingCollection<IPullRequestModel> GetPullRequests(ISimpleRepositoryModel repo);
+        IObservable<IRemoteRepositoryModel> GetRepository(string owner, string repo);
+        ITrackingCollection<IRemoteRepositoryModel> GetRepositories(ITrackingCollection<IRemoteRepositoryModel> collection);
+        IObservable<IRemoteRepositoryModel> GetForks(IRepositoryModel repository);
+        IObservable<LicenseItem> GetLicenses();
+        IObservable<GitIgnoreItem> GetGitIgnoreTemplates();
+        IObservable<IPullRequestModel> GetPullRequest(string owner, string name, int number);
+        ITrackingCollection<IPullRequestModel> GetPullRequests(IRepositoryModel repo, ITrackingCollection<IPullRequestModel> collection);
+        IObservable<IPullRequestModel> CreatePullRequest(ILocalRepositoryModel sourceRepository, IRepositoryModel targetRepository,
+            IBranch sourceBranch, IBranch targetBranch,
+            string title, string body);
+        IObservable<IBranch> GetBranches(IRepositoryModel repo);
         IObservable<Unit> InvalidateAll();
+        IObservable<string> GetFileContents(IRepositoryModel repo, string commitSha, string path, string fileSha);
     }
 }

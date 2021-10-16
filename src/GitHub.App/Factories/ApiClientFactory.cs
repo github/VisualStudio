@@ -1,13 +1,13 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using GitHub.Api;
-using GitHub.Caches;
+using GitHub.Infrastructure;
 using GitHub.Models;
 using GitHub.Primitives;
-using GitHub.Services;
 using Octokit;
 using Octokit.Reactive;
 using ApiClient = GitHub.Api.ApiClient;
-using GitHub.Infrastructure;
 
 namespace GitHub.Factories
 {
@@ -18,22 +18,26 @@ namespace GitHub.Factories
         readonly ProductHeaderValue productHeader;
 
         [ImportingConstructor]
-        public ApiClientFactory(ILoginCache loginCache, IProgram program, ILoggingConfiguration config)
+        public ApiClientFactory(IKeychain keychain, IProgram program)
         {
-            LoginCache = loginCache;
+            Keychain = keychain;
             productHeader = program.ProductHeader;
-            config.Configure();
         }
 
-        public IApiClient Create(HostAddress hostAddress)
+        public Task<IGitHubClient> CreateGitHubClient(HostAddress hostAddress)
         {
-            var apiBaseUri = hostAddress.ApiUri;
+            var credentialStore = new KeychainCredentialStore(Keychain, hostAddress);
+            var result = new GitHubClient(productHeader, credentialStore, hostAddress.ApiUri);
+            return Task.FromResult<IGitHubClient>(result);
+        }
 
+        public async Task<IApiClient> Create(HostAddress hostAddress)
+        {
             return new ApiClient(
                 hostAddress,
-                new ObservableGitHubClient(new GitHubClient(productHeader, new GitHubCredentialStore(hostAddress, LoginCache), apiBaseUri)));
+                new ObservableGitHubClient(await CreateGitHubClient(hostAddress)));
         }
 
-        protected ILoginCache LoginCache { get; private set; }
+        protected IKeychain Keychain { get; private set; }
     }
 }

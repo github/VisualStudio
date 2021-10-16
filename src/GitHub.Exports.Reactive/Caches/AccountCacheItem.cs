@@ -18,8 +18,6 @@ namespace GitHub.Caches
         public AccountCacheItem(Account account)
         {
             Login = account.Login;
-            OwnedPrivateRepositoriesCount = account.OwnedPrivateRepos;
-            PrivateRepositoriesInPlanCount = (account.Plan == null ? 0 : account.Plan.PrivateRepos);
             IsUser = (account as User) != null;
             Uri htmlUrl;
             IsEnterprise = Uri.TryCreate(account.HtmlUrl, UriKind.Absolute, out htmlUrl)

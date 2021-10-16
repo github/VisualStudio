@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using GitHub.VisualStudio.Helpers;
 
 namespace GitHub.Primitives
@@ -7,7 +8,7 @@ namespace GitHub.Primitives
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void RaisePropertyChanged(string propertyName)
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

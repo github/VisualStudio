@@ -44,7 +44,7 @@ namespace GitHub.Primitives
         {
             WebUri = new Uri(enterpriseUri, new Uri("/", UriKind.Relative));
             ApiUri = new Uri(enterpriseUri, new Uri("/api/v3/", UriKind.Relative));
-            //CredentialCacheKeyHost = ApiUri.Host;
+            GraphQLUri = new Uri(enterpriseUri, new Uri("/api/graphql", UriKind.Relative));
             CredentialCacheKeyHost = WebUri.ToString();
         }
 
@@ -52,20 +52,26 @@ namespace GitHub.Primitives
         {
             WebUri = new Uri("https://github.com");
             ApiUri = new Uri("https://api.github.com");
-            //CredentialCacheKeyHost = "github.com";
+            GraphQLUri = new Uri("https://api.github.com/graphql");
             CredentialCacheKeyHost = WebUri.ToString();
         }
 
         /// <summary>
-        /// The Base URL to the host. For example, "https://github.com" or "https://ghe.io"
+        /// The Base URL to the host. For example, "https://github.com" or "https://github-enterprise.com"
         /// </summary>
         public Uri WebUri { get; set; }
 
         /// <summary>
         /// The Base Url to the host's API endpoint. For example, "https://api.github.com" or
-        ///  "https://ghe.io/api/v3"
+        ///  "https://github-enterprise.com/api/v3"
         /// </summary>
         public Uri ApiUri { get; set; }
+
+        /// <summary>
+        /// The Base Url to the host's GraphQL API endpoint. For example, "https://api.github.com/graphql" or
+        ///  "https://github-enterprise.com/api/graphql"
+        /// </summary>
+        public Uri GraphQLUri { get; set; }
 
         // If the host name is "api.github.com" or "gist.github.com", we really only want "github.com",
         // since that's the same cache key for all the other github.com operations.
@@ -76,6 +82,16 @@ namespace GitHub.Primitives
             return hostUri.IsSameHost(GitHubDotComHostAddress.WebUri)
                    || hostUri.IsSameHost(GitHubDotComHostAddress.ApiUri)
                    || hostUri.IsSameHost(gistUri);
+        }
+
+        public static bool operator ==(HostAddress a, HostAddress b)
+        {
+            return object.ReferenceEquals(a, null) ? object.ReferenceEquals(b, null) : a.Equals(b);
+        }
+
+        public static bool operator !=(HostAddress a, HostAddress b)
+        {
+            return !(a == b);
         }
 
         public bool IsGitHubDotCom()

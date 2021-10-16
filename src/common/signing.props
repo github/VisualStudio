@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BuildType Condition="Exists('..\..\script\key.snk')">Internal</BuildType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildType)' == 'Internal'">
+    <AssemblyOriginatorKeyFile>..\..\script\key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(BuildType)' != 'Internal' and Exists('..\..\signingkey')">
+    <AssemblyOriginatorKeyFile>..\..\signingkey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\script\key.snk" Condition="'$(BuildType)' == 'Internal'">
+      <Link>key.snk</Link>
+    </None>
+
+    <None Include="..\..\signingkey" Condition="'$(BuildType)' != 'Internal' and Exists('..\..\signingkey')">
+      <Link>signingkey</Link>
+    </None>
+  </ItemGroup>
+</Project>
