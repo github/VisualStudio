@@ -1,6 +1,8 @@
 GitHub Extension for Visual Studio
 
-The [GitHub Extension for Visual Studio](https://visualstudio.github.com/) makes it easy to connect to and work with your repositories on [GitHub](https://github.com/) and [GitHub Enterprise](https://enterprise.github.com/) from directly within Visual Studio 2015 or newer. Clone existing repositories or create new ones and start collaborating!
+Visual Studio 2022 now includes the functionality from this extension out of the box. We recommend [downloading Visual Studio 2022](https://visualstudio.microsoft.com/vs/github/) to get the best experience.
+
+This GitHub Extension enhances Visual Studio 2015 and Visual Studio 2017 by making it easy to connect to and work with your repositories on [GitHub](https://github.com/) and [GitHub Enterprise](https://enterprise.github.com/). Clone existing repositories or create new ones and start collaborating!
 
 For more information about the extension, visit [https://visualstudio.github.com/](https://visualstudio.github.com/).
 
