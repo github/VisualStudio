@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitHub.Api;
 using GitHub.Models;
 using GitHub.Services;
+using GitHub.Settings;
 using Microsoft.VisualStudio.Threading;
 using NSubstitute;
 using NUnit.Framework;
@@ -154,22 +155,67 @@ public class RepositoryCloneServiceTests
             operatingSystem.Directory.DidNotReceive().CreateDirectory(clonePath);
             await vsGitServices.Received().Clone(cloneUrl, clonePath, true);
         }
+    }
 
-        static RepositoryCloneService CreateRepositoryCloneService(IOperatingSystem operatingSystem = null,
-            IVSGitServices vsGitServices = null, IUsageTracker usageTracker = null,
-            ITeamExplorerServices teamExplorerServices = null, IGitHubServiceProvider serviceProvider = null)
+    public class TheSetDefaultClonePathMethod
+    {
+        [TestCase(@"c:\source\owner\repositoryName", "https://github.com/owner/repositoryName", @"c:\source")]
+        [TestCase(@"c:\source\owner\newRepositoryName", "https://github.com/owner/repositoryName", @"c:\source")]
+        [TestCase(@"c:\source\owner\repositoryName", "https://github.com/OWNER/repositoryName", @"c:\source")]
+        [TestCase(@"c:\owner\repositoryName", "https://github.com/owner/repositoryName", @"c:\")]
+
+        [TestCase(@"c:\source\repositoryName", "https://github.com/owner/repositoryName", @"c:\source")]
+        [TestCase(@"c:\repositoryName", "https://github.com/owner/repositoryName", @"c:\")]
+        public void SetDefaultClonePath(string targetPath, string cloneUrl, string expectedDefaultPath)
         {
-            operatingSystem = operatingSystem ?? Substitute.For<IOperatingSystem>();
-            vsGitServices = vsGitServices ?? Substitute.For<IVSGitServices>();
-            usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
-            teamExplorerServices = teamExplorerServices ?? Substitute.For<ITeamExplorerServices>();
-            serviceProvider = serviceProvider ?? Substitute.For<IGitHubServiceProvider>();
+            var cloneService = CreateRepositoryCloneService();
 
-            operatingSystem.Environment.ExpandEnvironmentVariables(Args.String).Returns(x => x[0]);
+            cloneService.SetDefaultClonePath(targetPath, cloneUrl);
 
-            return new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
-                Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
-                usageTracker, serviceProvider, new JoinableTaskContext());
+            Assert.That(cloneService.DefaultClonePath, Is.EqualTo(expectedDefaultPath));
         }
+    }
+
+    public class TheDefaultClonePathProperty
+    {
+        [TestCase(@"c:\source\owner\name", "https://github.com/owner/name", @"c:\source")]
+        [TestCase(@"c:\source\name", "https://github.com/owner/name", @"c:\source")]
+        public void GetDefaultClonePath(string setTargetPath, string setCloneUrl, string expectedDefaultPath)
+        {
+            var cloneService = CreateRepositoryCloneService();
+
+            cloneService.SetDefaultClonePath(setTargetPath, setCloneUrl);
+
+            Assert.That(cloneService.DefaultClonePath, Is.EqualTo(expectedDefaultPath));
+        }
+    }
+    public class TheDefaultRepositoryLayoutProperty
+    {
+        [Test]
+        public void Defaults_To_Default_Layout()
+        {
+            var cloneService = CreateRepositoryCloneService();
+
+            Assert.That(cloneService.DefaultRepositoryLayout, Is.EqualTo(RepositoryLayout.Default));
+        }
+    }
+
+    static RepositoryCloneService CreateRepositoryCloneService(IOperatingSystem operatingSystem = null,
+        IVSGitServices vsGitServices = null, IUsageTracker usageTracker = null,
+        ITeamExplorerServices teamExplorerServices = null, IGitHubServiceProvider serviceProvider = null,
+        IPackageSettings packageSettings = null)
+    {
+        operatingSystem = operatingSystem ?? Substitute.For<IOperatingSystem>();
+        vsGitServices = vsGitServices ?? Substitute.For<IVSGitServices>();
+        usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
+        teamExplorerServices = teamExplorerServices ?? Substitute.For<ITeamExplorerServices>();
+        serviceProvider = serviceProvider ?? Substitute.For<IGitHubServiceProvider>();
+        packageSettings = packageSettings ?? Substitute.For<IPackageSettings>();
+
+        operatingSystem.Environment.ExpandEnvironmentVariables(Args.String).Returns(x => x[0]);
+
+        return new RepositoryCloneService(operatingSystem, vsGitServices, teamExplorerServices,
+            Substitute.For<IGraphQLClientFactory>(), Substitute.For<IGitHubContextService>(),
+            usageTracker, serviceProvider, new Lazy<IPackageSettings>(() => packageSettings), new JoinableTaskContext());
     }
 }

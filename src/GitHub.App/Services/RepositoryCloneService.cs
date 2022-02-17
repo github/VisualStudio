@@ -11,6 +11,7 @@ using GitHub.Extensions;
 using GitHub.Logging;
 using GitHub.Models;
 using GitHub.Primitives;
+using GitHub.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using Octokit.GraphQL;
@@ -39,6 +40,7 @@ namespace GitHub.Services
         readonly IGraphQLClientFactory graphqlFactory;
         readonly IGitHubContextService gitHubContextService;
         readonly IUsageTracker usageTracker;
+        readonly Lazy<IPackageSettings> packageSettings;
         readonly Lazy<EnvDTE.DTE> dte;
         ICompiledQuery<ViewerRepositoriesModel> readViewerRepositories;
 
@@ -51,6 +53,7 @@ namespace GitHub.Services
             IGitHubContextService gitHubContextService,
             IUsageTracker usageTracker,
             IGitHubServiceProvider sp,
+            Lazy<IPackageSettings> packageSettings,
             [Import(AllowDefault = true)] JoinableTaskContext joinableTaskContext)
         {
             this.operatingSystem = operatingSystem;
@@ -59,10 +62,9 @@ namespace GitHub.Services
             this.graphqlFactory = graphqlFactory;
             this.gitHubContextService = gitHubContextService;
             this.usageTracker = usageTracker;
+            this.packageSettings = packageSettings;
             dte = new Lazy<EnvDTE.DTE>(() => sp.GetService<EnvDTE.DTE>());
             JoinableTaskContext = joinableTaskContext ?? ThreadHelper.JoinableTaskContext;
-
-            defaultClonePath = GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
         }
 
         /// <inheritdoc/>
@@ -225,6 +227,8 @@ namespace GitHub.Services
                     // Count the number of times users clone into the Default Repository Location
                     await usageTracker.IncrementCounter(x => x.NumberOfClonesToDefaultClonePath);
                 }
+
+                SetDefaultClonePath(repositoryPath, cloneUrl);
             }
             catch (Exception ex)
             {
@@ -251,13 +255,38 @@ namespace GitHub.Services
                 : fallbackPath;
         }
 
-        public string DefaultClonePath { get { return defaultClonePath; } }
+        public void SetDefaultClonePath(string repositoryPath, UriString cloneUrl)
+        {
+            var (defaultPath, repositoryLayout) = RepositoryLayoutUtilities.GetDefaultPathAndLayout(repositoryPath, cloneUrl);
+
+            log.Information("Setting DefaultRepositoryLocation to {Location}", defaultPath);
+            packageSettings.Value.DefaultRepositoryLocation = defaultPath;
+
+            log.Information("Setting DefaultRepositoryLayout to {Layout}", repositoryLayout);
+            packageSettings.Value.DefaultRepositoryLayout = repositoryLayout.ToString();
+
+            packageSettings.Value.Save();
+        }
+
+        public RepositoryLayout DefaultRepositoryLayout
+        {
+            get => RepositoryLayoutUtilities.GetRepositoryLayout(packageSettings.Value.DefaultRepositoryLayout);
+        }
+
+        public string DefaultClonePath
+        {
+            get
+            {
+                var defaultPath = packageSettings.Value.DefaultRepositoryLocation;
+                if (!string.IsNullOrEmpty(defaultPath))
+                {
+                    return defaultPath;
+                }
+
+                return GetLocalClonePathFromGitProvider(operatingSystem.Environment.GetUserRepositoriesPath());
+            }
+        }
 
         JoinableTaskContext JoinableTaskContext { get; }
-
-        class OrganizationAdapter
-        {
-            public IReadOnlyList<RepositoryListItemModel> Repositories { get; set; }
-        }
     }
 }

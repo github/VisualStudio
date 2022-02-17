@@ -3,7 +3,7 @@
     {
       "name": "CollectMetrics",
       "type": "bool",
-      "default": 'true'
+      "default": "true"
     },
     {
       "name": "UIState",
@@ -20,6 +20,16 @@
       "name": "EnableTraceLogging",
       "type": "bool",
       "default": "false"
+    },
+    {
+      "name": "DefaultRepositoryLocation",
+      "type": "string",
+      "default": "null"
+    },
+    {
+      "name": "DefaultRepositoryLayout",
+      "type": "string",
+      "default": "null"
     }
   ]
 }

@@ -5,7 +5,7 @@
     {
       "name": "CollectMetrics",
       "type": "bool",
-      "default": 'true'
+      "default": "true"
     },
     {
       "name": "UIState",
@@ -22,6 +22,16 @@
       "name": "EnableTraceLogging",
       "type": "bool",
       "default": "false"
+    },
+    {
+      "name": "DefaultRepositoryLocation",
+      "type": "string",
+      "default": "null"
+    },
+    {
+      "name": "DefaultRepositoryLayout",
+      "type": "string",
+      "default": "null"
     }
   ]
 }
@@ -71,6 +81,20 @@ namespace GitHub.VisualStudio.Settings {
             set { enableTraceLogging  = value; this.RaisePropertyChange(); }
         }
 
+        string defaultRepositoryLocation;
+        public string DefaultRepositoryLocation
+        {
+            get { return defaultRepositoryLocation; }
+            set { defaultRepositoryLocation  = value; this.RaisePropertyChange(); }
+        }
+
+        string defaultRepositoryLayout;
+        public string DefaultRepositoryLayout
+        {
+            get { return defaultRepositoryLayout; }
+            set { defaultRepositoryLayout  = value; this.RaisePropertyChange(); }
+        }
+
 
         void LoadSettings()
         {
@@ -78,6 +102,8 @@ namespace GitHub.VisualStudio.Settings {
             UIState = SimpleJson.DeserializeObject<UIState>((string)settingsStore.Read("UIState", "{}"));
             HideTeamExplorerWelcomeMessage = (bool)settingsStore.Read("HideTeamExplorerWelcomeMessage", false);
             EnableTraceLogging = (bool)settingsStore.Read("EnableTraceLogging", false);
+            DefaultRepositoryLocation = (string)settingsStore.Read("DefaultRepositoryLocation", null);
+            DefaultRepositoryLayout = (string)settingsStore.Read("DefaultRepositoryLayout", null);
         }
 
         void SaveSettings()
@@ -86,6 +112,8 @@ namespace GitHub.VisualStudio.Settings {
             settingsStore.Write("UIState", SimpleJson.SerializeObject(UIState));
             settingsStore.Write("HideTeamExplorerWelcomeMessage", HideTeamExplorerWelcomeMessage);
             settingsStore.Write("EnableTraceLogging", EnableTraceLogging);
+            settingsStore.Write("DefaultRepositoryLocation", DefaultRepositoryLocation);
+            settingsStore.Write("DefaultRepositoryLayout", DefaultRepositoryLayout);
         }
 
     }

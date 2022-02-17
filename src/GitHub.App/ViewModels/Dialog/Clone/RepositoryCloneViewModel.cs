@@ -210,55 +210,27 @@ namespace GitHub.ViewModels.Dialog.Clone
         {
             if (repository != null)
             {
-                var basePath = GetUpdatedBasePath(Path);
-                previousRepository = repository;
-                Path = System.IO.Path.Combine(basePath, repository.Owner, repository.Name);
-            }
-        }
-
-        string GetUpdatedBasePath(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                return service.DefaultClonePath;
-            }
-
-            if (previousRepository == null)
-            {
-                return path;
-            }
-
-            if (FindDirWithout(path, previousRepository?.Owner, 2) is string dirWithoutOwner)
-            {
-                return dirWithoutOwner;
-            }
-
-            if (FindDirWithout(path, previousRepository?.Name, 1) is string dirWithoutRepo)
-            {
-                return dirWithoutRepo;
-            }
-
-            return path;
-
-            string FindDirWithout(string dir, string match, int levels)
-            {
-                string dirWithout = null;
-                for (var i = 0; i < 2; i++)
+                try
                 {
-                    if (string.IsNullOrEmpty(dir))
+                    if (previousRepository != null && !string.IsNullOrEmpty(Path))
                     {
-                        break;
+                        var (path, layout) = RepositoryLayoutUtilities.GetDefaultPathAndLayout(Path, previousRepository.CloneUrl);
+                        Path = RepositoryLayoutUtilities.GetDefaultRepositoryPath(repository.CloneUrl, path, layout);
                     }
-
-                    var name = System.IO.Path.GetFileName(dir);
-                    dir = System.IO.Path.GetDirectoryName(dir);
-                    if (name == match)
+                    else
                     {
-                        dirWithout = dir;
+                        Path = RepositoryLayoutUtilities.GetDefaultRepositoryPath(repository.CloneUrl,
+                            service.DefaultClonePath, service.DefaultRepositoryLayout);
                     }
                 }
+                catch (Exception)
+                {
+                    // Reset illegal paths
+                    Path = RepositoryLayoutUtilities.GetDefaultRepositoryPath(repository.CloneUrl,
+                        service.DefaultClonePath, service.DefaultRepositoryLayout);
+                }
 
-                return dirWithout;
+                previousRepository = repository;
             }
         }
 
