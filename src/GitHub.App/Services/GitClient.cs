@@ -19,6 +19,7 @@ namespace GitHub.Services
     {
         static readonly ILogger log = LogManager.ForContext<GitClient>();
         readonly IGitService gitService;
+        readonly IGitHubCredentialProvider credentialProvider;
         readonly PullOptions pullOptions;
         readonly PushOptions pushOptions;
         readonly FetchOptions fetchOptions;
@@ -30,6 +31,7 @@ namespace GitHub.Services
             Guard.ArgumentNotNull(gitService, nameof(gitService));
 
             this.gitService = gitService;
+            this.credentialProvider = credentialProvider;
 
             pushOptions = new PushOptions { CredentialsProvider = credentialProvider.HandleCredentials };
             fetchOptions = new FetchOptions { CredentialsProvider = credentialProvider.HandleCredentials };
@@ -140,6 +142,22 @@ namespace GitHub.Services
                     throw;
 #endif
                 }
+            });
+        }
+
+        public Task<IDictionary<string, string>> ListReferences(IRepository repo, string remoteName)
+        {
+            return Task.Run<IDictionary<string, string>>(() =>
+            {
+                var dictionary = new Dictionary<string, string>();
+                var remote = repo.Network.Remotes[remoteName];
+                var refs = repo.Network.ListReferences(remote, credentialProvider.HandleCredentials);
+                foreach (var reference in refs)
+                {
+                    dictionary[reference.CanonicalName] = reference.TargetIdentifier;
+                }
+
+                return dictionary;
             });
         }
 
