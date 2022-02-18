@@ -2091,6 +2091,15 @@ namespace GitHub {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There aren&apos;t any open issues..
+        /// </summary>
+        public static string ThereArentAnyOpenIssues {
+            get {
+                return ResourceManager.GetString("ThereArentAnyOpenIssues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There aren&apos;t any open pull requests.
         /// </summary>
         public static string ThereArenTAnyOpenPullRequests {

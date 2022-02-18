@@ -54,6 +54,7 @@ namespace GitHub.ViewModels.GitHubPane
         readonly ObservableAsPropertyHelper<string> title;
         readonly ReactiveCommand<Unit, Unit> refresh;
         readonly ReactiveCommand<Unit, Unit> showPullRequests;
+        readonly ReactiveCommand<Unit, Unit> showIssues;
         readonly ReactiveCommand<Unit, Unit> openInBrowser;
         readonly ReactiveCommand<Unit, Unit> help;
         IDisposable connectionSubscription;
@@ -152,6 +153,9 @@ namespace GitHub.ViewModels.GitHubPane
                 ShowPullRequests,
                 this.WhenAny(x => x.Content, x => x.Value == navigator));
 
+            showIssues = ReactiveCommand.CreateFromTask(
+                ShowIssues,
+                this.WhenAny(x => x.Content, x => x.Value == navigator));
             openInBrowser = ReactiveCommand.Create(
                 () =>
                 {
@@ -312,6 +316,12 @@ namespace GitHub.ViewModels.GitHubPane
         }
 
         /// <inheritdoc/>
+        public Task ShowIssues()
+        {
+            return NavigateTo<IIssueListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
+        }
+
+        /// <inheritdoc/>
         public Task ShowPullRequests()
         {
             return NavigateTo<IPullRequestListViewModel>(x => x.InitializeAsync(LocalRepository, Connection));
@@ -381,6 +391,7 @@ namespace GitHub.ViewModels.GitHubPane
 
             var menuService = (IMenuCommandService)paneServiceProvider.GetService(typeof(IMenuCommandService));
             BindNavigatorCommand(menuService, PkgCmdIDList.pullRequestCommand, showPullRequests);
+            BindNavigatorCommand(menuService, PkgCmdIDList.issuesCommand, showIssues);
             BindNavigatorCommand(menuService, PkgCmdIDList.backCommand, navigator.NavigateBack);
             BindNavigatorCommand(menuService, PkgCmdIDList.forwardCommand, navigator.NavigateForward);
             BindNavigatorCommand(menuService, PkgCmdIDList.refreshCommand, refresh);

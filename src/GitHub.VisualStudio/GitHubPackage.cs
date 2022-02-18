@@ -31,6 +31,7 @@ using Serilog;
 using Task = System.Threading.Tasks.Task;
 using Microsoft;
 using static System.FormattableString;
+using GitHub.ViewModels.Documents;
 
 namespace GitHub.VisualStudio
 {

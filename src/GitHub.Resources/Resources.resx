@@ -866,6 +866,8 @@ https://git-scm.com/download/win</value>
   <data name="AndOthers" xml:space="preserve">
     <value>and others</value>
   </data>
+  <data name="ThereArentAnyOpenIssues" xml:space="preserve">
+    <value>There aren't any open issues.</value>
   <data name="ThisConversationWasMarkedAsResolved" xml:space="preserve">
     <value>This conversation was marked as resolved</value>
   </data>
@@ -879,8 +881,7 @@ https://git-scm.com/download/win</value>
     <value>Contributed to repositories</value>
   </data>
   <data name="OpenFromGitHubSearchOrEnterAUrl" xml:space="preserve">
-    <value>Search or enter a URL</value>
-    
+    <value>Search or enter a URL</value>    
   </data>
   <data name="OpenFromGitHubBrowse" xml:space="preserve">
     <value>Browse...</value>
