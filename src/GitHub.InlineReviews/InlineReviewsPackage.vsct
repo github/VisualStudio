@@ -64,6 +64,16 @@
           <LocCanonicalName>.GitHub.PreviousComment</LocCanonicalName>
         </Strings>
       </Button>
+      <Button guid="guidPullRequestFilterCommandPackageCmdSet" id="PullRequestFilterCommandId" priority="0x0400" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLBAR_PROJWIN_FILTERS" />
+        <Icon guid="guidGitHubInlineReviews" id="pullrequestfilter" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Pull Request Filter</ButtonText>
+        </Strings>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+      </Button>
       <Button guid="guidGitHubCommandSet" id="ToggleInlineCommentMarginId" type="Button">
         <CommandFlag>DefaultDisabled</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -91,13 +101,13 @@
       <IDSymbol name="ToggleInlineCommentMarginId" value="0x1003" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{775aa523-6c52-4c11-9c28-823c99d15613}" >
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    <GuidSymbol name="guidPullRequestFilterCommandPackageCmdSet" value="{7cde2dfc-43c9-41ff-bf2e-bef41cd99e09}">
+      <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="PullRequestFilterCommandId" value="0x0100" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidGitHubInlineReviews" value="{7b2a62fb-6aaa-4893-82c2-4895716a390c}" >
+      <IDSymbol name="pullrequestfilter" value="1" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
