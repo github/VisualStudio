@@ -2,7 +2,7 @@
 
 Some dialog views need a connection to operate - if there is no connection, a login dialog should be shown: for example, clicking Create Gist without a connection will first prompt the user to log in.
 
-Achieving this is simple, first make your view model interface implement `IConnectionInitializedViewModel` and do any initialization that requires a connection in the `InitializeAsync` method in your view model:
+Achieving this is simple. First make your view model interface implement `IConnectionInitializedViewModel` and do any initialization that requires a connection in the `InitializeAsync` method in your view model:
 
 ```csharp
 public Task InitializeAsync(IConnection connection)
