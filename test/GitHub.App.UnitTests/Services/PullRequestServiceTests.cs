@@ -578,8 +578,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IVSGitExt>(),
             Substitute.For<IApiClientFactory>(),
             Substitute.For<IGraphQLClientFactory>(),
-            serviceProvider.GetOperatingSystem(),
-            Substitute.For<IUsageTracker>());
+            serviceProvider.GetOperatingSystem());
         return service;
     }
 
@@ -692,8 +691,7 @@ public class PullRequestServiceTests : TestBaseClass
             Substitute.For<IVSGitExt>(),
             Substitute.For<IApiClientFactory>(),
             Substitute.For<IGraphQLClientFactory>(),
-            serviceProvider.GetOperatingSystem(),
-            Substitute.For<IUsageTracker>());
+            serviceProvider.GetOperatingSystem());
 
         IModelService ms = null;
         LocalRepositoryModel sourceRepo = null;
@@ -906,8 +904,7 @@ public class PullRequestServiceTests : TestBaseClass
                 Substitute.For<IVSGitExt>(),
                 Substitute.For<IApiClientFactory>(),
                 Substitute.For<IGraphQLClientFactory>(),
-                Substitute.For<IOperatingSystem>(),
-                Substitute.For<IUsageTracker>());
+                Substitute.For<IOperatingSystem>());
 
             var localRepo = new LocalRepositoryModel { };
             var result = await service.GetDefaultLocalBranchName(localRepo, 123, "コードをレビューする準備ができたこと");
@@ -1064,8 +1061,7 @@ public class PullRequestServiceTests : TestBaseClass
         IVSGitExt gitExt = null,
         IApiClientFactory apiClientFactory = null,
         IGraphQLClientFactory graphqlFactory = null,
-        IOperatingSystem os = null,
-        IUsageTracker usageTracker = null)
+        IOperatingSystem os = null)
     {
         gitClient = gitClient ?? Substitute.For<IGitClient>();
         gitService = gitService ?? Substitute.For<IGitService>();
@@ -1073,7 +1069,6 @@ public class PullRequestServiceTests : TestBaseClass
         apiClientFactory = apiClientFactory ?? Substitute.For<IApiClientFactory>();
         graphqlFactory = graphqlFactory ?? Substitute.For<IGraphQLClientFactory>();
         os = os ?? Substitute.For<IOperatingSystem>();
-        usageTracker = usageTracker ?? Substitute.For<IUsageTracker>();
 
         return new PullRequestService(
             gitClient,
@@ -1081,8 +1076,7 @@ public class PullRequestServiceTests : TestBaseClass
             gitExt,
             apiClientFactory,
             graphqlFactory,
-            os,
-            usageTracker);
+            os);
     }
 
     static BranchCollection MockBranches(params string[] names)
