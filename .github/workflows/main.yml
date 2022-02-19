@@ -1,0 +1,83 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+env:
+  config: Release
+  githubvsSolution: GitHubVS.sln
+  vsixContainer: ${{ github.workspace }}\GitHub.VisualStudio.vsix
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  
+# Controls when the action will run. Triggers the workflow on push or pull request 
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - name: Nerdbank.GitVersioning
+      uses: aarnott/nbgv@v0.3
+      id: nbgv
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
+
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x'
+
+    - name: Add VSTest to PATH
+      uses: darenm/Setup-VSTest@v1
+
+    - name: NuGet restore ${{ env.githubvsSolution }}
+      run: nuget restore ${{ env.githubvsSolution }}
+
+    - name: MSBuild ${{ env.githubvsSolution }}
+      run: |
+        msbuild ${{ env.githubvsSolution }} /p:Configuration=${{ env.config }} /p:TargetVsixContainer=${{ env.vsixContainer }} /p:DeployExtension=False /verbosity:minimal
+      env:
+        GitHubVS_ClientId: ${{ secrets.GitHubVS_ClientId }}
+        GitHubVS_ClientSecret: ${{ secrets.GitHubVS_ClientSecret }}
+
+    - name: Sign the VSIX
+      if: github.ref == 'refs/heads/master'
+      run: tools/vsixsigntool/vsixsigntool.exe sign /f certificate.pfx /p '${{ secrets.CERTIFICATE_PASSWORD }}' /sha1 9c5a6d389e1454f2ed9ee9419cdf743689709f9c /fd sha256 /tr http://timestamp.digicert.com /td sha256 ${{ env.vsixContainer }}
+      
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: GitHubVS-${{ steps.nbgv.outputs.SemVer2 }}
+        path: ${{ env.vsixContainer }}
+
+    # We need to run '**\bin\**\*Tests.dll'
+    - name: Run unit tests
+      shell: bash
+      run: |
+        vstest.console /TestAdapterPath:test /Settings:test/test.runsettings \
+          test/GitHub.Api.UnitTests/bin/${{ env.config }}/net46/GitHub.Api.UnitTests.dll \
+          test/GitHub.App.UnitTests/bin/${{ env.config }}/net46/GitHub.App.UnitTests.dll \
+          test/GitHub.Exports.Reactive.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.Reactive.UnitTests.dll \
+          test/GitHub.Exports.UnitTests/bin/${{ env.config }}/net46/GitHub.Exports.UnitTests.dll \
+          test/GitHub.Extensions.UnitTests/bin/${{ env.config }}/net46/GitHub.Extensions.UnitTests.dll \
+          test/GitHub.InlineReviews.UnitTests/bin/${{ env.config }}/net46/GitHub.InlineReviews.UnitTests.dll \
+          test/GitHub.Services.Vssdk.UnitTests/bin/${{ env.config }}/net461/GitHub.Services.Vssdk.UnitTests.dll \
+          test/GitHub.StartPage.UnitTests/bin/${{ env.config }}/net46/GitHub.StartPage.UnitTests.dll \
+          test/GitHub.TeamFoundation.UnitTests/bin/${{ env.config }}/net46/GitHub.TeamFoundation.UnitTests.dll \
+          test/GitHub.UI.UnitTests/bin/${{ env.config }}/net46/GitHub.UI.UnitTests.dll \
+          test/GitHub.VisualStudio.UnitTests/bin/${{ env.config }}/net46/GitHub.VisualStudio.UnitTests.dll \
+          test/MetricsTests/MetricsTests/bin/${{ env.config }}/MetricsTests.dll

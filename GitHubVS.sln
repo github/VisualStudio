@@ -13,7 +13,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{72036B62-2FA6-4A22-8B33-69F698A18CF1}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\main.yml = .github\workflows\main.yml
 		README.md = README.md
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHub.UI", "src\GitHub.UI\GitHub.UI.csproj", "{346384DD-2445-4A28-AF22-B45F3957BD89}"
@@ -29,33 +31,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submodules", "Submodules", "{1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}"
 	ProjectSection(SolutionItems) = preProject
 		test\UnitTests\Args.cs = test\UnitTests\Args.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\Modules\BuildUtils.psm1 = scripts\Modules\BuildUtils.psm1
-		scripts\Modules\Debugging.psm1 = scripts\Modules\Debugging.psm1
-		scripts\modules\Versioning.ps1 = scripts\modules\Versioning.ps1
-		scripts\modules\Vsix.ps1 = scripts\modules\Vsix.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{7B6C5F8D-14B3-443D-B044-0E209AE12BDF}"
-	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
-		scripts\build.ps1 = scripts\build.ps1
-		scripts\Bump-Version.ps1 = scripts\Bump-Version.ps1
-		scripts\common.ps1 = scripts\common.ps1
-		scripts\Get-CheckedOutBranch.ps1 = scripts\Get-CheckedOutBranch.ps1
-		scripts\Get-HeadSha1.ps1 = scripts\Get-HeadSha1.ps1
-		scripts\modules.ps1 = scripts\modules.ps1
-		nuget.config = nuget.config
-		scripts\Require-CleanWorkTree.ps1 = scripts\Require-CleanWorkTree.ps1
-		scripts\Run-CodeCoverage.ps1 = scripts\Run-CodeCoverage.ps1
-		scripts\Run-NUnit.ps1 = scripts\Run-NUnit.ps1
-		scripts\Run-Tests.ps1 = scripts\Run-Tests.ps1
-		scripts\Run-XUnit.ps1 = scripts\Run-XUnit.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8A7DA2E7-262B-4581-807A-1C45CE79CDFD}"
@@ -519,7 +494,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8E1F1B4E-AEA2-4AB1-8F73-423A903550A1} = {7B6C5F8D-14B3-443D-B044-0E209AE12BDF}
 		{1E7F7253-A6AF-43C4-A955-37BEDDA01AC0} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AB8}
 		{08DD4305-7787-4823-A53F-4D0F725A07F3} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}
 		{674B69B8-0780-4D54-AE2B-C15821FA51CB} = {1E7F7253-A6AF-43C4-A955-37BEDDA01AC0}

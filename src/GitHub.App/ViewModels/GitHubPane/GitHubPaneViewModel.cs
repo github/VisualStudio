@@ -160,6 +160,14 @@ namespace GitHub.ViewModels.GitHubPane
                 },
                 currentPage.Select(x => x is IOpenInBrowser));
 
+            BrowseRepository = ReactiveCommand.Create(
+                () =>
+                {
+                    var url = LocalRepository.CloneUrl.ToRepositoryUrl();
+                    if (url != null) browser.OpenUrl(url);
+                },
+                currentPage.Select(x => x is IOpenInBrowser));
+
             help = ReactiveCommand.Create(() => { });
             help.Subscribe(_ =>
             {
@@ -531,5 +539,7 @@ namespace GitHub.ViewModels.GitHubPane
             var routeFormat = "^" + new Regex("(:([a-z]+))\\b").Replace(route, @"(?<$2>[\w_.\-=]+)") + "$";
             return new Regex(routeFormat, RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
         }
+
+        public ReactiveCommand<Unit, Unit> BrowseRepository { get; }
     }
 }

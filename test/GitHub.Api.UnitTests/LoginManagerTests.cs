@@ -298,13 +298,30 @@ public class LoginManagerTests
             Assert.ThrowsAsync<IncorrectScopesException>(() => target.Login(host, client, "foo", "bar"));
         }
 
-        IGitHubClient CreateClient(User user = null, string[] responseScopes = null)
+        [TestCase("X-OAuth-Scopes")]
+        [TestCase("x-oauth-scopes")]
+        public void ValidResponseScopesDoesNotThrow(string scopesHeader)
+        {
+            var client = CreateClient(responseScopes: scopes, scopesHeader: scopesHeader);
+            client.Authorization.GetOrCreateApplicationAuthentication("id", "secret", Arg.Any<NewAuthorization>())
+                .Returns(CreateApplicationAuthorization("123abc"));
+
+            var keychain = Substitute.For<IKeychain>();
+            var tfa = new Lazy<ITwoFactorChallengeHandler>(() => Substitute.For<ITwoFactorChallengeHandler>());
+            var oauthListener = Substitute.For<IOAuthCallbackListener>();
+
+            var target = new LoginManager(keychain, tfa, oauthListener, "id", "secret", scopes, scopes);
+
+            Assert.DoesNotThrowAsync(() => target.Login(host, client, "foo", "bar"));
+        }
+
+        IGitHubClient CreateClient(User user = null, string[] responseScopes = null, string scopesHeader = "X-OAuth-Scopes")
         {
             var result = Substitute.For<IGitHubClient>();
             var userResponse = Substitute.For<IApiResponse<User>>();
             userResponse.HttpResponse.Headers.Returns(new Dictionary<string, string>
             {
-                {  "X-OAuth-Scopes", string.Join(",", responseScopes ?? scopes) }
+                {  scopesHeader, string.Join(",", responseScopes ?? scopes) }
             });
             userResponse.Body.Returns(user ?? new User());
             result.Connection.Get<User>(new Uri("user", UriKind.Relative), null, null).Returns(userResponse);

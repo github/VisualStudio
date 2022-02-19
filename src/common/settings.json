@@ -6,11 +6,6 @@
       "default": 'true'
     },
     {
-      "name": "EditorComments",
-      "type": "bool",
-      "default": "false"
-    },
-    {
       "name": "UIState",
       "type": "object",
       "typename": "UIState",
