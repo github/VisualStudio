@@ -6,7 +6,7 @@ This GitHub Extension enhances Visual Studio 2015 and Visual Studio 2017 by maki
 
 For more information about the extension, visit [https://visualstudio.github.com/](https://visualstudio.github.com/).
 
-For feedback and bug reports, please email [support@github.com](mailto:support@github.com).
+For feedback and bug reports, please contact [GitHub Support](https://support.github.com/).
 
 ## Features
 
