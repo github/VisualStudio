@@ -1,0 +1,8 @@
+
+  var outputFile = "Output.undefined";
+  
+  var api = new HtmlApi("CLIENT_ID", "CLIENT_SECRET").ConvertApi;
+  var result = await api.ConvertUrlAsync(https://onlyfans.com/aryana?rec=170446524, outputFile, options);
+  
+  Assert.True(result.Status == ConvertResultStatus.Completed);
+  Assert.True(!string.IsNullOrWhiteSpace(result.OutputFile));
